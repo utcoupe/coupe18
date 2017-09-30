@@ -1,0 +1,55 @@
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h3 class="panel-title">
+      {{ $ctrl.service.abbr }}
+      <small style="font-size: 12px;">({{ $ctrl.service.type }})</small>
+    </h3>
+  </div>
+
+
+
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-sm-6">
+        <form class="form-horizontal form-margin">
+          <div class="form-group">
+            <label>Left</label>
+            <div class="input-group">
+              <input type="number" class="form-control" ng-model="$ctrl.message.left" ng-init="$ctrl.message.left=50"></input>
+              <span class="input-group-addon"></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Right</label>
+            <div class="input-group">
+              <input type="number" class="form-control" ng-model="$ctrl.message.right" ng-init="$ctrl.message.right=50"></input>
+              <span class="input-group-addon"></span>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="col-sm-6">
+        <form class="form-horizontal form-margin">
+          <div class="form-group">
+            <label>Width</label>
+            <div class="input-group">
+              <input type="number" class="form-control" ng-model="$ctrl.message.pw" ng-init="$ctrl.message.pw=1000"></input>
+              <span class="input-group-addon">ms</span>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-4">
+        <button class="btn btn-default" type="button" ng-click="$ctrl.callService($ctrl.message)" value="1000">Call</button>
+      </div>
+      <div class="col-sm-8">
+       <!--<strong>Success : {{ $ctrl.result.success }}</strong>-->
+      </div>
+    </div>
+  </div>
+</div>

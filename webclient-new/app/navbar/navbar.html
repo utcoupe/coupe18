@@ -1,0 +1,23 @@
+<nav class="navbar navbar-default navbar-static-top">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#!/">
+        <img src="assets/images/ros-logo.svg" height="22px"></img>
+      </a>
+      <a class="navbar-brand" href="#!/">
+        <img src="assets/images/utcoupe-logo.png" height="35px"></img>
+      </a>
+      <span ng-if="$ctrl.ros.isConnected">Connected !</span>
+      <span ng-if="!$ctrl.ros.isConnected">Disconnected !</span>
+    </div>
+
+    <ul class="nav navbar-nav navbar-right">
+      <li ng-class="{ 'active': $ctrl.isPath('/') }"><a href="#!/">Diagnostic</a></li>
+      <li ng-class="{ 'active': $ctrl.isPath('/reseau') }"><a href="#!/reseau">Réseau</a></li>
+      <li ng-class="{ 'active': $ctrl.isPath('/simulateur') }"><a href="#!/simulateur">Simulateur</a></li>
+      <li ng-class="{ 'active': $ctrl.isPath('/hokuyo') }"><a href="#!/hokuyo">Hokuyo</a></li>
+      <li ng-class="{ 'active': $ctrl.isPath('/telecommande') }"><a href="#!/telecommande">Télécommande</a></li>
+      <li ng-class="{ 'active': $ctrl.isPath('/settings') }"><a href="#!/settings">Settings</a></li>
+    </ul>
+  </div>
+</nav>

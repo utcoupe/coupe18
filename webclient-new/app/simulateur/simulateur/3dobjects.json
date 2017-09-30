@@ -1,0 +1,1172 @@
+[
+     {
+        "name": "plateau",
+        "source": "3d/table_statique.dae",
+        "pos":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 2
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "plateau"
+    },
+    {
+        "name": "mod_lun00",
+        "source": "3d/mod_lun_bleu.dae",
+        "pos":
+        {
+            "x": 0.950,
+            "y": 0.0,
+            "z": 0.2
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "bleu"
+    },
+    {
+        "name": "mod_lun01",
+        "source": "3d/mod_lun_bleu.dae",
+        "pos":
+        {
+            "x": 0.2,
+            "y": 0.0,
+            "z": 0.6
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "bleu"
+    },
+    {
+        "name": "mod_lun02",
+        "source": "3d/mod_lun_bleu.dae",
+        "pos":
+        {
+            "x": 0.8,
+            "y": 0.0,
+            "z": 1.85
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "bleu"
+    },
+    {
+        "name": "mod_lun03",
+        "source": "3d/mod_lun_jaune.dae",
+        "pos":
+        {
+            "x": 2.050,
+            "y": 0.0,
+            "z": 0.2
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "jaune"
+    },
+    {
+        "name": "mod_lun04",
+        "source": "3d/mod_lun_jaune.dae",
+        "pos":
+        {
+            "x": 2.8,
+            "y": 0.0,
+            "z": 0.6
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "jaune"
+    },
+    {
+        "name": "mod_lun05",
+        "source": "3d/mod_lun_jaune.dae",
+        "pos":
+        {
+            "x": 2.2,
+            "y": 0.0,
+            "z": 1.85
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "jaune"
+    },
+    {
+        "name": "mod_lun06",
+        "source": "3d/mod_lun_bleu_jaune.dae",
+        "pos":
+        {
+            "x": 0.5,
+            "y": 0.0,
+            "z": 1.1
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "bleujaune"
+    },
+    {
+        "name": "mod_lun07",
+        "source": "3d/mod_lun_bleu_jaune.dae",
+        "pos":
+        {
+            "x": 0.9,
+            "y": 0.0,
+            "z": 1.4
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "bleujaune"
+    },
+    {
+        "name": "mod_lun08",
+        "source": "3d/mod_lun_bleu_jaune.dae",
+        "pos":
+        {
+            "x": 0.95,
+            "y": 0.0,
+            "z": 0.6
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "bleujaune"
+    },
+    {
+        "name": "mod_lun09",
+        "source": "3d/mod_lun_bleu_jaune.dae",
+        "pos":
+        {
+            "x": 2.5,
+            "y": 0.0,
+            "z": 1.1
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 180,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "bleujaune"
+    },
+    {
+        "name": "mod_lun10",
+        "source": "3d/mod_lun_bleu_jaune.dae",
+        "pos":
+        {
+            "x": 2.1,
+            "y": 0.0,
+            "z": 1.4
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 180,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "bleujaune"
+    },
+    {
+        "name": "mod_lun11",
+        "source": "3d/mod_lun_bleu_jaune.dae",
+        "pos":
+        {
+            "x": 2,
+            "y": 0.0,
+            "z": 0.6
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 180,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "bleujaune"
+    },
+    {
+        "name": "mod_lun12",
+        "source": "3d/mod_lun_bleu.dae",
+        "pos":
+        {
+            "x": 1.15,
+            "y": 0.0,
+            "z": 0.038
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "bleu"
+    },
+    {
+        "name": "mod_lun13",
+        "source": "3d/mod_lun_bleu.dae",
+        "pos":
+        {
+            "x": 1.15,
+            "y": 0.1,
+            "z": 0.038
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "bleu"
+    },
+    {
+        "name": "mod_lun14",
+        "source": "3d/mod_lun_bleu.dae",
+        "pos":
+        {
+            "x": 1.15,
+            "y": 0.2,
+            "z": 0.038
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "bleu"
+    },
+    {
+        "name": "mod_lun15",
+        "source": "3d/mod_lun_bleu.dae",
+        "pos":
+        {
+            "x": 1.15,
+            "y": 0.3,
+            "z": 0.038
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "bleu"
+    },
+    {
+        "name": "mod_lun16",
+        "source": "3d/mod_lun_jaune.dae",
+        "pos":
+        {
+            "x": 1.85,
+            "y": 0.0,
+            "z": 0.038
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "jaune"
+    },
+    {
+        "name": "mod_lun17",
+        "source": "3d/mod_lun_jaune.dae",
+        "pos":
+        {
+            "x": 1.85,
+            "y": 0.1,
+            "z": 0.038
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "jaune"
+    },
+    {
+        "name": "mod_lun18",
+        "source": "3d/mod_lun_jaune.dae",
+        "pos":
+        {
+            "x": 1.85,
+            "y": 0.2,
+            "z": 0.038
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "jaune"
+    },
+    {
+        "name": "mod_lun19",
+        "source": "3d/mod_lun_jaune.dae",
+        "pos":
+        {
+            "x": 1.85,
+            "y": 0.3,
+            "z": 0.038
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "jaune"
+    },
+    {
+        "name": "mod_lun20",
+        "source": "3d/mod_lun_bleu_jaune.dae",
+        "pos":
+        {
+            "x": 0.038,
+            "y": 0.0,
+            "z": 1.35
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 180,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "bleujaune"
+    },
+    {
+        "name": "mod_lun21",
+        "source": "3d/mod_lun_bleu_jaune.dae",
+        "pos":
+        {
+            "x": 0.038,
+            "y": 0.1,
+            "z": 1.35
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "bleujaune"
+    },
+    {
+        "name": "mod_lun22",
+        "source": "3d/mod_lun_bleu_jaune.dae",
+        "pos":
+        {
+            "x": 0.038,
+            "y": 0.2,
+            "z": 1.35
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 180,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "bleujaune"
+    },
+    {
+        "name": "mod_lun23",
+        "source": "3d/mod_lun_bleu_jaune.dae",
+        "pos":
+        {
+            "x": 0.038,
+            "y": 0.3,
+            "z": 1.35
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "bleujaune"
+    },
+    {
+        "name": "mod_lun24",
+        "source": "3d/mod_lun_bleu_jaune.dae",
+        "pos":
+        {
+            "x": 2.962,
+            "y": 0.0,
+            "z": 1.35
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "bleujaune"
+    },
+    {
+        "name": "mod_lun25",
+        "source": "3d/mod_lun_bleu_jaune.dae",
+        "pos":
+        {
+            "x": 2.962,
+            "y": 0.1,
+            "z": 1.35
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 180,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "bleujaune"
+    },
+    {
+        "name": "mod_lun26",
+        "source": "3d/mod_lun_bleu_jaune.dae",
+        "pos":
+        {
+            "x": 2.962,
+            "y": 0.2,
+            "z": 1.35
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "bleujaune"
+    },
+    {
+        "name": "mod_lun27",
+        "source": "3d/mod_lun_bleu_jaune.dae",
+        "pos":
+        {
+            "x": 2.962,
+            "y": 0.3,
+            "z": 1.35
+        },
+        "rotation":
+        {
+            "x": 0,
+            "y": 180,
+            "z": 0
+        },
+        "type": "mod_lun",
+        "couleur": "bleujaune"
+    },
+    {
+        "name": "pr_blue",
+        "source": "3d/pr_bleu.dae",
+        "pos":{
+            "x": 0.9,
+            "y": 0,
+            "z": 0.15
+        },
+        "type": "pr",
+        "couleur": "bleu",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "pr_yellow",
+        "source": "3d/pr_jaune.dae",
+        "pos":{
+            "x": 2.1,
+            "y": 0,
+            "z": 0.15
+        },
+        "type": "pr",
+        "couleur": "jaune",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "gr_blue",
+        "source": "3d/gr_bleu.dae",
+        "pos":{
+            "x": 0.15,
+            "y": 0,
+            "z": 0.15
+        },
+        "type": "gr",
+        "couleur": "bleu",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "gr_yellow",
+        "source": "3d/gr_jaune.dae",
+        "pos":{
+            "x": 2.85,
+            "y": 0,
+            "z": 0.15
+        },
+        "type": "gr",
+        "couleur": "jaune",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane01",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 0.65,
+            "y": 0,
+            "z": 0.6
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane02",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 0.70,
+            "y": 0,
+            "z": 0.57
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane03",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 0.65,
+            "y": 0,
+            "z": 0.54
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane04",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 0.70,
+            "y": 0,
+            "z": 0.51
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane05",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 0.60,
+            "y": 0,
+            "z": 0.51
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane06",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 2.35,
+            "y": 0,
+            "z": 0.6
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane07",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 2.40,
+            "y": 0,
+            "z": 0.57
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane08",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 2.35,
+            "y": 0,
+            "z": 0.54
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane09",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 2.40,
+            "y": 0,
+            "z": 0.51
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane10",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 2.30,
+            "y": 0,
+            "z": 0.51
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane11",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 1.07,
+            "y": 0,
+            "z": 1.930
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane12",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 1.12,
+            "y": 0,
+            "z": 1.90
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane13",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 1.07,
+            "y": 0,
+            "z": 1.87
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane14",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 1.12,
+            "y": 0,
+            "z": 1.84
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane15",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 1.02,
+            "y": 0,
+            "z": 1.84
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane16",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 1.93,
+            "y": 0,
+            "z": 1.930
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane17",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 1.98,
+            "y": 0,
+            "z": 1.90
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane18",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 1.93,
+            "y": 0,
+            "z": 1.87
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane19",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 1.98,
+            "y": 0,
+            "z": 1.84
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane20",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 1.88,
+            "y": 0,
+            "z": 1.84
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane21",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 0.45,
+            "y": 0,
+            "z": 1.85
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane22",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 0.40,
+            "y": 0,
+            "z": 1.88
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane24",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 0.2,
+            "y": 0,
+            "z": 1.55
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane25",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 0.05,
+            "y": 0,
+            "z": 1.7
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane26",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 0.2,
+            "y": 0,
+            "z": 1.8
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane27",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 0.2,
+            "y": 0,
+            "z": 1.95
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane28",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 0.35,
+            "y": 0,
+            "z": 1.92
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane29",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 0.3,
+            "y": 0,
+            "z": 1.8
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane30",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 0.35,
+            "y": 0,
+            "z": 1.5
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane31",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 2.55,
+            "y": 0,
+            "z": 1.85
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane32",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 2.6,
+            "y": 0,
+            "z": 1.88
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane34",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 2.8,
+            "y": 0,
+            "z": 1.55
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane35",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 2.95,
+            "y": 0,
+            "z": 1.7
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane36",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 2.8,
+            "y": 0,
+            "z": 1.8
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane37",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 2.8,
+            "y": 0,
+            "z": 1.95
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane38",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 2.65,
+            "y": 0,
+            "z": 1.92
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane39",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 2.7,
+            "y": 0,
+            "z": 1.8
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "titane40",
+        "source": "3d/titane.dae",
+        "pos":{
+            "x": 2.65,
+            "y": 0,
+            "z": 1.5
+        },
+        "type": "titane",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "name": "roche01",
+        "source": "3d/roche.dae",
+        "pos":{
+            "x": 2.85,
+            "y": 0,
+            "z": 1.5
+        },
+        "type": "roche",
+        "rotation":{
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    }
+]
