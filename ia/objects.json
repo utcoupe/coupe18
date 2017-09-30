@@ -1,0 +1,311 @@
+{
+    "balls": {
+        "front_left": {
+            "pos":
+            {
+                "x": 0,
+                "y": 2000
+            },
+			"d": 510,
+            "color": "blue",
+            "status": "initial"
+        },
+        "small_left": {
+			"pos":{
+				"x": 650,
+				"y": 540
+			},
+			"d": 240,
+            "color": "blue",
+            "status": "initial"
+        },
+        "small_right": {
+            "pos":
+            {
+                "x": 2350,
+                "y": 540
+            },
+			"d": 240,
+            "color": "yellow",
+            "status": "initial"
+        },
+        "small_front_left": {
+			"pos":{
+				"x": 1070,
+				"y": 1870
+			},
+			"d": 240,
+            "color": "blue",
+            "status": "initial"
+        },
+        "small_front_right": {
+            "pos":
+            {
+                "x": 1930,
+                "y": 1870
+            },
+			"d": 240,
+            "color": "yellow",
+            "status": "initial"
+        },
+        "front_right": {
+            "pos":
+            {
+                "x": 3000,
+                "y": 2000
+            },
+            "d": 510,
+            "color": "yellow",
+            "status": "initial"
+        },
+        "throw_left": {
+            "pos":
+            {
+                "x": 300,
+                "y": 800
+            },
+            "d": 0,
+            "color": "blue",
+            "status": "initial"
+        },
+        "throw_right": {
+            "pos":
+            {
+                "x": 300,
+                "y": 2200
+            },
+            "d": 0,
+            "color": "yellow",
+            "status": "initial"
+        }
+    },
+    "module": {
+        "mod_lun01": {
+            "pos":
+            {
+                "x": 200,
+                "y": 600
+            },
+            "d": 63,
+            "color": "blue",
+            "status": "initial"
+        },
+        "mod_lun02": {
+            "pos":
+            {
+                "x": 800,
+                "y": 1850
+            },
+            "d": 63,
+            "color": "blue",
+            "status": "initial"
+        },
+        "mod_lun04": {
+            "pos":
+            {
+                "x": 2800,
+                "y": 600
+            },
+            "d": 63,
+            "color": "yellow",
+            "status": "initial"
+        },
+        "mod_lun05": {
+            "pos":
+            {
+                "x": 2200,
+                "y": 1850
+            },
+            "d": 63,
+            "color": "yellow",
+            "status": "initial"
+        },
+        "mod_lun06": {
+            "pos":
+            {
+                "x": 500,
+                "y": 1100
+            },
+            "d": 63,
+            "color": "both",
+            "status": "initial"
+        },
+        "mod_lun07": {
+            "pos":
+            {
+                "x": 900,
+                "y": 1400
+            },
+            "d": 63,
+            "color": "both",
+            "status": "initial"
+        },
+        "mod_lun08": {
+            "pos":
+            {
+                "x": 1000,
+                "y": 600
+            },
+            "d": 63,
+            "color": "blue",
+            "realColor": "both",
+            "status": "initial"
+        },
+        "mod_lun09": {
+            "pos":
+            {
+                "x": 2500,
+                "y": 1100
+            },
+            "d": 63,
+            "color": "both",
+            "status": "initial"
+        },
+        "mod_lun10": {
+            "pos":
+            {
+                "x": 2100,
+                "y": 1400
+            },
+            "d": 63,
+            "color": "both",
+            "status": "initial"
+        },
+        "mod_lun11": {
+            "pos":
+            {
+                "x": 2000,
+                "y": 600
+            },
+            "d": 63,
+            "color": "yellow",
+            "realColor": "both",
+            "status": "initial"
+        }
+    },
+    "mountedModules": {
+        "left": {
+            "pos":
+            {
+                "x": 102,
+                "y": 925
+            },
+            "color": "both",
+            "status": "initial"
+        },
+        "middle_left": {
+            "pos":
+            {
+                "x": 1070,
+                "y": 1400
+            },
+            "color": "both",
+            "status": "initial"
+        },
+        "middle_center": {
+            "pos":
+            {
+                "x": 1500,
+                "y": 1300
+            },
+            "color": "both",
+            "status": "initial"
+        },
+        "middle_right": {
+            "pos":
+            {
+                "x": 1930,
+                "y": 1400
+            },
+            "color": "both",
+            "status": "initial"
+        },
+        "right": {
+            "pos":
+            {
+                "x": 2898,
+                "y": 925
+            },
+            "color": "both",
+            "status": "initial"
+        }
+    },
+    "rocket": {
+        "front_left_20>23": {
+            "pos":
+            {
+                "x": 38,
+                "y": 1350
+            },
+            "color": "both",
+            "status": "initial"
+        },
+        "front_right_24>27": {
+            "pos":
+            {
+                "x": 2962,
+                "y": 1350
+            },
+            "color": "both",
+            "status": "initial"
+        },
+        "rear_left_12>15": {
+            "pos":
+            {
+                "x": 1150,
+                "y": 38
+            },
+            "color": "blue",
+            "status": "initial"
+        },
+        "rear_right_16>19": {
+            "pos":
+            {
+                "x": 1850,
+                "y": 38
+            },
+            "color": "yellow",
+            "status": "initial"
+        }
+    },
+    "throwBalls": {
+        "left": {
+            "pos":
+            {
+                "x": 200,
+                "y": 400
+            },
+            "color": "blue",
+            "status": "initial"
+        },
+        "right": {
+            "pos":
+            {
+                "x": 2800,
+                "y": 400
+            },
+            "color": "yellow",
+            "status": "initial"
+        }
+    },
+    "seesaw": {
+        "left": {
+            "pos":
+            {
+                "x": 650,
+                "y": 180
+            },
+            "color": "blue",
+            "status": "initial"
+        },
+        "right": {
+            "pos":
+            {
+                "x": 2350,
+                "y": 180
+            },
+            "color": "yellow",
+            "status": "initial"
+        }
+    }
+}

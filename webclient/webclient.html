@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html style="height:100%" ng-app="app">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Webclient UTCoupe</title>
+
+		<link rel="stylesheet" type="text/css" href="lib/bootstrap/css/bootstrap.min.css">
+		<link rel="stylesheet" type="text/css" href="webclient.css">
+
+		<script src="lib/angular.min.js"></script>
+		<script src="lib/angular-route.min.js"></script>
+		<script src="lib/jquery-2.1.1.min.js"></script>
+		<script src="lib/raphael.min.js"></script>
+		<!-- <script src="lib/socket.io.js"></script> -->
+		<script src="../node_modules/socket.io-client/dist/socket.io.js"></script>
+		<script src="lib/bootstrap/js/bootstrap.min.js"></script>
+		
+		<!-- ************************* Simulateur ************************* -->
+
+		<script src="../simulateur/three/three.min.js"></script>
+		<script src="../simulateur/three/OrbitControls.js"></script>
+		<script src="../simulateur/three/ColladaLoader.js"></script>
+		<script src="../simulateur/three/loader.js"></script>
+
+		<script type="text/javascript" src="../simulateur/getParsedJSONFromFile.js"></script>
+        <script type="text/javascript" src="../simulateur/position.class.js"></script>
+        <script type="text/javascript" src="../simulateur/object3d.class.js"></script>
+        <script type="text/javascript" src="../simulateur/controller.class.js"></script>
+        <script type="text/javascript" src="../simulateur/robot.class.js"></script>
+        
+
+		<script src="socket_webclient.class.js"></script>
+		<script src="webclient.js"></script>
+		<script src="index.js"></script>
+		<script src="pages/orders/orders.js"></script>
+		<script src="pages/reseau/reseau.js"></script>
+		<script src="pages/logger/logger.js"></script>
+		<script src="pages/simulateur/simulateur.js"></script>
+		<script src="pages/hokuyo/hokuyoDisplay.class.js"></script>
+		<script src="pages/hokuyo/hokuyo.js"></script>
+
+		<!-- telecommande -->
+		<script src="pages/telecommande/robotdisplay.class.js"></script>
+		<script src="pages/telecommande/tibotdisplay.class.js"></script>
+		<script src="pages/telecommande/grobotdisplay.class.js"></script>
+		<script src="pages/telecommande/telecommande.js"></script>
+
+
+	</head>
+	<body style="height:100%" >
+		<div ng-controller="AppCtrl">
+			<div id="div_menu" ng-include="'menu.tpl.html'"></div>
+			<div ng-view class="container-fluid"></div>
+		</div>
+
+	</body>
+</html>

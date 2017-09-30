@@ -1,0 +1,469 @@
+{
+  "__comment": "\nUse duration ?\nDetermine priorities\nFront of robots ? -> angles\nDuplicate uncolored actions, mirror colored",
+  "actions":{
+    "take_module_08":{
+      "type": "module",
+      "owner": "pr",
+      "objectname": "module__mod_lun08",
+      "startpoints": [{
+        "x": 1000,
+        "y": 505,
+        "a": -0.8
+      }],
+      "direction": "backward",
+      "priority": 150,
+      "dependency": "",
+      "dependencyRobotContent": {
+        "supModule": 1,
+        "infModule": 0
+      },
+      "preparation_orders":[{
+        "dest": "unit_grabber",
+        "name": "openArm",
+        "params": {}
+      }],
+      "orders":[{
+        "dest": "unit_grabber",
+        "name": "take_module",
+        "params": {
+          "rocket": false,
+          "nb_modules_to_take": 1
+        }
+      }],
+      "kill": null
+    },
+    "take_module_11":{
+      "type": "module",
+      "owner": "pr",
+      "objectname": "module__mod_lun11",
+      "startpoints": [{
+        "x": 2000,
+        "y": 505,
+        "a": -0.8
+      }],
+      "direction": "backward",
+      "priority": 150,
+      "dependency": "",
+      "dependencyRobotContent": {
+        "supModule": 1,
+        "infModule": 0
+      },
+      "preparation_orders":[{
+        "dest": "unit_grabber",
+        "name": "openArm",
+        "params": {}
+      }],
+      "orders":[{
+        "dest": "unit_grabber",
+        "name": "take_module",
+        "params": {
+          "rocket": false,
+          "nb_modules_to_take": 1
+        }
+      }],
+      "kill": null
+    },
+    "drop_module_border_left":{
+      "type": "drop_module",
+      "owner": "pr",
+      "objectname": "mountedModules__left",
+      "startpoints": [{
+        "x": 150,
+        "y": 1100,
+        "a": 2.3707
+      }],
+      "direction": "whatever",
+      "priority": 80,
+      "dependency": "",
+      "dependencyRobotContent": {
+        "infModule": 2
+      },
+      "preparation_orders":[{
+        "dest": "base_constructor",
+        "name": "prepare_module",
+        "params": {
+          "color": "TO_BE_FILLED_BY_IA",
+          "push_toward": "right"
+        }
+      }],
+      "orders":[{
+        "dest": "base_constructor",
+        "name": "drop_module",
+        "params": {
+          "nb_modules_to_drop": 3
+        }
+      }],
+      "kill": null
+    },
+    "drop_module_middle_left_1":{
+      "type": "drop_module",
+      "owner": "pr",
+      "objectname": "mountedModules__middle_left",
+      "startpoints": [{
+        "x": 1020,
+        "y": 1350,
+        "a": -0.7853
+      }],
+      "direction": "forward",
+      "priority": 92,
+      "dependency": "",
+      "dependencyRobotContent": {
+        "infModule": 3
+      },
+      "preparation_orders":[{
+        "dest": "base_constructor",
+        "name": "prepare_module",
+        "params": {
+          "color": "TO_BE_FILLED_BY_IA",
+          "push_toward": "right"
+        }
+      }],
+      "orders":[{
+        "dest": "base_constructor",
+        "name": "drop_module",
+        "params": {}
+      }],
+      "kill": null
+    },
+    "drop_module_middle_left_2":{
+      "type": "drop_module",
+      "owner": "pr",
+      "objectname": "mountedModules__middle_left",
+      "startpoints": [{
+        "x": 1150,
+        "y": 1400,
+        "a": 2.3561
+      }],
+      "direction": "backward",
+      "priority": 149,
+      "dependency": "",
+      "dependencyRobotContent": {
+        "infModule": 3
+      },
+      "preparation_orders":[{
+        "dest": "base_constructor",
+        "name": "prepare_module",
+        "params": {
+          "color": "TO_BE_FILLED_BY_IA",
+          "push_toward": "left"
+        }
+      }],
+      "orders":[{
+        "dest": "base_constructor",
+        "name": "drop_module",
+        "params": {}
+      }],
+      "kill": null
+    },
+    "drop_module_middle_center_1":{
+      "type": "drop_module",
+      "owner": "pr",
+      "objectname": "mountedModules__middle_center",
+      "startpoints": [{
+        "x": 1445,
+        "y": 1350,
+        "a": 0.01
+      }],
+      "direction": "backward",
+      "priority": 140,
+      "dependency": "",
+      "dependencyRobotContent": {
+        "infModule": 1
+      },
+      "preparation_orders":[{
+        "dest": "base_constructor",
+        "name": "prepare_module",
+        "params": {
+          "color": "TO_BE_FILLED_BY_IA",
+          "push_toward": "right"
+        }
+      }],
+      "orders":[{
+        "dest": "base_constructor",
+        "name": "drop_module",
+        "params": {}
+      }],
+      "kill": null
+    },
+    "drop_module_middle_center_2":{
+      "type": "drop_module",
+      "owner": "pr",
+      "objectname": "mountedModules__middle_center",
+      "startpoints": [{
+        "x": 1555,
+        "y": 1350,
+        "a": 3.1415
+      }],
+      "direction": "backward",
+      "priority": 140,
+      "dependency": "",
+      "dependencyRobotContent": {
+        "infModule": 1
+      },
+      "preparation_orders":[{
+        "dest": "base_constructor",
+        "name": "prepare_module",
+        "params": {
+          "color": "TO_BE_FILLED_BY_IA",
+          "push_toward": "left"
+        }
+      }],
+      "orders":[{
+        "dest": "base_constructor",
+        "name": "drop_module",
+        "params": {}
+      }],
+      "kill": null
+    },
+    "drop_module_middle_right_1":{
+      "type": "drop_module",
+      "owner": "pr",
+      "objectname": "mountedModules__middle_right",
+      "startpoints": [{
+        "x": 1860,
+        "y": 1400,
+        "a": 0.7853
+      }],
+      "direction": "backward",
+      "priority": 140,
+      "dependency": "",
+      "dependencyRobotContent": {
+        "infModule": 1
+      },
+      "preparation_orders":[{
+        "dest": "base_constructor",
+        "name": "prepare_module",
+        "params": {
+          "color": "TO_BE_FILLED_BY_IA",
+          "push_toward": "right"
+        }
+      }],
+      "orders":[{
+        "dest": "base_constructor",
+        "name": "drop_module",
+        "params": {}
+      }],
+      "kill": null
+    },
+    "drop_module_middle_right_2":{
+      "type": "drop_module",
+      "owner": "pr",
+      "objectname": "mountedModules__middle_right",
+      "startpoints": [{
+        "x": 1980,
+        "y": 1450,
+        "a": -2.3561
+      }],
+      "direction": "backward",
+      "priority": 88,
+      "dependency": "",
+      "dependencyRobotContent": {
+        "infModule": 3
+      },
+      "preparation_orders":[{
+        "dest": "base_constructor",
+        "name": "prepare_module",
+        "params": {
+          "color": "TO_BE_FILLED_BY_IA",
+          "push_toward": "left"
+        }
+      }],
+      "orders":[{
+        "dest": "base_constructor",
+        "name": "drop_module",
+        "params": {}
+      }],
+      "kill": null
+    },
+    "seesaw_left_step_1":{
+      "type": "seesaw",
+      "owner": "gr",
+      "objectname": "seesaw__left",
+      "startpoints": [{
+        "x": 600,
+        "y": 180,
+        "a": 3.1415
+      }],
+      "direction": "backward",
+      "priority": 250,
+      "dependency": "",
+      "orders":[{
+        "dest": "gr",
+        "name": "climb_seesaw",
+        "params": {}
+      }],
+      "kill": null
+    },
+    "seesaw_left_step_2":{
+      "type": "seesaw",
+      "owner": "gr",
+      "objectname": "seesaw__left",
+      "startpoints": [{
+        "x": 750,
+        "y": 180
+      }],
+      "direction": "backward",
+      "priority": 200,
+      "dependency": "",
+      "orders":[   
+      ],
+      "kill": null
+    },
+      "seesaw_left_step_3":{
+      "type": "seesaw",
+      "owner": "gr",
+      "objectname": "seesaw__left",
+      "startpoints": [{
+        "x": 1110,
+        "y": 400,
+	"a": -2.6
+      }],
+      "direction": "backward",
+      "priority": 198,
+      "dependency": "",
+      "orders":[
+      ],
+      "kill": null
+    },
+    "seesaw_right_step_1":{
+      "type": "seesaw",
+      "owner": "gr",
+      "objectname": "seesaw__right",
+      "startpoints": [{
+        "x": 2400,
+        "y": 180,
+        "a": 0.01
+      }],
+      "direction": "backward",
+      "priority": 250,
+      "dependency": "",
+      "orders":[{
+        "dest": "gr",
+        "name": "climb_seesaw",
+        "params": {}
+      }],
+      "kill": null
+    },
+    "seesaw_right_step_2":{
+      "type": "seesaw",
+      "owner": "gr",
+      "objectname": "seesaw__right",
+      "startpoints": [{
+        "x": 2250,
+        "y": 180
+      }],
+      "direction": "backward",
+      "priority": 200,
+      "dependency": "",
+      "orders":[
+      ],
+      "kill": null
+    },
+    "seesaw_right_step_3":{
+      "type": "seesaw",
+      "owner": "gr",
+      "objectname": "seesaw__right",
+      "startpoints": [{
+        "x": 1890,
+        "y": 400,
+        "a": -1.03
+      }],
+      "direction": "backward",
+      "priority": 198,
+      "dependency": "",
+      "orders":[
+      ],
+      "kill": null
+    },
+    "catch_balls_front_left":{
+      "type": "catch_balls",
+      "owner": "gr",
+      "objectname": "balls__front_left",
+      "startpoints": [{
+        "x": 600,
+                "y": 1400,
+                "a": -0.7853
+      }],
+      "direction": "backward",
+      "priority": 120,
+      "dependency": "",
+      "preparation_orders":[{
+        "dest": "sweeper",
+        "name": "turn_on",
+        "params": {}
+      }],
+      "orders":[{
+        "dest": "sweeper",
+        "name": "swallow_balls",
+        "params": {}
+        }],
+      "kill": null
+    },
+    "catch_balls_front_right":{
+      "type": "catch_balls",
+      "owner": "gr",
+      "objectname": "balls__front_right",
+      "startpoints": [{
+        "x": 2400,
+                "y": 1400,
+                "a": -2.356
+      }],
+      "direction": "backward",
+      "priority": 120,
+      "dependency": "",
+      "preparation_orders":[{
+        "dest": "sweeper",
+        "name": "turn_on",
+        "params": {}
+      }],
+      "orders":[{
+        "dest": "sweeper",
+        "name": "swallow_balls",
+        "params": {}
+        }],
+      "kill": null
+    },
+    "throw_balls_left":{
+      "type": "throw_balls",
+      "owner": "gr",
+      "objectname": "balls__throw_left",
+      "startpoints": [{
+        "x": 300,
+                "y": 800,
+                "a": -1.570796
+      }],
+      "direction": "forward",
+      "priority": 119,
+      "dependency": "",
+      "orders":[{
+        "dest": "canon",
+        "name": "throw_balls",
+        "params": {
+          "dist": 100
+        }
+        }],
+      "kill": null
+    },
+    "throw_balls_right":{
+      "type": "throw_balls",
+      "owner": "gr",
+      "objectname": "balls__throw_right",
+      "startpoints": [{
+        "x": 2700,
+                "y": 800,
+                "a": -1.570796
+      }],
+      "direction": "forward",
+      "priority": 119,
+      "dependency": "",
+      "orders":[{
+        "dest": "canon",
+        "name": "throw_balls",
+        "params": {
+          "dist": 100
+        }
+        }],
+      "kill": null
+    }
+  }
+}

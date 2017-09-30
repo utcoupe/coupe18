@@ -1,0 +1,141 @@
+body{
+	margin: 0px;
+	display: block;
+}
+
+#page{
+	margin: auto;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.rects{
+	/*width: 20%;*/
+	height: 100%;
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	flex: 3;
+}
+
+.arrows{
+	/*width: 6.65%;*/
+	height: 100%;
+	float: left;
+	flex: 1;
+}
+
+.thing{
+	/*max-height: 25%;*/
+	min-height: 62px;
+	border: solid lightgray 1px;
+	border-radius: 10px;
+	margin-top: 5%;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	text-align: left;
+	padding-left: 30%;
+}
+
+div.green{
+	border: green solid 1px;
+}
+
+div.yellow{
+	border: gold solid 1px;
+}
+
+div.blue{
+	border: dodgerblue solid 1px;
+}
+
+div.error{
+	border: firebrick solid 1px;
+}
+
+div.waiting{
+	opacity: 0.5;
+}
+
+div.ok{
+	border: orange solid 1px;
+}
+
+div.starting{
+	opacity: 0.5;
+	border: yellow solid 1px;
+}
+
+div.everythingIsAwesome{ 
+	border: greenyellow solid 1px;
+}
+
+.devicerobot {
+	background: url('./img/electronic58.png') no-repeat;
+	background-position: 5% 50%;
+}
+
+.devicesimu {
+	background: url('./img/seo1.png') no-repeat;
+	background-position: 5% 50%;
+}
+
+.deviceia {
+	background: url('./img/three115.png') no-repeat;
+	background-position: 5% 50%;
+}
+
+.deviceserver {
+	background: url('./img/server40.png') no-repeat;
+	background-position: 5% 50%;
+}
+
+.devicesmartphone {
+	background: url('./img/smartphone11.png') no-repeat;
+	background-size: 10%;
+	background-position: 5% 50%;
+}
+
+.devicelaptop {
+	background: url('./img/laptop107.png') no-repeat;
+	background-position: 5% 50%;
+}
+
+.devicehok {
+	background: url('./img/radar8.png') no-repeat;
+	background-position: 5% 50%;
+}
+
+.devicelidar {
+	background: url('./img/radar8.png') no-repeat;
+	background-position: 5% 50%;
+}
+
+.devicetablet {
+	background: url('./img/tablet82.png') no-repeat;
+	background-size: 25%;
+	background-position: 5% 50%;
+}
+
+.devicearduino {
+	background: url('./img/arduino.png') no-repeat;
+	background-size: 25%;
+	background-position: 5% 50%;
+}
+
+h3 {
+	margin-bottom: 0px;
+	margin-top: 0px;
+}
+
+span{
+	padding-top: 2px;
+}
+
+path {
+	stroke:lightblue;
+	stroke-width: 1.25px;
+	fill: none;
+}

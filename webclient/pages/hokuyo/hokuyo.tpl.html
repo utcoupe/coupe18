@@ -1,0 +1,34 @@
+<style type="text/css">
+	@import url(pages/hokuyo/hokuyo.css);
+</style>
+<div ng-controller="HokuyoCtrl">
+    <div class="hokuyo">
+<!--     	Test 1
+        {{test}}
+        <input type="number" ng-model="test3" ></input> -->
+
+
+		<div class="test" style="display: none;">
+			<span class="legend">Name:</span>
+			<input type="text" ng-model="name"/>
+			<br />
+			<span class="legend">From:</span>
+			<input type="text" ng-model="from"/>
+			<br />
+			<textarea ng-model="data" rows="20" cols="45"></textarea>
+			<br />
+			<button type="button" class="btn" ng-click="update()">Mettre à jour</button> 
+		</div>
+
+		<div id="mainHokDisp" name="mainHokDisp">
+		</div>
+
+		<div id="singleHokDisps" name="singleHokDisps" >
+			<div id="hok1" name="hok1" class="singleHokDisp" >
+			</div>
+
+			<div id="hok2" name="hok2" class="singleHokDisp" >
+			</div>
+		</div>
+    </div>
+</div>

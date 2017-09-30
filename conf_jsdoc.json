@@ -1,0 +1,47 @@
+{
+    "tags": {
+        "allowUnknownTags": true,
+        "dictionaries": ["jsdoc","closure"]
+    },
+    "source": {
+        "include": [
+            "package.json",
+            "README.md",
+            "utcoupe",
+            "server",
+            "config.js",
+            "ia",
+            "clients",
+            "clients/asserv",
+            "clients/robot",
+            "clients/extension",
+            "clients/actuators",
+            "clients/shared",
+            "simulateur",
+            "webclient/pages/simulateur/simulateur.js"],
+        "includePattern": ".+\\.js(doc|x)?$",
+        "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "plugins": [],
+    "templates": {
+        "cleverLinks": false,
+        "monospaceLinks": false,
+        "dateFormat": "ddd MMM Do YYYY",
+        "outputSourceFiles": true,
+        "outputSourcePath": true,
+        "systemName": "UTCoupe 17",
+        "footer": "",
+        "copyright": "DocStrap Copyright © 2012-2015 The contributors to the JSDoc3 and DocStrap projects.",
+        "navType": "vertical",
+        "theme": "cyborg",
+        "linenums": true,
+        "collapseSymbols": false,
+        "inverseNav": true,
+        "protocol": "html://",
+        "methodHeadingReturns": false
+    },
+    "opts": {
+        "destination": "./doc/",
+        "template": "node_modules/ink-docstrap/template"
+    }
+}

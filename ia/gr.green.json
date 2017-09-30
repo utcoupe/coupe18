@@ -1,0 +1,69 @@
+{
+	"pos": {
+		"x": 110,
+		"y": 1000,
+		"a": 0
+	},
+	"script": [
+		{
+			"name": "setpid",
+			"data": {
+				"p": 1.2,
+				"i": 20,
+				"d": 5
+			}
+		},{
+			"name": "setpos",
+			"data": {
+				"x": 130,
+				"y": 1000,
+				"a": 0,
+				"color": "green"
+			}
+		},{
+			"name": "acheter",
+			"data": {}
+		},{
+			"name": "setvit",
+			"data": {
+				"v": 500,
+				"r": 0.3
+			}
+		},{
+			"name": "goxy",
+			"data": {
+				"x": 1245,
+				"y": 1000
+			}
+		},{
+			"name": "goa",
+			"data": {
+				"a": 1.5708
+			}
+		},{
+			"name": "setvit",
+			"data": {
+				"v": 150,
+				"r": 0.3
+			}
+		},{
+			"name": "goxy",
+			"data": {
+				"x": 1245,
+				"y": 1510
+			}
+		},{
+			"name": "vendre",
+			"data": {}
+		},{
+			"name": "goxy",
+			"data": {
+				"x": 1245,
+				"y": 1800
+			}
+		},{
+			"name": "acheter",
+			"data": {}
+		}
+	]
+}

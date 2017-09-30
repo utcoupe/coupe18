@@ -1,0 +1,87 @@
+<div ng-controller="IndexCtrl">
+	<!-- <ul>
+		<li ng-repeat="(name, launched) in utcoupe">
+			<span class="utcoupe" ng-class="{launched: launched}" >{{ name }}</span>
+			<button type="button" class="btn" ng-hide="launched" ng-click="launch(name)">Lancer</button>
+			<button type="button" class="btn" ng-show="launched" ng-click="stop(name)">Arrêter</button>
+			<br /><br />
+		</li>
+	</ul>
+	<p>Color: <span style="color:{{ our_color }}">{{ our_color }}</span> ; Changer pour
+	<button class="btn" ng-show="our_color=='yellow'" ng-click="our_color='blue'">Blue</button>
+	<button class="btn" ng-show="our_color=='blue'" ng-click="our_color='yellow'">Yellow</button>
+	</p> -->
+	<li>
+		<span>Serveur websocket</span>
+		<button type="button" class="btn" ng-class="{activeButton: utcoupe.isServerVerbose}" ng-click="toogleVerbose()">Verbose</button>
+	</li>
+	<li>
+		<span class="utcoupe" ng-class="{launched: utcoupe.ia}" >IA</span>
+		<button type="button" class="btn" ng-hide="utcoupe.ia" ng-click="spawn('ia')">Lancer</button> 
+		<button type="button" class="btn" ng-show="utcoupe.ia" ng-click="kill('ia')">Arrêter</button>
+		<button type="button" class="btn" ng-show="utcoupe.ia" ng-click="jack()">Jack</button> <br/>
+		<span class="legend">Color:</span>
+		<span style="color:{{ our_color }};" class="config" >{{ our_color }}</span>
+		<button class="btn" ng-show="our_color=='yellow'" ng-disabled="utcoupe.ia" ng-click="our_color='blue'">Blue</button>
+		<button class="btn" ng-show="our_color=='blue'" ng-disabled="utcoupe.ia" ng-click="our_color='yellow'">Yellow</button>
+		<br />
+		<span class="legend">We have hats:</span> <span class="config" >{{ we_have_hats }}</span>
+		<button class="btn" ng-show="we_have_hats==false" ng-disabled="utcoupe.ia" ng-click="we_have_hats=true">true</button>
+		<button class="btn" ng-show="we_have_hats==true"  ng-disabled="utcoupe.ia" ng-click="we_have_hats=false">false</button>
+		<br />
+		
+		<!--
+		<span class="legend">Erobots:</span> <span class="config" >{{ nb_erobots }}</span>
+		<button class="btn" ng-show="nb_erobots==1" ng-disabled="utcoupe.ia" ng-click="nb_erobots=2">2</button>
+		<button class="btn" ng-show="nb_erobots==2"  ng-disabled="utcoupe.ia" ng-click="nb_erobots=1">1</button>
+		<br />
+		<div ng-show="nb_erobots>=1" >
+			<span class="legend">Diamètre EGR:</span> <span class="config" >{{ EGR_d }}mm</span>
+			<input type="text" ng-model="EGR_d" />
+		</div>
+		<div ng-show="nb_erobots>=2" >
+			<span class="legend">Diamètre EPR:</span> <span class="config" >{{ EPR_d }}mm</span>
+			<input type="text" ng-model="EPR_d" />
+		</div>
+ 		-->
+		<br /><br />
+	</li>
+	<li>
+		<span class="utcoupe" ng-class="{launched: utcoupe.gr}" >GR</span>
+		<button type="button" class="btn" ng-hide="utcoupe.gr" ng-click="spawn('gr')">Lancer</button> 
+		<button type="button" class="btn" ng-show="utcoupe.gr" ng-click="kill('gr')">Arrêter</button>
+		<button type="button" class="btn" ng-click="start('gr')">Start</button>
+		<button type="button" class="btn" ng-click="stop('gr')">Stop</button>
+		<button type="button" class="btn" ng-click="place('gr')">Placer</button>
+		<!-- /!\ Met du temps à cause du sudo /!\ -->
+		<br /><br />
+	</li>
+	<li>
+		<span class="utcoupe" ng-class="{launched: utcoupe.pr}" >PR</span>
+		<button type="button" class="btn" ng-hide="utcoupe.pr" ng-click="spawn('pr')">Lancer</button> 
+		<button type="button" class="btn" ng-show="utcoupe.pr" ng-click="kill('pr')">Arrêter</button>
+		<button type="button" class="btn" ng-click="start('pr')">Start</button>
+		<button type="button" class="btn" ng-click="stop('pr')">Stop</button>
+		<button type="button" class="btn" ng-click="place('pr')">Placer</button>
+		<br /><br />
+	</li>
+	<li>
+		<span class="utcoupe" ng-class="{launched: utcoupe.lidar}" >Lidar</span>
+		<button type="button" class="btn" ng-hide="utcoupe.lidar" ng-click="spawn('lidar')">Lancer</button> 
+		<button type="button" class="btn" ng-show="utcoupe.lidar" ng-click="kill('lidar')">Arrêter</button> 
+		<button type="button" class="btn" ng-show="utcoupe.lidar" ng-click="resumeLidar()">Start avec couleur</button>
+		<button type="button" class="btn" ng-show="utcoupe.lidar" ng-click="pauseLidar()">Stop</button>
+		<button type="button" class="btn" ng-show="utcoupe.lidar" ng-click="calibLidar()">Recalage</button>
+		<br /><br />
+	</li>
+	<li>
+		<span class="utcoupe" ng-class="{launched: utcoupe.hokuyo}" >Hokuyo</span>
+		<button type="button" class="btn" ng-hide="utcoupe.hokuyo" ng-click="spawn('hokuyo')">Lancer</button> 
+		<button type="button" class="btn" ng-show="utcoupe.hokuyo" ng-click="kill('hokuyo')">Arrêter</button> 
+		<button type="button" class="btn" ng-click="startC()">Lancer le C</button>
+		<button type="button" class="btn" ng-click="stopC()">Stopper le C</button>
+		<button type="button" class="btn" ng-click="calibration()">Calibration</button>
+		<br /><br />
+	</li>
+	<div ng-include="'pages/logger/logger.tpl.html'"></div>
+</div>

@@ -1,0 +1,38 @@
+li {
+	font-size: 18px;
+	list-style-type: none;
+}
+
+.utcoupe {
+	color: red;
+}
+.utcoupe.launched {
+	color: green;
+}
+
+.activeButton {
+	background-color: #81E939;
+}
+
+.config {
+	color: #fff;
+	background: #000;
+	padding: 5px;
+	border-radius: 3px;
+}
+.legend {
+	width: 200px;
+	display: inline-block;
+}
+
+.logger{
+	background: black;
+	color: white;
+	padding: 3px;
+}
+
+.logger_head{
+	min-width: 6em;
+	color: DeepPink;
+	display: inline-block;
+}

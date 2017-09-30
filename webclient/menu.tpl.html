@@ -1,0 +1,13 @@
+<nav class="navbar navbar-default" ng-controller="MenuCtrl">
+	<div class="container-fluid">
+		<ul class="nav navbar-nav">
+			<li ng-class="{active:act_page=='index'}"><a href="#/">Home</a></li>
+			<li ng-class="{active:act_page=='reseau'}"><a href="#/reseau">Réseau</a></li>
+			<li ng-class="{active:act_page=='simulateur'}"><a href="#/simulateur">Simulateur</a></li>
+			<li ng-class="{active:act_page=='hokuyo'}"><a href="#/hokuyo">Hokuyo</a></li>
+			<li ng-class="{active:act_page=='orders'}"><a href="#/orders">Orders</a></li>
+			<!-- <li><a href="#/logger">Logger</a></li> -->
+			<li ng-class="{active:act_page=='telecommande'}"><a href="#/telecommande">Télécommande</a></li>
+		</ul>
+	</div>
+</nav>
