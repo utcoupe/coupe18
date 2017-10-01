@@ -21,7 +21,10 @@ gulp.task('js-vendor', function () {
     'node_modules/eventemitter2/lib/eventemitter2.js',
     'node_modules/raphael/raphael.js',
     'node_modules/jquery/dist/jquery.js',
-    'node_modules/three/build/three.js'
+    'node_modules/three/build/three.js',
+    'node_modules/chart.js/dist/Chart.js',
+    'node_modules/angular-chart.js/dist/angular-chart.js'
+
     //'node_modules/three-collada-loader/index.js'
   ])
     .pipe(concat('vendor.js'))

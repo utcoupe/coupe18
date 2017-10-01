@@ -18,7 +18,6 @@ class RosService {
 
   newRosConnection(callback) {
     if (this.$rootScope.isConnected || this.setting === angular.isUndefined) {
-      if(callback) callback();
       return;
     }
 
