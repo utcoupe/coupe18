@@ -1,5 +1,5 @@
 class RosService {
-  constructor($rootScope, $log, $interval, $timeout, Settings) {
+  constructor($rootScope, $log, $interval, $timeout, Settings, Domains) {
     $rootScope.isConnected = false;
     this.isConnected = $rootScope.isConnected;
 
@@ -9,11 +9,13 @@ class RosService {
     this.$log = $log;
     this.$rootScope = $rootScope;
     this.ros = false;
+    this.Domains = Domains;
 
+    this.resetData();
     this.newRosConnection();
     $interval(() => {
       this.newRosConnection();
-    }, 1000); // [ms]
+    }, 500); // [ms]
   }
 
   newRosConnection(callback) {
@@ -32,6 +34,7 @@ class RosService {
     this.ros.on('connection', () => {
       this.$rootScope.isConnected = true;
       this.isConnected = this.$rootScope.isConnected;
+      this.loadData();
       this.$log.log('Successfully connected to server !');
     });
 
@@ -51,9 +54,9 @@ class RosService {
 
 
     if(callback) {
-      this.$timeout(() => {
+      this.$timeout(function() {
         callback();
-      }, 1000); // [ms]
+      }.bind(this), 1000); // [ms]
     }
   }
 
@@ -76,6 +79,7 @@ class RosService {
     if(!this.ros) return;
     let topic = new ROSLIB.Topic({ ros: this.ros, name: from })
     topic.subscribe(callback);
+    return topic;
   }
 
   getParam(name, callback) {
@@ -89,6 +93,118 @@ class RosService {
     let param = new ROSLIB.Param({ ros: this.ros, name: name })
     param.set(value);
   }
+
+
+
+  resetData() {
+    this.data = {
+      rosout: [],
+      topics: [],
+      nodes: [],
+      parameters: [],
+      services: []
+    };
+  }
+
+  // Load structure, all data, parameters, topics, services, nodes...
+  loadData() {
+    this.resetData();
+
+    this.ros.getTopics((topics) => { // Topics now has topics and types arrays
+      angular.forEach(topics.topics, (name) => {
+        let t = {
+          name: name,
+          active: true
+        }
+        this.data.topics.push(t);
+        this.ros.getTopicType(name, (type) => { t.type = type; });
+      });
+
+      for(let d of this.$rootScope.domains) {
+        for(let t of d.topics) {
+          let name = '/'+d.name+'/'+t;
+          if(!_.some(this.data.topics, (active) => active.name == name )) {
+            let newT = {
+              name: name,
+              abbr: t,
+              active: false
+            };
+            this.data.topics.push(newT);
+          }
+        }
+      }
+    });
+
+    this.ros.getServices((services) => {
+      angular.forEach(services, (name) => {
+        let s = {
+          name: name,
+          active: true
+        }
+        this.data.services.push(s);
+        this.ros.getServiceType(name, (type) => { s.type = type; });
+      });
+
+
+      for(let d of this.$rootScope.domains) {
+        for(let s of d.services) {
+          let name = '/'+d.name+'/'+s;
+          if(!_.some(this.data.services, (active) => active.name == name )) {
+            let newS = {
+              name: name,
+              abbr: s,
+              active: false
+            };
+            this.data.services.push(newS);
+          }
+        }
+      }
+
+
+    });
+
+    this.ros.getParams((params) => {
+      angular.forEach(params, (name) => {
+        const param = new ROSLIB.Param({ ros: this.ros, name });
+        this.data.parameters.push({ name });
+
+        param.get((value) => {
+          _.findWhere(this.data.parameters, { name }).value = value;
+        });
+      });
+    });
+
+    this.ros.getNodes((nodes) => {
+      angular.forEach(nodes, (name) => {
+        this.data.nodes.push({ name });
+      });
+    });
+  }
+
+
+  getDomains() {
+    if(!this.data)
+      return;
+    const allData = this.data.topics.concat(this.data.services, this.data.nodes);
+    const domains = this.Domains.getDomains(allData);
+
+
+    return domains;
+  }
+
+  getTopicsForDomain(domain) {
+    return this.Domains.getDataForDomain(this.data.topics, domain, false);
+  }
+
+  getServicesForDomain(domain) {
+    console.log(this.Domains.getDataForDomain(this.data.services, domain, false));
+    return this.Domains.getDataForDomain(this.data.services, domain, false);
+  }
+
+  getGlobalParameters() {
+    return this.Domains.getGlobalParameters(this.data.parameters);
+  }
+
 
 
 }

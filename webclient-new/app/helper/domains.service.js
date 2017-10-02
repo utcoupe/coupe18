@@ -46,21 +46,22 @@ class DomainsService {
     return result;
   }
 
-  getDataForDomain(array, domainName, advanced) {
+  getDataForDomain(array, domainName) {
     const result = [];
     angular.forEach(array, (entry) => {
       const nameArray = entry.name.split('/');
       if (
         nameArray.length > 1 &&
-        nameArray[1] === domainName &&
-        this.filterAdvanced(entry.name, advanced)
+        nameArray[1] === domainName
       ) {
-        entry.abbr = nameArray.slice(2).join(' ');
+        entry.abbr = nameArray.slice(2).join('/');
         result.push(entry);
       }
     });
     return result;
   }
+
+
 }
 
 // Filter advanced topics, services, parameters by checking the beginning capital letter

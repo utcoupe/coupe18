@@ -13,4 +13,39 @@ function ROSCCConfig($routeProvider, localStorageServiceProvider) {
     .setPrefix('roscc');
 }
 
-angular.module('roscc', ['ngRoute', 'ui.bootstrap', 'LocalStorageModule', 'chart.js']).config(ROSCCConfig);
+function run($rootScope) {
+  $rootScope.domains = [
+    {
+      name: 'ai',
+      topics: [],
+      services: []
+    },
+    {
+      name: 'movement',
+      topics: [],
+      services: []
+    },
+    {
+      name: 'perception',
+      topics: ['expectedTopic', 'ex/to', 'test2'],
+      services: ['non']
+    },
+    {
+      name: 'memory',
+      topics: ['oui'],
+      services: []
+    },
+    {
+      name: 'navigation',
+      topics: [],
+      services: []
+    }
+  ];
+
+
+
+
+}
+
+
+angular.module('roscc', ['ngRoute', 'ui.bootstrap', 'LocalStorageModule', 'chart.js']).config(ROSCCConfig).run(run);

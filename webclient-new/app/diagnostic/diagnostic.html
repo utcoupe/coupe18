@@ -1,5 +1,5 @@
 <div class="container-fluid">
-  <center><div><a href='#' ng-click="$ctrl.refresh()">Actualiser</a></div></center><br />
+  <center><div><a ng-click="$ctrl.refresh()">Actualiser</a></div></center><br />
   <!-- No connection alert -->
   <div class="alert alert-danger col-sm-6 col-sm-offset-3" role="alert" ng-if="!$ctrl.ros.isConnected">
     <p class="lead"><i class="glyphicon glyphicon-warning-sign"></i> Whoops...</p>
@@ -32,11 +32,8 @@
           <div ng-repeat="domain in $ctrl.domains" ng-show="$ctrl.activeDomain == domain.name">
             <p class="lead text-capitalize" style="font-size: 28px;">{{ domain.name }}</p>
 
-            <!-- Services -->
-            <cc-service service="service" ng-repeat="service in $ctrl.ros.getServicesForDomain(domain.name)"></cc-service>
-
-            <!-- Parameters -->
-            <!-- <cc-parameter parameter="parameter" ng-repeat="parameter in $ctrl.Domains.getDataForDomain($ctrl.ros.data.parameters, domain, $ctrl.setting.advanced)"></cc-parameter> -->
+            <!-- Topics -->
+            <cc-topic topic="topic" ng-repeat="topic in $ctrl.ros.getTopicsForDomain(domain.name)"></cc-topic>
           </div>
         </div>
       </div>
@@ -48,7 +45,12 @@
         <table class="table">
           <tr ng-repeat="logEntry in $ctrl.ros.data.rosout" ng-if="$ctrl.Domains.filterAdvanced(logEntry.abbr, $ctrl.setting.advanced)">
             <td>
-              <strong ng-class="{ 'text-danger bg-danger': logEntry.level > 8, 'text-danger': logEntry.level == 8, 'text-warning': logEntry.level == 4, 'text-info': logEntry.level == 2, 'text-muted': logEntry.level < 2 }">
+              <strong ng-class="{
+                        'text-danger bg-danger': logEntry.level > 8,
+                        'text-danger': logEntry.level == 8,
+                        'text-warning': logEntry.level == 4,
+                        'text-info': logEntry.level == 2,
+                        'text-muted': logEntry.level < 2 }" >
                 {{ logEntry.abbr }}
               </strong>
               <br>

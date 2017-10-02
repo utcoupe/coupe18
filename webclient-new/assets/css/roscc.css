@@ -15,12 +15,19 @@ html, body {
 .panel-active {
   border: none;
 }
-.panel-active .panel-heading {
+.panel-active.panel-default .panel-heading {
   color: white;
   background-color: #2E3D5F;
   border: 1px #2E3D5F solid;
   border-radius: 3px;
 }
+.panel-active.panel-danger .panel-heading {
+  color: white;
+  background-color: #8e3b3b;
+  border: 1px #8e3b3b solid;
+  border-radius: 3px;
+}
+
 
 .sidebar {
   position: absolute;

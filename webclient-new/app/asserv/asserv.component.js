@@ -27,8 +27,6 @@ class AsservController {
       scales: {
         xAxes: [{
           ticks: {
-            min: 0,
-            max: 5,
             display: false
           },
           gridLines: {
@@ -36,7 +34,12 @@ class AsservController {
           }
         }]
       },
-      animation: false
+      animation: false,
+      title: {
+            display: true,
+            text: 'Custom Chart Title',
+            fontSize: 20
+        }
     };
 
     this.datasetOverride = {
@@ -57,13 +60,21 @@ class AsservController {
         d.push(Math.sin(y));
         l.push(y);
       }
+
       this.charts.push({
         data: d,
         labels: l,
-        options: this.options,
+        options: JSON.parse(JSON.stringify(this.options)),
         datasetOverride: this.datasetOverride
       })
     }
+
+    this.charts[0].options.title.text = 'Linear Speed';
+    this.charts[1].options.title.text = 'Angular Speed';
+    this.charts[2].options.title.text = 'X Position';
+    this.charts[3].options.title.text = 'Orientation';
+    this.charts[4].options.title.text = 'Y Position';
+
 
 
     var canvas = document.getElementsByTagName("canvas");

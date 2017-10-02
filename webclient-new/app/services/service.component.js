@@ -9,11 +9,16 @@ class ServiceController {
     const path = 'app/services/';
     this.fileName = `${path}default.html`;
 
-    // Check if file exists
-    this.$scope.$watch('service.type', () => {
-      if (!this.service.type) {
+    this.$scope.$watchGroup(['service.type', 'service.active'], () => {
+      if(!this.service.active) {
+        this.filename = `${path}disabled.html`;
         return;
       }
+      if (!this.service.type) {
+        this.fileName = `${path}default.html`;
+        return;
+      }
+
       const fileName = `${path}${this.service.type}.html`;
       this.$http.get(fileName).then((result) => {
         if (result.data) {
@@ -24,6 +29,9 @@ class ServiceController {
   }
 
   callService(input, isJSON) {
+    // if(!this.service.active)
+    //   return;
+
     const data = isJSON ? angular.fromJson(input) : input;
     const ROSservice = new ROSLIB.Service({
       ros: this.ros.ros,

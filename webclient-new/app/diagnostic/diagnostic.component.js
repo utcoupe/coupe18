@@ -1,5 +1,5 @@
 
-class ControlController {
+class DiagnosticController {
   constructor($rootScope, $timeout, $interval, Settings, Domains, Ros) {
     this.$timeout = $timeout;
     this.Domains = Domains;
@@ -57,6 +57,7 @@ class ControlController {
       ${addZero(d.getMinutes())}:
       ${addZero(d.getSeconds())}.
       ${addZero(d.getMilliseconds())}`;
+
       this.ros.data.rosout.unshift(message);
 
       if (this.ros.data.rosout.length > this.maxConsoleEntries) {
@@ -74,7 +75,7 @@ class ControlController {
   }
 }
 
-angular.module('roscc').component('ccControl', {
-  templateUrl: 'app/control/control.html',
-  controller: ControlController,
+angular.module('roscc').component('ccDiagnostic', {
+  templateUrl: 'app/diagnostic/diagnostic.html',
+  controller: DiagnosticController,
 });

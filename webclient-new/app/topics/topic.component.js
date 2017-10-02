@@ -5,7 +5,8 @@ class TopicController {
     this.setting = Settings.get();
     this.Quaternions = Quaternions;
     this.ros = Ros;
-    this.isSubscribing = false;
+    this.isSubscribing = true;
+    this.toggle = true;
   }
 
   $onInit() {
@@ -18,21 +19,33 @@ class TopicController {
     const path = 'app/topics/';
     this.fileName = `${path}default.html`;
 
-    // Check if file exists
-    this.$scope.$watch('topic.type', () => {
-      if (!this.topic.type) {
+    this.$scope.$watchGroup(['topic.type', 'topic.active'], () => {
+      if(!this.topic.active) {
+        this.fileName = `${path}disabled.html`;
+        this.isSubscribing = false;
+        this.toggle = false;
         return;
       }
+
+      if (!this.topic.type) {
+        this.fileName = `${path}default.html`;
+        this.toggleSubscription(false);
+        return;
+      }
+
       const fileName = `${path}${this.topic.type}.html`;
       this.$http.get(fileName).then((result) => {
         if (result.data) {
           this.fileName = fileName;
+          this.toggleSubscription(false);
         }
-      });
+      }, () => {});
     });
   }
 
   toggleSubscription(data) {
+    if(!this.topic.active)
+      return;
     if (!data) {
       this.roslibTopic.subscribe((message) => {
         this.message = message;
