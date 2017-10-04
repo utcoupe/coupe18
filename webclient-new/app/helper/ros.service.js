@@ -188,17 +188,26 @@ class RosService {
     const allData = this.data.topics.concat(this.data.services, this.data.nodes);
     const domains = this.Domains.getDomains(allData);
 
+    let expectedD = _.pluck(this.$rootScope.domains, 'name');
 
-    return domains;
+    //set expected domains first in the list
+    return _.uniq(expectedD.concat(domains));
+  }
+
+  getExpectedDomains() {
+    return _.pluck(this.$rootScope.domains, 'name');
+  }
+
+  getUnexpectedDomains() {
+    return _.difference(this.getDomains(), this.getExpectedDomains());
   }
 
   getTopicsForDomain(domain) {
-    return this.Domains.getDataForDomain(this.data.topics, domain, false);
+    return this.Domains.getDataForDomain(this.data.topics, domain, true);
   }
 
   getServicesForDomain(domain) {
-    console.log(this.Domains.getDataForDomain(this.data.services, domain, false));
-    return this.Domains.getDataForDomain(this.data.services, domain, false);
+    return this.Domains.getDataForDomain(this.data.services, domain, true);
   }
 
   getGlobalParameters() {

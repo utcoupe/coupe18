@@ -61,6 +61,7 @@ class TopicController {
     const message = new ROSLIB.Message(data);
     this.roslibTopic.publish(message);
   }
+
 }
 
 angular.module('roscc').component('ccTopic', {

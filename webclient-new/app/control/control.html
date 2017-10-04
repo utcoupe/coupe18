@@ -13,14 +13,27 @@
         <div class="col-sm-3">
           <!-- Domains -->
           <div class="panel panel-default panel-domain"
-               ng-class="{ 'panel-active': ($ctrl.activeDomain == domain.name),
-                           'panel-danger': !$ctrl.isDomainActive(domain.name) }"
-               ng-repeat="domain in $ctrl.domains"
-               ng-click="$ctrl.setActiveDomain(domain.name)" >
+               ng-class="{ 'panel-active': ($ctrl.activeDomain == domain),
+                           'panel-danger': !$ctrl.isDomainActive(domain) }"
+               ng-repeat="domain in $ctrl.ros.getExpectedDomains()"
+               ng-click="$ctrl.setActiveDomain(domain)">
 
-            <div class="panel-heading">
-              <h3 class="panel-title text-capitalize">{{ domain.name }}</h3>
-            </div>
+               <div class="panel-heading">
+                 <h3 class="panel-title text-capitalize">{{ domain }}</h3>
+               </div>
+          </div>
+          <input type="checkbox" ng-model="$ctrl.setting.showUnexpected"> Advanced View</input>
+          <hr ng-if="$ctrl.setting.showUnexpected"/>
+
+          <div class="panel panel-default panel-domain"
+               ng-class="{ 'panel-active': ($ctrl.activeDomain == domain) }"
+               ng-repeat="domain in $ctrl.ros.getUnexpectedDomains()"
+               ng-click="$ctrl.setActiveDomain(domain)"
+               ng-if="$ctrl.setting.showUnexpected && !!$ctrl.ros.getServicesForDomain(domain).length">
+
+               <div class="panel-heading">
+                 <h3 class="panel-title text-capitalize">{{ domain }}</h3>
+               </div>
           </div>
 
           <br /><br />
@@ -29,11 +42,11 @@
         </div>
 
         <div class="col-sm-9">
-          <div ng-repeat="domain in $ctrl.domains" ng-show="$ctrl.activeDomain == domain.name">
-            <p class="lead text-capitalize" style="font-size: 28px;">{{ domain.name }}</p>
+          <div ng-repeat="domain in $ctrl.ros.getDomains()" ng-show="$ctrl.activeDomain == domain">
+            <p class="lead text-capitalize" style="font-size: 28px;">{{ domain }}</p>
 
             <!-- Services -->
-            <cc-service service="service" ng-repeat="service in $ctrl.ros.getServicesForDomain(domain.name)"></cc-service>
+            <cc-service service="service" ng-repeat="service in $ctrl.ros.getServicesForDomain(domain)"></cc-service>
 
             <!-- Parameters -->
             <!-- <cc-parameter parameter="parameter" ng-repeat="parameter in $ctrl.Domains.getDataForDomain($ctrl.ros.data.parameters, domain, $ctrl.setting.advanced)"></cc-parameter> -->

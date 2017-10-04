@@ -7,7 +7,7 @@ function ROSCCConfig($routeProvider, localStorageServiceProvider) {
     .when('/hokuyo', { template: '<cc-hokuyo></cc-hokuyo>' })
     .when('/telecommande', { template: '<cc-control></cc-control>' })
     .when('/settings', { template: '<cc-settings></cc-settings>' })
-    .otherwise({ redirectTo: '/telecommande' });
+    .otherwise({ redirectTo: '/diagnostic' });
 
   localStorageServiceProvider
     .setPrefix('roscc');
@@ -28,7 +28,7 @@ function run($rootScope) {
     {
       name: 'perception',
       topics: ['expectedTopic', 'ex/to', 'test2'],
-      services: ['non']
+      services: []
     },
     {
       name: 'memory',

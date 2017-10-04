@@ -13,27 +13,36 @@
         <div class="col-sm-3">
           <!-- Domains -->
           <div class="panel panel-default panel-domain"
-               ng-class="{ 'panel-active': ($ctrl.activeDomain == domain.name),
-                           'panel-danger': !$ctrl.isDomainActive(domain.name) }"
-               ng-repeat="domain in $ctrl.domains"
-               ng-click="$ctrl.setActiveDomain(domain.name)" >
+               ng-class="{ 'panel-active': ($ctrl.activeDomain == domain),
+                           'panel-danger': !$ctrl.isDomainActive(domain) }"
+               ng-repeat="domain in $ctrl.ros.getExpectedDomains()"
+               ng-click="$ctrl.setActiveDomain(domain)">
 
-            <div class="panel-heading">
-              <h3 class="panel-title text-capitalize">{{ domain.name }}</h3>
-            </div>
+             <div class="panel-heading">
+               <h3 class="panel-title text-capitalize">{{ domain }}</h3>
+             </div>
           </div>
+          <input type="checkbox" ng-model="$ctrl.setting.showUnexpected"> Advanced View</input>
+          <hr ng-if="$ctrl.setting.showUnexpected"/>
 
-          <br /><br />
-          <!-- Global parameters -->
-          <cc-parameter ng-repeat="parameter in $ctrl.getGlobalParameters()" ng-show="$ctrl.Domains.filterAdvanced(parameter.name, $ctrl.setting.advanced)" parameter="parameter"></cc-parameter>
+          <div class="panel panel-default panel-domain"
+               ng-class="{ 'panel-active': ($ctrl.activeDomain == domain)}"
+               ng-repeat="domain in $ctrl.ros.getUnexpectedDomains()"
+               ng-click="$ctrl.setActiveDomain(domain)"
+               ng-if="$ctrl.setting.showUnexpected && !!$ctrl.ros.getTopicsForDomain(domain).length">
+
+             <div class="panel-heading">
+               <h3 class="panel-title text-capitalize">{{ domain }}</h3>
+             </div>
+          </div>
         </div>
 
         <div class="col-sm-9">
-          <div ng-repeat="domain in $ctrl.domains" ng-show="$ctrl.activeDomain == domain.name">
-            <p class="lead text-capitalize" style="font-size: 28px;">{{ domain.name }}</p>
+          <div ng-repeat="domain in $ctrl.ros.getDomains()" ng-show="$ctrl.activeDomain == domain">
+            <p class="lead text-capitalize" style="font-size: 28px;">{{ domain }}</p>
 
             <!-- Topics -->
-            <cc-topic topic="topic" ng-repeat="topic in $ctrl.ros.getTopicsForDomain(domain.name)"></cc-topic>
+            <cc-topic topic="topic" ng-repeat="topic in $ctrl.ros.getTopicsForDomain(domain)"></cc-topic>
           </div>
         </div>
       </div>

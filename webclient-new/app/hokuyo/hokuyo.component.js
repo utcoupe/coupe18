@@ -27,13 +27,13 @@ class HokuyoController {
     // $scope.test = "Coucou !";
     // $scope.test3 = 42;
 
-    /*
+
     $scope.name = "hokuyo.polar_raw_data";
     $scope.from = "hokuyo";
     $scope.data = '{\n\
     "hokuyo": "one",\n\
     "polarSpots": [\n\
-    [ -40, 235 ],\n\
+    [ -90, 350 ],\n\
     [ -30, 235 ],\n\
     [ -35, 230 ],\n\
     [ -25, 230 ],\n\
@@ -49,7 +49,7 @@ class HokuyoController {
     [ 30, 235 ]\n\
   ]\n\
 }';
-*/
+
 
     $scope.name = "lidar.all";
     $scope.from = "lidar";
@@ -97,6 +97,8 @@ class HokuyoController {
     $scope.update = function() {
       Hokuyo.onOrder($scope.from, $scope.name, JSON.parse($scope.data));
     }
+
+    $scope.update();
   }
 }
 
