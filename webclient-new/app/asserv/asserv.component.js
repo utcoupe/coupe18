@@ -4,7 +4,6 @@ class AsservController {
     this.ros = Ros;
 
     Ros.listen('/asserv/test', function(e) {
-      console.log(e);
       for(let i = 0; i < 8; i++) {
         this.charts[i].data.push(e.data);
         this.charts[i].labels.push(this.charts[i].labels[this.charts[i].labels.length-1] + 0.1);

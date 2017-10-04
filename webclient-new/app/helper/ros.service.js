@@ -19,7 +19,7 @@ class RosService {
   }
 
   newRosConnection(callback) {
-    if (this.$rootScope.isConnected || this.setting === angular.isUndefined) {
+    if (this.$rootScope.isConnected || !this.setting) {
       return;
     }
 
@@ -203,11 +203,11 @@ class RosService {
   }
 
   getTopicsForDomain(domain) {
-    return this.Domains.getDataForDomain(this.data.topics, domain, true);
+    return this.Domains.getDataForDomain(this.data.topics, domain, false);
   }
 
   getServicesForDomain(domain) {
-    return this.Domains.getDataForDomain(this.data.services, domain, true);
+    return this.Domains.getDataForDomain(this.data.services, domain, false);
   }
 
   getGlobalParameters() {

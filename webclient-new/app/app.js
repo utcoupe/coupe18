@@ -21,7 +21,7 @@ function run($rootScope) {
       services: []
     },
     {
-      name: 'movement',
+      name: "movement",
       topics: [],
       services: []
     },

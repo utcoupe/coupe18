@@ -1,6 +1,8 @@
 class HokuyoController {
-  constructor($rootScope, $scope, Hokuyo) {
+  constructor($rootScope, $scope, Hokuyo, Ros) {
     $rootScope.act_page = 'hokuyo';
+    this.$scope = $scope;
+    this.ros = Ros;
 
     let changedTab = false;
     if (Hokuyo.displays.one != null) {
@@ -24,78 +26,99 @@ class HokuyoController {
       }
     }
 
-    // $scope.test = "Coucou !";
-    // $scope.test3 = 42;
+    this.ros.listen('/perception/hokuyo_1_raw', function(msg) {
+      this.$scope.name = "hokuyo.polar_raw_data";
+      this.$scope.from = "hokuyo";
+      this.$scope.data = {
+        hokuyo: "one",
+        polarSpots: Hokuyo.formatPolarPoints(msg)
+      };
+      console.log(this.$scope.data);
+      this.$scope.update();
+    }.bind(this));
+
+    this.ros.listen('/perception/hokuyo_2_raw', function(msg) {
+      this.$scope.name = "hokuyo.polar_raw_data";
+      this.$scope.from = "hokuyo";
+      this.$scope.data = {
+        hokuyo: "two",
+        polarSpots: Hokuyo.formatPolarPoints(msg)
+      };
+      console.log(this.$scope.data);
+
+      this.$scope.update();
+    }.bind(this));
 
 
-    $scope.name = "hokuyo.polar_raw_data";
-    $scope.from = "hokuyo";
-    $scope.data = '{\n\
-    "hokuyo": "one",\n\
-    "polarSpots": [\n\
-    [ -90, 350 ],\n\
-    [ -30, 235 ],\n\
-    [ -35, 230 ],\n\
-    [ -25, 230 ],\n\
-    [ -20, 100 ],\n\
-    [ -15, 105 ],\n\
-    [ -5, 120 ],\n\
-    [ 0, 100 ],\n\
-    [ 5, 90 ],\n\
-    [ 10, 95 ],\n\
-    [ 15, 100 ],\n\
-    [ 20, 100 ],\n\
-    [ 25, 230 ],\n\
-    [ 30, 235 ]\n\
-  ]\n\
-}';
 
-
-    $scope.name = "lidar.all";
-    $scope.from = "lidar";
-    $scope.data = '{\n\
-      "hokuyos": [\n\
-        {\n\
-          "name": "one",\n\
-          "position": {\n\
-            "x": -6.2,\n\
-            "y": -6.2,\n\
-            "w": 0\n\
-          }\n\
-        },\n\
-        {\n\
-          "name": "two",\n\
-          "position": {\n\
-            "x": 306.2,\n\
-            "y": 100,\n\
-            "w": 180\n\
-          }\n\
-        }\n\
-      ],\n\
-      "cartesianSpots": [\n\
-        [ 20, 200 ],\n\
-        [ 30, 202 ],\n\
-        [ 40, 199 ],\n\
-        [ 148, 104 ],\n\
-        [ 145, 95 ],\n\
-        [ 153, 105 ],\n\
-        [ 155, 98 ],\n\
-        [ 95, 135 ],\n\
-        [ 100, 129 ],\n\
-        [ 101, 140 ],\n\
-        [ 105, 132 ],\n\
-        [ 104, 137 ],\n\
-        [ 230, 2 ],\n\
-        [ 234, 4 ]\n\
-      ],\n\
-      "robotsSpots": [\n\
-        [ 150, 100 ],\n\
-        [ 100, 135 ]\n\
-      ]\n\
-    }';
+//     $scope.name = "hokuyo.polar_raw_data";
+//     $scope.from = "hokuyo";
+//     $scope.data = '{\n\
+//     "hokuyo": "one",\n\
+//     "polarSpots": [\n\
+//     [ -90, 350 ],\n\
+//     [ -30, 235 ],\n\
+//     [ -35, 230 ],\n\
+//     [ -25, 230 ],\n\
+//     [ -20, 100 ],\n\
+//     [ -15, 105 ],\n\
+//     [ -5, 120 ],\n\
+//     [ 0, 100 ],\n\
+//     [ 5, 90 ],\n\
+//     [ 10, 95 ],\n\
+//     [ 15, 100 ],\n\
+//     [ 20, 100 ],\n\
+//     [ 25, 230 ],\n\
+//     [ 30, 235 ]\n\
+//   ]\n\
+// }';
+//
+//
+//     $scope.name = "lidar.all";
+//     $scope.from = "lidar";
+//     $scope.data = '{\n\
+//       "hokuyos": [\n\
+//         {\n\
+//           "name": "one",\n\
+//           "position": {\n\
+//             "x": -6.2,\n\
+//             "y": -6.2,\n\
+//             "w": 0\n\
+//           }\n\
+//         },\n\
+//         {\n\
+//           "name": "two",\n\
+//           "position": {\n\
+//             "x": 306.2,\n\
+//             "y": 100,\n\
+//             "w": 180\n\
+//           }\n\
+//         }\n\
+//       ],\n\
+//       "cartesianSpots": [\n\
+//         [ 20, 200 ],\n\
+//         [ 30, 202 ],\n\
+//         [ 40, 199 ],\n\
+//         [ 148, 104 ],\n\
+//         [ 145, 95 ],\n\
+//         [ 153, 105 ],\n\
+//         [ 155, 98 ],\n\
+//         [ 95, 135 ],\n\
+//         [ 100, 129 ],\n\
+//         [ 101, 140 ],\n\
+//         [ 105, 132 ],\n\
+//         [ 104, 137 ],\n\
+//         [ 230, 2 ],\n\
+//         [ 234, 4 ]\n\
+//       ],\n\
+//       "robotsSpots": [\n\
+//         [ 150, 100 ],\n\
+//         [ 100, 135 ]\n\
+//       ]\n\
+//     }';
 
     $scope.update = function() {
-      Hokuyo.onOrder($scope.from, $scope.name, JSON.parse($scope.data));
+      Hokuyo.onOrder($scope.from, $scope.name, $scope.data);
     }
 
     $scope.update();

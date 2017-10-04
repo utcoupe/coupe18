@@ -1,14 +1,18 @@
 <nav class="navbar navbar-default navbar-static-top">
   <div class="container">
     <div class="navbar-header">
+      <span>
+        <div style="display: inline-block;" ng-if="$ctrl.ros.isConnected" id="connected" title='connected'></div>
+        <div style="display: inline-block;" ng-if="!$ctrl.ros.isConnected" id="disconnected" title='disconnected'></div>
+      </span>
       <a class="navbar-brand" href="#!/">
         <img src="assets/images/ros-logo.svg" height="22px"></img>
       </a>
       <a class="navbar-brand" href="#!/">
-        <img src="assets/images/utcoupe-logo.png" height="35px"></img>
+          <img src="assets/images/utcoupe-logo.png" height="35px"></img>
       </a>
-      <span ng-if="$ctrl.ros.isConnected">Connected !</span>
-      <span ng-if="!$ctrl.ros.isConnected">Disconnected !</span>
+
+
     </div>
 
     <ul class="nav navbar-nav navbar-right">

@@ -12,6 +12,28 @@ function($rootScope, $sce, Ros) {
     main: null
   };
 
+  // format laserscan ros msg to a list of lists [theta, r], theta in degrees
+  // r in cm
+  this.formatPolarPoints = function(msg) {
+    let amin = msg.angle_min;
+    let amax = msg.angle_max;
+    let ainc = msg.angle_increment;
+
+    let rmin = msg.range_min;
+    let rmax = msg.range_max;
+
+    let acurr = amin;
+    let out = [];
+    for(let r of msg.ranges) {
+      if(r > rmax || r < rmin || acurr > amax)
+        break;
+      out.push([acurr%360, r * 100]);
+      acurr += ainc;
+    }
+
+    return out;
+  }
+
   this.init = function () {
     //Client.order(this.onOrder); //FIXME
   };
