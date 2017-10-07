@@ -9,23 +9,35 @@ function ROSCCConfig($routeProvider, localStorageServiceProvider) {
 function run($rootScope) {
   $rootScope.domains = [{
     name: 'ai',
-    topics: [],
-    services: []
+    topics: ['oui1', 'non1'],
+    services: ['s1', 's2']
+  }, {
+    name: "recognition",
+    topics: ['oui1', 'non1'],
+    services: ['gzfd']
+  }, {
+    name: "processing",
+    topics: ['oui1', 'non1'],
+    services: ['etr']
+  }, {
+    name: "sensors",
+    topics: ['oui1', 'non1'],
+    services: ['trezz']
   }, {
     name: "movement",
-    topics: [],
+    topics: ['oui1', 'non1'],
     services: []
   }, {
-    name: 'perception',
-    topics: ['expectedTopic', 'ex/to', 'test2'],
+    name: "memory",
+    topics: ['oui1', 'non1'],
     services: []
   }, {
-    name: 'memory',
-    topics: ['oui'],
+    name: "feedback",
+    topics: ['oui1', 'non1'],
     services: []
   }, {
-    name: 'navigation',
-    topics: [],
+    name: "navigation",
+    topics: ['oui1', 'non1'],
     services: []
   }];
 }
@@ -217,7 +229,6 @@ var ControlController = function () {
   }, {
     key: 'onConnected',
     value: function onConnected() {
-      this.setConsole();
 
       if (!this.activeDomain) {
         var _iteratorNormalCompletion = true;
@@ -248,37 +259,6 @@ var ControlController = function () {
         }
       }
     }
-
-    // Setup of console (in the right sidebar)
-
-  }, {
-    key: 'setConsole',
-    value: function setConsole() {
-      var _this3 = this;
-
-      var consoleTopic = new ROSLIB.Topic({
-        ros: this.ros.ros,
-        name: this.setting.log,
-        messageType: 'rosgraph_msgs/Log'
-      });
-      consoleTopic.subscribe(function (message) {
-        var nameArray = message.name.split('/');
-        var d = new Date(message.header.stamp.secs * 1E3 + message.header.stamp.nsecs * 1E-6);
-
-        message.abbr = nameArray.length > 1 ? nameArray[1] : message.name;
-
-        // String formatting of message time and date
-        function addZero(i) {
-          return i < 10 ? '0' + i : '' + i;
-        }
-        message.dateString = addZero(d.getHours()) + ':\n      ' + addZero(d.getMinutes()) + ':\n      ' + addZero(d.getSeconds()) + '.\n      ' + addZero(d.getMilliseconds());
-        _this3.ros.data.rosout.unshift(message);
-
-        if (_this3.ros.data.rosout.length > _this3.maxConsoleEntries) {
-          _this3.ros.data.rosout.pop();
-        }
-      });
-    }
   }, {
     key: 'refresh',
     value: function refresh() {
@@ -290,6 +270,11 @@ var ControlController = function () {
       return _.some(this.ros.getTopicsForDomain(domain), function (t) {
         return t.active == true;
       });
+    }
+  }, {
+    key: '$onDestroy',
+    value: function $onDestroy() {
+      this.consoleTopic.unsubscribe();
     }
   }]);
 
@@ -385,12 +370,12 @@ var DiagnosticController = function () {
     value: function setConsole() {
       var _this3 = this;
 
-      var consoleTopic = new ROSLIB.Topic({
+      this.consoleTopic = new ROSLIB.Topic({
         ros: this.ros.ros,
         name: this.setting.log,
         messageType: 'rosgraph_msgs/Log'
       });
-      consoleTopic.subscribe(function (message) {
+      this.consoleTopic.subscribe(function (message) {
         var nameArray = message.name.split('/');
         var d = new Date(message.header.stamp.secs * 1E3 + message.header.stamp.nsecs * 1E-6);
 
@@ -420,6 +405,11 @@ var DiagnosticController = function () {
       return _.some(this.ros.getTopicsForDomain(domain), function (t) {
         return t.active == true;
       });
+    }
+  }, {
+    key: '$onDestroy',
+    value: function $onDestroy() {
+      this.consoleTopic.unsubscribe();
     }
   }]);
 
@@ -1613,10 +1603,9 @@ var ServiceController = function () {
 
       this.$scope.$watchGroup(['service.type', 'service.active'], function () {
         if (!_this.service.active) {
-          _this.filename = path + 'disabled.html';
+          _this.fileName = path + 'disabled.html';
           return;
-        }
-        if (!_this.service.type) {
+        } else if (!_this.service.type) {
           _this.fileName = path + 'default.html';
           return;
         }
@@ -1634,8 +1623,8 @@ var ServiceController = function () {
     value: function callService(input, isJSON) {
       var _this2 = this;
 
-      // if(!this.service.active)
-      //   return;
+      //(!this.service.active)
+      //  return;
 
       var data = isJSON ? angular.fromJson(input) : input;
       var ROSservice = new ROSLIB.Service({
@@ -1980,9 +1969,7 @@ var TopicController = function () {
           _this.isSubscribing = false;
           _this.toggle = false;
           return;
-        }
-
-        if (!_this.topic.type) {
+        } else if (!_this.topic.type) {
           _this.fileName = path + 'default.html';
           _this.toggleSubscription(false);
           return;

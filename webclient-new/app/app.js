@@ -17,27 +17,42 @@ function run($rootScope) {
   $rootScope.domains = [
     {
       name: 'ai',
-      topics: [],
-      services: []
+      topics: ['oui1', 'non1'],
+      services: ['s1', 's2']
+    },
+    {
+      name: "recognition",
+      topics: ['oui1', 'non1'],
+      services: ['gzfd']
+    },
+    {
+      name: "processing",
+      topics: ['oui1', 'non1'],
+      services: ['etr']
+    },
+    {
+      name: "sensors",
+      topics: ['oui1', 'non1'],
+      services: ['trezz']
     },
     {
       name: "movement",
-      topics: [],
+      topics: ['oui1', 'non1'],
       services: []
     },
     {
-      name: 'perception',
-      topics: ['expectedTopic', 'ex/to', 'test2'],
+      name: "memory",
+      topics: ['oui1', 'non1'],
       services: []
     },
     {
-      name: 'memory',
-      topics: ['oui'],
+      name: "feedback",
+      topics: ['oui1', 'non1'],
       services: []
     },
     {
-      name: 'navigation',
-      topics: [],
+      name: "navigation",
+      topics: ['oui1', 'non1'],
       services: []
     }
   ];

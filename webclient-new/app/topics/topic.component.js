@@ -27,7 +27,7 @@ class TopicController {
         return;
       }
 
-      if (!this.topic.type) {
+      else if (!this.topic.type) {
         this.fileName = `${path}default.html`;
         this.toggleSubscription(false);
         return;

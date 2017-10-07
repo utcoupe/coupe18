@@ -40,12 +40,12 @@ class DiagnosticController {
 
   // Setup of console (in the right sidebar)
   setConsole() {
-    const consoleTopic = new ROSLIB.Topic({
+    this.consoleTopic = new ROSLIB.Topic({
       ros: this.ros.ros,
       name: this.setting.log,
       messageType: 'rosgraph_msgs/Log',
     });
-    consoleTopic.subscribe((message) => {
+    this.consoleTopic.subscribe((message) => {
       const nameArray = message.name.split('/');
       const d = new Date((message.header.stamp.secs * 1E3) + (message.header.stamp.nsecs * 1E-6));
 
@@ -72,6 +72,10 @@ class DiagnosticController {
 
   isDomainActive(domain) {
     return _.some(this.ros.getTopicsForDomain(domain), (t) => t.active == true);
+  }
+
+  $onDestroy() {
+    this.consoleTopic.unsubscribe();
   }
 }
 

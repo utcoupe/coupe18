@@ -11,10 +11,10 @@ class ServiceController {
 
     this.$scope.$watchGroup(['service.type', 'service.active'], () => {
       if(!this.service.active) {
-        this.filename = `${path}disabled.html`;
+        this.fileName = `${path}disabled.html`;
         return;
       }
-      if (!this.service.type) {
+      else if (!this.service.type) {
         this.fileName = `${path}default.html`;
         return;
       }
@@ -26,11 +26,13 @@ class ServiceController {
         }
       }, () => {});
     });
+
+
   }
 
   callService(input, isJSON) {
-    // if(!this.service.active)
-    //   return;
+    //(!this.service.active)
+    //  return;
 
     const data = isJSON ? angular.fromJson(input) : input;
     const ROSservice = new ROSLIB.Service({
