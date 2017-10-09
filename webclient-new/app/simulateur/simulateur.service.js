@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 //FIXME : à mettre dans le service
 /**
  * Convertit la position indiquée par l'ia en celle du simulateur
@@ -81,7 +83,7 @@ function clearPath(simulateur, robot)
 
 
 angular.module('roscc').service('Simulateur', ['$rootScope', 'Ros',
-function ($rootScope, Ros) {
+function () {
 	this.init = function () {
 		/*Client.order(function (from, name, data) {
 			if (name == 'simulateur' && $rootScope.act_page == 'simulateur') {
@@ -101,3 +103,5 @@ function ($rootScope, Ros) {
 		}.bind(this));*/ //FIXME
 	};
 }]);
+
+/* eslint-enable */

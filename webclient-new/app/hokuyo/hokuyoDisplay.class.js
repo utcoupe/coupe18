@@ -1,5 +1,7 @@
 "use strict";
 
+/* eslint-disable */
+
 class HokuyoDisplay {
   constructor(parentId, mode, reinitColor = false, oneColor = null, twoColor = null) {
     this.MAIN = "main";
@@ -281,3 +283,7 @@ class HokuyoDisplay {
                 }
               }
             }
+
+
+
+            /* eslint-enable */

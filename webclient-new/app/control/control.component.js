@@ -7,12 +7,11 @@ class ControlController {
 
     this.ros = Ros;
     this.setting = Settings.get();
-    this.maxConsoleEntries = 200;
 
     if($rootScope.isConnected) {
       this.$timeout(() => { this.onConnected(); }, 1000);
     } else {
-      $rootScope.$watch('isConnected', function(newValue, oldValue) {
+      $rootScope.$watch('isConnected', function(newValue) {
         if(newValue)
           this.$timeout(() => { this.onConnected(); }, 1000);
       }.bind(this));
@@ -48,7 +47,6 @@ class ControlController {
   }
 
   $onDestroy() {
-    this.consoleTopic.unsubscribe();
   }
 }
 

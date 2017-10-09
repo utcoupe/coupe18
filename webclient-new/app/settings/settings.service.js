@@ -55,8 +55,11 @@ class SettingsService {
       port: 9090, // default port of rosbridge_server
       log: '/rosout',
       advanced: false,
+      hokuyo_1: '/sensors/hokuyo_1_raw',
+      hokuyo_2: "/sensors/hokuyo_2_raw"
     };
   }
 }
+
 
 angular.module('roscc').service('Settings', SettingsService);

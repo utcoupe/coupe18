@@ -33,9 +33,9 @@ gulp.task('js-vendor', function () {
 
 // Lint javascript based on airbnb ES5 linter and angular code style guide
 gulp.task('js-lint', function() {
-//  return gulp.src(['app/**/*.js'])
-//    .pipe(eslint({fix:true})) // use .eslintrc.json file for rules
-//    .pipe(eslint.format())
+  return gulp.src(['app/**/*.js'])
+    .pipe(eslint()) // use .eslintrc.json file for rules
+    .pipe(eslint.format())
 //    /*.pipe(eslint.failAfterError())*/;
 });
 
@@ -44,4 +44,4 @@ gulp.task('watch', function () {
   gulp.watch('app/**/*.js', ['js']);
 });
 
-gulp.task('default', ['js-lint', 'js-vendor', 'js']);
+gulp.task('default', [/*'js-lint', */'js-vendor', 'js', 'watch']);

@@ -1,5 +1,5 @@
 angular.module('roscc').service('Hokuyo', ['$rootScope', '$sce', 'Ros',
-function($rootScope, $sce, Ros) {
+function() {
   this.displays = {
     main: null,
     one: null,
@@ -16,18 +16,13 @@ function($rootScope, $sce, Ros) {
   // r in cm
   this.formatPolarPoints = function(msg) {
     let amin = msg.angle_min;
-    let amax = msg.angle_max;
     let ainc = msg.angle_increment;
 
-    let rmin = msg.range_min;
-    let rmax = msg.range_max;
 
     let acurr = amin;
     let out = [];
     for(let r of msg.ranges) {
-      if(r > rmax || r < rmin || acurr > amax)
-        break;
-      out.push([acurr%360, r * 100]);
+      out.push([(acurr * 180 / Math.PI )%360, r * 100]);
       acurr += ainc;
     }
 
@@ -41,7 +36,7 @@ function($rootScope, $sce, Ros) {
   this.onOrder = function (from, name, data) {
     // if($rootScope.act_page == 'hokuyo') {
     if (name == 'hokuyo.polar_raw_data') {
-      if (!!this.displays[data.hokuyo]) {
+      if (this.displays[data.hokuyo]) {
         // Save for later
         this.lastData[data.hokuyo] = data.polarSpots;
 

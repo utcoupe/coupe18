@@ -1,8 +1,11 @@
+/* eslint-disable no-undef */
+
 class HokuyoController {
-  constructor($rootScope, $scope, Hokuyo, Ros) {
+  constructor($rootScope, $scope, Hokuyo, Settings, Ros) {
     $rootScope.act_page = 'hokuyo';
     this.$scope = $scope;
     this.ros = Ros;
+    this.setting = Settings.get();
 
     let changedTab = false;
     if (Hokuyo.displays.one != null) {
@@ -26,25 +29,24 @@ class HokuyoController {
       }
     }
 
-    this.ros.listen('/perception/hokuyo_1_raw', function(msg) {
+    this.ros.listen(this.setting.hokuyo_1, function(msg) {
+
       this.$scope.name = "hokuyo.polar_raw_data";
       this.$scope.from = "hokuyo";
       this.$scope.data = {
         hokuyo: "one",
         polarSpots: Hokuyo.formatPolarPoints(msg)
       };
-      console.log(this.$scope.data);
       this.$scope.update();
     }.bind(this));
 
-    this.ros.listen('/perception/hokuyo_2_raw', function(msg) {
+    this.ros.listen(this.setting.hokuyo_2, function(msg) {
       this.$scope.name = "hokuyo.polar_raw_data";
       this.$scope.from = "hokuyo";
       this.$scope.data = {
         hokuyo: "two",
         polarSpots: Hokuyo.formatPolarPoints(msg)
       };
-      console.log(this.$scope.data);
 
       this.$scope.update();
     }.bind(this));
@@ -130,3 +132,5 @@ angular.module('roscc').component('ccHokuyo', {
   templateUrl: 'app/hokuyo/hokuyo.html',
   controller: HokuyoController,
 });
+
+/* eslint-enable no-undef */

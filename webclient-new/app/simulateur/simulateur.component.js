@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 
 class SimulateurController {
 	constructor ($rootScope, $scope, Ros, Simulateur) {
@@ -17,7 +18,7 @@ class SimulateurController {
 		$scope.rot_gr = new Position();
 		$scope.pos_epr = new Position();
 		$scope.pos_egr = new Position();
-		$scope.vueDeFace = function () { Simulateur.controllerSimu.selectView("front"); console.log("OUI") }
+		$scope.vueDeFace = function () { Simulateur.controllerSimu.selectView("front"); }
 		$scope.vueDeDessus = function () { Simulateur.controllerSimu.selectView("top"); }
 		$scope.vueDeDerriere = function () { Simulateur.controllerSimu.selectView("behind"); }
 		$scope.vueDeGauche = function () { Simulateur.controllerSimu.selectView("left"); }
@@ -42,3 +43,5 @@ angular.module('roscc').component('ccSimulateur', {
   templateUrl: 'app/simulateur/simulateur.html',
   controller: SimulateurController
 });
+
+/* eslint-enable no-undef */

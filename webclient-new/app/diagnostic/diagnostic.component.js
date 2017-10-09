@@ -12,7 +12,7 @@ class DiagnosticController {
     if($rootScope.isConnected) {
       this.$timeout(() => { this.onConnected(); }, 1000);
     } else {
-      $rootScope.$watch('isConnected', function(newValue, oldValue) {
+      $rootScope.$watch('isConnected', function(newValue) {
         if(newValue)
           this.$timeout(() => { this.onConnected(); }, 1000);
       }.bind(this));
