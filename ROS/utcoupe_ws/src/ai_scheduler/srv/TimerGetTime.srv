@@ -1,0 +1,4 @@
+---
+int32 total_time
+int32 time
+int32 time_left
