@@ -148,6 +148,10 @@ qtcreator-*
 # Emacs
 .#*
 
+# KDevelop 4
+*.kdev4
+.kdev4/
+
 # Catkin custom files
 CATKIN_IGNORE
 
@@ -155,3 +159,4 @@ CATKIN_IGNORE
 #CUSTOM ADDS
 nohup.out
 *.swp
+.directory
