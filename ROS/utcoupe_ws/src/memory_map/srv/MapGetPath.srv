@@ -1,0 +1,8 @@
+string entity_name # Get what robot trajectory ?
+---
+uint8 STATUS_FINISHED  = 0
+uint8 STATUS_EXECUTING = 1
+uint8 STATUS_PAUSED    = 2
+uint8 STATUS_STOPPED   = 3
+uint8 status #The current status of the robot's path
+Point2D[] path_waypoints

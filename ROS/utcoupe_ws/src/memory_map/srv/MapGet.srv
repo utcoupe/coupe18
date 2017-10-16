@@ -1,0 +1,11 @@
+uint8 GETTYPE_GETOBJECT = 0
+uint8 GETTYPE_GETENTITY = 1
+uint8 GETTYPE_CONDITION = 1
+
+uint8 gettype # Gives the type of element the caller wants
+
+# For GetObject and GetEntity
+string name
+
+---
+string response
