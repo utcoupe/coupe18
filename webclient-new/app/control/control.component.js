@@ -1,9 +1,10 @@
 
 class ControlController {
-  constructor($rootScope, $timeout, $interval, Settings, Domains, Ros) {
+  constructor($rootScope, $timeout, $interval, Settings, Domains, Ros, Console) {
     this.$timeout = $timeout;
     this.Domains = Domains;
     this.domains = $rootScope.domains;
+    this.logs = Console.logs;
 
     this.ros = Ros;
     this.setting = Settings.get();

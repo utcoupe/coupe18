@@ -52,7 +52,7 @@
       <!-- Console Log -->
       <div class="console">
         <table class="table">
-          <tr ng-repeat="logEntry in $ctrl.ros.data.rosout" ng-if="$ctrl.Domains.filterAdvanced(logEntry.abbr, $ctrl.setting.advanced)">
+          <tr ng-repeat="logEntry in $ctrl.logs" ng-if="$ctrl.Domains.filterAdvanced(logEntry.abbr, $ctrl.setting.advanced)">
             <td>
               <strong ng-class="{
                         'text-danger bg-danger': logEntry.level > 8,
@@ -62,7 +62,6 @@
                         'text-muted': logEntry.level < 2 }" >
                 {{ logEntry.abbr }}
               </strong>
-              <br>
               <small><i class="glyphicon glyphicon-time"></i> {{ logEntry.dateString }}</small>
             </td>
             <td>{{ logEntry.msg }}</td>
