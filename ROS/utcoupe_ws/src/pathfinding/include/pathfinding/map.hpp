@@ -12,75 +12,10 @@
 
 #include <iostream>
 #include <vector>
-#include <cmath>
-
-#include <boost/graph/astar_search.hpp>
-#include <boost/graph/grid_graph.hpp>
-#include <boost/graph/filtered_graph.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/unordered_map.hpp>
-#include <boost/unordered_set.hpp>
 
 #include "bitmap_image.hpp"
-
-class MAP;
-
-typedef boost::grid_graph<2> grid;
-typedef boost::graph_traits<grid>::vertex_descriptor vertex_descriptor;
-
-struct vertex_hash : std::unary_function<vertex_descriptor, std::size_t> {
-    std::size_t operator()(vertex_descriptor const &u) const {
-        std::size_t seed = 0;
-        boost::hash_combine(seed, u[0]);
-        boost::hash_combine(seed, u[1]);
-        return seed;
-    }
-};
-
-struct found_goal {
-};
-
-typedef boost::graph_traits<grid>::vertices_size_type vertices_size_type;
-typedef boost::unordered_set<vertex_descriptor, vertex_hash> vertex_set;
-typedef boost::vertex_subset_complement_filter<grid, vertex_set>::type filtered_grid;
-
-typedef enum heuristic_type {
-    EUCLIDEAN, NORM1
-} heuristic_type;
-
-std::ostream &operator<<(std::ostream &os, const MAP &map);
-
-class heuristicCompute : public boost::astar_heuristic<filtered_grid, double> {
-public:
-    heuristicCompute(heuristic_type type, vertex_descriptor goal) : m_goal(goal), m_type(type) {};
-
-    double computeHeuristic(vertex_descriptor v) {
-        double returnValue = 0.0;
-        if (m_type == NORM1) {
-            returnValue = std::abs((double)m_goal[0] - (double)v[0]) + std::abs((double)m_goal[1] - (double)v[1]);
-        } else if (m_type == EUCLIDEAN) {
-            returnValue = sqrt(pow(double(m_goal[0]) - double(v[0]), 2) + pow(double(m_goal[1]) - double(v[1]), 2));
-        }
-        return returnValue;
-    }
-
-private:
-    vertex_descriptor m_goal;
-    heuristic_type m_type;
-};
-
-
-struct astar_goal_visitor : public boost::default_astar_visitor {
-    astar_goal_visitor(vertex_descriptor goal) : m_goal(goal) {};
-
-    void examine_vertex(vertex_descriptor u, const filtered_grid &) {
-        if (u == m_goal)
-            throw found_goal();
-    }
-
-private:
-    vertex_descriptor m_goal;
-};
+#include "shared_declarations.hpp"
+#include "heuristic_compute.hpp"
 
 /**
  * The map object computes paths based on an internal map.
@@ -146,6 +81,12 @@ public:
     bool solved() const { return !solution.empty(); }
 
     void set_heuristic_mode(heuristic_type mode) { h_mode = mode; };
+    
+    /**
+     * Print the maze as an ASCII map.
+     */
+    std::ostream &operator<<(std::ostream &output);
+    
 private:
     unsigned int map_w, map_h;
     grid create_map(std::size_t x, std::size_t y);

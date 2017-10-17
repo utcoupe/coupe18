@@ -253,37 +253,35 @@ filtered_grid MAP::create_barrier_map() {
 #define BARRIER "#"
 
 // Print the maze as an ASCII map.
-std::ostream &operator<<(std::ostream &output, const MAP &m) {
-    output << "Grid size : " << m.get_map_w() << "x" << m.get_map_h() << std::endl;
+std::ostream& MAP::operator<<(std::ostream &output) {
+    output << "Grid size : " << get_map_w() << "x" << get_map_h() << std::endl;
     // Header
-    for (unsigned int i = 0; i < m.get_map_w() + 2; i++)
+    for (unsigned int i = 0; i < get_map_w() + 2; i++)
         output << BARRIER;
     output << std::endl;
     // Body
-    for (unsigned int y = 0; y < m.get_map_h(); y++) {
-        for (unsigned int x = 0; x < m.get_map_w(); x++) {
-            // Put a barrier on the left-hand side.
-            if (x == 0)
-                output << BARRIER;
+    for (unsigned int y = 0; y < get_map_h(); y++) {
+        // Put a barrier on the left-hand side.
+        output << BARRIER;
+        for (unsigned int x = 0; x < get_map_w(); x++) {
             // Put the character representing this point in the maze grid.
             vertex_descriptor u = {{(vertices_size_type) x, (vertices_size_type) y}};
-            if (m.smooth_solution_contains(u))
+            if (smooth_solution_contains(u))
                 output << "O";
-            else if (m.solution_contains(u))
+            else if (solution_contains(u))
                 output << ".";
-            else if (m.has_barrier(u))
+            else if (has_barrier(u))
                 output << BARRIER;
             else
                 output << " ";
-            // Put a barrier on the right-hand side.
-            if (x == m.get_map_w() - 1)
-                output << BARRIER;
         }
+        // Put a barrier on the right-hand side.
+        output << BARRIER;
         // Put a newline after every row except the last one.
         output << std::endl;
     }
     // Footer
-    for (unsigned int i = -1; i < m.get_map_w() + 2; i++)
+    for (unsigned int i = -1; i < get_map_w() + 2; i++)
         output << BARRIER;
     return output;
 }
