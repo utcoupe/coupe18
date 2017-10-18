@@ -15,6 +15,7 @@ gulp.task('js-vendor', function () {
   return gulp.src([
     'node_modules/underscore/underscore.js',
     'node_modules/angular/angular.js',
+    'node_modules/angular-animate/angular-animate.js',
     'node_modules/angular-route/angular-route.js',
     'node_modules/angular-local-storage/dist/angular-local-storage.js',
     'node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js',

@@ -4,7 +4,6 @@ class ConsoleService {
     this.ros = Ros;
     this.setting = Settings.get();
 
-    this.maxConsoleEntries = 200;
     this.logs = [];
     this.setConsole();
   }
@@ -30,9 +29,10 @@ class ConsoleService {
 
       this.logs.unshift(message);
 
-      if (this.logs.length > this.maxConsoleEntries) {
+      if (this.logs.length > this.setting.maxConsoleEntries) {
         this.logs.pop();
       }
+
     });
   }
 

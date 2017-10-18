@@ -22,7 +22,6 @@ class ServiceController {
       const fileName = `${path}${this.service.type}.html`;
       this.$http.get(fileName).then((result) => {
         if (result.data) {
-
           this.fileName = fileName;
         }
       }, () => {});

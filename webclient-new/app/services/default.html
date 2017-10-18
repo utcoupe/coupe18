@@ -1,10 +1,9 @@
-<div class="panel panel-default">
-  <div class="panel-heading clearfix">
-    <h3 class="panel-title">
-      {{ $ctrl.service.abbr }}
-      <small style="font-size: 12px;">({{ $ctrl.service.type }} / Default)</small>
-    </h3>
-  </div>
+<div uib-accordion-group class="panel-default" is-open="$ctrl.service.isOpen">
+  <uib-accordion-heading>
+    {{ $ctrl.service.abbr }}
+    <div style="float: right">  <small style="font-size: 12px;">({{ $ctrl.service.type }} / Default)</small></div>
+    <div style="clear: both;"></div>
+  </uib-accordion-heading>
 
   <div class="panel-body">
     <div class="row">

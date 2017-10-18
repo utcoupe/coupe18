@@ -42,7 +42,7 @@ function run($rootScope) {
   }];
 }
 
-angular.module('roscc', ['ngRoute', 'ui.bootstrap', 'LocalStorageModule', 'chart.js']).config(ROSCCConfig).run(run);
+angular.module('roscc', ['ngRoute', 'ui.bootstrap', 'LocalStorageModule', 'chart.js', 'ngAnimate']).config(ROSCCConfig).run(run);
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -271,8 +271,19 @@ var ControlController = function () {
       });
     }
   }, {
-    key: '$onDestroy',
-    value: function $onDestroy() {}
+    key: 'collapseAll',
+    value: function collapseAll(domain) {
+      this.ros.getServicesForDomain(domain).map(function (item) {
+        item.isOpen = false;
+      });
+    }
+  }, {
+    key: 'expandAll',
+    value: function expandAll(domain) {
+      this.ros.getServicesForDomain(domain).map(function (item) {
+        item.isOpen = true;
+      });
+    }
   }]);
 
   return ControlController;
@@ -369,6 +380,20 @@ var DiagnosticController = function () {
         return t.active == true;
       });
     }
+  }, {
+    key: 'collapseAll',
+    value: function collapseAll(domain) {
+      this.ros.getTopicsForDomain(domain).map(function (item) {
+        item.isOpen = false;
+      });
+    }
+  }, {
+    key: 'expandAll',
+    value: function expandAll(domain) {
+      this.ros.getTopicsForDomain(domain).map(function (item) {
+        item.isOpen = true;
+      });
+    }
   }]);
 
   return DiagnosticController;
@@ -391,7 +416,6 @@ var ConsoleService = function () {
     this.ros = Ros;
     this.setting = Settings.get();
 
-    this.maxConsoleEntries = 200;
     this.logs = [];
     this.setConsole();
   }
@@ -423,7 +447,7 @@ var ConsoleService = function () {
 
         _this.logs.unshift(message);
 
-        if (_this.logs.length > _this.maxConsoleEntries) {
+        if (_this.logs.length > _this.setting.maxConsoleEntries) {
           _this.logs.pop();
         }
       });
@@ -1630,7 +1654,6 @@ var ServiceController = function () {
         var fileName = '' + path + _this.service.type + '.html';
         _this.$http.get(fileName).then(function (result) {
           if (result.data) {
-
             _this.fileName = fileName;
           }
         }, function () {});
@@ -1793,7 +1816,8 @@ var SettingsService = function () {
         log: '/rosout',
         advanced: false,
         hokuyo_1: '/sensors/hokuyo_1_raw',
-        hokuyo_2: "/sensors/hokuyo_2_raw"
+        hokuyo_2: '/sensors/hokuyo_2_raw',
+        maxConsoleEntries: 200
       };
     }
   }]);

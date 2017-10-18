@@ -63,4 +63,4 @@ function run($rootScope) {
 }
 
 
-angular.module('roscc', ['ngRoute', 'ui.bootstrap', 'LocalStorageModule', 'chart.js']).config(ROSCCConfig).run(run);
+angular.module('roscc', ['ngRoute', 'ui.bootstrap', 'LocalStorageModule', 'chart.js', 'ngAnimate']).config(ROSCCConfig).run(run);

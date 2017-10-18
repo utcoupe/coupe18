@@ -1,13 +1,13 @@
-<div class="panel panel-default" ng-class="{'panel-success': $ctrl.toggle}">
-  <div class="panel-heading clearfix">
-    <button class="btn btn-default btn-sm pull-right" ng-click="$ctrl.toggleSubscription(!$ctrl.toggle)" ng-model="$ctrl.toggle" uib-btn-checkbox>{{ $ctrl.toggle ? 'Unsubscribe' : 'Subscribe' }}</button>
+<div uib-accordion-group class="panel-default" ng-class="{'panel-success': $ctrl.toggle}" is-open="$ctrl.topic.isOpen">
+  <uib-accordion-heading>
+    {{ $ctrl.topic.abbr }}
 
-    <h3 class="panel-title">
-      {{ $ctrl.topic.abbr }}
-      <small style="font-size: 12px;">({{ $ctrl.topic.type }})</small>
-    </h3>
-  </div>
+    <button class="btn btn-default btn-sm pull-right sub-btn" ng-click="$event.stopPropagation();$event.preventDefault();$ctrl.toggleSubscription(!$ctrl.toggle);" ng-model="$ctrl.toggle" uib-btn-checkbox>{{ $ctrl.toggle ? 'Unsubscribe' : 'Subscribe' }}</button>
+    <div style="float: right">  <small style="font-size: 12px;">({{ $ctrl.topic.type }})</small></div>
 
+    <div style="clear: both;"></div>
+  </uib-accordion-heading>
+  
   <div class="panel-body">
     <div class="row">
       <div class="col-xs-12">

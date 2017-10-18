@@ -54,6 +54,7 @@ class TopicController {
       this.roslibTopic.unsubscribe();
     }
     this.isSubscribing = !data;
+
   }
 
   publishMessage(input, isJSON) {

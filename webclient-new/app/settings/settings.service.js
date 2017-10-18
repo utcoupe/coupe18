@@ -56,7 +56,8 @@ class SettingsService {
       log: '/rosout',
       advanced: false,
       hokuyo_1: '/sensors/hokuyo_1_raw',
-      hokuyo_2: "/sensors/hokuyo_2_raw"
+      hokuyo_2: '/sensors/hokuyo_2_raw',
+      maxConsoleEntries: 200
     };
   }
 }

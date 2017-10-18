@@ -1,5 +1,11 @@
 <div class="container-fluid">
-  <center><div><a ng-click="$ctrl.refresh()" class="reload">Actualiser</a></div></center><br />
+  <center>
+    <button class="btn btn-info" ng-click="$ctrl.refresh()">
+      Refresh
+    </button>
+
+  </center><br />
+
   <!-- No connection alert -->
   <div class="alert alert-danger col-sm-6 col-sm-offset-3" role="alert" ng-if="!$ctrl.ros.isConnected">
     <p class="lead"><i class="glyphicon glyphicon-warning-sign"></i> Whoops...</p>
@@ -22,27 +28,51 @@
                <h3 class="panel-title text-capitalize">{{ domain }}</h3>
              </div>
           </div>
-          <input type="checkbox" ng-model="$ctrl.setting.showUnexpected"> Advanced View</input>
+          <center><button class="btn btn-info" ng-click="$ctrl.showUnexpected = !$ctrl.showUnexpected">
+            <span class="glyphicon" ng-class="{ 'glyphicon-chevron-down' : !$ctrl.showUnexpected,
+                        'glyphicon-chevron-up' : $ctrl.showUnexpected }"></span>
+
+            {{ $ctrl.showUnexpected ? ' Hide unexpected' : 'Show unexpected'}}
+
+            <span class="glyphicon" ng-class="{ 'glyphicon-chevron-down' : !$ctrl.showUnexpected,
+                        'glyphicon-chevron-up' : $ctrl.showUnexpected }"></span>
+          </button></center>
+          <br/>
           <hr ng-if="$ctrl.setting.showUnexpected"/>
 
           <div class="panel panel-default panel-domain"
                ng-class="{ 'panel-active': ($ctrl.activeDomain == domain)}"
                ng-repeat="domain in $ctrl.ros.getUnexpectedDomains()"
                ng-click="$ctrl.setActiveDomain(domain)"
-               ng-if="$ctrl.setting.showUnexpected && !!$ctrl.ros.getTopicsForDomain(domain).length">
+               ng-if="$ctrl.showUnexpected && !!$ctrl.ros.getTopicsForDomain(domain).length">
 
              <div class="panel-heading">
                <h3 class="panel-title text-capitalize">{{ domain }}</h3>
+
              </div>
           </div>
         </div>
 
         <div class="col-sm-9">
           <div ng-repeat="domain in $ctrl.ros.getDomains()" ng-show="$ctrl.activeDomain == domain">
-            <p class="lead text-capitalize" style="font-size: 28px;">{{ domain }}</p>
+            <p class="lead text-capitalize" style="font-size: 28px; float:left">{{ domain }}</p>
+            <div style="float: right">
+              <button class="btn btn-default" ng-click="$ctrl.expandAll(domain)">
+                Expand all
+              </button>
+              <button class="btn btn-default" ng-click="$ctrl.collapseAll(domain)">
+                Collapse all
+              </button>
+            </div>
+            <div style="clear: both;"></div>
 
-            <!-- Topics -->
-            <cc-topic topic="topic" ng-repeat="topic in $ctrl.ros.getTopicsForDomain(domain)"></cc-topic>
+            <uib-accordion close-others="false">
+              <!-- Topics -->
+              <div ng-repeat="topic in $ctrl.ros.getTopicsForDomain(domain)">
+                <cc-topic topic="topic"></cc-topic>
+                <div style="height:7px;"></div>
+              </div>
+            </uib-accordion>
           </div>
         </div>
       </div>
@@ -52,7 +82,7 @@
       <!-- Console Log -->
       <div class="console">
         <table class="table">
-          <tr ng-repeat="logEntry in $ctrl.logs" ng-if="$ctrl.Domains.filterAdvanced(logEntry.abbr, $ctrl.setting.advanced)">
+          <tr ng-repeat="logEntry in $ctrl.logs">
             <td>
               <strong ng-class="{
                         'text-danger bg-danger': logEntry.level > 8,

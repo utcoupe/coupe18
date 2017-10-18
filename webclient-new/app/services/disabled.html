@@ -1,15 +1,7 @@
-<div class="panel panel-danger">
-  <div class="panel-heading clearfix">
-    <h3 class="panel-title">
-      {{ $ctrl.service.abbr }}
-    </h3>
-  </div>
-
-  <div class="panel-body">
-    <div class="row">
-      <div class="col-xs-12">
-        Service not running !
-      </div>
-    </div>
-  </div>
+<div uib-accordion-group class="panel-danger" is-disabled="true">
+  <uib-accordion-heading>
+    {{ $ctrl.service.abbr }}
+    <div style="float: right">  <small style="font-size: 12px;">Not running !</small></div>
+    <div style="clear: both;"></div>
+  </uib-accordion-heading>
 </div>

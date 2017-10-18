@@ -47,7 +47,16 @@ class ControlController {
     return _.some(this.ros.getTopicsForDomain(domain), (t) => t.active == true);
   }
 
-  $onDestroy() {
+  collapseAll(domain) {
+    this.ros.getServicesForDomain(domain).map(function(item){
+      item.isOpen = false;
+    });
+  }
+
+  expandAll(domain) {
+    this.ros.getServicesForDomain(domain).map(function(item){
+      item.isOpen = true;
+    });
   }
 }
 

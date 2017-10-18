@@ -46,6 +46,18 @@ class DiagnosticController {
   isDomainActive(domain) {
     return _.some(this.ros.getTopicsForDomain(domain), (t) => t.active == true);
   }
+
+  collapseAll(domain) {
+    this.ros.getTopicsForDomain(domain).map(function(item){
+      item.isOpen = false;
+    });
+  }
+
+  expandAll(domain) {
+    this.ros.getTopicsForDomain(domain).map(function(item){
+      item.isOpen = true;
+    });
+  }
 }
 
 angular.module('roscc').component('ccDiagnostic', {
