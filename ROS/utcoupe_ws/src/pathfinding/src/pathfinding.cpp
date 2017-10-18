@@ -34,12 +34,16 @@
 #include "ros/console.h"
 #include "std_msgs/String.h"
 
+#include "geometry_msgs/Point.h"
+
+#include "pathfinding/DoOrder.h"
 #include "pathfinding/FindPath.h"
 
 #include "pathfinding/map.hpp"
 
 #define FAILED_STR "FAIL\n"
-const std::string TOPIC = "navigation/pathfinding";
+const std::string TOPIC_DOORDER = "navigation/pathfinding/doorder";
+const std::string TOPIC_FINDPATH = "navigation/pathfinding/findpath";
 
 using namespace std;
 using namespace TCLAP;
@@ -117,6 +121,8 @@ void addDynamicObject(string &command, MAP &map) {
     }
 }
 
+std::vector<vertex_descriptor> calcPath(MAP& map, unsigned int x_s, unsigned int y_s, unsigned int x_e, unsigned int y_e, chrono::time_point<chrono::system_clock>& startChrono, double& distance);
+
 /**
  * Compute a path from start point to end point
  * If start point is not valid, find the nearest valid point
@@ -128,12 +134,11 @@ void addDynamicObject(string &command, MAP &map) {
  */
 string commandCalcPath(string &command, MAP &map) {
     unsigned int x_s, y_s, x_e, y_e;
-    vertex_descriptor start, end, start_valid, end_valid;
     vector<vertex_descriptor> path;
-    double distance;
     stringstream answer;
     chrono::time_point<chrono::system_clock> startChrono, endChrono;
     chrono::duration<double> elapsedSeconds;
+    double distance;
 
     // Get the initial and end point and search the nearest valid point
 
@@ -142,47 +147,12 @@ string commandCalcPath(string &command, MAP &map) {
         ROS_ERROR( "Did not parse the input correctly");
         return FAILED_STR;
     }
-    if (!(isValid(x_s, y_s, map) && isValid(x_e, y_e, map))) {
-        ROS_ERROR("Start or end point is not in the map");
+    
+    path = calcPath(map, x_s, y_s, x_e, y_e, startChrono, distance);
+    
+    if (path.size() == 0) // There was an error in calcPath(...)
         return FAILED_STR;
-    }
-
-    end = map.get_vertex(x_e, y_e);
-    if (map.has_dynamic_barrier(end)) {
-       ROS_ERROR("End point on a dynamic object");
-        return FAILED_STR;
-    }
-    end_valid = map.find_nearest_valid(end);
-
-    start = map.get_vertex(x_s, y_s);
-    start_valid = map.find_nearest_valid(start);
-
-    if (debugFlag) {
-        ROS_DEBUG_STREAM("Start : " << start_valid[0] << ":" << start_valid[1]);
-        ROS_DEBUG_STREAM("End : " << end_valid[0] << ":" << end_valid[1]);
-        startChrono = chrono::system_clock::now();
-    }
-
-    // Ask the map to compute the path between the start and the end
-    map.solve(start_valid, end_valid);
-    if (!map.solved()) {
-       ROS_ERROR("Could not find any path");
-        return FAILED_STR;
-    }
-    // Transform the path to be smoother
-    map.solve_smooth();
-    // Get the result path
-    path = map.get_smooth_solution();
-    distance = map.get_smooth_solution_length();
-    // Check if the path is valid
-    if (start != start_valid) {
-        path.insert(path.begin(), start);
-        distance += heuristicCompute(heuristicMode, start).computeHeuristic(start_valid);
-    }
-    if (end != end_valid) {
-        path.push_back(end);
-        distance += heuristicCompute(heuristicMode, end).computeHeuristic(end_valid);
-    }
+    
     // Create the string representing the path
     for (auto &point: path) {
         answer << point[0] << ";" << point[1] << ";";
@@ -200,15 +170,71 @@ string commandCalcPath(string &command, MAP &map) {
     return answer.str();
 }
 
+std::vector<vertex_descriptor> calcPath(MAP& map, unsigned int x_s,         unsigned int y_s, unsigned int x_e, unsigned int y_e, chrono::time_point<chrono::system_clock>& startChrono, double& distance) {
+    vertex_descriptor start, end, start_valid, end_valid;
+    std::vector<vertex_descriptor> path;
+    
+    if (!(isValid(x_s, y_s, map) && isValid(x_e, y_e, map))) {
+        ROS_ERROR("Start or end point is not in the map");
+        return path;
+    }
+
+    end = map.get_vertex(x_e, y_e);
+    if (map.has_dynamic_barrier(end)) {
+       ROS_ERROR("End point on a dynamic object");
+        return path;
+    }
+    end_valid = map.find_nearest_valid(end);
+
+    start = map.get_vertex(x_s, y_s);
+    start_valid = map.find_nearest_valid(start);
+
+    if (debugFlag) {
+        ROS_DEBUG_STREAM("Start : " << start_valid[0] << ":" << start_valid[1]);
+        ROS_DEBUG_STREAM("End : " << end_valid[0] << ":" << end_valid[1]);
+        startChrono = chrono::system_clock::now();
+    }
+
+    // Ask the map to compute the path between the start and the end
+    map.solve(start_valid, end_valid);
+    if (!map.solved()) {
+       ROS_ERROR("Could not find any path");
+        return path;
+    }
+    // Transform the path to be smoother
+    map.solve_smooth();
+    // Get the result path
+    path = map.get_smooth_solution();
+    distance = map.get_smooth_solution_length();
+    // Check if the path is valid
+    if (start != start_valid) {
+        path.insert(path.begin(), start);
+        distance += heuristicCompute(heuristicMode, start).computeHeuristic(start_valid);
+    }
+    if (end != end_valid) {
+        path.push_back(end);
+        distance += heuristicCompute(heuristicMode, end).computeHeuristic(end_valid);
+    }
+    return path;
+}
+
+class CallBackService {
+public:
+    CallBackService (MAP& map): map(map) {};
+    
+protected:
+    MAP& map;
+};
+
 /**
  * This class acts as a callback, with binding possibilities. No more corrupted double-linked list errors!
  * TODO Change string messages with parsing to structured messages
  */
-class CallbackService {
+class CallbackDoOrderService : public CallBackService {
 public:
-    CallbackService(MAP& map): map(map) {}
+    CallbackDoOrderService(MAP& map): CallBackService(map) {}
     
-    bool  callCallback (pathfinding::FindPath::Request &req, pathfinding::FindPath::Response &res) {
+    bool  callCallback (pathfinding::DoOrder::Request &req, pathfinding::DoOrder::Response &res) {
         string command, answer;
         command = req.msg;
         ROS_DEBUG_STREAM ("I heard \"" << command << "\"");
@@ -227,9 +253,61 @@ public:
         }
         return true;
     }
+};
+
+inline string pointToStr(const geometry_msgs::Point& point) {
+    ostringstream str;
+    str << "(" << point.x << "," << point.y << ")";
+    return str.str();
+}
+
+class CallBackFindPathService : public CallBackService {
+public:
+    CallBackFindPathService (MAP& map) : CallBackService(map) {}
     
-private:
-    MAP& map;
+    bool callCallback (pathfinding::FindPath::Request &req, pathfinding::FindPath::Response &res) {
+        vector<vertex_descriptor> path;
+        chrono::time_point<chrono::system_clock> startChrono, endChrono;
+        chrono::duration<double> elapsedSeconds;
+        double distance;
+        
+        ROS_DEBUG_STREAM("FindPath: I heard : " << pointToStr(req.posStart) << ", " << pointToStr(req.posEnd));
+        
+        path = calcPath(map, req.posStart.x, req.posStart.y, req.posEnd.x, req.posEnd.y, startChrono, distance);
+        
+        if (path.size() == 0) // there was an error in calcPath(...)
+        {
+            res.success = false;
+            return true;
+        }
+        
+        string strPath = "[";
+        
+        for (auto &point: path) {
+            geometry_msgs::Point p;
+            p.x = point[0];
+            p.y = point[1];
+            res.path.push_back(p);
+            strPath += pointToStr(p) + ", ";
+        }
+        if (strPath.size() >= 2)
+            strPath.erase(strPath.end() - 2, strPath.end());
+        strPath += "]";
+        
+        if (debugFlag) {
+            endChrono = chrono::system_clock::now();
+            elapsedSeconds = endChrono - startChrono;
+            ROS_DEBUG_STREAM("Path contains " << path.size() << " points, total distance = " << distance);
+            ROS_DEBUG_STREAM("Computing time : " << elapsedSeconds.count());
+        }
+        if (bmpRenderingFlag) {
+            map.generate_bmp("tmp.bmp");
+        }
+        
+        ROS_DEBUG_STREAM("Answering " << strPath << ", true");
+        res.success = true;
+        return true;
+    }
 };
 
 int main(int argc, char **argv) {
@@ -271,14 +349,15 @@ int main(int argc, char **argv) {
     map.set_heuristic_mode(heuristicMode);
     ROS_DEBUG_STREAM("Done, map size is : " << map.get_map_w()
              << "x" << map.get_map_h());
-
-    ROS_DEBUG_STREAM ("Trying to subscribe to " << TOPIC);
     
     ros::NodeHandle n;
     
     // Why is this astrocity needed? Because neither std or boost detect the correct cast for boost::bind and std lanmbda.
-    CallbackService callback(map);
-    ros::ServiceServer service = n.advertiseService(TOPIC, &CallbackService::callCallback, &callback);
+    CallbackDoOrderService callbackDoOrder(map);
+    ros::ServiceServer serviceDoOrder = n.advertiseService(TOPIC_DOORDER, &CallbackDoOrderService::callCallback, &callbackDoOrder);
+    
+    CallBackFindPathService callbackFindPath(map);
+    ros::ServiceServer serviceFindPath = n.advertiseService(TOPIC_FINDPATH, &CallBackFindPathService::callCallback, &callbackFindPath);
     
     ROS_INFO ("pathfinding now ready to receive order!");
     ROS_DEBUG ("TODO: Change parsed string messages to structured messages");

@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
     roscpp
     std_msgs
     genmsg
+    geometry_msgs
 )
 
 find_package(Boost REQUIRED)
@@ -20,6 +21,7 @@ SET(TCLAP_INCLUDE_DIR libs/tclap-1.2.1/include)
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
+  DoOrder.srv
   FindPath.srv
 )
 
@@ -27,6 +29,7 @@ add_service_files(
 generate_messages(
   DEPENDENCIES
   std_msgs
+  geometry_msgs
 )
 
 ################################################
