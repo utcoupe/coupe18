@@ -24,7 +24,7 @@ WARNINGS
 #=            Base classes            =
 #====================================*/
 
-class TaskStatus:
+class TaskStatus():
 	CRITICAL            = ('CRITICAL'			, '💔')					# Fatal error, system will shutdown.
 	WAITINGFORRESPONSE  = ('WAITINGFORRESPONSE'	, '💬')					# Order sent service or action message, waiting for response callback.
 	NEEDSPREVIOUS       = ('NEEDSPREVIOUS'      , '↳')					# Task can't execute yet because it needs the previous task to be at SUCCESS still.
@@ -34,6 +34,7 @@ class TaskStatus:
 	ERROR               = ('ERROR'				, '⛔', "error_msg")		# Error. Order couldn't be done, AI will try to find an alternative path of orders in the tree.
 	BLOCKED             = ('BLOCKED'			, '◼')					# Node can't execute because conditions aren't fully satisfied.
 	SUCCESS             = ('SUCCESS'			, '🆗', 0.0)				# Order and lists complete.
+	@staticmethod
 	def toEmoji(status):
 		return status[1]
 
@@ -112,6 +113,13 @@ class Task(object):
 class GameProperties():
 	GAME_DURATION = None
 	REWARD_POINTS = 0
+
+class Param():
+	def __init__(self, name, type, required=True, value=None):
+		self.name = name
+		self.type = type
+		self.required = required
+		self.value = value
 
 #/*=====  End of Base classes  ======*/
 
@@ -421,32 +429,40 @@ class Order(Task):
 
 class Message():
 	def __init__(self, xml):
-		self.Department  = xml.attrib["department"]
-		self.Destination = xml.find("dest").text if len(xml.findall("dest")) > 0 else "main"
-		self.Command     = xml.find("command").text
+		if not "dest" in xml.attrib:
+			raise KeyError, "PARSING ERROR ! Messages need a 'dest' attribute"
 
-		# Save which parameters are needed for the message
-		self.NeededParamsIDs = []
-		for param in xml.find("params").findall("param"):
-			self.NeededParamsIDs.append(param.attrib["id"])
+		self.Destination = xml.attrib["dest"]
 
+		self.Parameters = []
+		paramsNames = [];
 
-		self.Parameters = {}
-		for param in xml.find("params"):
-			pass
-		#self.check_valid() TODO reput
-		self.Parameters = xml.find("params").text #TODO do full params handling, this is just pasting the params tag
+		for param in xml.findall("param"):
+			if not "name" in param.attrib:
+				raise KeyError, "PARSING ERROR ! Params need a 'name' attribute"
+			if not "type" in param.attrib:
+				raise KeyError, "PARSING ERROR ! Params need a 'type' attribute"
+			if not "required" in param.attrib and not param.text:
+				raise KeyError, "PARSING ERROR ! Non-prefilled params need a 'required' attribute"
 
-	def check_valid(self): #checks if all parameters are valid
-		#TODO forget that ? hardcoded
-		if self.Department not in ["ai", "mapmanager", "localization", "perception", "movement"]:
-			raise KeyError, "ERROR '{}' department doesn't exist ! (may need to update the check list in the ai_classes.py file)".format(self.Department)
+			name = param.attrib["name"]
+			type = param.attrib["type"]
+			required = (param.attrib["required"] == "true")
+			value = param.text if param.text else None
+
+			if name in paramsNames:
+				raise KeyError, "PARSING ERROR ! {} param not unique in this task".format(name)
+
+			self.Parameters.append(Params(name, type, required, value))
+			paramsNames.append(name)
 
 
 	def send(self, communicator):
 		params = None #TODO
 		self.startTime = time.time()
-		response = communicator.SendGenericCommand(self.Department, self.Destination, self.Command, self.Parameters)
+		split = self.Destination.split("/")
+		#TODO : change AICommunication to take only the dest and the params
+		response = communicator.SendGenericCommand(split[0], split[1], split[2], self.Parameters)
 		self.TimeTaken = time.time() - self.startTime
 		return response, self.TimeTaken
 
