@@ -4,7 +4,7 @@ from ai_communication import AICommunication
 from ai_services import AIServices
 from AI import RobotAI, TaskStatus
 
-from robot_ai.msg import AICommand
+from ai_scheduler.msg import AICommand
 
 class AINode():
 	def __init__(self):

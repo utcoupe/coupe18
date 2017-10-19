@@ -11,7 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
-  robot_ai
+  ai_scheduler
   message_generation
 )
 
