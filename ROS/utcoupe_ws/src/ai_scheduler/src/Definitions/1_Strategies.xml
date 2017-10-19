@@ -1,6 +1,6 @@
 <strategies>
-	
 	<!-- STRATEGY : <description here> -->
+	<!-- NOTE : The actions are in a rather random order. This strategy is set up for testing purposes only !-->
 	<strategy name="strategy_ftw">
 		<game>
 			<time>90</time>

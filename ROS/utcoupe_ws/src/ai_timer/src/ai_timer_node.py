@@ -11,7 +11,7 @@ class TimerNode():
 	def __init__(self):
 		self.DepartmentName, self.PackageName = "ai", "timer"
 		self.NODE = rospy.init_node(self.PackageName, log_level = rospy.INFO)
-		self.SERV = rospy.Service(  self.PackageName, AIGenericCommand, self.on_srv_request)
+		self.SERV = rospy.Service("/{}/{}".format(self.DepartmentName, self.PackageName), AIGenericCommand, self.on_srv_request)
 		self.PUBL = rospy.Publisher("/game_timer", ai_timer, queue_size = 10)
 
 		self.Duration = None # Holds the match duration.

@@ -1,16 +1,18 @@
 # AI Actions definition files
+
+(_TODO writing in progress_)
 This is where the robot is told what to do.
 
 ## 1. Files
-- `1_Strategies.xml` 
+- `1_Strategies.xml`
 
 File basic structure :
 ```xml
 <strategies>
-	<strategy>
+	<strategy name="utcoupe_ftw">
 	...
 	</strategy>
-	<strategy>
+	<strategy name="hithere">
 	...
 	</strategy>
 </strategies>
@@ -18,7 +20,7 @@ File basic structure :
 
 - `2_Actions.xml`
 
-Fail basic structure :
+File basic structure :
 ```xml
 <actionsstrategies>
 	<action name="sth", ref="actuator_open">
@@ -73,7 +75,7 @@ When a group is executed, the conditions to consider it is successful or not can
 - `one` : At least one action must be done correctly.
 - `+` : Do all actions if possible, but if one is done it will be considered successful.
 - `last` : The last action must be executed correctly.
-	
+
 Properties :
 - `reward`: If the whole group execution is considered successful, this is the amount of reward points given.
 
@@ -86,19 +88,19 @@ An Action object is a group of `Orders`, `Actions` and `ActionLists`.
 Properties :
 - `time`, obligatory : Approximate time needed to complete an action (seconds).
 - `reward` : If there are any, the action gives reward points to the AI.
-	
+
 Supported embedded actions that can be used in actions:
 - The `wheels` group communicates with the ROS `robot_movement_wheels` package. This is how the AI asks for the robot to move from a point to another. Actions defined :
 	- `wheels_gotoxy`: Ask the robot to move to a certain position. angle doesn't matter.
 	- `wheels_gotoxya`: Go to a certain position and angle.
 	- `wheels_gotoa`: Ask the robot to turn toward a certain direction.
-	- `wheels_delay`: Stop the robot for a certain duration (seconds).	
+	- `wheels_delay`: Stop the robot for a certain duration (seconds).
 - The `actuators` group:
 	- `actuator_open`: Set the actuator to the `closed` position set in the `robot.json` description file.
 	- `actuator_close`: Set the actuator to the `open` position set in the `robot.json` description file.
-	- `actuator_toggle`: Toggle between open/close position. 
+	- `actuator_toggle`: Toggle between open/close position.
 	- `actuator_setpos`: Manually set a position to the actuator.
 
 
 ### 4. Actions execution
-The last layer, `HardareActions.json`, 
+The last layer, `HardareActions.json`,

@@ -89,11 +89,11 @@
 		<params></params>
 		<conditions></conditions>
 		<actions name = "jack then start timer" exec="all" order="linear">
-            <orderref ref="wait_for_jack"/>
-            <nextneedsprevious/>
             <orderref ref="timer_set_duration"/>
 			<nextneedsprevious/>
             <orderref ref="timer_start"/>
+			<nextneedsprevious/>
+			<orderref ref="wait_for_jack"/>
 		</actions>
 	</action>
 

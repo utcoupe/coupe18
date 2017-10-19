@@ -1,6 +1,5 @@
 import rospy, time
-
-from robot_ai.msg import ai_timer
+from ai_timer.msg import ai_timer
 
 class GameTimer():
 	def __init__(self):
@@ -11,5 +10,5 @@ class GameTimer():
 	def on_new_time(self, msg):
 		if msg.is_finished:
 			if not self._finished:
-				rospy.logwarn("GAME FINISHED")
+				rospy.logwarn("[AI] GAME FINISHED EVENT FROM TIMER")
 				self._finished = True

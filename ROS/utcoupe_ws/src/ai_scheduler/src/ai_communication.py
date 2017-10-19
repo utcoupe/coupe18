@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import rospy
-import robot_ai.srv
+import ai_scheduler.srv
 
 class AICommunication():
 	def __init__(self):
@@ -14,10 +14,11 @@ class AICommunication():
 		rospy.logdebug("[AI]     Waiting for service to be available...")
 		rospy.wait_for_service(dest)
 
-		rospy.logdebug("[AI]     Sending request.")
-		service = rospy.ServiceProxy(dest, robot_ai.srv.AIGenericCommand)
+		rospy.logdebug("[AI]     Available. Sending request...")
+		service = rospy.ServiceProxy(dest, ai_scheduler.srv.AIGenericCommand)
 		rospy.logdebug("[AI]     Got response!")
 
 		return service(msg_department, msg_dest, msg_command, msg_params)
 
-# THREADING THIS : https://stackoverflow.com/questions/6800984/python-how-to-pass-and-run-a-callback-method-in-python ==> FORGET : USE ACTIONS
+# THREADING THIS : https://stackoverflow.com/questions/6800984/python-how-to-pass-and-run-a-callback-method-in-python
+# TODO ==> FORGET : IMPLEMENT ACTIONS INSTEAD

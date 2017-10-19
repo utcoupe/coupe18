@@ -1,12 +1,12 @@
 #!/usr/bin/python
 import rospy, time
-from robot_ai.srv import AIGenericCommand, AIGenericCommandResponse
+from ai_scheduler.srv import AIGenericCommand, AIGenericCommandResponse
 
 class AIServices():
 	def __init__(self, department, package):
 		self.DepartmentName, self.PackageName = department, package
-		rospy.Service(self.PackageName, AIGenericCommand, self.on_generic_command)
-		
+		rospy.Service("/{}/{}".format(self.DepartmentName, self.PackageName), AIGenericCommand, self.on_generic_command)
+
 	def on_generic_command(self, req):
 		if self.validate_request(req):
 			res_code, reason = self.executeService(req)
@@ -43,7 +43,3 @@ class AIServices():
 		return True
 	def __repr__(self):
 		return "/{}/{}".format(self.DepartmentName, self.PackageName)
-
-
-if __name__ == '__main__':
-	AIServices()

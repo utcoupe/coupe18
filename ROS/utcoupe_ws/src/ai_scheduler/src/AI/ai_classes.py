@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from random import randint
-from conditions import *
+from ai_conditions import *
 import rospy, time
 import copy
 

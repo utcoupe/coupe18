@@ -10,7 +10,7 @@ class AINode():
 	def __init__(self):
 		self.DepartmentName, self.PackageName = "ai", "scheduler"
 
-		self.NODE = rospy.init_node('main', log_level = rospy.DEBUG)
+		self.NODE = rospy.init_node(self.PackageName, log_level = rospy.DEBUG)
 		self.communication = AICommunication()
 
 		self.wait_for_departments()
@@ -25,7 +25,7 @@ class AINode():
 		rospy.loginfo("[AI] Launching robot with strategy :")
 		self.AI.Strategy.PrettyPrint()
 
-		# Run the whole AI
+		# Run the whole AI until there are no orders left to execute
 		while not rospy.is_shutdown():
 			if self.AI.Strategy.canContinue():
 				self.AI.Strategy.getNext().execute(self.communication)
@@ -37,7 +37,10 @@ class AINode():
 
 
 	def wait_for_departments(self):
-		pass # TODO wait for all services to be ready.
+		pass # TODO wait for all services to be ready before launching the actions.
 
+'''
+PACKAGE STARTING POINT HERE
+'''
 if __name__ == "__main__":
 	node = AINode()
