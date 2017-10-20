@@ -9,14 +9,10 @@
 		</conditions>
 		<actions exec="one">
 			<orderref ref="actuator_open">
-				<param id="module_ID">
-					<ID>2</ID>
-				</param>
+				<ID>2</ID>
 			</orderref>
 			<orderref ref="ai_delay">
-				<param id="time">
-					<time>1.5</time>
-				</param>
+				<time>1.5</time>
 			</orderref>
 			<orderref ref="actuator_close">
 				<ID>1</ID>
@@ -32,14 +28,10 @@
 		</conditions>
 		<actions exec='all' order="random">
 			<orderref ref="actuator_open">
-				<param id="module_ID">
-					<ID>2</ID>
-				</param>
+				<ID>2</ID>
 			</orderref>
 			<orderref ref="ai_delay">
-				<param id="time">
-					<time>1.5</time>
-				</param>
+				<time>1.5</time>
 			</orderref>
 			<orderref ref="actuator_close">
 				<ID>1</ID>
@@ -61,7 +53,8 @@
 		</conditions>
 		<actions exec="all" order="linear">
 			<orderref ref = "wheels_goto">
-				<param id="position"/>
+				<pos_x>50</pos_x>
+				<pos_y>84</pos_y>
 			</orderref>
 			<nextneedsprevious/>
 			<actionref ref="takein_module"/>
@@ -77,7 +70,8 @@
 		</conditions>
 		<actions exec="all" order="linear">
 			<orderref ref = "wheels_goto">
-				<param id="position"/>
+				<pos_x>50</pos_x>
+				<pos_y>84</pos_y>
 			</orderref>
 			<nextneedsprevious/>
 			<actionref ref="takeout_module"/>
@@ -89,9 +83,9 @@
 		<params></params>
 		<conditions></conditions>
 		<actions name = "jack then start timer" exec="all" order="linear">
-            <orderref ref="timer_set_duration"/>
+      <orderref ref="timer_set_duration"/>
 			<nextneedsprevious/>
-            <orderref ref="timer_start"/>
+      <orderref ref="timer_start"/>
 			<nextneedsprevious/>
 			<orderref ref="wait_for_jack"/>
 		</actions>

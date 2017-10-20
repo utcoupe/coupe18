@@ -115,11 +115,12 @@ class GameProperties():
 	REWARD_POINTS = 0
 
 class Param():
-	def __init__(self, name, type, required=True, value=None):
+	def __init__(self, name, type, required=True, value=None, preset=False):
 		self.name = name
 		self.type = type
 		self.required = required
 		self.value = value
+		self.preset = preset #if True : param cannot be set from outside
 
 #/*=====  End of Base classes  ======*/
 
@@ -444,17 +445,27 @@ class Message():
 				raise KeyError, "PARSING ERROR ! Params need a 'type' attribute"
 			if "optional" in param.attrib and param.text:
 				raise KeyError, "PARSING ERROR ! Prefilled params cannot have a 'optional' attribute"
+			if "default" in param.attrib and param.text:
+				raise KeyError, "PARSING ERROR ! Prefilled params cannot have a 'default' attribute"
 
-			name = param.attrib["name"]
-			type = param.attrib["type"]
-			required = (param.attrib["optional"] != "true") if "optional" in param.attrib else True;
 
-			value = param.text if param.text else None
+			name = param.attrib["name"].lower()
+			type = param.attrib["type"].lower()
+			required = (param.attrib["optional"].lower() != "true") if "optional" in param.attrib else True;
+			preset = False
+
+			if param.text:
+				value = param.text
+				preset = True
+			elif "default" in param.attrib:
+				value = param.attrib["default"]
+			else:
+				value = None
 
 			if name in paramsNames:
 				raise KeyError, "PARSING ERROR ! {} param not unique in this task".format(name)
 
-			self.Parameters.append(Param(name, type, required, value))
+			self.Parameters.append(Param(name, type, required, value, preset))
 			paramsNames.append(name)
 
 
