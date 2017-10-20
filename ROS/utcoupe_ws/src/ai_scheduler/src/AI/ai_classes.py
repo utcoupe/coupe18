@@ -442,18 +442,19 @@ class Message():
 				raise KeyError, "PARSING ERROR ! Params need a 'name' attribute"
 			if not "type" in param.attrib:
 				raise KeyError, "PARSING ERROR ! Params need a 'type' attribute"
-			if not "required" in param.attrib and not param.text:
-				raise KeyError, "PARSING ERROR ! Non-prefilled params need a 'required' attribute"
+			if "optional" in param.attrib and param.text:
+				raise KeyError, "PARSING ERROR ! Prefilled params cannot have a 'optional' attribute"
 
 			name = param.attrib["name"]
 			type = param.attrib["type"]
-			required = (param.attrib["required"] == "true")
+			required = (param.attrib["optional"] != "true") if "optional" in param.attrib else True;
+
 			value = param.text if param.text else None
 
 			if name in paramsNames:
 				raise KeyError, "PARSING ERROR ! {} param not unique in this task".format(name)
 
-			self.Parameters.append(Params(name, type, required, value))
+			self.Parameters.append(Param(name, type, required, value))
 			paramsNames.append(name)
 
 
@@ -461,8 +462,8 @@ class Message():
 		params = None #TODO
 		self.startTime = time.time()
 		split = self.Destination.split("/")
-		#TODO : change AICommunication to take only the dest and the params
-		response = communicator.SendGenericCommand(split[0], split[1], split[2], self.Parameters)
+
+		response = communicator.SendGenericCommand(self.Destination, self.Parameters)
 		self.TimeTaken = time.time() - self.startTime
 		return response, self.TimeTaken
 

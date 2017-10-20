@@ -1,6 +1,4 @@
-string department
 string destination
-string command
 string params
 ---
 int16 response_code
