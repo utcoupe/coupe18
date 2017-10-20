@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 from random import randint
 from ai_conditions import *
+from ai_params import *
 import rospy, time
 import copy
-
 '''
 GENERAL TOBEDONE
 	- Service responses codes instead of simple true/false
@@ -114,13 +114,8 @@ class GameProperties():
 	GAME_DURATION = None
 	REWARD_POINTS = 0
 
-class Param():
-	def __init__(self, name, type, required=True, value=None, preset=False):
-		self.name = name
-		self.type = type
-		self.required = required
-		self.value = value
-		self.preset = preset #if True : param cannot be set from outside
+
+
 
 #/*=====  End of Base classes  ======*/
 
@@ -204,6 +199,7 @@ class ActionList(Task):
 				if len(instances) != 1:
 					raise KeyError, "{} order instance(s) found with the name '{}'.".format(len(instances), node_xml.attrib["ref"])
 				i = copy.deepcopy(instances[0])
+				i.setParameters(node_xml)
 				i.setParent(self)
 				if nextneedsprevious:
 					i.Status = TaskStatus.NEEDSPREVIOUS;nextneedsprevious = False
@@ -395,6 +391,10 @@ class Order(Task):
 		self.Message = Message(xml.find("message"))
 		self.TimeTaken = None
 
+	def setParameters(self, orderref_xml):
+		childs = [child for child in orderref_xml]
+		self.Message.setParameters(childs)
+
 	def getDuration(self):
 		return self.Duration
 
@@ -439,35 +439,11 @@ class Message():
 		paramsNames = [];
 
 		for param in xml.findall("param"):
-			if not "name" in param.attrib:
-				raise KeyError, "PARSING ERROR ! Params need a 'name' attribute"
-			if not "type" in param.attrib:
-				raise KeyError, "PARSING ERROR ! Params need a 'type' attribute"
-			if "optional" in param.attrib and param.text:
-				raise KeyError, "PARSING ERROR ! Prefilled params cannot have a 'optional' attribute"
-			if "default" in param.attrib and param.text:
-				raise KeyError, "PARSING ERROR ! Prefilled params cannot have a 'default' attribute"
 
-
-			name = param.attrib["name"].lower()
 			type = param.attrib["type"].lower()
-			required = (param.attrib["optional"].lower() != "true") if "optional" in param.attrib else True;
-			preset = False
+			p = ParamCreator(param)
 
-			if param.text:
-				value = param.text
-				preset = True
-			elif "default" in param.attrib:
-				value = param.attrib["default"]
-			else:
-				value = None
-
-			if name in paramsNames:
-				raise KeyError, "PARSING ERROR ! {} param not unique in this task".format(name)
-
-			self.Parameters.append(Param(name, type, required, value, preset))
-			paramsNames.append(name)
-
+			self.Parameters.append(p)
 
 	def send(self, communicator):
 		params = None #TODO
@@ -477,6 +453,11 @@ class Message():
 		response = communicator.SendGenericCommand(self.Destination, self.Parameters)
 		self.TimeTaken = time.time() - self.startTime
 		return response, self.TimeTaken
+
+	def setParameters(self, xml_list):
+		for child in xml_list:
+			name = child.tag
+			value = child.text
 
 
 
