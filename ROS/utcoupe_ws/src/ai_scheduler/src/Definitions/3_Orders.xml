@@ -78,7 +78,7 @@
 
 	<order ref="timer_set_duration">
 		<message dest="/ai/timer">
-			<param name="delay" type="float">0.75</param>
+			<param name="delay" type="float"/>
 		</message>
 	</order>
 

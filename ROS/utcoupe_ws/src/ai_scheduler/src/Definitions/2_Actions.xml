@@ -24,7 +24,7 @@
 		<conditions>
 			<chest ref = "robot_body_chest_modules" qty_in_min="1" />
 		</conditions>
-		<actions exec='all' order="random">
+		<actions exec="all" order="random">
 			<orderref ref="actuator_open">
 				<actuator_name>actu_1_tmtc</actuator_name>
 			</orderref>

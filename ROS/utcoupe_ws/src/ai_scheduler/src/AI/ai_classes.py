@@ -7,9 +7,9 @@ import rospy, time
 import copy
 '''
 GENERAL TOBEDONE
-	- Service responses codes instead of simple true/false
 	- Parameters
 	- Conditions (chest, needsprevious..)
+	- Actions instead of Services
 
 TESTS TOBEDONE
 	- Fastest ExecutionOrder
@@ -399,14 +399,12 @@ class Order(Task):
 		return self.Duration
 
 	def execute(self, communicator):
-		'''if len(kwargs) != len(self.NeededParamsIDs):
-			raise ValueError, "ERROR missing or too many parameters for message."'''
 		self.setStatus(TaskStatus.WAITINGFORRESPONSE)
 		rospy.loginfo("Executing task : {}...".format(self.__repr__()))
+		response, self.TimeTaken = self.Message.send(communicator, self.callback)
 
-
-		response, self.TimeTaken = self.Message.send(communicator)
-
+	def callback(self, response):
+		print "got response !! from Order class!!"
 		# After response
 		if response.response_code == 200:
 			self.setStatus(TaskStatus.SUCCESS)
@@ -436,8 +434,7 @@ class Message():
 		self.Destination = xml.attrib["dest"]
 
 		self.Parameters = []
-		paramsNames = [];
-
+		paramsNames = []
 		for param in xml.findall("param"):
 			p = ParamCreator(param)
 
@@ -449,13 +446,10 @@ class Message():
 
 
 
-	def send(self, communicator):
+	def send(self, communicator, callback):
 		self.startTime = time.time()
-		split = self.Destination.split("/")
-
-		response = communicator.SendGenericCommand(self.Destination, self.Parameters)
-		self.TimeTaken = time.time() - self.startTime
-		return response, self.TimeTaken
+		response = communicator.SendRequest(self.Destination, self.Parameters, callback)
+		return response, time.time() - self.startTime
 
 	def setParameters(self, xml_list):
 		for child in xml_list:

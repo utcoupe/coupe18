@@ -8,7 +8,7 @@ class Param(object):
         self.parseDefinition(xml_definition)
 
     def parseValue(self, xml):
-        pass;
+        pass
 
     def parseDefinition(self, xml): # parse name, type, required and preset
         if not "name" in xml.attrib:
