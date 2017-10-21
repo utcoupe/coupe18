@@ -21,13 +21,16 @@ class Param(object):
         self.type = xml.attrib["type"].lower()
 
         self.required = (xml.attrib["optional"].lower() != "true") if "optional" in xml.attrib else True;
-        self.preset = False
+        self.preset = (xml.attrib["preset"].lower() == "true") if "preset" in xml.attrib else False;
+
+        if self.preset and self.required:
+            raise KeyError, "PARSING ERROR ! Param cannot be preset and optional"
 
         childs = 0
         for c in xml: childs += 1
 
         if childs or xml.text: # parse preset
-            self.value = self.parseValue(xml)
+            self.parseValue(xml)
             self.preset = True
         else:
             self.value = None
@@ -52,18 +55,17 @@ class StringParser(Param):
     TYPE_NAME = "string"
 
     def parseValue(self, xml):
-        print xml.text
-        return xml.text
+        self.value = xml.text
 
 
 class IntParser(Param):
     TYPE_NAME = "int"
 
     def parseValue(self, xml):
-        return int(xml.text)
+        self.value = int(xml.text)
 
 class FloatParser(Param):
     TYPE_NAME = "float"
 
     def parseValue(self, xml):
-        return float(xml.text)
+        self.value = float(xml.text)

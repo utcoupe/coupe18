@@ -15,7 +15,7 @@
 				<conditions>
 				</conditions>
 				<orderref ref="wheels_goto">
-					<position type="xy" x="3" y="2000"/>
+					<!--<position type="xy" x="3" y="2000"/>-->
 				</orderref>
 
 				<actionlist name="Take Modules" exec="all" order="linear" reward="100">

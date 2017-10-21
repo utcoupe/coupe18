@@ -439,14 +439,17 @@ class Message():
 		paramsNames = [];
 
 		for param in xml.findall("param"):
-
-			type = param.attrib["type"].lower()
 			p = ParamCreator(param)
 
 			self.Parameters.append(p)
+			if p.name in paramsNames:
+				raise KeyError, "PARSE ERROR ! Parameter {} already defined here".format(p.name)
+
+			paramsNames.append(p.name)
+
+
 
 	def send(self, communicator):
-		params = None #TODO
 		self.startTime = time.time()
 		split = self.Destination.split("/")
 
@@ -457,12 +460,19 @@ class Message():
 	def setParameters(self, xml_list):
 		for child in xml_list:
 			name = child.tag
-			value = child.text
+			params = [p for p in self.Parameters if p.name == name]
+			if(len(params) != 1):
+				raise KeyError, "PARSE ERROR ! Parameter {} defined {} times".format(child.tag, len(params))
 
+			param = params[0]
+			if param.preset:
+				raise KeyError, "PARSE ERROR ! Parameter {} is preset, cannot modify it".format(param.name)
 
+			param.parseValue(child)
 
-
-
+		for param in self.Parameters:
+			if param.value == None and param.required:
+				raise KeyError, "PARSE ERROR ! Parameter {} is not set".format(param.name)
 
 class Colors():
 	BOLD  = "\033[1m"

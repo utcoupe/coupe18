@@ -9,13 +9,11 @@
 		</conditions>
 		<actions exec="one">
 			<orderref ref="actuator_open">
-				<ID>2</ID>
+				<actuator_name>actu_1_tmtc</actuator_name>
 			</orderref>
-			<orderref ref="ai_delay">
-				<time>1.5</time>
-			</orderref>
+			<orderref ref="ai_delay"/>
 			<orderref ref="actuator_close">
-				<ID>1</ID>
+				<actuator_name>actu_1_tmtc</actuator_name>
 			</orderref>
 		</actions>
 	</action>
@@ -28,13 +26,11 @@
 		</conditions>
 		<actions exec='all' order="random">
 			<orderref ref="actuator_open">
-				<ID>2</ID>
+				<actuator_name>actu_1_tmtc</actuator_name>
 			</orderref>
-			<orderref ref="ai_delay">
-				<time>1.5</time>
-			</orderref>
+			<orderref ref="ai_delay"/>
 			<orderref ref="actuator_close">
-				<ID>1</ID>
+				<actuator_name>actu_1_tmtc</actuator_name>
 			</orderref>
 		</actions>
 	</action>
@@ -53,8 +49,7 @@
 		</conditions>
 		<actions exec="all" order="linear">
 			<orderref ref = "wheels_goto">
-				<pos_x>50</pos_x>
-				<pos_y>84</pos_y>
+
 			</orderref>
 			<nextneedsprevious/>
 			<actionref ref="takein_module"/>
@@ -70,8 +65,7 @@
 		</conditions>
 		<actions exec="all" order="linear">
 			<orderref ref = "wheels_goto">
-				<pos_x>50</pos_x>
-				<pos_y>84</pos_y>
+
 			</orderref>
 			<nextneedsprevious/>
 			<actionref ref="takeout_module"/>
@@ -87,7 +81,9 @@
 			<nextneedsprevious/>
       <orderref ref="timer_start"/>
 			<nextneedsprevious/>
-			<orderref ref="wait_for_jack"/>
+			<orderref ref="wait_for_jack">
+				<display_num>5</display_num>
+			</orderref>
 		</actions>
 	</action>
 
@@ -95,9 +91,9 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="mostreward">
-			<orderref ref="actuator_startup_sequence"><actuator_id>1</actuator_id></orderref>
-			<orderref ref="actuator_startup_sequence"><actuator_id>6</actuator_id></orderref>
-			<orderref ref="actuator_startup_sequence"><actuator_id>7</actuator_id></orderref>
+			<orderref ref="actuator_startup_sequence"><actuator_name>a1</actuator_name></orderref>
+			<orderref ref="actuator_startup_sequence"><actuator_name>a6</actuator_name></orderref>
+			<orderref ref="actuator_startup_sequence"><actuator_name>a7</actuator_name></orderref>
 			<actionref ref="unload_module"/>
 		</actions>
 	</action>
