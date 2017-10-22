@@ -18,7 +18,7 @@ It will provide two servers:
 - `C` followed by 4 parameters `x_s`, `y_s`, `x_e`, `y_e` which are the start and end positions to join. It will return a string with a list of point folowed by the total distance in it.
 - `D` followed by n*3 parameters. Each group of parameters are `x`, `y`, `r` representing a circle barrier. It will not respond anything.
 
-## How it works :gears:
+## How it works
 ### Current version
 The program opens an image containing the static barriers of the game. Black pixels represent forbiden access and white ones clear access. This image is converted to a `boost::grid_graph<2>` and the position are exprimed with `boost::vertex`.
 
