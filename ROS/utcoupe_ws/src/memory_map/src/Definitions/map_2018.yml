@@ -3,9 +3,30 @@ terrain:
         width: 3.0
         height: 2.0
     walls:
-        sth: 0 #TODO create main map polygons.
+        sth: 0  # TODO create main map polygons.
     mesh_path: "package://memory_map/src/Definitions/arena_2018_beta_withoutobjects.stl"
-    #TODO keep zones ?
+    zones:
+        construction_site_green:
+            position:
+                x: 0.2
+                y: 0.4
+                type: fixed
+                frame_id: map
+            shape:
+                type: rect
+                width: 80
+                height: 450
+            visual:
+                ns: zones
+                id: 1
+                type: cube
+                scale: [0.2, 0.4, 0.001]
+                z: 0.001
+                orientation: [90, 0, 0]
+                color: [0.1, 0.7, 0.1, 1.0]
+
+            properties:
+                walkable: true
     waypoints:
         construction_site_1:
             position:
@@ -13,7 +34,7 @@ terrain:
                 x: 0.18
                 y: 0.19
                 a: 0.00304
-                type: fixed #TODO useless ? can be different ?
+                type: fixed  # TODO useless ? can be different ?
 entities:
     ROBOT:
         position:
@@ -31,7 +52,7 @@ entities:
                 - [-85,  140]
                 - [-85, -84 ]
                 - [-29, -140]
-        visual: #TODO integrate in shape ?
+        visual:  # TODO integrate in shape ?
             color: [255, 50, 50]
         chest: null
         trajectory:
@@ -48,7 +69,7 @@ entities:
             type: polygon
             points:
                 - [ 29, -140] # TODO complete
-        visual: #TODO integrate in shape ?
+        visual:  # TODO integrate in shape ?
             color: [255, 50, 50]
         chest: null
         trajectory:

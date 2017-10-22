@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import os
-from objects import *
+from objects import Zone, Waypoint, Entity, Object
 
 
 class MapLoader():
@@ -21,6 +21,9 @@ class MapLoader():
     def init_dict(self, data):
         MapDict = data
         # -------- Terrain
+        zones = MapDict["terrain"]["zones"]
+        for zone in zones:
+            zones[zone] = Zone(zone, zones[zone])
 
         # -------- Waypoints
         waypoints = MapDict["terrain"]["waypoints"]

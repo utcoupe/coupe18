@@ -32,32 +32,20 @@ class Entity():
         self.CurrentPath = path
 
 
-class Zone():  # TODO not used anymore ?
+class Zone():
     def __init__(self, name, initdict):
         self.Name = name
         self.Position = Position(initdict["position"])
         self.Shape = Shape(initdict["shape"])
+        self.Visual = Visual(initdict["visual"])
 
         self.Walkable = initdict["properties"]["walkable"]
-        '''
-        self.Properties = {
-            "walkable": None,
-            "TODO_define_more": None
-        }
-        for key in self.Properties:
-            try:
-                self.Properties[key] = initdict["properties"][key]
-            except KeyError:
-                pass
-        '''
 
 
 class Waypoint():
     def __init__(self, name, initdict):
         self.Name = name
         self.Position = Position(initdict["position"])
-
-
 
 
 '''
@@ -149,7 +137,7 @@ class Shape():
             solution = clipper.Execute(offset)[0]
             return Shape({"type": "polygon", "points": solution})
         else:
-            raise TypeError, "Can't inflate this shape type."
+            raise TypeError("Can't inflate this shape type.")
 
 
 class Visual():
