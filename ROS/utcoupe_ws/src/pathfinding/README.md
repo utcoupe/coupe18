@@ -22,7 +22,7 @@ It will provide two servers:
 ### Current version
 The program opens an image containing the static barriers of the game. Black pixels represent forbiden access and white ones clear access. This image is converted to a `boost::grid_graph<2>` and the position are exprimed with `boost::vertex`.
 
-The algorithm is A*. The program use the `boost::astar_search` with `boost::default_astar_visitor`. It creates a grid and mark the vertex (`boost::graph_traits<boost::grid_graph<2>>::vertex_descriptor`) when it "visits" it. Because it starts on the start position and travel in the graph step by step by priotizing the smallest distances, at the end it will found the shortest path between the start position and the end position. All vertexes have the same weigh in the graph.
+The algorithm is A*. The program uses the `boost::astar_search` with `boost::default_astar_visitor`. It creates a grid and mark the vertex (`boost::graph_traits<boost::grid_graph<2>>::vertex_descriptor`) when it "visits" it. Because it starts on the start position and travel in the graph step by step by priotizing the smallest distances, at the end it will found the shortest path between the start position and the end position. All vertexes have the same weigh in the graph.
 
 The visitor can go relatively to its position to `(0,1)`, `(0,-1)`, `(1,0)`, `(-1,0)`, if they are valid. When he finds the end position, it writes the path and raises an exception (here it's `found_goal`). Else it returns.
 
