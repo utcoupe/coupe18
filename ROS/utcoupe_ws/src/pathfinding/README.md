@@ -18,10 +18,14 @@ It will provide two servers:
 - `C` followed by 4 parameters `x_s`, `y_s`, `x_e`, `y_e` which are the start and end positions to join. It will return a string with a list of point folowed by the total distance in it.
 - `D` followed by n*3 parameters. Each group of parameters are `x`, `y`, `r` representing a circle barrier. It will not respond anything.
 
-## How it works
+## How it works :gears:
 # Current version
 The program opens an image containing the static barriers of the game. Black pixels represent forbiden access and white ones clear access. This image is converted to a `boost::grid_graph<2>` and the position are exprimed with `boost::vertex`.
 
-The algorithm is A*. The program use the `boost::astar_search` with `boost::default_astar_visitor`. It creates a grid and mark the vertex (`boost::graph_traits<boost::grid_graph<2>>::vertex_descriptor`) when it "visits" it. Because it starts on the start position and travel in the graph step by step by priotizing the smallest distances, at the end it will found the shortest path between the start position and the end position. All vertexes have the same weigh.
+The algorithm is A*. The program use the `boost::astar_search` with `boost::default_astar_visitor`. It creates a grid and mark the vertex (`boost::graph_traits<boost::grid_graph<2>>::vertex_descriptor`) when it "visits" it. Because it starts on the start position and travel in the graph step by step by priotizing the smallest distances, at the end it will found the shortest path between the start position and the end position. All vertexes have the same weigh in the graph.
 
-With the shortest path, the program then smoothes it by removing unnecessary waypoints (if we have a then b then c and we can draw a line between a and c without meeting any barriers then we can delete b).
+The visitor can go relatively to its position to `(0,1)`, `(0,-1)`, `(1,0)`, `(-1,0)` if they are valid. If he finds the end position it writes the path and raises an exception (here it's `found_goal`).
+
+With the shortest path, the program then smoothes it by removing unnecessary waypoints (if we have `a` then `b` then `c` and we can draw a line between `a` and `c` without meeting any barriers then we can delete `b`).
+
+For another example of `boost::astar_search`, look there : https://github.com/wpm/Astar-Maze-Solver
