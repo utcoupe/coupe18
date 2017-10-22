@@ -15,8 +15,8 @@ with the following arguments:
 It will provide two servers:
 * `/navigation/pathfinding/findpath`: See `srv/FindPath.srv`
 * `/navigation/pathfinding/doorder`: Receive an order in string format. All parameters have to be seperated by a `;`. The first is a letter (ASCII) :
-- `C` followed by 4 parameters `x_s`, `y_s`, `x_e`, `y_e` which are the start and end positions to join. It will return a string with a list of point folowed by the total distance in it.
-- `D` followed by n*3 parameters. Each group of parameters are `x`, `y`, `r` representing a circle barrier. It will not respond anything.
+    - `C` followed by 4 parameters `x_s`, `y_s`, `x_e`, `y_e` which are the start and end positions to join. It will return a string with a list of point folowed by the total distance in it.
+    - `D` followed by n*3 parameters. Each group of parameters are `x`, `y`, `r` representing a circle barrier. It will not respond anything.
 
 ## How it works
 ### Current version
