@@ -9,8 +9,9 @@ class RequestTypes():
 class AICommunication():
     def SendRequest(self, dest, params, callback):
         servers = {
-            "/ai/timer":          (RequestTypes.SERVICE, ai_scheduler.srv.AIGenericCommandRequest),
-            "/ai/scheduler":      (RequestTypes.SERVICE, ai_scheduler.srv.AIGenericCommandRequest)
+            "/ai/timer":          (RequestTypes.SERVICE, ai_scheduler.srv.AIGenericCommand),
+            "/ai/scheduler":      (RequestTypes.SERVICE, ai_scheduler.srv.AIGenericCommand),
+            "/test":         (RequestTypes.SERVICE, ai_scheduler.srv.test)
         }
         def getRequestType(dest):
             return servers[dest][0]
@@ -29,7 +30,7 @@ class AICommunication():
         else:
             raise ValueError, "Message destination '{}' was not recognized. Has it been added to ai_conditions.py definition dict, or misspelled ?".format(dest)
 
-    def sendService(self, dest, req_class, params):
+    def sendService(self, dest, srv_class, params):
         rospy.wait_for_service(dest)
-        service = rospy.ServiceProxy(dest, req_class)
-        return service(req_class(**params))
+        service = rospy.ServiceProxy(dest, srv_class)
+        return service(srv_class._request_class(**params))

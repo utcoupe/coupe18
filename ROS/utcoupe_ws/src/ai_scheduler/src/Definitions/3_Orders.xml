@@ -7,8 +7,14 @@
 		</message>
 	</order>
 
+	<order ref="test" duration="1">
+		<message dest="/test">
+			<param name="position" type="pose2d"/>
+		</message>
+	</order>
+
 	<order ref="funny_action" duration="1">
-		<message dest="/movement/actuators/execute">
+		<message dest=" ccccccccccccvvddd">
 			<param name="command" type="string">actuator_set</param>
 			<param name="actuator_name" type="string">funny_action_servo</param>
 		</message>
@@ -78,7 +84,7 @@
 
 	<order ref="timer_set_duration">
 		<message dest="/ai/timer">
-			<param name="delay" type="float"/>
+			<param name="delay" type="float">0.75</param>
 		</message>
 	</order>
 
