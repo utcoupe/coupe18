@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 import rospy
-# from geometry_msgs import Pose2D
+from geometry_msgs.msg import Pose2D
 import serial
 import threading
 import Queue
+from asserv.srv import *
 
 __author__ = "Thomas Fuhrmann"
 __date__ = 21/10/2017
@@ -15,9 +16,9 @@ class Asserv:
         self._reception_queue = Queue.Queue()
         # Init ROS stuff
         rospy.init_node('asserv', anonymous=True)
-        # self._pub_robot_pose = rospy.Publisher("pose2d", Pose2D)
+        self._pub_robot_pose = rospy.Publisher("pose2d", Pose2D, queue_size=5)
         # self._sub_arm = rospy.Subscriber("arm", 1, Asserv.callback_arm)
-        # self._sub_goto = rospy.Subscriber("goto", 5, Asserv.callback_goto)
+        self._sub_goto = rospy.Service("goto", Goto, self.callback_goto)
         # Init the serial communication
         self._arduino_startep_flag = False
         # TODO dynamic arduino port
@@ -38,8 +39,11 @@ class Asserv:
     def callback_arm(self, data):
         rospy.loginfo("ARM callback")
 
-    def callback_goto(self, data):
-        rospy.loginfo("GOTO callback")
+    def callback_goto(self, request):
+        rospy.loginfo("GOTO callback, data x=%d, y=%d", request.x, request.y)
+        # TODO process things...
+        return GotoResponse(True)
+
 
     def data_receiver(self):
         while not rospy.is_shutdown():
@@ -69,7 +73,8 @@ class Asserv:
         #last_finished_id;x;y;angle;speed_pwd_left;speed_pwm_right;linear_speed;wheel_spd_left;wheel_spd_right;sharp;P;I;D;
         elif data.find("~") != -1:
             receied_data_list = data.split(";")
-            rospy.loginfo("data sharp : " + receied_data_list[10])
+            # rospy.loginfo("data sharp : " + receied_data_list[10])
+            self._pub_robot_pose.publish(Pose2D(float(receied_data_list[2]), float(receied_data_list[3]), float(receied_data_list[4])))
         else:
             # TODO process orders ack reception
             rospy.loginfo("received order ack")
