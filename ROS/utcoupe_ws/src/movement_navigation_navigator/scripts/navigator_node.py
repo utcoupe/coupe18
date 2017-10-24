@@ -10,32 +10,39 @@
 
 import rospy
 #from movement_navigation_navigator.msg import *
-from movement_navigation_navigator.srv import *
+from movement_navigation_navigator.srv import Goto
+
+from Pathfinder import PathfinderClient
 
 def pointToStr(point):
     return "(" + str(point.x) + "," + str(point.y) + ")"
 
-def handle_goto(req):
-    debugStr = "Asked to go from "
-    debugStr += pointToStr(req.posStart)
-    debugStr += " to " + pointToStr(req.posEnd)
-    rospy.logdebug(debugStr)
-    # sends the request to the pathfinder
-    # TODO
-    # then sends the path point per point to the arduino_asserv
-    # TODO
-    # then return success
-    return True
+class NavigatorNode:
+    def __init__ (self):
+        self._pathfinderClient = PathfinderClient()
 
-def startNode():
-    rospy.init_node ('navigator')
+    def _handle_goto(self, req):
+        debugStr = "Asked to go from "
+        debugStr += pointToStr(req.posStart)
+        debugStr += " to " + pointToStr(req.posEnd)
+        rospy.logdebug(debugStr)
+        # sends the request to the pathfinder
+        self._pathfinderClient.FindPath(req.posStart, req.posEnd)
+        # then sends the path point per point to the arduino_asserv
+        # TODO
+        # then return success
+        return True
 
-    s = rospy.Service ("/navigation/navigator/goto", Goto, handle_goto)
-    rospy.loginfo ("Ready to navigate!")
-    rospy.spin ()
+    def startNode(self):
+        rospy.init_node ('navigator')
+
+        self._s = rospy.Service ("/navigation/navigator/goto", Goto, self._handle_goto)
+        rospy.loginfo ("Ready to navigate!")
+        rospy.spin ()
 
 if __name__ == "__main__":
     try:
-        startNode()
+        node = NavigatorNode ()
+        node.startNode ()
     except rospy.ROSInterruptException:
         pass
