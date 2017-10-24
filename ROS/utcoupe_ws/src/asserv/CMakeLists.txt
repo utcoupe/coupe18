@@ -19,7 +19,7 @@ catkin_python_setup()
 ## Generate messages in the 'msg' folder
 add_message_files(
         FILES
-        WheelSpeed.msg
+        RobotSpeed.msg
 )
 
 ## Generate services in the 'srv' folder

@@ -5,6 +5,7 @@ import serial
 import threading
 import Queue
 from asserv.srv import *
+from asserv.msg import *
 
 __author__ = "Thomas Fuhrmann"
 __date__ = 21/10/2017
@@ -16,11 +17,13 @@ class Asserv:
         self._reception_queue = Queue.Queue()
         # Init ROS stuff
         rospy.init_node('asserv', anonymous=True)
-        self._pub_robot_pose = rospy.Publisher("pose2d", Pose2D, queue_size=5)
+        self._pub_robot_pose = rospy.Publisher("robot/pose2d", Pose2D, queue_size=5)
+        self._pub_robot_speed = rospy.Publisher("robot/speed", RobotSpeed, queue_size=5)
         # self._sub_arm = rospy.Subscriber("arm", 1, Asserv.callback_arm)
         self._sub_goto = rospy.Service("goto", Goto, self.callback_goto)
         # Init the serial communication
         self._arduino_startep_flag = False
+        self._order_id = 0
         # TODO dynamic arduino port
         self._serial_com = None
         self._serial_receiver_thread = None
@@ -75,6 +78,7 @@ class Asserv:
             receied_data_list = data.split(";")
             # rospy.loginfo("data sharp : " + receied_data_list[10])
             self._pub_robot_pose.publish(Pose2D(float(receied_data_list[2]), float(receied_data_list[3]), float(receied_data_list[4])))
+            self._pub_robot_speed.publish(RobotSpeed(float(receied_data_list[5]), float(receied_data_list[6]), float(receied_data_list[7]), float(receied_data_list[8]), float(receied_data_list[9])))
         else:
             # TODO process orders ack reception
             rospy.loginfo("received order ack")
