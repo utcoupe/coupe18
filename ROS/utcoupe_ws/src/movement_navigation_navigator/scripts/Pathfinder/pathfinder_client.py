@@ -24,7 +24,7 @@ class PathfinderClient:
     def FindPath (self, startPos, endPos):
         try:
             path = self.pathfinderFindPathService(startPos, endPos)
-            return path
+            return path.path
         except rospy.ServiceException, e:
             error_str = "Error when trying to use "
             error_str += self.PATHFINDER_FINDPATH_SERVICE_NAME

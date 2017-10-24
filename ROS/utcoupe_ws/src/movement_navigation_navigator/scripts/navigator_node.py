@@ -9,7 +9,8 @@
 #--> retourner travail_fini à ai
 
 import rospy
-#from movement_navigation_navigator.msg import *
+
+from geometry_msgs.msg import Point
 from movement_navigation_navigator.srv import Goto
 
 from Pathfinder import PathfinderClient
@@ -27,11 +28,19 @@ class NavigatorNode:
         debugStr += " to " + pointToStr(req.posEnd)
         rospy.logdebug(debugStr)
         # sends the request to the pathfinder
-        self._pathfinderClient.FindPath(req.posStart, req.posEnd)
+        path = self._pathfinderClient.FindPath(req.posStart, req.posEnd)
+        self._printPath (path)
         # then sends the path point per point to the arduino_asserv
         # TODO
         # then return success
         return True
+
+    def _printPath (self, path):
+        debugStr = "Received path: ["
+        for point in path:
+            debugStr += pointToStr(point)
+        debugStr += "]"
+        rospy.logdebug (debugStr)
 
     def startNode(self):
         rospy.init_node ('navigator')
