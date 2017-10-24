@@ -4,8 +4,10 @@ from geometry_msgs.msg import Pose2D
 import serial
 import threading
 import Queue
+import os
 from asserv.srv import *
 from asserv.msg import *
+import protocol_parser
 
 __author__ = "Thomas Fuhrmann"
 __date__ = 21/10/2017
@@ -15,6 +17,7 @@ class Asserv:
     def __init__(self):
         # Internal data members
         self._reception_queue = Queue.Queue()
+        self._orders_dictionnary = protocol_parser.protocol_parse(os.environ['UTCOUPE_WORKSPACE'] + "/arduino/common/asserv/protocol.h")
         # Init ROS stuff
         rospy.init_node('asserv', anonymous=True)
         self._pub_robot_pose = rospy.Publisher("robot/pose2d", Pose2D, queue_size=5)
@@ -44,7 +47,7 @@ class Asserv:
 
     def callback_goto(self, request):
         rospy.loginfo("GOTO callback, data x=%d, y=%d", request.x, request.y)
-        self.send_serial_data('d', [str(request.x), str(request.y), str(1)])
+        self.send_serial_data(self._orders_dictionnary['GOTO'], [str(request.x), str(request.y), str(1)])
         return GotoResponse(True)
 
     def data_receiver(self):
@@ -70,7 +73,7 @@ class Asserv:
         # TODO adapt the received name !
         if (not self._arduino_startep_flag) and data.find("gr_asserv") == 0:
             rospy.loginfo("Activate the Arduino")
-            self.send_serial_data('S', [])
+            self.send_serial_data(self._orders_dictionnary['START'], [])
             self._arduino_startep_flag = True
         #last_finished_id;x;y;angle;speed_pwd_left;speed_pwm_right;linear_speed;wheel_spd_left;wheel_spd_right;sharp;P;I;D;
         elif data.find("~") != -1:
