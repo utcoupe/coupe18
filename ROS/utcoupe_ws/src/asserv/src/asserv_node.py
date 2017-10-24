@@ -44,9 +44,8 @@ class Asserv:
 
     def callback_goto(self, request):
         rospy.loginfo("GOTO callback, data x=%d, y=%d", request.x, request.y)
-        # TODO process things...
+        self.send_serial_data('d', [str(request.x), str(request.y), str(1)])
         return GotoResponse(True)
-
 
     def data_receiver(self):
         while not rospy.is_shutdown():
@@ -71,7 +70,7 @@ class Asserv:
         # TODO adapt the received name !
         if (not self._arduino_startep_flag) and data.find("gr_asserv") == 0:
             rospy.loginfo("Activate the Arduino")
-            self.send_serial_data('S', "0")
+            self.send_serial_data('S', [])
             self._arduino_startep_flag = True
         #last_finished_id;x;y;angle;speed_pwd_left;speed_pwm_right;linear_speed;wheel_spd_left;wheel_spd_right;sharp;P;I;D;
         elif data.find("~") != -1:
@@ -85,7 +84,9 @@ class Asserv:
 
     def send_serial_data(self, order_type, args_list):
         if self._serial_com is not None:
-            self._serial_com.write(order_type + '; '.join(args_list))
+            args_list.insert(0, str(self._order_id))
+            self._serial_com.write(order_type + ';' + ';'.join(args_list))
+            self._order_id += 1
 
 
 if __name__ == "__main__":
