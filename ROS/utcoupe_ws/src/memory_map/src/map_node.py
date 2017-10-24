@@ -1,33 +1,32 @@
 #!/usr/bin/python
 import rospy
-from MapManager import MapLoader, GetServiceHandler, SetServiceHandler
+from MapManager import *
 from Markers import MarkersPublisher
 
 
-class Map():
+class MapNode():
     def __init__(self):
         # TODO to be better when Definitions package available.
         rospy.init_node('map', log_level=rospy.DEBUG)
-        self.MapDict = MapLoader().load("../Definitions/map_2018.yml")
+        self.map = Map("../Definitions/map_2018.yml")
 
         # Starting and publishing the table STL to RViz
         self.markers = MarkersPublisher()
-        self.markers.publishTable(self.MapDict)
+        self.markers.publishTable(self.map.getMapDict())
 
-        # Starting the Get and Set service handlers
-        '''
-        getter = GetServiceHandler(MapDict)
-        setter = SetServiceHandler(MapDict)
-        '''
+        # Starting the Get, Set and Conditions service handlers
+        GetServiceHandler()
+        SetServiceHandler()
+        ConditionsHandler()
         self.run()
 
     def run(self):
         r = rospy.Rate(30)
         while not rospy.is_shutdown():
-            self.markers.publishZones(self.MapDict)
-            self.markers.publishObjects(self.MapDict)
+            self.markers.publishZones(self.map.getMapDict())
+            self.markers.publishObjects(self.map.getMapDict())
             r.sleep()
 
 
 if __name__ == "__main__":
-    Map()
+    MapNode()

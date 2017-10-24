@@ -35,6 +35,16 @@ terrain:
                 y: 0.19
                 a: 0.00304
                 type: fixed  # TODO useless ? can be different ?
+            visual:
+                ns: waypoints
+                id: 1
+                type: cube
+                scale: [0.04, 0.04, 0.04]
+                z: 0.02
+                orientation: [0, 0, 0]
+                color: [0.8, 0.1, 0.1, 1.0]
+
+
 entities:
     ROBOT:
         position:
@@ -119,6 +129,10 @@ entities:
 
 
 objects:
+    grape_1:
+        type: container
+        attributes:
+            objects_max: 5
     cube_1:
         type: object
         position:
@@ -922,7 +936,6 @@ objects:
             ground_obstacle: true # is the object to be avoided in the pathfinder
         userdata:
             color: orange
-
 
 
 

@@ -1,1 +1,1 @@
-from markers_publisher import *
+from markers_publisher import MarkersPublisher

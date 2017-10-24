@@ -1,0 +1,12 @@
+string container_name
+
+uint8 CONDITION_LT_NUMBER = 0
+uint8 CONDITION_MT_NUMBER = 1
+uint8 CONDITION_LT_CONTAINER = 2
+uint8 CONDITION_MT_CONTAINER = 3
+uint8 condition_type
+
+int16 condition_number
+string condition_container_name
+---
+bool result

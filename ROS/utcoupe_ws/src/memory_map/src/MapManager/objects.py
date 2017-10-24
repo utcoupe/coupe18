@@ -1,21 +1,10 @@
 import math
 import pyclipper  # pip install pyclipper
+import rospy
 from visualization_msgs.msg import Marker
 '''
 HIGH LEVEL DEFINITION CLASSES
 '''
-
-
-class Object():
-    def __init__(self, name, initdict):
-        self.Name = name
-        self.Position = Position(initdict["position"])
-        self.Shape = Shape(initdict["shape"])
-        self.Visual = Visual(initdict["visual"])
-        self.Type = initdict["type"]
-
-        self.Chest = initdict["chest"] if "chest" in initdict else False  # TODO
-        self.UserData = initdict["userdata"]
 
 
 class Entity():
@@ -24,7 +13,7 @@ class Entity():
         self.Position = Position(initdict["position"])
         self.Shape = Shape(initdict["shape"])
 
-        self.Chest = initdict["chest"] if "chest" in initdict else False  # TODO
+        self.Chest = initdict["chest"] if "chest" in initdict else False # TODO
         self.Trajectory = Trajectory(initdict["trajectory"])
         self.CurrentPath = []
 
@@ -48,6 +37,27 @@ class Waypoint():
         self.Position = Position(initdict["position"])
 
 
+class ObjectNamespace():
+    def __init__(self, name, initdict):
+        self.Name = name
+
+class ObjectContainer():
+    def __init__(self):
+        pass
+
+class Object():
+    def __init__(self, name, initdict):
+        self.Name = name
+        self.Position = Position(initdict["position"])
+        self.Shape = Shape(initdict["shape"])
+        self.Visual = Visual(initdict["visual"])
+        self.Type = initdict["type"]
+        print "loaded object with type" + str(self.Type)
+
+        self.Chest = initdict["chest"] if "chest" in initdict else False # TODO
+        self.UserData = initdict["userdata"]
+
+
 '''
 LOW LEVEL DEFINITION CLASSES
 '''
@@ -68,7 +78,8 @@ class Position():
         self.CollisionType = initdict["type"]
 
     def transform(self, add_x, add_y):
-        p = Position({"x": self.x + add_x, "y": self.y + add_y, "type": self.CollisionType})
+        p = Position({"x": self.x + add_x, "y": self.y +
+                      add_y, "type": self.CollisionType})
         if self.has_angle:
             p.a = self.a
             self.has_angle = True
@@ -93,7 +104,8 @@ class Shape():
         if self.Type == "rect":
             self.width = initdict["width"]
             self.height = initdict["height"]
-            self.points = [(0, 0), (self.width, 0), (self.width, self.height), (0, self.height)]
+            self.points = [(0, 0), (self.width, 0),
+                           (self.width, self.height), (0, self.height)]
             '''
             self.points =  [(- self.width / 2.0, - self.height / 2.0),
                             (  self.width / 2.0, - self.height / 2.0),
@@ -114,7 +126,8 @@ class Shape():
         if theta == 0:
             return self.points
         if self.Type not in ["rect", "polygon", "polyline"]:
-            raise TypeError("This shape ({0}) cannot be rotated.".format(self.Type))
+            raise TypeError(
+                "This shape ({0}) cannot be rotated.".format(self.Type))
 
         rotatedPolygon = []
         for corner in self.points:
@@ -133,7 +146,8 @@ class Shape():
             return Shape({"type": "rect", "width": self.width + offset, "height": self.height + offset})
         elif self.Type == "polygon":
             clipper = pyclipper.PyclipperOffset()
-            clipper.AddPath(self.points, pyclipper.JT_MITER, pyclipper.ET_CLOSEDPOLYGON)
+            clipper.AddPath(self.points, pyclipper.JT_MITER,
+                            pyclipper.ET_CLOSEDPOLYGON)
             solution = clipper.Execute(offset)[0]
             return Shape({"type": "polygon", "points": solution})
         else:
@@ -149,11 +163,11 @@ class Visual():
             "sphere": Marker.SPHERE
             # TODO To Complete
         }
-        self.Type           = markerType[initdict["type"]]
-        self.z              = initdict["z"]
-        self.Scale          = initdict["scale"]
-        self.Orientation    = initdict["orientation"]
-        self.Color          = initdict["color"]
+        self.Type = markerType[initdict["type"]]
+        self.z = initdict["z"]
+        self.Scale = initdict["scale"]
+        self.Orientation = initdict["orientation"]
+        self.Color = initdict["color"]
 
 
 class Trajectory():
@@ -177,5 +191,6 @@ class Color():
         self.B = self.RGB[2]
 
     def textColor(self):
-        lum = 1 - (0.299 * self.R + 0.587 * self.G + 0.114 * self.B) / 255  # https://stackoverflow.com/questions/1855884/determine-font-color-based-on-background-color
+        # https://stackoverflow.com/questions/1855884/determine-font-color-based-on-background-color
+        lum = 1 - (0.299 * self.R + 0.587 * self.G + 0.114 * self.B) / 255
         return (255, 255, 255) if lum > 0.5 else (0, 0, 0)

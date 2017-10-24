@@ -1,6 +1,6 @@
 #!/usr/bin/python
-import os
-from objects import Zone, Waypoint, Entity, Object
+import rospy, os
+from objects import *
 
 
 class MapLoader():
@@ -15,8 +15,9 @@ class MapLoader():
             except yaml.YAMLError as exc:
                 print exc
 
-    def loafYamlFromDescriptionModule(self, name):
-        pass  # TODO use this when Definitions package is ready instead of loading from file.
+    def loafYamlFromDescriptionModule(self, path):
+        # TODO use this when Definitions package is ready instead of loading from file.
+        pass
 
     def init_dict(self, data):
         MapDict = data
@@ -37,7 +38,13 @@ class MapLoader():
 
         # -------- Objects
         objects = MapDict["objects"]
-        for obj in objects:
-            objects[obj] = Object(obj, objects[obj])
+        for elem in objects:
+            #if objects[elem]["type"] == "namespace":
+            #    objects[elem] = ObjectNamespace(elem, objects[elem])
+            #elif objects[elem]["type"] == "container":
+            #    rospy.logerr("Object '{}' found in the map description file that doesn't belong to any namespace. object not loaded".format(elem))
+            if objects[elem]["type"] == "object":
+                objects[elem] = Object(elem, objects[elem])
+                #rospy.logerr("Object '{}' found in the map description file that doesn't belong to any namespace. object not loaded".format(elem))
 
         return MapDict

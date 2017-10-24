@@ -1,15 +1,17 @@
 #!/usr/bin/python
-import rospy
 import math
+import rospy
 from visualization_msgs.msg import Marker
 
 
 class MarkersPublisher():
     def __init__(self):
         self.MARKERS_TOPIC = "visualization_markers"
-        self.MarkersPUBL = rospy.Publisher(self.MARKERS_TOPIC, Marker, queue_size=10)
+        self.MarkersPUBL = rospy.Publisher(
+            self.MARKERS_TOPIC, Marker, queue_size=10)
         while not self.MarkersPUBL.get_num_connections():
-            rospy.sleep(0.05)  # wait for RViz to connect
+            # wait for RViz to connect # TODO BLOCKS IF RVIZ NOT LAUNCHED
+            rospy.sleep(0.05)
 
         self.markerShapes = {  # TODO Remove
             "cube": Marker.CUBE,
@@ -24,7 +26,8 @@ class MarkersPublisher():
         tableSTLMarker.ns = "table"
         tableSTLMarker.id = 0
 
-        tableSTLMarker.mesh_resource = mapdict["terrain"]["mesh_path"]  # TODO adapt when Definitions will be done
+        # TODO adapt when Definitions will be done
+        tableSTLMarker.mesh_resource = mapdict["terrain"]["mesh_path"]
         tableSTLMarker.action = Marker.ADD
         tableSTLMarker.scale.x = 0.001
         tableSTLMarker.scale.y = 0.001
