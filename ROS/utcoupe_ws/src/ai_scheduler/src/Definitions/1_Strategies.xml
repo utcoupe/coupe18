@@ -11,7 +11,7 @@
 				<position>
 					<x>50</x>
 					<y>55</y>
-					<theta>78</theta>
+					<z>85</z>
 				</position>
 			</orderref>
 			<actionref ref="wait_for_jack"/>

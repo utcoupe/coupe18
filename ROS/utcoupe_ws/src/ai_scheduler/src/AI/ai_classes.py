@@ -443,7 +443,8 @@ class Message():
 
     def send(self, communicator, callback):
         self.startTime = time.time()
-        response = communicator.SendRequest(self.Destination, self.RosParameters, callback)
+        response = communicator.SendRequest(self.Destination,
+                                            self.RosParameters, callback)
         return response, time.time() - self.startTime
 
     def setParameters(self, xml_list):  # populate values of params
@@ -461,10 +462,9 @@ class Message():
                                cannot modify it".format(param.name))
 
             param.parseValue(child)
+        [p.checkValues() for p in self.Parameters]
 
         self.RosParameters = {p.name: p.getRos() for p in self.Parameters}
-        #TODO : check if all is populated
-
 
 class Colors():
     BOLD  = "\033[1m"

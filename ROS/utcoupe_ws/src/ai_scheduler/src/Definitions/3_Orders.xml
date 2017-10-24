@@ -9,7 +9,11 @@
 
 	<order ref="test" duration="1">
 		<message dest="/test">
-			<param name="position" type="pose2d"/>
+			<param name="position" type="pose2d">
+				<theta>99</theta> <!-- defaults -->
+				<x>88</x>
+			</param>
+			<param name="nombre" type="float" optional="true"/>
 		</message>
 	</order>
 

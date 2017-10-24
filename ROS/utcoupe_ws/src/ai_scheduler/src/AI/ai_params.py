@@ -1,73 +1,117 @@
 #!/usr/bin/env python
 
+# Functionalities of params :
+# - default : <param type="int">78</param>
+#      => if the value is not set in orderref, the param will take this value
+#       (defaults can be set not fully) : <param type="pose2d">
+#                                           <x>75</x>
+#                                           <y>78</y>
+#                                         </param>
+#            => x and y can be overwritten or not in orderref, but 'theta' has
+#                                                                    to be set
+#
+# - preset : <param type="int" preset="true">78</param>
+#      => the param can't be set in orderref, this fixed value will be sent in
+#                                                                  the message
+#      => a preset has to be fully set in the declaration
+#
+# - optional : <param type="int" optional="true"/>
+#      => the value doesn't have to be set in orderref, default value of ROS
+#                                                                will be set
+#
+#
+
 import std_msgs.msg
 import geometry_msgs.msg
+import copy
 
-#TODO : add default
-class Param(object):  # base class for parsing xml to param object
-    TYPE_NAME = ""
-    TYPE_ROS = None
+
+class Param(object):    # base class for parsing xml to param object
+    TYPE_NAME = ""      # name used in the xml (<param type="XX" ...)
+    TYPE_ROS = None     # ros message class (geometry_msgs.msg.XX)
 
     def __init__(self, xml=None):
-        if xml is not None:
+        if xml is not None:             # if called from a type attr in the xml
             self.parseDefinition(xml)
-            if "preset" in xml.attrib and xml.attrib["preset"] == "true":
-                preset = True
-            else:
-                preset = False
-            self.parseValue(xml, preset)
+            self.parseValue(xml)        # parse defaults or presets if there is
 
-    def getRos(self):
+            if self.preset:
+                self.checkValues()
+        else:                           # if in the struct of another parser
+            self.optional = False
+            self.name = self.TYPE_NAME
+
+    def getRos(self):                   # return a dict with only ros messages
+        ret = copy.deepcopy(self.value)
+        for k in ret:
+            if isinstance(ret[k], Param):
+                ret[k] = ret[k].getRos()
+
+        return self.TYPE_ROS(**ret)
+
+    def checkValues(self):              # check if no value is missing
+        if self.optional:
+            return
+
         for k in self.value:
-            if isinstance(self.value[k], Param):
-                print self.name
-                self.value[k] = self.value[k].getRos()
+            if isinstance(self.value[k], Param) and not self.value[k].optional:
+                try:
+                    self.value[k].checkValues()
+                except KeyError as e:
+                    raise KeyError("Value '{}' is needed for the parameter '{}' !"
+                                   .format(k, self.name))
+            elif self.value[k] is None:
+                raise KeyError("A value for the parameter '{}' is needed !"
+                               .format(self.name))
 
-        return self.TYPE_ROS(**self.value)
-
-    def parseValue(self, xml, preset=False):
-        self.preset = preset
+    def parseValue(self, xml):  # parse the content, in orderref or for presets
         for child in xml:
             if child.tag in self.value:
                 if isinstance(self.value[child.tag], Param):
-                    self.value[child.tag].parseValue(child, preset)
+                    self.value[child.tag].parseValue(child)
                 else:
                     self.value[child.tag] = child.text
             else:
-                raise KeyError("PARSE ERROR ! Param {} does not have an attribute {}"
-                               .format(self.TYPE_NAME, child.tag))
+                raise KeyError("Parameter of type '{}' doesn't need a value "
+                               "'{}', only {} !"
+                               .format(self.TYPE_NAME, child.tag,
+                                       self.value.keys()))
 
     def parseDefinition(self, xml):  # parse name, type, required and preset
         if "name" not in xml.attrib:
-            raise KeyError("PARSE ERROR ! Params need a 'name' attribute")
+            raise KeyError("Parameters need a 'name' attribute")
 
         self.name = xml.attrib["name"].lower()
 
-        self.required = (xml.attrib["optional"].lower() !=
-                         "true") if "optional" in xml.attrib else True
-        if "preset" in xml.attrib:
-            self.preset = (xml.attrib["preset"].lower() == "true")
-        else:
-            self.preset = False
+        self.preset = False
+        if "preset" in xml.attrib and xml.attrib["preset"] == "true":
+            self.preset = True
 
-        if self.preset and self.required:
-            raise KeyError("PARSE ERROR ! Param cannot be preset and optional")
+        self.optional = False
+        if "optional" in xml.attribute:
+            self.optional = xml.attrib["optional"].lower() == "true"
+
+        if self.preset and self.optional:
+            raise KeyError("Parameter {} cannot be preset and optional !"
+                           .format(self.name))
 
 
-def ParamCreator(xml):  # factory
+def ParamCreator(xml):  # factory : give parser given the type as string
     if "type" not in xml.attrib:
-        raise KeyError("PARSE ERROR : Param definition need a type !")
+        raise KeyError("Parameters definitions need a type !")
 
     for cls in Param.__subclasses__():
         if cls.TYPE_NAME == xml.attrib["type"]:
             return cls(xml)
 
-    raise ValueError("PARSE ERROR ! No parser defined for type '{}'"
+    raise ValueError("No parser defined for type '{}' ! Please add a subclass"
+                     "of 'Param' in the file ai_params.py"
                      .format(xml.attrib["type"]))
 
 
 # Child classes - one for each type of param
 
+# base classes : getRos return a primitive type
 class StringParser(Param):
     TYPE_NAME = "string"
     TYPE_ROS = std_msgs.msg.String
@@ -78,15 +122,9 @@ class StringParser(Param):
         }
         super(StringParser, self).__init__(xml)
 
-
-    def parseValue(self, xml, preset=False):
-        self.preset = preset
-        if not xml.text:
-            if not preset:
-                return
-            else:
-                raise KeyError("PARSE ERROR ! String param need a content !")
-        self.value["data"] = xml.text
+    def parseValue(self, xml):
+        if xml.text:
+            self.value["data"] = xml.text
 
     def getRos(self):
         return self.value["data"]
@@ -102,14 +140,9 @@ class IntParser(Param):
         }
         super(IntParser, self).__init__(xml)
 
-    def parseValue(self, xml, preset=False):
-        self.preset = preset
-        if not xml.text:
-            if not preset:
-                return
-            else:
-                raise KeyError("PARSE ERROR ! Int param need a content !")
-        self.value["data"] = int(xml.text)
+    def parseValue(self, xml):
+        if xml.text:
+            self.value["data"] = int(xml.text)
 
     def getRos(self):
         return self.value["data"]
@@ -125,19 +158,17 @@ class FloatParser(Param):
         }
         super(FloatParser, self).__init__(xml)
 
-    def parseValue(self, xml, preset=False):
-        self.preset = preset
-        if not xml.text:
-            if not preset:
-                return
-            else:
-                raise KeyError("PARSE ERROR ! Float param need a content !")
-        self.value["data"] = float(xml.text)
+    def parseValue(self, xml):
+        if xml.text:
+            self.value["data"] = float(xml.text)
 
     def getRos(self):
         return self.value["data"]
 
 
+# complex classes
+# you can choose the override parseValue and getRos if you need to,
+# but for the simplest, just declaring the struct of self.value should do
 class Pose2DParser(Param):
     TYPE_NAME = "pose2d"
     TYPE_ROS = geometry_msgs.msg.Pose2D
