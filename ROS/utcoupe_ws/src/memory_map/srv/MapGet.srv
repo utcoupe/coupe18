@@ -1,11 +1,58 @@
-uint8 GETTYPE_GETOBJECT = 0
-uint8 GETTYPE_GETENTITY = 1
-uint8 GETTYPE_CONDITION = 1
+# SERVICE TO GET AN OBJECT'S ATTRIBUTE
+# 3 infos to give :
+#   - type of object to retrieve the attribute from (entity, object, container...)
+#   - filter to find the element : name of the element, find the closest one from a certain point, ...
+#   - attribute to get
 
-uint8 gettype # Gives the type of element the caller wants
 
-# For GetObject and GetEntity
+# --------- FINDING THE RIGHT OBJECT -----------
+# element_type : Type of element to retreive from the map.
+uint8 ELEMENT_TYPE_TERRAIN   = 0
+uint8 ELEMENT_TYPE_ZONE      = 1
+uint8 ELEMENT_TYPE_WAYPOINT  = 2
+uint8 ELEMENT_TYPE_ENTITY    = 3
+uint8 ELEMENT_TYPE_CONTAINER = 4
+uint8 ELEMENT_TYPE_OBJECT    = 5
+uint8 element_type
+
+# filter_type : how to find the objet ? This gives the type of filter to apply.
+uint8 FILTER_NAME        = 0  # simple name of the object to retrieve (can be inside an object container)
+#TODO: uint8 FILTER_POSITION    = 1  # physical position (near a certain XY, place)
+#TODO: uint8 FILTER_CONTAINER   = 2  # search objects that are in a certain container
+uint8 filter_type
+
+# For name filter : give the name of the object you wish to find.
 string name
 
+#TODO: # For position filter
+# uint8 FILTER_POSITION_TYPE_CLOSEST_FROM = 0
+# uint8 FILTER_POSITION_TYPE_IN_ZONE = 0
+# uint8 FILTER_POSITION_TYPE_CLOSEST_FROM = 0
+# uint8 FILTER_POSITION_TYPE_CLOSEST_FROM = 0
+# uint8 position_type
+# string reference # TODO: needs to be defined with all the things above
+
+
+# --------- GETTING THE RIGHT ATTRIBUTE -----------
+# attribute_name : give which 
+string attribute_name
+
 ---
-string response
+# RESPONSE SECTION
+
+# response status : give if request got a result or not
+int16 response_code # 200 ok, 404 element not found, ... TODO: define
+string reason
+
+# the response_type gives which of the variables below contain the answer.
+uint8 RESPONSE_TYPE_INT    = 0
+uint8 RESPONSE_TYPE_FLOAT  = 1
+uint8 RESPONSE_TYPE_STRING = 2
+uint8 RESPONSE_TYPE_JSON   = 3
+uint8 RESPONSE_TYPE_POSE2D = 4
+uint8 response_type
+
+int32 response_int
+float32 response_float
+string response_string
+geometry_msgs/Pose2D response_pose2d

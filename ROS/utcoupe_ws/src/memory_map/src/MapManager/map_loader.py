@@ -20,24 +20,23 @@ class MapLoader():
         pass
 
     def init_dict(self, data):
-        MapDict = data
         # -------- Terrain
-        zones = MapDict["terrain"]["zones"]
+        zones = data["terrain"]["zones"]
         for zone in zones:
             zones[zone] = Zone(zone, zones[zone])
 
         # -------- Waypoints
-        waypoints = MapDict["terrain"]["waypoints"]
+        waypoints = data["terrain"]["waypoints"]
         for waypoint in waypoints:
             waypoints[waypoint] = Waypoint(waypoint, waypoints[waypoint])
 
         # -------- Entities
-        entities = MapDict["entities"]
+        entities = data["entities"]
         for entity in entities:
             entities[entity] = Entity(entity, entities[entity])
 
         # -------- Objects
-        objects = MapDict["objects"]
+        objects = data["objects"]
         for elem in objects:
             #if objects[elem]["type"] == "namespace":
             #    objects[elem] = ObjectNamespace(elem, objects[elem])
@@ -47,4 +46,4 @@ class MapLoader():
                 objects[elem] = Object(elem, objects[elem])
                 #rospy.logerr("Object '{}' found in the map description file that doesn't belong to any namespace. object not loaded".format(elem))
 
-        return MapDict
+        return data

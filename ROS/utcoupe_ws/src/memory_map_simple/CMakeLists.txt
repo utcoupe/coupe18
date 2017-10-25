@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(memory_map)
+project(memory_map_simple)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -8,10 +8,10 @@ project(memory_map)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  geometry_msgs
   roscpp
   rospy
   std_msgs
-  geometry_msgs
   message_generation
 )
 
@@ -51,16 +51,14 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 # add_message_files(
 #   FILES
-#   MapPosition2D.msg
+#   Message1.msg
+#   Message2.msg
 # )
 
 # Generate services in the 'srv' folder
 add_service_files(
   FILES
-  MapConditionContainer.srv
   MapGet.srv
-  MapGet2.srv
-  MapSet.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -73,8 +71,8 @@ add_service_files(
 # Generate added messages and services with any dependencies listed here
 generate_messages(
   DEPENDENCIES
-  std_msgs
   geometry_msgs
+  std_msgs
 )
 
 ################################################
@@ -107,10 +105,9 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-    CATKIN_DEPENDS message_runtime
 #  INCLUDE_DIRS include
-#  LIBRARIES memory_map
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+#  LIBRARIES memory_map_simple
+ CATKIN_DEPENDS message_runtime geometry_msgs roscpp rospy std_msgs
 #  DEPENDS system_lib
 )
 
@@ -127,7 +124,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/memory_map.cpp
+#   src/${PROJECT_NAME}/memory_map_simple.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -138,7 +135,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/memory_map_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/memory_map_simple_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -195,7 +192,7 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_memory_map.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_memory_map_simple.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

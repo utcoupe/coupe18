@@ -21,10 +21,11 @@ class Map():
     @staticmethod
     def findFromPath(path):
         filters = path.split("/")
-        instance = Map.MapDict
+        result = Map.MapDict
         for f in filters[1:]:
-            instance = instance[f]
-            print "Applied filter {} : {}".format(f, instance)
+            result = result[f]
+            print "Applied filter {} : {}".format(f, result)
+        return result
 
     @staticmethod
     def getMapDict():

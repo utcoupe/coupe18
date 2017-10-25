@@ -1,7 +1,6 @@
 #!/usr/bin/python
 import rospy
-from get_manager import GetManager as GM
-from set_manager import SetManager as SM
+from map import Map
 import memory_map.srv
 
 
@@ -32,17 +31,16 @@ class ConditionsHandler():
 
 class GetServiceHandler():
     def __init__(self):
-        self.GetSERV = rospy.Service(
-            Servers.GET_SERV, memory_map.srv.MapGet, self.on_get)
+        self.GetSERV = rospy.Service(Servers.GET_SERV, memory_map.srv.MapGet2, self.on_get)
 
     def on_get(self, req):
-        pass
+        print "Got get request ! responding : " + str(Map.get(req.request_path))
+
 
 
 class SetServiceHandler():
     def __init__(self):
-        self.SetSERV = rospy.Service(
-            Servers.SET_SERV, memory_map.srv.MapSet, self.on_set)
+        self.SetSERV = rospy.Service(Servers.SET_SERV, memory_map.srv.MapSet, self.on_set)
 
     def on_set(self, req):
         pass

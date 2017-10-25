@@ -1,7 +1,0 @@
-uint8 OBJTYPE_OBJECT    = 0
-uint8 OBJTYPE_CONTAINER = 1
-
-uint8 object_type
-string object_name
----
-string json #TODO create real variables
