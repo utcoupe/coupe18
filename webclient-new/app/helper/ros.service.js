@@ -15,7 +15,7 @@ class RosService {
     this.newRosConnection();
     $interval(() => {
       this.newRosConnection();
-    }, 500); // [ms]
+    }, 1000); // [ms]
   }
 
   newRosConnection(callback) {
@@ -117,7 +117,9 @@ class RosService {
           active: true
         }
         this.data.topics.push(t);
-        this.ros.getTopicType(name, (type) => { t.type = type; });
+        this.ros.getTopicType(name, (type) => {
+          _.findWhere(this.data.topics, t).type = type;
+        });
       });
 
       for(let d of this.$rootScope.domains) {
@@ -142,7 +144,9 @@ class RosService {
           active: true
         }
         this.data.services.push(s);
-        this.ros.getServiceType(name, (type) => { s.type = type; });
+        this.ros.getServiceType(name, (type) => {
+          _.findWhere(this.data.services, s).type = type;
+        });
       });
 
 
@@ -159,8 +163,6 @@ class RosService {
           }
         }
       }
-
-
     });
 
     this.ros.getParams((params) => {

@@ -3,13 +3,18 @@ class ServiceController {
     this.$scope = $scope;
     this.$http = $http;
     this.ros = Ros;
+
   }
 
   $onInit() {
-    const path = 'app/services/';
-    this.fileName = `${path}default.html`;
 
     this.$scope.$watchGroup(['service.type', 'service.active'], () => {
+      const path = 'app/services/';
+
+
+      this.fileName = `${path}default.html`;
+
+
       if(!this.service.active) {
         this.fileName = `${path}disabled.html`;
         return;
@@ -26,9 +31,8 @@ class ServiceController {
         }
       }, () => {});
     });
-
-
   }
+
 
   callService(input, isJSON) {
     //(!this.service.active)

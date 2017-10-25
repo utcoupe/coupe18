@@ -7,6 +7,7 @@ function ROSCCConfig($routeProvider, localStorageServiceProvider) {
 }
 
 function run($rootScope) {
+
   $rootScope.domains = [{
     name: 'ai',
     topics: ['oui1', 'non1'],
@@ -610,7 +611,7 @@ var RosService = function () {
     this.newRosConnection();
     $interval(function () {
       _this.newRosConnection();
-    }, 500); // [ms]
+    }, 1000); // [ms]
   }
 
   _createClass(RosService, [{
@@ -724,7 +725,7 @@ var RosService = function () {
           };
           _this3.data.topics.push(t);
           _this3.ros.getTopicType(name, function (type) {
-            t.type = type;
+            _.findWhere(_this3.data.topics, t).type = type;
           });
         });
 
@@ -798,7 +799,7 @@ var RosService = function () {
           };
           _this3.data.services.push(s);
           _this3.ros.getServiceType(name, function (type) {
-            s.type = type;
+            _.findWhere(_this3.data.services, s).type = type;
           });
         });
 
@@ -1639,10 +1640,11 @@ var ServiceController = function () {
     value: function $onInit() {
       var _this = this;
 
-      var path = 'app/services/';
-      this.fileName = path + 'default.html';
-
       this.$scope.$watchGroup(['service.type', 'service.active'], function () {
+        var path = 'app/services/';
+
+        _this.fileName = path + 'default.html';
+
         if (!_this.service.active) {
           _this.fileName = path + 'disabled.html';
           return;

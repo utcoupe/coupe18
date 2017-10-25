@@ -28,15 +28,18 @@
                  <h3 class="panel-title text-capitalize">{{ domain }}</h3>
                </div>
           </div>
-            <center><button class="btn btn-info" ng-click="$ctrl.showUnexpected = !$ctrl.showUnexpected">
+          <center><div class="panel panel-info panel-domain" ng-click="$ctrl.showUnexpected = !$ctrl.showUnexpected">
+            <div class="panel-heading">
               <span class="glyphicon" ng-class="{ 'glyphicon-chevron-down' : !$ctrl.showUnexpected,
-                          'glyphicon-chevron-up' : $ctrl.showUnexpected }"></span>
+                        'glyphicon-chevron-up' : $ctrl.showUnexpected }"></span>
+
 
               {{ $ctrl.showUnexpected ? ' Hide unexpected' : 'Show unexpected'}}
 
               <span class="glyphicon" ng-class="{ 'glyphicon-chevron-down' : !$ctrl.showUnexpected,
-                          'glyphicon-chevron-up' : $ctrl.showUnexpected }"></span>
-            </button></center>
+                        'glyphicon-chevron-up' : $ctrl.showUnexpected }"></span>
+            </div>
+          </div></center>
             <br/>
           <hr ng-if="$ctrl.setting.showUnexpected"/>
 

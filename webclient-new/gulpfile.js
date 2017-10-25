@@ -3,10 +3,20 @@ const gulp = require('gulp'),
   concat = require('gulp-concat'),
   eslint = require('gulp-eslint');
 
+function swallowError (error) {
+
+  // If you want details of the error in the console
+  console.log(error.toString())
+
+  this.emit('end')
+}
+
 // Concat all js files into roscc.js
 gulp.task('js', function () {
   return gulp.src(['app/app.js', 'app/**/*.js'])
+    .on('error', swallowError)
     .pipe(babel({ presets: ['es2015'] }))
+    .on('error', swallowError)
     .pipe(concat('roscc.js'))
     .pipe(gulp.dest('assets/js/'));
 });

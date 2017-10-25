@@ -1,0 +1,90 @@
+<div uib-accordion-group class="panel-default" is-open="$ctrl.service.isOpen">
+  <uib-accordion-heading>
+    {{ $ctrl.service.abbr }}
+    <div style="float: right">  <small style="font-size: 12px;">({{ $ctrl.service.type }})</small></div>
+    <div style="clear: both;"></div>
+  </uib-accordion-heading>
+
+    <!-- set variables, not clean but no need for another controller -->
+    <div ng-show="false" ng-init="modes = ['Position', 'Position & Angle', 'Angle', 'Angle (modulo)']"></div>
+
+    <form class="form-margin">
+      <div class="row">
+
+        <div class="form-group col-lg-3">
+          <label>Mode</label>
+          <div class="input-group">
+            <select class="form-control" ng-model="$ctrl.message.command" ng-init="$ctrl.message.command = 0">
+              <option ng-repeat="m in modes" ng-value="$index">{{ m }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group col-lg-3" ng-show="$ctrl.message.command == 0 || $ctrl.message.command == 1">
+          <label>X</label>
+          <div class="input-group">
+            <input type="number" class="form-control" ng-model="$ctrl.message.x" ng-readonly="$ctrl.isSubscribing">
+            <span class="input-group-addon">mm</span>
+          </div>
+        </div>
+
+        <div class="form-group col-lg-3" ng-show="$ctrl.message.command == 0 || $ctrl.message.command == 1">
+          <label>Y</label>
+          <div class="input-group">
+            <input type="number" class="form-control" ng-model="$ctrl.message.y" ng-readonly="$ctrl.isSubscribing">
+            <span class="input-group-addon">mm</span>
+          </div>
+        </div>
+
+        <div class="form-group col-lg-3" ng-show="$ctrl.message.command > 0">
+          <label>Angle</label>
+          <div class="input-group">
+            <input type="number" class="form-control" ng-model="angleDeg" ng-change="$ctrl.message.a = angleDeg" ng-readonly="$ctrl.isSubscribing">
+            <span class="input-group-addon">deg</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="btn btn-default btn-md pull-right" type="button" ng-click="$ctrl.callService($ctrl.message)">
+          Go to {{ modes[$ctrl.message.command] | lowercase}}
+        </button>
+      </div>
+    </form>
+
+
+<!--
+
+
+    <div class="form-group">
+      <label>Mode</label>
+      <select ng-model="$ctrl.message.mode">
+        <option ng-repeat="m in modes" ng-value="$index">{{ m }}</option>
+      </select>
+    </div>
+
+    <div class="col-sm-6">
+        <div class="form-group">
+          <label>X</label>
+          <div class="input-group">
+            <input type="number" class="form-control" ng-model="$ctrl.message.posStart.x">
+            <span class="input-group-addon">m</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Y</label>
+          <div class="input-group">
+            <input type="number"ng-model="$ctrl.message.posStart.y">
+            <span class="input-group-addon">m</span>
+          </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+      <div class="col-sm-12">
+        <button class="btn btn-default" type="button" ng-click="$ctrl.callService($ctrl.message)">Call</button>
+      </div>
+    </div>-->
+</div>
