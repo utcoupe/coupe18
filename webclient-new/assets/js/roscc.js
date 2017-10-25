@@ -1627,12 +1627,14 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var ServiceController = function () {
-  function ServiceController($scope, $http, Ros) {
+  function ServiceController($scope, $http, $timeout, Ros) {
     _classCallCheck(this, ServiceController);
 
     this.$scope = $scope;
     this.$http = $http;
     this.ros = Ros;
+    this.$timeout = $timeout;
+    this.flashState = -1;
   }
 
   _createClass(ServiceController, [{
@@ -1675,10 +1677,27 @@ var ServiceController = function () {
         name: this.service.name,
         serviceType: this.service.type
       });
+      console.log(data);
       var request = new ROSLIB.ServiceRequest(data);
 
       ROSservice.callService(request, function (result) {
         _this2.result = result;
+        _this2.flashState = -1;
+        // -1 : no flash
+        // 0 : returned some object
+        // 1 : return some object with a success = true
+        // 2 : return some object with a success = false
+
+        //assume this is the success state
+        if (_.keys(result).length == 1 && typeof result[_.keys(result)[0]] === 'boolean') {
+          var success = result[_.keys(result)[0]];
+          if (success) _this2.flashState = 1;else _this2.flashState = 2;
+        } else {
+          _this2.flashState = 0;
+        }
+        _this2.$timeout(function () {
+          _this2.flashState = -1;
+        }, 2000);
       });
     }
   }]);

@@ -1,9 +1,10 @@
 class ServiceController {
-  constructor($scope, $http, Ros) {
+  constructor($scope, $http, $timeout, Ros) {
     this.$scope = $scope;
     this.$http = $http;
     this.ros = Ros;
-
+    this.$timeout = $timeout;
+    this.flashState = -1;
   }
 
   $onInit() {
@@ -44,10 +45,28 @@ class ServiceController {
       name: this.service.name,
       serviceType: this.service.type,
     });
+    console.log(data);
     const request = new ROSLIB.ServiceRequest(data);
 
     ROSservice.callService(request, (result) => {
       this.result = result;
+      this.flashState = -1;
+      // -1 : no flash
+      // 0 : returned some object
+      // 1 : return some object with a success = true
+      // 2 : return some object with a success = false
+
+      //assume this is the success state
+      if(_.keys(result).length == 1 && typeof result[_.keys(result)[0]] === 'boolean') {
+        let success = result[_.keys(result)[0]];
+        if(success)
+          this.flashState = 1
+        else
+          this.flashState = 2
+      } else {
+        this.flashState = 0
+      }
+      this.$timeout(() => { this.flashState = -1 }, 2000);
     });
   }
 }

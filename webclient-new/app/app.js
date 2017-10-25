@@ -14,6 +14,7 @@ function ROSCCConfig($routeProvider, localStorageServiceProvider) {
 }
 
 function run($rootScope) {
+  
   $rootScope.domains = [
     {
       name: 'ai',

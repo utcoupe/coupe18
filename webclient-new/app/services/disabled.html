@@ -1,4 +1,8 @@
-<div uib-accordion-group class="panel-danger" is-disabled="true">
+<div uib-accordion-group
+ng-class="{'panel-default' : $ctrl.flashState == -1,
+           'panel-info' : $ctrl.flashState == 0,
+           'panel-success' : $ctrl.flashState == 1,
+           'panel-danger' : $ctrl.flashState == 2}" is-disabled="true">
   <uib-accordion-heading>
     {{ $ctrl.service.abbr }}
     <div style="float: right">  <small style="font-size: 12px;">Not running !</small></div>

@@ -1,4 +1,8 @@
-<div uib-accordion-group class="panel-default">
+<div uib-accordion-group
+ng-class="{'panel-default' : $ctrl.flashState == -1,
+           'panel-info' : $ctrl.flashState == 0,
+           'panel-success' : $ctrl.flashState == 1,
+           'panel-danger' : $ctrl.flashState == 2}" is-open="$ctrl.service.isOpen">
   <uib-accordion-heading>
     {{ $ctrl.service.abbr }}
     <div style="float: right">  <small style="font-size: 12px;">({{ $ctrl.service.type }})</small></div>
