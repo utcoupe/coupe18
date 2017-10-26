@@ -4,7 +4,7 @@ uint8 SPDMAX = 0
 uint8 ACCMAX = 1
 uint8 PIDRIGHT = 2
 uint8 PIDLEFT = 3
-uint8 PIDALL = 3
+uint8 PIDALL = 4
 uint8 parameter
 uint16 acc
 uint16 spd
