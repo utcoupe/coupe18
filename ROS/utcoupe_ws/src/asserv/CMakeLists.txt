@@ -25,9 +25,13 @@ add_message_files(
 ## Generate services in the 'srv' folder
 add_service_files(
         FILES
-        Goto.srv
         AsservParameters.srv
+        EmergencyStop.srv
+        Goto.srv
         Management.srv
+        Pwm.srv
+        SetPos.srv
+        Speed.srv
 )
 
 # Generate added messages and services with any dependencies listed here

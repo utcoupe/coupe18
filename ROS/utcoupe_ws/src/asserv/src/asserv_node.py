@@ -23,7 +23,11 @@ class Asserv:
         self._pub_robot_pose = rospy.Publisher("robot/pose2d", Pose2D, queue_size=5)
         self._pub_robot_speed = rospy.Publisher("robot/speed", RobotSpeed, queue_size=5)
         # self._sub_arm = rospy.Subscriber("arm", 1, Asserv.callback_arm)
-        self._srv_goto = rospy.Service("asserv/goto", Goto, self.callback_goto)
+        self._srv_goto = rospy.Service("asserv/controls/goto", Goto, self.callback_goto)
+        self._srv_pwm = rospy.Service("asserv/controls/pwm", Pwm, self.callback_pwm)
+        self._srv_speed = rospy.Service("asserv/controls/speed", Speed, self.callback_speed)
+        self._srv_set_pos = rospy.Service("asserv/controls/set_pos", SetPos, self.callback_set_pos)
+        self._srv_emergency_stop = rospy.Service("asserv/controls/emergency_stop", EmergencyStop, self.callback_emergency_stop)
         self._srv_params = rospy.Service("asserv/parameters", AsservParameters, self.callback_asserv_param)
         self._srv_management = rospy.Service("asserv/management", Management, self.callback_management)
         # Init the serial communication
@@ -58,12 +62,26 @@ class Asserv:
             self.send_serial_data(self._orders_dictionnary['ROT'], [str(request.a)])
         elif request.command == request.ROTNOMODULO:
             self.send_serial_data(self._orders_dictionnary['ROTNOMODULO'], [str(request.a)])
-        elif request.command == request.SET_POS:
-            self.send_serial_data(self._orders_dictionnary['SET_POS'], [str(request.x), str(request.y), str(request.a)])
         else:
             response = False
             rospy.logerr("GOTO command %d does not exists...", request.command)
         return GotoResponse(response)
+
+    def callback_set_pos(self, request):
+        self.send_serial_data(self._orders_dictionnary['SET_POS'], [str(request.x), str(request.y), str(request.a)])
+        return SetPosResponse(True)
+
+    def callback_pwm(self, request):
+        self.send_serial_data(self._orders_dictionnary['PWM'], [str(request.left), str(request.right), str(request.duration)])
+        return PwmResponse(True)
+
+    def callback_speed(self, request):
+        self.send_serial_data(self._orders_dictionnary['SPD'], [str(request.linear), str(request.angular), str(request.duration)])
+        return SpeedResponse(True)
+
+    def callback_emergency_stop(self, request):
+        self.send_serial_data(self._orders_dictionnary['SETEMERGENCYSTOP'], [str(request.enable)])
+        return EmergencyStopResponse(True)
 
     def callback_asserv_param(self, request):
         response = True
