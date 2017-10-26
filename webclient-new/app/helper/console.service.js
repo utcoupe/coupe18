@@ -1,11 +1,16 @@
 class ConsoleService {
 
-  constructor(Ros, Settings) {
+  constructor(Ros, Settings, $rootScope) {
     this.ros = Ros;
     this.setting = Settings.get();
 
     this.logs = [];
-    this.setConsole();
+    $rootScope.$watch('isConnected', () => {
+      if($rootScope.isConnected)
+        this.setConsole();
+      else if(this.consoleTopic)
+        this.consoleTopic.unsubscribe();
+      });
   }
 
   // Setup of console (in the right sidebar)

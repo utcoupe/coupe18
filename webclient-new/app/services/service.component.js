@@ -45,8 +45,9 @@ class ServiceController {
       name: this.service.name,
       serviceType: this.service.type,
     });
-    console.log(data);
     const request = new ROSLIB.ServiceRequest(data);
+
+    this.flashState = -1;
 
     ROSservice.callService(request, (result) => {
       this.result = result;
@@ -66,7 +67,10 @@ class ServiceController {
       } else {
         this.flashState = 0
       }
-      this.$timeout(() => { this.flashState = -1 }, 2000);
+      if(this.flashBackPromise)
+        this.$timeout.cancel(this.flashBackPromise);
+
+      this.flashBackPromise = this.$timeout(() => { this.flashState = -1 }, 2000);
     });
   }
 }

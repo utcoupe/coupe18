@@ -14,8 +14,19 @@ function ROSCCConfig($routeProvider, localStorageServiceProvider) {
 }
 
 function run($rootScope) {
-  
+
   $rootScope.domains = [
+    {
+      name: 'asserv',
+      topics: [],
+      services: ['controls/emergency_stop',
+                 'controls/goto',
+                 'controls/set_pos',
+                 'controls/speed',
+                 'controls/pwm',
+                 'management',
+                 'parameters']
+    },
     {
       name: 'ai',
       topics: ['oui1', 'non1'],

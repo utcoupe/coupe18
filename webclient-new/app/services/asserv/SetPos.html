@@ -10,25 +10,10 @@ class="panel-default" is-open="$ctrl.service.isOpen">
     <div style="clear: both;"></div>
   </uib-accordion-heading>
 
-  <!-- set variables, not clean but no need for another controller -->
-  <div ng-show="false" ng-init="modes = ['Position', 'Position & Angle', 'Angle', 'Angle (no modulo)']"></div>
-
-
-  <div ng-show="false" ng-init="x = 0; y = 0; a = 0;"></div>
-
   <form class="form-margin">
     <div class="row">
 
-      <div class="form-group col-lg-3">
-        <label>Mode</label>
-        <div class="input-group">
-          <select class="form-control" ng-model="command" ng-init="command = 0">
-            <option ng-repeat="m in modes" ng-value="$index">{{ m }}</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-group col-lg-3" ng-show="command == 0 || command == 1">
+      <div class="form-group col-lg-4">
         <label>X</label>
         <div class="input-group">
           <input type="number" class="form-control" ng-model="x">
@@ -36,7 +21,7 @@ class="panel-default" is-open="$ctrl.service.isOpen">
         </div>
       </div>
 
-      <div class="form-group col-lg-3" ng-show="command == 0 || command == 1">
+      <div class="form-group col-lg-4">
         <label>Y</label>
         <div class="input-group">
           <input type="number" class="form-control" ng-model="y">
@@ -44,7 +29,7 @@ class="panel-default" is-open="$ctrl.service.isOpen">
         </div>
       </div>
 
-      <div class="form-group col-lg-3" ng-show="command > 0">
+      <div class="form-group col-lg-4">
         <label>Angle</label>
         <div class="input-group">
           <input type="number" class="form-control" ng-model="a">
@@ -55,12 +40,11 @@ class="panel-default" is-open="$ctrl.service.isOpen">
 
     <div class="row">
       <button class="btn btn-default btn-md pull-right" type="button" ng-click="$ctrl.callService({
-          x,
-          y,
-          a: a * 3.14159 / 180,
-          command: command
+        x,
+        y,
+        a: a * 3.14159 / 180
       })">
-        Go to {{ modes[command] | lowercase}}
+        Set position & angle
       </button>
     </div>
   </form>

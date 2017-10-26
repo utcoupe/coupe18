@@ -114,7 +114,8 @@ class RosService {
       angular.forEach(topics.topics, (name) => {
         let t = {
           name: name,
-          active: true
+          active: true,
+          isOpen: true
         }
         this.data.topics.push(t);
         this.ros.getTopicType(name, (type) => {
@@ -141,7 +142,8 @@ class RosService {
       angular.forEach(services, (name) => {
         let s = {
           name: name,
-          active: true
+          active: true,
+          isOpen: true
         }
         this.data.services.push(s);
         this.ros.getServiceType(name, (type) => {

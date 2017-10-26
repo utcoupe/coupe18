@@ -20,7 +20,7 @@
           <!-- Domains -->
           <div class="panel panel-default panel-domain"
                ng-class="{ 'panel-active': ($ctrl.activeDomain == domain),
-                           'panel-danger': !$ctrl.isDomainActive(domain) }"
+                           'panel-danger': !$ctrl.isDomainActiveForServices(domain) }"
                ng-repeat="domain in $ctrl.ros.getExpectedDomains()"
                ng-click="$ctrl.setActiveDomain(domain)">
 

@@ -9,6 +9,10 @@ function ROSCCConfig($routeProvider, localStorageServiceProvider) {
 function run($rootScope) {
 
   $rootScope.domains = [{
+    name: 'asserv',
+    topics: [],
+    services: ['controls/emergency_stop', 'controls/goto', 'controls/set_pos', 'controls/speed', 'controls/pwm', 'management', 'parameters']
+  }, {
     name: 'ai',
     topics: ['oui1', 'non1'],
     services: ['s1', 's2']
@@ -265,9 +269,16 @@ var ControlController = function () {
       this.ros.loadData();
     }
   }, {
-    key: 'isDomainActive',
-    value: function isDomainActive(domain) {
+    key: 'isDomainActiveForTopics',
+    value: function isDomainActiveForTopics(domain) {
       return _.some(this.ros.getTopicsForDomain(domain), function (t) {
+        return t.active == true;
+      });
+    }
+  }, {
+    key: 'isDomainActiveForServices',
+    value: function isDomainActiveForServices(domain) {
+      return _.some(this.ros.getServicesForDomain(domain), function (t) {
         return t.active == true;
       });
     }
@@ -411,14 +422,18 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var ConsoleService = function () {
-  function ConsoleService(Ros, Settings) {
+  function ConsoleService(Ros, Settings, $rootScope) {
+    var _this = this;
+
     _classCallCheck(this, ConsoleService);
 
     this.ros = Ros;
     this.setting = Settings.get();
 
     this.logs = [];
-    this.setConsole();
+    $rootScope.$watch('isConnected', function () {
+      if ($rootScope.isConnected) _this.setConsole();else if (_this.consoleTopic) _this.consoleTopic.unsubscribe();
+    });
   }
 
   // Setup of console (in the right sidebar)
@@ -427,7 +442,7 @@ var ConsoleService = function () {
   _createClass(ConsoleService, [{
     key: 'setConsole',
     value: function setConsole() {
-      var _this = this;
+      var _this2 = this;
 
       this.consoleTopic = new ROSLIB.Topic({
         ros: this.ros.ros,
@@ -446,10 +461,10 @@ var ConsoleService = function () {
         }
         message.dateString = addZero(d.getHours()) + ':\n      ' + addZero(d.getMinutes()) + ':\n      ' + addZero(d.getSeconds());
 
-        _this.logs.unshift(message);
+        _this2.logs.unshift(message);
 
-        if (_this.logs.length > _this.setting.maxConsoleEntries) {
-          _this.logs.pop();
+        if (_this2.logs.length > _this2.setting.maxConsoleEntries) {
+          _this2.logs.pop();
         }
       });
     }
@@ -721,7 +736,8 @@ var RosService = function () {
         angular.forEach(topics.topics, function (name) {
           var t = {
             name: name,
-            active: true
+            active: true,
+            isOpen: true
           };
           _this3.data.topics.push(t);
           _this3.ros.getTopicType(name, function (type) {
@@ -795,7 +811,8 @@ var RosService = function () {
         angular.forEach(services, function (name) {
           var s = {
             name: name,
-            active: true
+            active: true,
+            isOpen: true
           };
           _this3.data.services.push(s);
           _this3.ros.getServiceType(name, function (type) {
@@ -1677,8 +1694,9 @@ var ServiceController = function () {
         name: this.service.name,
         serviceType: this.service.type
       });
-      console.log(data);
       var request = new ROSLIB.ServiceRequest(data);
+
+      this.flashState = -1;
 
       ROSservice.callService(request, function (result) {
         _this2.result = result;
@@ -1695,7 +1713,9 @@ var ServiceController = function () {
         } else {
           _this2.flashState = 0;
         }
-        _this2.$timeout(function () {
+        if (_this2.flashBackPromise) _this2.$timeout.cancel(_this2.flashBackPromise);
+
+        _this2.flashBackPromise = _this2.$timeout(function () {
           _this2.flashState = -1;
         }, 2000);
       });
