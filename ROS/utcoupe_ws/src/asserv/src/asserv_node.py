@@ -23,7 +23,8 @@ class Asserv:
         self._pub_robot_pose = rospy.Publisher("robot/pose2d", Pose2D, queue_size=5)
         self._pub_robot_speed = rospy.Publisher("robot/speed", RobotSpeed, queue_size=5)
         # self._sub_arm = rospy.Subscriber("arm", 1, Asserv.callback_arm)
-        self._sub_goto = rospy.Service("goto", Goto, self.callback_goto)
+        self._srv_goto = rospy.Service("asserv/goto", Goto, self.callback_goto)
+        self._srv_params = rospy.Service("asserv/parameters", AsservParameters, self.callback_asserv_param)
         # Init the serial communication
         self._arduino_startep_flag = False
         self._order_id = 0
@@ -60,6 +61,23 @@ class Asserv:
             response = False
             rospy.logerr("GOTO command %d does not exists...", request.command)
         return GotoResponse(response)
+
+    def callback_asserv_param(self, request):
+        response = True
+        if request.parameter == request.SPDMAX:
+            self.send_serial_data(self._orders_dictionnary['SPDMAX'], [str(request.spd), str(request.spd_ratio)])
+        elif request.parameter == request.ACCMAX:
+            self.send_serial_data(self._orders_dictionnary['ACCMAX'], [str(request.acc)])
+        elif request.parameter == request.PIDRIGHT:
+            self.send_serial_data(self._orders_dictionnary['PIDRIGHT'], [str(request.p), str(request.i), str(request.d)])
+        elif request.parameter == request.PIDLEFT:
+            self.send_serial_data(self._orders_dictionnary['PIDLEFT'], [str(request.p), str(request.i), str(request.d)])
+        elif request.parameter == request.PIDALL:
+            self.send_serial_data(self._orders_dictionnary['PIDALL'], [str(request.p), str(request.i), str(request.d)])
+        else:
+            response = False
+            rospy.logerr("AsservParameters command %d does not exists...", request.parameter)
+        return AsservParametersResponse(response)
 
     def data_receiver(self):
         while not rospy.is_shutdown():
