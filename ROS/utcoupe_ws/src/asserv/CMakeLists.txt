@@ -27,6 +27,7 @@ add_service_files(
         FILES
         Goto.srv
         AsservParameters.srv
+        Management.srv
 )
 
 # Generate added messages and services with any dependencies listed here

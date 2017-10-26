@@ -25,6 +25,7 @@ class Asserv:
         # self._sub_arm = rospy.Subscriber("arm", 1, Asserv.callback_arm)
         self._srv_goto = rospy.Service("asserv/goto", Goto, self.callback_goto)
         self._srv_params = rospy.Service("asserv/parameters", AsservParameters, self.callback_asserv_param)
+        self._srv_management = rospy.Service("asserv/management", Management, self.callback_management)
         # Init the serial communication
         self._arduino_startep_flag = False
         self._order_id = 0
@@ -57,6 +58,8 @@ class Asserv:
             self.send_serial_data(self._orders_dictionnary['ROT'], [str(request.a)])
         elif request.command == request.ROTNOMODULO:
             self.send_serial_data(self._orders_dictionnary['ROTNOMODULO'], [str(request.a)])
+        elif request.command == request.SET_POS:
+            self.send_serial_data(self._orders_dictionnary['SET_POS'], [str(request.x), str(request.y), str(request.a)])
         else:
             response = False
             rospy.logerr("GOTO command %d does not exists...", request.command)
@@ -78,6 +81,23 @@ class Asserv:
             response = False
             rospy.logerr("AsservParameters command %d does not exists...", request.parameter)
         return AsservParametersResponse(response)
+
+    def callback_management(self, request):
+        response = True
+        if request.command == request.KILLG:
+            self.send_serial_data(self._orders_dictionnary['KILLG'], [])
+        elif request.command == request.CLEANG:
+            self.send_serial_data(self._orders_dictionnary['CLEANG'], [])
+        elif request.command == request.PAUSE:
+            self.send_serial_data(self._orders_dictionnary['PAUSE'], [])
+        elif request.command == request.RESUME:
+            self.send_serial_data(self._orders_dictionnary['RESUME'], [])
+        elif request.command == request.RESET_ID:
+            self.send_serial_data(self._orders_dictionnary['RESET_ID'], [])
+        else:
+            response = False
+            rospy.logerr("Management command %d does not exists...", request.command)
+        return ManagementResponse(response)
 
     def data_receiver(self):
         while not rospy.is_shutdown():
