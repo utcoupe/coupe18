@@ -46,9 +46,20 @@ class Asserv:
         rospy.loginfo("ARM callback")
 
     def callback_goto(self, request):
-        rospy.loginfo("GOTO callback, data x=%d, y=%d", request.x, request.y)
-        self.send_serial_data(self._orders_dictionnary['GOTO'], [str(request.x), str(request.y), str(1)])
-        return GotoResponse(True)
+        response = True
+        # TODO manage the direction
+        if request.command == request.GOTO:
+            self.send_serial_data(self._orders_dictionnary['GOTO'], [str(request.x), str(request.y), str(1)])
+        elif request.command == request.GOTOA:
+            self.send_serial_data(self._orders_dictionnary['GOTOA'], [str(request.x), str(request.y), str(request.a), str(1)])
+        elif request.command == request.ROT:
+            self.send_serial_data(self._orders_dictionnary['ROT'], [str(request.a)])
+        elif request.command == request.ROTNOMODULO:
+            self.send_serial_data(self._orders_dictionnary['ROTNOMODULO'], [str(request.a)])
+        else:
+            response = False
+            rospy.logerr("GOTO command %d does not exists...", request.command)
+        return GotoResponse(response)
 
     def data_receiver(self):
         while not rospy.is_shutdown():
