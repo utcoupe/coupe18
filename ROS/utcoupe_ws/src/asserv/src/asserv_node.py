@@ -8,6 +8,7 @@ import os
 from asserv.srv import *
 from asserv.msg import *
 import protocol_parser
+import check_arduino
 
 __author__ = "Thomas Fuhrmann"
 __date__ = 21/10/2017
@@ -36,7 +37,7 @@ class Asserv:
         # TODO dynamic arduino port
         self._serial_com = None
         self._serial_receiver_thread = None
-        self.start_serial_com_line("/dev/ttyACM0")
+        self.start_serial_com_line(check_arduino.get_arduino_port("asserv"))
         self.start()
 
     def start_serial_com_line(self, port):
@@ -135,22 +136,22 @@ class Asserv:
                 self._reception_queue.task_done()
 
     def process_received_data(self, data):
-        rospy.loginfo("Process : " + data)
+        # rospy.loginfo("Process : " + data)
         # At init, start the Arduino
-        # TODO adapt the received name !
-        if (not self._arduino_startep_flag) and data.find("gr_asserv") == 0:
-            rospy.loginfo("Activate the Arduino")
+        if (not self._arduino_startep_flag) and data.find("asserv") != -1:
             self.send_serial_data(self._orders_dictionnary['START'], [])
-            self._arduino_startep_flag = True
-        #last_finished_id;x;y;angle;speed_pwd_left;speed_pwm_right;linear_speed;wheel_spd_left;wheel_spd_right;sharp;P;I;D;
         elif data.find("~") != -1:
             receied_data_list = data.split(";")
             # rospy.loginfo("data sharp : " + receied_data_list[10])
             self._pub_robot_pose.publish(Pose2D(float(receied_data_list[2]), float(receied_data_list[3]), float(receied_data_list[4])))
             self._pub_robot_speed.publish(RobotSpeed(float(receied_data_list[5]), float(receied_data_list[6]), float(receied_data_list[7]), float(receied_data_list[8]), float(receied_data_list[9])))
         else:
+            # Special order ack, the first one concern the Arduino activation
+            if data.find("0;") != -1:
+                rospy.loginfo("Arduino started")
+                self._arduino_startep_flag = True
             # TODO process orders ack reception
-            rospy.loginfo("received order ack")
+            rospy.loginfo("received order ack : %s", data)
 
     def send_serial_data(self, order_type, args_list):
         if self._serial_com is not None:
