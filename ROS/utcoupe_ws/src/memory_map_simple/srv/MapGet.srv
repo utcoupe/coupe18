@@ -4,19 +4,4 @@ string request_path
 int16 res_code 
 string reason
 
-# the response_type gives which of the variables below contain the answer.
-uint8 RESPONSE_TYPE_INT    = 0
-uint8 RESPONSE_TYPE_FLOAT  = 1
-uint8 RESPONSE_TYPE_STRING = 2
-uint8 RESPONSE_TYPE_JSON   = 3
-uint8 RESPONSE_TYPE_POSE2D = 4
-uint8 res_type
-
-int32 res_int
-float32 res_float
-string res_string
 string res_json
-geometry_msgs/Pose2D res_pose2d
-
-# "/objects/*.container/cube_11.object/userData/color"
-# "/objects/*.container/cube_11.object/position/x,y,frame_id"

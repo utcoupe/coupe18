@@ -1,6 +1,7 @@
 This is a simple version of the map package.
 It simply loads the map.yml description file into a python dict.
 
+__CAUTION__ : Strictly no data validation nor error handling yet!
 
 # Getting data from the database
 
@@ -12,3 +13,5 @@ This is equivalent to writing in python `MapDict["objects"]["cube_1"]["userdata"
 ## Response
 
 The module returns a JSON with all the content localted inside the last element the request path gave.
+
+# Setting data

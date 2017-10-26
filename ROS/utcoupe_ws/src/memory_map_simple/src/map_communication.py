@@ -13,7 +13,7 @@ class Servers():
 
 class ConditionsHandler():
     def __init__(self):
-        return
+        return  # TODO: adapt
         self.ContainersSERV = rospy.Service(Servers.CONDITIONS_CONTAINERS_SERV,
                                             memory_map_simple.srv.MapConditionContainer,
                                             self.serv_handler_on_container_condition)
@@ -36,16 +36,21 @@ class GetServiceHandler():
 
     def on_get(self, req):
         result = Map.get(req.request_path)
-        print "Got get request ! responding : " + str(result)
-        return memory_map_simple.srv.MapGetResponse(res_type = memory_map_simple.srv.MapGetResponse.RESPONSE_TYPE_JSON,
+
+        success, reason = 200, ""
+        if not result: success, reason = 500, "Invalid path on get request."
+        rospy.loginfo("GET: responding '{}'.".format(result))
+        
+        return memory_map_simple.srv.MapGetResponse(res_code = success, reason = reason,
                                                     res_json = json.dumps(result))
 
 
 
 class SetServiceHandler():
     def __init__(self):
-        return
         self.SetSERV = rospy.Service(Servers.SET_SERV, memory_map_simple.srv.MapSet, self.on_set)
 
     def on_set(self, req):
-        pass
+        success, reason = Map.set(req.path, req.json_new_value)
+        rospy.loginfo("SET: responding code {} (reason : '{}').".format(success, reason))
+        return memory_map_simple.srv.MapSetResponse(success, reason)

@@ -1,5 +1,6 @@
 #!/usr/bin/python
-import rospy, os
+import os
+import rospy
 
 
 class MapLoader():

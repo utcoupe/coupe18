@@ -55,4 +55,5 @@ uint8 response_type
 int32 response_int
 float32 response_float
 string response_string
+string response_json
 geometry_msgs/Pose2D response_pose2d
