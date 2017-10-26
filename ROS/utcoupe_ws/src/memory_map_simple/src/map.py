@@ -24,7 +24,7 @@ class Map():
         result = Map.MapDict
         for f in filters[1:]:
             result = result[f]
-            print "Applied filter {} : {}".format(f, result)
+            #print "Applied filter {} : {}".format(f, result)
         return result
 
     @staticmethod
