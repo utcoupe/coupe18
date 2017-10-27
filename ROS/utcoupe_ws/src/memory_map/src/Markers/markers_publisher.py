@@ -9,17 +9,16 @@ class MarkersPublisher():
         self.RvizConnected = True
         self.MARKERS_TOPIC = "visualization_markers"
         self.MarkersPUBL = rospy.Publisher(self.MARKERS_TOPIC, Marker, queue_size=10)
-        
-        count = 0
-        while not self.MarkersPUBL.get_num_connections():
-            # wait for RViz to connect, breaks after a few tries
+
+        count = 0  # TODO HARDCODED
+        while not self.MarkersPUBL.get_num_connections():  # wait for RViz to connect, breaks after a few tries
             rospy.sleep(0.2)
             count += 1
-            if count > 5:  # TODO HARDCODED
+            if count > 5:
                 self.RvizConnected = False
                 break # Cancel connection
 
-    def publishTable(self, mapdict):
+    def publishTable(self, world):
         if self.RvizConnected:
             tableSTLMarker = Marker()
             tableSTLMarker.header.frame_id = "/map"
@@ -28,7 +27,7 @@ class MarkersPublisher():
             tableSTLMarker.id = 0
 
             # TODO adapt when Definitions will be done
-            tableSTLMarker.mesh_resource = mapdict["terrain"]["mesh_path"]
+            tableSTLMarker.mesh_resource = world.Terrain.mesh_path
             tableSTLMarker.action = Marker.ADD
             tableSTLMarker.scale.x = 0.001
             tableSTLMarker.scale.y = 0.001
@@ -48,11 +47,9 @@ class MarkersPublisher():
 
             self.MarkersPUBL.publish(tableSTLMarker)
 
-    def publishZones(self, mapdict):
+    def publishZones(self, world):
         if self.RvizConnected:
-            for z in mapdict["terrain"]["zones"]:
-                z = mapdict["terrain"]["zones"][z]
-
+            for z in world.Terrain.Zones.Elements:
                 marker = Marker()
                 marker.header.frame_id = z.Position.frame_id
                 marker.type = z.Visual.Type
@@ -78,10 +75,9 @@ class MarkersPublisher():
 
                 self.MarkersPUBL.publish(marker)
 
-    def publishObjects(self, mapdict):
+    def publishObjects(self, world):
         if self.RvizConnected:
-            for o in mapdict["objects"]:
-                o = mapdict["objects"][o]
+            for o in world.Objects.Elements:
                 if o.Type == "object":
                     marker = Marker()
                     marker.header.frame_id = o.Position.frame_id
@@ -107,6 +103,8 @@ class MarkersPublisher():
                     marker.pose.orientation.w = orientation[3]
 
                     self.MarkersPUBL.publish(marker)
+                elif o.Type == "container":
+                    rospy.logwarn("Can't show containers yet, not implemented.")
 
     def eulerToQuaternion(self, xyz):
         cr = math.cos(xyz[0] * 0.5)

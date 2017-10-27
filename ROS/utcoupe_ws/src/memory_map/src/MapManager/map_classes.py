@@ -11,18 +11,13 @@ MAP METACLASSES
 class Terrain(MapElement):
     def __init__(self, name, initdict):
         super(Terrain, self).__init__(name)
-        '''
-        description = {
-            "zones": map_objects.Zone,
-            "waypoints": map_objects.Waypoint
-        }
-        super(Terrain, self).__init__(name, initdict, description)
-        '''
         LoadingHelpers.checkKeysExist(initdict, "walls", "zones", "waypoints")
         #self.Walls = ListManager("zones", map_objects.Zone, initdict["zones"])  # TODO: implement
         self.Zones = ListManager("zones", Zone, initdict["zones"])
         self.Waypoints = ListManager("waypoints", Waypoint, initdict["waypoints"])
 
+        LoadingHelpers.checkKeysExist(initdict, "mesh_path")
+        self.mesh_path = initdict["mesh_path"]
 
 class ObjectContainer(ListManager):
     def __init__(self, name, initdict):

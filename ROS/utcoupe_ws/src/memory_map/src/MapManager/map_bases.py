@@ -11,6 +11,14 @@ class MapElement(object):
         pass
 
 '''
+CONSTRUCTOR
+description = {
+    "zones": map_objects.Zone,
+    "waypoints": map_objects.Waypoint
+}
+super(Terrain, self).__init__(name, initdict, description)
+
+DEF
 class ListGroup(MapElement):
     def __init__(self, name, initdict, listsdict):
         super(ListGroup, self).__init__(name)
