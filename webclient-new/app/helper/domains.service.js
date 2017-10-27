@@ -52,7 +52,8 @@ class DomainsService {
       const nameArray = entry.name.split('/');
       if (
         nameArray.length > 1 &&
-        nameArray[1] === domainName
+        nameArray[1] === domainName &&
+        entry.fetched
       ) {
         entry.abbr = nameArray.slice(2).join('/');
         result.push(entry);

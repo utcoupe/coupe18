@@ -210,14 +210,14 @@ var ControlController = function () {
     if ($rootScope.isConnected) {
       this.$timeout(function () {
         _this.onConnected();
-      }, 1000);
+      }, 100);
     } else {
       $rootScope.$watch('isConnected', function (newValue) {
         var _this2 = this;
 
         if (newValue) this.$timeout(function () {
           _this2.onConnected();
-        }, 1000);
+        }, 100);
       }.bind(this));
     }
   }
@@ -245,6 +245,7 @@ var ControlController = function () {
 
             if (this.ros.getDomains().includes(d.name)) {
               this.setActiveDomain(d.name);
+              return;
             }
           }
         } catch (err) {
@@ -531,7 +532,7 @@ var DomainsService = function () {
       var result = [];
       angular.forEach(array, function (entry) {
         var nameArray = entry.name.split('/');
-        if (nameArray.length > 1 && nameArray[1] === domainName) {
+        if (nameArray.length > 1 && nameArray[1] === domainName && entry.fetched) {
           entry.abbr = nameArray.slice(2).join('/');
           result.push(entry);
         }
@@ -741,7 +742,8 @@ var RosService = function () {
           };
           _this3.data.topics.push(t);
           _this3.ros.getTopicType(name, function (type) {
-            _.findWhere(_this3.data.topics, t).type = type;
+            _.findWhere(_this3.data.topics, { name: name }).type = type;
+            _.findWhere(_this3.data.topics, { name: name }).fetched = true;
           });
         });
 
@@ -815,8 +817,10 @@ var RosService = function () {
             isOpen: true
           };
           _this3.data.services.push(s);
+
           _this3.ros.getServiceType(name, function (type) {
-            _.findWhere(_this3.data.services, s).type = type;
+            _.findWhere(_this3.data.services, { name: name }).type = type;
+            _.findWhere(_this3.data.services, { name: name }).fetched = true;
           });
         });
 
@@ -1660,30 +1664,43 @@ var ServiceController = function () {
       var _this = this;
 
       this.$scope.$watchGroup(['service.type', 'service.active'], function () {
-        var path = 'app/services/';
+        _this.setFileName();
+      }, function () {});
 
-        _this.fileName = path + 'default.html';
+      /*this.ros.ros.getServiceType(this.service.name, (type) => {
+        this.service.type = type;
+        this.setFileName();
+      });*/
+    }
+  }, {
+    key: 'setFileName',
+    value: function setFileName() {
+      var _this2 = this;
 
-        if (!_this.service.active) {
-          _this.fileName = path + 'disabled.html';
-          return;
-        } else if (!_this.service.type) {
-          _this.fileName = path + 'default.html';
-          return;
+      console.log("value changed for " + this.service.name + " " + this.service.type);
+      var path = 'app/services/';
+
+      this.fileName = path + 'default.html';
+
+      if (!this.service.active) {
+        this.fileName = path + 'disabled.html';
+        return;
+      } else if (!this.service.type) {
+        this.fileName = path + 'default.html';
+        return;
+      }
+
+      var fileName = '' + path + this.service.type + '.html';
+      this.$http.get(fileName).then(function (result) {
+        if (result.data) {
+          _this2.fileName = fileName;
         }
-
-        var fileName = '' + path + _this.service.type + '.html';
-        _this.$http.get(fileName).then(function (result) {
-          if (result.data) {
-            _this.fileName = fileName;
-          }
-        }, function () {});
-      });
+      }, function () {});
     }
   }, {
     key: 'callService',
     value: function callService(input, isJSON) {
-      var _this2 = this;
+      var _this3 = this;
 
       //(!this.service.active)
       //  return;
@@ -1699,8 +1716,8 @@ var ServiceController = function () {
       this.flashState = -1;
 
       ROSservice.callService(request, function (result) {
-        _this2.result = result;
-        _this2.flashState = -1;
+        _this3.result = result;
+        _this3.flashState = -1;
         // -1 : no flash
         // 0 : returned some object
         // 1 : return some object with a success = true
@@ -1709,14 +1726,14 @@ var ServiceController = function () {
         //assume this is the success state
         if (_.keys(result).length == 1 && typeof result[_.keys(result)[0]] === 'boolean') {
           var success = result[_.keys(result)[0]];
-          if (success) _this2.flashState = 1;else _this2.flashState = 2;
+          if (success) _this3.flashState = 1;else _this3.flashState = 2;
         } else {
-          _this2.flashState = 0;
+          _this3.flashState = 0;
         }
-        if (_this2.flashBackPromise) _this2.$timeout.cancel(_this2.flashBackPromise);
+        if (_this3.flashBackPromise) _this3.$timeout.cancel(_this3.flashBackPromise);
 
-        _this2.flashBackPromise = _this2.$timeout(function () {
-          _this2.flashState = -1;
+        _this3.flashBackPromise = _this3.$timeout(function () {
+          _this3.flashState = -1;
         }, 2000);
       });
     }

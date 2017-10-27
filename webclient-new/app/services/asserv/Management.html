@@ -15,8 +15,8 @@ class="panel-default" is-open="$ctrl.service.isOpen">
 
   <form class="form-margin">
     <div class="row">
-      <div class="col-md-1"></div>
-      <div ng-repeat="c in commands" class="col-md-2">
+      <div class="col-lg-1"></div>
+      <div ng-repeat="c in commands" class="col-lg-2">
         <button class="btn btn-default btn-md" type="button"  ng-click="$ctrl.callService({command: $index})">
           {{ c }}
         </button>

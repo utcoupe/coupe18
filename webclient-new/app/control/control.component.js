@@ -10,11 +10,11 @@ class ControlController {
     this.setting = Settings.get();
 
     if($rootScope.isConnected) {
-      this.$timeout(() => { this.onConnected(); }, 1000);
+      this.$timeout(() => { this.onConnected(); }, 100);
     } else {
       $rootScope.$watch('isConnected', function(newValue) {
         if(newValue)
-          this.$timeout(() => { this.onConnected(); }, 1000);
+          this.$timeout(() => { this.onConnected(); }, 100);
       }.bind(this));
     }
 
@@ -32,6 +32,7 @@ class ControlController {
       for(let d of this.domains) {
         if(this.ros.getDomains().includes(d.name)) {
           this.setActiveDomain(d.name);
+          return;
         }
       }
     }

@@ -119,7 +119,8 @@ class RosService {
         }
         this.data.topics.push(t);
         this.ros.getTopicType(name, (type) => {
-          _.findWhere(this.data.topics, t).type = type;
+          _.findWhere(this.data.topics, { name }).type = type;
+          _.findWhere(this.data.topics, { name }).fetched = true;
         });
       });
 
@@ -146,8 +147,10 @@ class RosService {
           isOpen: true
         }
         this.data.services.push(s);
+
         this.ros.getServiceType(name, (type) => {
-          _.findWhere(this.data.services, s).type = type;
+          _.findWhere(this.data.services, { name }).type = type;
+          _.findWhere(this.data.services, { name }).fetched = true;
         });
       });
 

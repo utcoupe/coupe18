@@ -10,30 +10,39 @@ class ServiceController {
   $onInit() {
 
     this.$scope.$watchGroup(['service.type', 'service.active'], () => {
-      const path = 'app/services/';
+      this.setFileName();
+    }, () => {});
 
-
-      this.fileName = `${path}default.html`;
-
-
-      if(!this.service.active) {
-        this.fileName = `${path}disabled.html`;
-        return;
-      }
-      else if (!this.service.type) {
-        this.fileName = `${path}default.html`;
-        return;
-      }
-
-      const fileName = `${path}${this.service.type}.html`;
-      this.$http.get(fileName).then((result) => {
-        if (result.data) {
-          this.fileName = fileName;
-        }
-      }, () => {});
-    });
+    /*this.ros.ros.getServiceType(this.service.name, (type) => {
+      this.service.type = type;
+      this.setFileName();
+    });*/
   }
 
+  setFileName() {
+    console.log("value changed for "+this.service.name + " " + this.service.type);
+    const path = 'app/services/';
+
+
+    this.fileName = `${path}default.html`;
+
+
+    if(!this.service.active) {
+      this.fileName = `${path}disabled.html`;
+      return;
+    }
+    else if (!this.service.type) {
+      this.fileName = `${path}default.html`;
+      return;
+    }
+
+    const fileName = `${path}${this.service.type}.html`;
+    this.$http.get(fileName).then((result) => {
+      if (result.data) {
+        this.fileName = fileName;
+      }
+    }, () => {});
+  }
 
   callService(input, isJSON) {
     //(!this.service.active)
