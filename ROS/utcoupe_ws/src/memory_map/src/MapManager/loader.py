@@ -1,13 +1,24 @@
 #!/usr/bin/python
-import rospy, os
-from objects import *
+import os
+import rospy
 
+class LoadingHelpers():
+    @staticmethod
+    def checkKeysExist(checkdict, *keys_required):
+        for k in keys_required:
+            if k not in checkdict.keys():
+                m = "Missing required '{}' element in Map YML description file. Couldn't load Map.".format(k)
+                rospy.logerr(m)
+                raise ValueError(m)
 
 class MapLoader():
-    def load(self, filename):
-        return self.init_dict(self.loadYamlFromFile(filename))
+    @staticmethod
+    def loadFile(filename):
+        return MapLoader.loadYamlFromFile(filename)
+        # return self.init_dict(self.loadYamlFromFile(filename))
 
-    def loadYamlFromFile(self, filename):
+    @staticmethod
+    def loadYamlFromFile(filename):
         import yaml
         with open(os.path.dirname(__file__) + "/" + filename, 'r') as stream:
             try:
@@ -15,10 +26,11 @@ class MapLoader():
             except yaml.YAMLError as exc:
                 print exc
 
-    def loafYamlFromDescriptionModule(self, path):
+    @staticmethod
+    def loafYamlFromDescriptionModule(path):
         # TODO use this when Definitions package is ready instead of loading from file.
         pass
-
+    '''
     def init_dict(self, data):
         # -------- Terrain
         zones = data["terrain"]["zones"]
@@ -47,3 +59,4 @@ class MapLoader():
                 #rospy.logerr("Object '{}' found in the map description file that doesn't belong to any namespace. object not loaded".format(elem))
 
         return data
+    '''

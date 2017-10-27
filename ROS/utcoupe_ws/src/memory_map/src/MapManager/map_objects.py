@@ -37,12 +37,8 @@ class Waypoint():
         self.Position = Position(initdict["position"])
 
 
-class ObjectNamespace():
-    def __init__(self, name, initdict):
-        self.Name = name
-
 class ObjectContainer():
-    def __init__(self):
+    def __init__(self, name, initdict):
         pass
 
 class Object():
@@ -104,14 +100,7 @@ class Shape():
         if self.Type == "rect":
             self.width = initdict["width"]
             self.height = initdict["height"]
-            self.points = [(0, 0), (self.width, 0),
-                           (self.width, self.height), (0, self.height)]
-            '''
-            self.points =  [(- self.width / 2.0, - self.height / 2.0),
-                            (  self.width / 2.0, - self.height / 2.0),
-                            (  self.width / 2.0,   self.height / 2.0),
-                            (- self.width / 2.0,   self.height / 2.0)] # corners centered around the middle
-            '''
+            self.points = [(0, 0), (self.width, 0), (self.width, self.height), (0, self.height)]
         elif self.Type == "circle":
             self.radius = initdict["radius"]
         elif self.Type == "polygon":

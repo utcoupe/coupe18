@@ -1,39 +1,61 @@
 #!/usr/bin/python
 import rospy
-from map_loader import MapLoader
-
+from loader import MapLoader, LoadingHelpers
+from map_classes import Terrain, ListManager
+import map_objects
 
 class Map():
-    MapDict = {}
+    def __init__(self, filename):
+        self.load(MapLoader.loadFile(filename))
 
-    @staticmethod
-    def load(filename):
-        Map.MapDict = MapLoader().load(filename)
+    def load(self, initdict):
+        LoadingHelpers.checkKeysExist(initdict, "terrain", "entities", "objects")
+        self.Terrain    = Terrain(    "terrain",                               initdict["terrain"] )
+        self.Entities   = ListManager("entities", map_objects.Entity,          initdict["entities"])
+        self.Objects    = ListManager("objects",  map_objects.ObjectContainer, initdict["objects"] )
+        rospy.logdebug("[memory/map] Loaded map successfully.")
 
-    @staticmethod
-    def get(path):
-        return Map.findFromPath(path)
-
-    @staticmethod
-    def set(filter, value):
+    def get(self, path):
         pass
 
-    @staticmethod
-    def findFromPath(path):
-        filters = path.split("/")
-        instance = Map.MapDict
-        for f in filters[1:]:
-            instance = instance[f]
-            print "Applied filter {} : {}".format(f, instance)
+    def set(self, path, new_value):
+        pass
 
-    @staticmethod
-    def getMapDict():
-        return Map.MapDict
 
-    @staticmethod
-    def getObject(objectname):  # TODO:
-        for elem in Map.MapDict["objects"]:
-            o = elem.getObject(objectname)
-            if o: 
-                return o
-        return None
+
+
+
+# class Map():
+#     MapDict = {}
+
+#     @staticmethod
+#     def load(filename):
+#         Map.MapDict = MapLoader().load(filename)
+
+#     @staticmethod
+#     def get(path):
+#         return Map.findFromPath(path)
+
+#     @staticmethod
+#     def set(filter, value):
+#         pass
+
+#     @staticmethod
+#     def findFromPath(path):
+#         filters = path.split("/")
+#         instance = Map.MapDict
+#         for f in filters[1:]:
+#             instance = instance[f]
+#             print "Applied filter {} : {}".format(f, instance)
+
+#     @staticmethod
+#     def getMapDict():
+#         return Map.MapDict
+
+#     @staticmethod
+#     def getObject(objectname):  # TODO:
+#         for elem in Map.MapDict["objects"]:
+#             o = elem.getObject(objectname)
+#             if o: 
+#                 return o
+#         return None

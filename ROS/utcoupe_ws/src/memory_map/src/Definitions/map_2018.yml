@@ -3,7 +3,7 @@ terrain:
         width: 3.0
         height: 2.0
     walls:
-        sth: 0  # TODO create main map polygons.
+        sth: 0  # TODO: create main map polygons.
     mesh_path: "package://memory_map/src/Definitions/arena_2018_beta_withoutobjects.stl"
     zones:
         construction_site_green:

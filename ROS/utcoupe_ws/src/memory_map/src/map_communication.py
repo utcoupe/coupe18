@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import rospy
-from map import Map
+from MapManager import Map
 import memory_map.srv
 
 

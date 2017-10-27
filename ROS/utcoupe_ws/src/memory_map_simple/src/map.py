@@ -20,7 +20,14 @@ class Map():
 
     @staticmethod
     def set(path, new_value):
-        return Map.nested_set(path, new_value)
+        keys = Map.parsePath(path)
+        restricted_dict = Map.nested_get(Map.MapDict, keys, new_value)
+        print restricted_dict
+        restricted_dict = new_value
+        print restricted_dict
+        print Map.nested_get(Map.MapDict, keys, new_value)
+        return 200, "TODO"
+
 
     @staticmethod
     def findFromPath(path):
@@ -33,19 +40,28 @@ class Map():
         return dataDict
 
     @staticmethod
-    def nested_set(path, new_value):
+    def nested_get(mapdict, keys, new_value):
+        if len(keys) > 1:
+            if keys[0] in mapdict:
+                return Map.nested_get(mapdict[keys[0]], keys[1:], new_value)
+            else:
+                return None
+        elif len(keys) == 1:
+            return mapdict[keys[0]]
+        '''
         mapdict = Map.MapDict
         keys = Map.parsePath(path)
 
         for k in keys:
             print str(mapdict) + "\n\n"
             mapdict = mapdict.setdefault(k, None)
-            if mapdict == None:
+            if mapdict is None:
                 rospy.logerr("Path key not found in dict. Invalid path.")
-                return 404, "Key '{}' in set path not found in the map dict.".format(k)
+                return 404, "Key '{}' in path not found in the map dict.".format(k)
 
         mapdict = new_value
         return 200, ""
+        '''
 
     @staticmethod
     def parsePath(path):
