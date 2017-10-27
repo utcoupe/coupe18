@@ -1,24 +1,22 @@
 #!/usr/bin/python
 import rospy
-from MapManager import *
+import MapManager
 from Markers import MarkersPublisher
 
 
 class MapNode():
     def __init__(self):
-        # TODO to be better when Definitions package available.
         rospy.init_node('map', log_level=rospy.DEBUG)
-        self.World = Map("../Definitions/map_2018.yml")
-        print self.World.Objects.Elements[0].Position.x # Temp test for accessing values
+        self.World = MapManager.Map("../Definitions/map_2018.yml")  # TODO to be better when Definitions package available.
 
         # Starting and publishing the table STL to RViz
         self.markers = MarkersPublisher()
         self.markers.publishTable(self.World)
 
         # Starting the Get, Set and Conditions service handlers
-        GetServiceHandler()
-        SetServiceHandler()
-        ConditionsHandler()
+        MapManager.GetServiceHandler()
+        MapManager.SetServiceHandler()
+        MapManager.ConditionsHandler()
         self.run()
 
     def run(self):

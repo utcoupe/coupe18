@@ -1,7 +1,9 @@
 import math
 import pyclipper  # pip install pyclipper
 import rospy
+from loader import LoadingHelpers
 from visualization_msgs.msg import Marker
+
 
 '''
 LOW LEVEL DEFINITION CLASSES
@@ -9,24 +11,33 @@ LOW LEVEL DEFINITION CLASSES
 
 
 class Position():
+    '''
+    TODO: basic class only
+    Fully describes a 2D position in the map. The position can acquire a reference name.
+    Can be of type XY or XYA. The ROS tf frame_id is necessary.
+    '''
     def __init__(self, initdict):
+        LoadingHelpers.checkKeysExist(initdict, "frame_id", "x", "y", "type")
         self.frame_id = initdict["frame_id"]
         self.x = float(initdict["x"])
         self.y = float(initdict["y"])
 
-        try:
+        if "a" in initdict.keys():
             self.a = float(initdict["a"])
             self.has_angle = True
-        except KeyError:
+        else:
             self.has_angle = False
 
         self.CollisionType = initdict["type"]
 
-    def transform(self, add_x, add_y):
+    def transform(self, add_x, add_y, add_a = 0.0):
+        '''
+        Returns a new Position object with the applied transformation.
+        '''
         p = Position({"x": self.x + add_x, "y": self.y +
                       add_y, "type": self.CollisionType})
         if self.has_angle:
-            p.a = self.a
+            p.a = self.a + add_a
             self.has_angle = True
         return p
 

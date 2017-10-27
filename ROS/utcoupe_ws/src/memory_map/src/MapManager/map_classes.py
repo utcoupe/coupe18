@@ -9,6 +9,10 @@ MAP METACLASSES
 '''
 
 class Terrain(MapElement):
+    '''
+    Terrain Metaclass. Holds the map general information, as well as 
+    general objects : Zones and Waypoints.
+    '''
     def __init__(self, name, initdict):
         super(Terrain, self).__init__(name)
         LoadingHelpers.checkKeysExist(initdict, "walls", "zones", "waypoints")
@@ -20,6 +24,11 @@ class Terrain(MapElement):
         self.mesh_path = initdict["mesh_path"]
 
 class ObjectContainer(ListManager):
+    '''
+    Manages a list of objects. Can handle transfers of object from a
+    container to another, and check conditions.
+    '''
+
     def __init__(self, name, initdict):
         LoadingHelpers.checkKeysExist(initdict, "objects")
         super(ObjectContainer, self).__init__(name, None, None)  # Manually initialise list (Can be several classes)
@@ -40,6 +49,14 @@ MAP CLASSES
 '''
 
 class Entity():
+    '''
+    Describes a dynamic robot, buddy or enemy. Holds information like
+    the current robot's path and state, previous trajectories, containers, etc.
+
+    Can check conditions on the robot's position, etc.
+    # TODO: expand description.
+    '''
+
     def __init__(self, name, initdict):
         self.Name = name
         self.Position = Position(initdict["position"])
@@ -54,6 +71,13 @@ class Entity():
 
 
 class Zone():
+    '''
+    Describes a zone : can be useful for checking conditions (e.g. if an object or entity
+    is in a certain area).
+
+    Can hold additional information, like speed limits or walkability.
+    '''
+    
     def __init__(self, name, initdict):
         self.Name = name
         self.Position = Position(initdict["position"])
@@ -64,12 +88,20 @@ class Zone():
 
 
 class Waypoint():
+    '''
+    Describes a static position that was given a name. Can be gotten from other packages
+    for referencing a XY position while defining it only once here.
+
+    Can hold additional information, like an approach circle.
+    '''
+    
     def __init__(self, name, initdict):
         self.Name = name
         self.Position = Position(initdict["position"])
 
 
 class Object():
+    
     def __init__(self, name, initdict):
         self.Name = name
         self.Position = Position(initdict["position"])

@@ -3,8 +3,17 @@ import os
 import rospy
 
 class LoadingHelpers():
+    '''
+    Helpers static class. Provides validation methods for easier and 
+    cleaner YML verification handling inside the classes.
+    '''
+
     @staticmethod
     def checkKeysExist(checkdict, *keys_required):
+        '''
+        Checks if the dict given has all of the keys given in keys_required.
+        Pops a ROS error and stops the node if the condition is not verified.
+        '''
         for k in keys_required:
             if k not in checkdict.keys():
                 m = "Missing required '{}' element in Map YML description file. Couldn't load Map.".format(k)
@@ -13,19 +22,32 @@ class LoadingHelpers():
     
     @staticmethod
     def checkValueValid(value, *values_required):
+        '''
+        Checks if the the value given corresponds to one of the possibilities given in values_required.
+        Pops a ROS error and stops the node if the condition is not verified.
+        '''
         if value not in values_required:
             m = "Element value '{}' not valid, must be in '{}'. Couldn't load Map.".format(value, values_required)
             rospy.logerr(m)
             raise ValueError(m)
 
+
 class MapLoader():
     @staticmethod
     def loadFile(filename):
+        '''
+        Gets the YML Map description file from the specified method 
+        Please change the method correspondingly to what is currently used in your package.
+        '''
         return MapLoader.loadYamlFromFile(filename)
         # return self.init_dict(self.loadYamlFromFile(filename))
 
     @staticmethod
     def loadYamlFromFile(filename):
+        '''
+        Loads the description file simply by getting the file in disk.
+        The file MUST be in the package's directory to avoid any problems.
+        '''
         import yaml
         with open(os.path.dirname(__file__) + "/" + filename, 'r') as stream:
             try:
@@ -35,35 +57,7 @@ class MapLoader():
 
     @staticmethod
     def loafYamlFromDescriptionModule(path):
-        # TODO use this when Definitions package is ready instead of loading from file.
-        pass
-    '''
-    def init_dict(self, data):
-        # -------- Terrain
-        zones = data["terrain"]["zones"]
-        for zone in zones:
-            zones[zone] = Zone(zone, zones[zone])
-
-        # -------- Waypoints
-        waypoints = data["terrain"]["waypoints"]
-        for waypoint in waypoints:
-            waypoints[waypoint] = Waypoint(waypoint, waypoints[waypoint])
-
-        # -------- Entities
-        entities = data["entities"]
-        for entity in entities:
-            entities[entity] = Entity(entity, entities[entity])
-
-        # -------- Objects
-        objects = data["objects"]
-        for elem in objects:
-            #if objects[elem]["type"] == "namespace":
-            #    objects[elem] = ObjectNamespace(elem, objects[elem])
-            #elif objects[elem]["type"] == "container":
-            #    rospy.logerr("Object '{}' found in the map description file that doesn't belong to any namespace. object not loaded".format(elem))
-            if objects[elem]["type"] == "object":
-                objects[elem] = Object(elem, objects[elem])
-                #rospy.logerr("Object '{}' found in the map description file that doesn't belong to any namespace. object not loaded".format(elem))
-
-        return data
-    '''
+        '''
+        Loads the description file by gettign it from the 'memory/definitions' ROS package.
+        '''
+        pass  # TODO use this when Definitions package is ready instead of loading from file.
