@@ -2,57 +2,6 @@ import math
 import pyclipper  # pip install pyclipper
 import rospy
 from visualization_msgs.msg import Marker
-'''
-HIGH LEVEL DEFINITION CLASSES
-'''
-
-
-class Entity():
-    def __init__(self, name, initdict):
-        self.Name = name
-        self.Position = Position(initdict["position"])
-        self.Shape = Shape(initdict["shape"])
-
-        self.Chest = initdict["chest"] if "chest" in initdict else False # TODO
-        self.Trajectory = Trajectory(initdict["trajectory"])
-        self.CurrentPath = []
-
-    def setCurrentPath(self, path):
-        self.CurrentPath = path
-
-
-class Zone():
-    def __init__(self, name, initdict):
-        self.Name = name
-        self.Position = Position(initdict["position"])
-        self.Shape = Shape(initdict["shape"])
-        self.Visual = Visual(initdict["visual"])
-
-        self.Walkable = initdict["properties"]["walkable"]
-
-
-class Waypoint():
-    def __init__(self, name, initdict):
-        self.Name = name
-        self.Position = Position(initdict["position"])
-
-
-class ObjectContainer():
-    def __init__(self, name, initdict):
-        pass
-
-class Object():
-    def __init__(self, name, initdict):
-        self.Name = name
-        self.Position = Position(initdict["position"])
-        self.Shape = Shape(initdict["shape"])
-        self.Visual = Visual(initdict["visual"])
-        self.Type = initdict["type"]
-        print "loaded object with type" + str(self.Type)
-
-        self.Chest = initdict["chest"] if "chest" in initdict else False # TODO
-        self.UserData = initdict["userdata"]
-
 
 '''
 LOW LEVEL DEFINITION CLASSES

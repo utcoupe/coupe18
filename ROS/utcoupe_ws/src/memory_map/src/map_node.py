@@ -9,7 +9,7 @@ class MapNode():
         # TODO to be better when Definitions package available.
         rospy.init_node('map', log_level=rospy.DEBUG)
         world = Map("../Definitions/map_2018.yml")
-        print world.Terrain.Zones.Elements[0].Shape.Type # Temp test for accessing values
+        print world.Objects.Elements[0].Position.x # Temp test for accessing values
 
         # Starting and publishing the table STL to RViz
         self.markers = MarkersPublisher()

@@ -1,33 +1,16 @@
 #!/usr/bin/python
-import rospy
 from loader import LoadingHelpers
-import map_objects
+from map_bases import MapElement, ListManager
+from map_objects import *
 
-class MapElement(object):
-    def __init__(self, name):
-        self.Name = name
 
 '''
-class ListGroup(MapElement):
-    def __init__(self, name, initdict, listsdict):
-        super(ListGroup, self).__init__(name)
-        LoadingHelpers.checkKeysExist(initdict, *listsdict.keys())
-
-        self.Lists = []
-        for k in listsdict.keys():
-            self.Lists.append(ListManager(k, listsdict[k], initdict[k]))
+MAP METACLASSES
 '''
 
-class ListManager(MapElement):
-    def __init__(self, name, classtype, initdict):
-        super(ListManager, self).__init__(name)
-        self.Elements = []
-        for k in initdict.keys():
-            self.Elements.append(classtype(k, initdict[k]))
-
-
-class Terrain():
+class Terrain(MapElement):
     def __init__(self, name, initdict):
+        super(Terrain, self).__init__(name)
         '''
         description = {
             "zones": map_objects.Zone,
@@ -37,5 +20,67 @@ class Terrain():
         '''
         LoadingHelpers.checkKeysExist(initdict, "walls", "zones", "waypoints")
         #self.Walls = ListManager("zones", map_objects.Zone, initdict["zones"])  # TODO: implement
-        self.Zones = ListManager("zones", map_objects.Zone, initdict["zones"])
-        self.Waypoints = ListManager("waypoints", map_objects.Waypoint, initdict["waypoints"])
+        self.Zones = ListManager("zones", Zone, initdict["zones"])
+        self.Waypoints = ListManager("waypoints", Waypoint, initdict["waypoints"])
+
+
+class ObjectContainer(ListManager):
+    def __init__(self, name, initdict):
+        LoadingHelpers.checkKeysExist(initdict, "objects")
+        super(ObjectContainer, self).__init__(name, None, None)  # Manually initialise list (Can be several classes)
+
+        for k in initdict["objects"]:
+            o = initdict["objects"][k]
+            LoadingHelpers.checkKeysExist(o, "type")
+            LoadingHelpers.checkValueValid(o["type"], "container", "object")
+            if o["type"] == "container":
+                self.Elements.append(ObjectContainer(k, o))
+            elif o["type"] == "object":
+                self.Elements.append(Object(k, o))
+
+
+
+'''
+MAP CLASSES
+'''
+
+class Entity():
+    def __init__(self, name, initdict):
+        self.Name = name
+        self.Position = Position(initdict["position"])
+        self.Shape = Shape(initdict["shape"])
+
+        self.Chest = initdict["chest"] if "chest" in initdict else False # TODO
+        self.Trajectory = Trajectory(initdict["trajectory"])
+        self.CurrentPath = []
+
+    def setCurrentPath(self, path):
+        self.CurrentPath = path
+
+
+class Zone():
+    def __init__(self, name, initdict):
+        self.Name = name
+        self.Position = Position(initdict["position"])
+        self.Shape = Shape(initdict["shape"])
+        self.Visual = Visual(initdict["visual"])
+
+        self.Walkable = initdict["properties"]["walkable"]
+
+
+class Waypoint():
+    def __init__(self, name, initdict):
+        self.Name = name
+        self.Position = Position(initdict["position"])
+
+
+class Object():
+    def __init__(self, name, initdict):
+        self.Name = name
+        self.Position = Position(initdict["position"])
+        self.Shape = Shape(initdict["shape"])
+        self.Visual = Visual(initdict["visual"])
+        self.Type = initdict["type"]
+
+        self.Chest = initdict["chest"] if "chest" in initdict else False # TODO
+        self.UserData = initdict["userdata"]

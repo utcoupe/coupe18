@@ -10,6 +10,13 @@ class LoadingHelpers():
                 m = "Missing required '{}' element in Map YML description file. Couldn't load Map.".format(k)
                 rospy.logerr(m)
                 raise ValueError(m)
+    
+    @staticmethod
+    def checkValueValid(value, *values_required):
+        if value not in values_required:
+            m = "Element value '{}' not valid, must be in '{}'. Couldn't load Map.".format(value, values_required)
+            rospy.logerr(m)
+            raise ValueError(m)
 
 class MapLoader():
     @staticmethod
