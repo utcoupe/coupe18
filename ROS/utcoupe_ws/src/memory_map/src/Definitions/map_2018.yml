@@ -133,7 +133,7 @@ objects:
             frame_id: /map
             x: 0.850
             y: 1.520
-            a: 0
+            a: 43.3
             type: pickable #TODO usable value ?
         shape:
             type: rect

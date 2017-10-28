@@ -30,25 +30,17 @@ class Position():
 
         self.CollisionType = initdict["type"]
 
-    def get(self, mappath):
-        key = mappath.getNextKey()
-        if key.Extension == "value":
-            if key.KeyName == "*":
-                response_dict = {
-                    "frame_id": self.frame_id,
-                    "x": self.x,
-                    "y": self.y,
-                    "has_angle": self.has_angle,
-                    "type": self.CollisionType
-                }
-                if self.has_angle:
-                    response_dict["a"] = self.a
-                return response_dict
-            else:
-                rospy.logerr("[memory/map] GET request: Position couldn't recognize any value named '{}'".format(key.KeyName))
-                return None
-        else:
-            rospy.logerr("[memory/map] GET request: Position couldn't recognize key extension '{}'".format(key.Extension))
+    def get(self):
+        response_dict = {
+            "frame_id": self.frame_id,
+            "x": self.x,
+            "y": self.y,
+            "has_angle": self.has_angle,
+            "type": self.CollisionType
+        }
+        if self.has_angle:
+            response_dict["a"] = self.a
+        return response_dict
 
     def transform(self, add_x, add_y, add_a = 0.0):
         '''
@@ -88,6 +80,25 @@ class Shape():
         elif self.Type == "line":
             self.start = initdict["start"]
             self.end = initdict["end"]
+        else:
+            raise ValueError("'{}' shape type not recognized or supported.".format(self.Type))
+
+    def get(self):
+        response_dict = {
+            "type": self.Type
+        }
+        if self.Type == "rect":
+            response_dict["width"] = self.width
+            response_dict["height"] = self.height
+            response_dict["points"] = self.points
+        elif self.Type == "circle":
+            response_dict["radius"] = self.radius
+        elif self.Type == "polygon":
+            response_dict["points"] = self.points
+        elif self.Type == "line":
+            response_dict["start"] = self.end
+            response_dict["end"] = self.end
+        return response_dict
 
     def rotated(self, theta):
         """Rotates the given polygon which consists of corners represented as (x,y),
@@ -125,18 +136,22 @@ class Shape():
 
 class Visual():
     def __init__(self, initdict):
+        self.Dict = initdict
         self.NS = initdict["ns"]
-        self.ID = initdict["id"]
+        self.ID = int(initdict["id"])
         markerType = {
             "cube": Marker.CUBE,
             "sphere": Marker.SPHERE
             # TODO To Complete
         }
         self.Type = markerType[initdict["type"]]
-        self.z = initdict["z"]
+        self.z = float(initdict["z"])
         self.Scale = initdict["scale"]
         self.Orientation = initdict["orientation"]
         self.Color = initdict["color"]
+    
+    def get(self):
+        return self.Dict
 
 
 class Trajectory():

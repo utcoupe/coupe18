@@ -10,7 +10,7 @@ MAP METACLASSES
 
 class Terrain(MapElement):
     '''
-    Terrain Metaclass. Holds the map general information, as well as 
+    Terrain Metaclass. Holds the map general information, as well as
     general objects : Zones and Waypoints.
     '''
     def __init__(self, name, initdict):
@@ -89,7 +89,7 @@ class Zone():
 
     Can hold additional information, like speed limits or walkability.
     '''
-    
+
     def __init__(self, name, initdict):
         self.Name = name
         self.Position = Position(initdict["position"])
@@ -106,14 +106,13 @@ class Waypoint():
 
     Can hold additional information, like an approach circle.
     '''
-    
+
     def __init__(self, name, initdict):
         self.Name = name
         self.Position = Position(initdict["position"])
 
 
 class Object():
-    
     def __init__(self, name, initdict):
         self.Name = name
         self.Position = Position(initdict["position"])
@@ -123,12 +122,26 @@ class Object():
 
         self.Chest = initdict["chest"] if "chest" in initdict else False # TODO
         self.UserData = initdict["userdata"]
-    
+
     def get(self, mappath):
         key = mappath.getNextKey()
         if key.Extension == "attribute":
             if key.KeyName == "position":
-                return self.Position.get(mappath)
+                return self.Position.get()
+            elif key.KeyName == "shape":
+                return self.Shape.get()
+            elif key.KeyName == "visual":
+                return self.Visual.get()
+            elif key.KeyName == "chest": #TODO complex ?
+                return self.Chest
+            elif key.KeyName == "userdata":
+                if len(mappath.getKeysLeft()) > 0:
+                    d = self.UserData
+                    for k in mappath.getKeysLeft():
+                        if k.KeyName in d: d = d[k.KeyName]
+                        else: return None
+                    return d
+                else: return self.UserData
             else:
                 rospy.logerr("[memory/map] GET request: Object didn't find any attribute named '{}'".format(key.KeyName))
                 return None

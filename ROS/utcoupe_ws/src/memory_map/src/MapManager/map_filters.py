@@ -21,7 +21,10 @@ class MapPath(object):
             rospy.logerr("[memory/map] MapPath too short ! Asked to access inexistent key")
             return None
 
-# TODO not implemented yet
+    def getKeysLeft(self):
+        return self.Keys[self.i + 1:]
+
+
 class MapPathKey(object):
     def __init__(self, keystring):
         print keystring
