@@ -46,6 +46,7 @@ class MarkersPublisher():
             tableSTLMarker.pose.orientation.w = o[3]
 
             self.MarkersPUBL.publish(tableSTLMarker)
+            rospy.logdebug("[memory/map] Published table to RViz.")
 
     def publishZones(self, world):
         if self.RvizConnected:

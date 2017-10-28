@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import rospy
-from MapManager import Map
+from MapManager import Map, MapPath
 import memory_map.srv
 
 
@@ -10,31 +10,16 @@ class Servers():
     SET_SERV = "/memory/map/set"
 
 
-class ConditionsHandler():
-    def __init__(self):
-        self.ContainersSERV = rospy.Service(Servers.CONDITIONS_CONTAINERS_SERV,
-                                            memory_map.srv.MapConditionContainer,
-                                            self.serv_handler_on_container_condition)
-        rospy.loginfo("created conditions server")
-
-    def serv_handler_on_container_condition(self, req):
-        if req.condition_type == memory_map.srv.MapConditionContainer.CONDITION_LT_NUMBER:
-            result = True
-        elif req.condition_type == memory_map.srv.MapConditionContainer.CONDITION_MT_NUMBER:
-            result = True
-        elif req.condition_type == memory_map.srv.MapConditionContainer.CONDITION_LT_CONTAINER:
-            result = True
-        elif req.condition_type == memory_map.srv.MapConditionContainer.CONDITION_MT_CONTAINER:
-            result = True
-        return memory_map.srv.MapConditionContainerResponse(result)
-
-
 class GetServiceHandler():
     def __init__(self):
-        self.GetSERV = rospy.Service(Servers.GET_SERV, memory_map.srv.MapGet2, self.on_get)
+        self.GetSERV = rospy.Service(Servers.GET_SERV, memory_map.srv.MapGetFromPath, self.on_get)
 
     def on_get(self, req):
-        print "Got get request ! responding : " + str(Map.get(req.request_path))
+        rospy.loginfo("GET:" + str(req.request_path))
+        parsed_path = MapPath(req.request_path)
+        response = Map.get(parsed_path)
+        print "GET Response : " + str(response)
+        return None
 
 
 
@@ -44,3 +29,14 @@ class SetServiceHandler():
 
     def on_set(self, req):
         pass
+
+
+class ConditionsHandler():
+    def __init__(self):
+        self.ContainersSERV = rospy.Service(Servers.CONDITIONS_CONTAINERS_SERV,
+                                            memory_map.srv.MapConditionContainer,
+                                            self.serv_handler_on_container_condition)
+
+    def serv_handler_on_container_condition(self, req):
+        result = None
+        return memory_map.srv.MapConditionContainerResponse(result)

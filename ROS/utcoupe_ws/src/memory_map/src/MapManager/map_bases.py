@@ -4,10 +4,10 @@ class MapElement(object):
     def __init__(self, name):
         self.Name = name
 
-    def get(self, path):  # To be overritten.
+    def get(self, mappath):  # To be overritten.
         pass
 
-    def set(self, path, new_value):  # To be overritten.
+    def set(self, mappath, new_value):  # To be overritten.
         pass
 
 '''

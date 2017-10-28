@@ -4,7 +4,7 @@ import rospy
 
 class LoadingHelpers():
     '''
-    Helpers static class. Provides validation methods for easier and 
+    Helpers static class. Provides validation methods for easier and
     cleaner YML verification handling inside the classes.
     '''
 
@@ -19,7 +19,7 @@ class LoadingHelpers():
                 m = "Missing required '{}' element in Map YML description file. Couldn't load Map.".format(k)
                 rospy.logerr(m)
                 raise ValueError(m)
-    
+
     @staticmethod
     def checkValueValid(value, *values_required):
         '''
@@ -36,11 +36,10 @@ class MapLoader():
     @staticmethod
     def loadFile(filename):
         '''
-        Gets the YML Map description file from the specified method 
+        Gets the YML Map description file from the specified method
         Please change the method correspondingly to what is currently used in your package.
         '''
         return MapLoader.loadYamlFromFile(filename)
-        # return self.init_dict(self.loadYamlFromFile(filename))
 
     @staticmethod
     def loadYamlFromFile(filename):

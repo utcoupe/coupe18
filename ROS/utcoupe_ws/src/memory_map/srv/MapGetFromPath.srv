@@ -1,5 +1,10 @@
 # SERVICE TO GET AN OBJECT'S ATTRIBUTE
 string request_path
+# IDEAS :
+# /objects.list/*.container/cube_12.object/position.property/x.value
+# /entities.list/ROBOT.entity/containers.list/balls_main.container/ball_1.object/position.property/x.value
+# /entities/ROBOT/containers/balls_main/count
+
 ---
 # the response_type gives which of the variables below contain the answer.
 uint8 RESPONSE_TYPE_INT    = 0

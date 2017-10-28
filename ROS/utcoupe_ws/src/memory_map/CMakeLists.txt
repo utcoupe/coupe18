@@ -59,7 +59,7 @@ add_service_files(
   FILES
   MapConditionContainer.srv
   MapGet.srv
-  MapGet2.srv
+  MapGetFromPath.srv
   MapSet.srv
 )
 
