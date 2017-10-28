@@ -30,6 +30,26 @@ class Position():
 
         self.CollisionType = initdict["type"]
 
+    def get(self, mappath):
+        key = mappath.getNextKey()
+        if key.Extension == "value":
+            if key.KeyName == "*":
+                response_dict = {
+                    "frame_id": self.frame_id,
+                    "x": self.x,
+                    "y": self.y,
+                    "has_angle": self.has_angle,
+                    "type": self.CollisionType
+                }
+                if self.has_angle:
+                    response_dict["a"] = self.a
+                return response_dict
+            else:
+                rospy.logerr("[memory/map] GET request: Position couldn't recognize any value named '{}'".format(key.KeyName))
+                return None
+        else:
+            rospy.logerr("[memory/map] GET request: Position couldn't recognize key extension '{}'".format(key.Extension))
+
     def transform(self, add_x, add_y, add_a = 0.0):
         '''
         Returns a new Position object with the applied transformation.

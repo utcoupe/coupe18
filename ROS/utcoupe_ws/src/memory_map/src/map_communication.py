@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import json
 import rospy
 from MapManager import Map, MapPath
 import memory_map.srv
@@ -18,8 +19,9 @@ class GetServiceHandler():
         rospy.loginfo("GET:" + str(req.request_path))
         parsed_path = MapPath(req.request_path)
         response = Map.get(parsed_path)
+
         print "GET Response : " + str(response)
-        return None
+        return memory_map.srv.MapGetFromPathResponse(json.dumps(response))
 
 
 

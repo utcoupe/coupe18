@@ -16,7 +16,7 @@ class Terrain(MapElement):
     def __init__(self, name, initdict):
         super(Terrain, self).__init__(name)
         LoadingHelpers.checkKeysExist(initdict, "walls", "zones", "waypoints")
-        #self.Walls = ListManager("zones", map_objects.Zone, initdict["zones"])  # TODO: implement
+        #self.Walls = ListManager("zones", map_objects.Zone, initdict["zones"])  # TODO implement
         self.Zones = ListManager("zones", Zone, initdict["zones"])
         self.Waypoints = ListManager("waypoints", Waypoint, initdict["waypoints"])
 
@@ -41,6 +41,18 @@ class ObjectContainer(ListManager):
                 self.Elements.append(ObjectContainer(k, o))
             elif o["type"] == "object":
                 self.Elements.append(Object(k, o))
+
+    def get(self, mappath):
+        key = mappath.getNextKey()
+        if key.Extension == "object":
+            for o in self.Elements:
+                if key.KeyName == o.Name:
+                    print "helloo"
+                    return o.get(mappath)
+            rospy.logerr("[memory/map] GET request: ObjectContainer didn't find any object named '{}'".format(key.KeyName))
+            return None
+        else:
+            rospy.logerr("[memory/map] GET request: ObjectContainer couldn't recognize key extension '{}'".format(key.Extension))
 
 
 
@@ -111,3 +123,14 @@ class Object():
 
         self.Chest = initdict["chest"] if "chest" in initdict else False # TODO
         self.UserData = initdict["userdata"]
+    
+    def get(self, mappath):
+        key = mappath.getNextKey()
+        if key.Extension == "attribute":
+            if key.KeyName == "position":
+                return self.Position.get(mappath)
+            else:
+                rospy.logerr("[memory/map] GET request: Object didn't find any attribute named '{}'".format(key.KeyName))
+                return None
+        else:
+            rospy.logerr("[memory/map] GET request: Object couldn't recognize key extension '{}'".format(key.Extension))

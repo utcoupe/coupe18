@@ -7,23 +7,31 @@ class MapPath(object):
     '''
 
     def __init__(self, stringpath):
-        self.i = 0
+        self.i = -1
         self.Keys = [self.parseKey(k) for k in stringpath.split('/') if k != '']
 
     def parseKey(self, keystring):
-        return keystring  # TODO implement string to python object
+        return MapPathKey(keystring)  # TODO implement string to python object
 
-    def getNext(self):
+    def getNextKey(self):
         self.i += 1
-        return self.Keys[self.i]
+        if self.i < len(self.Keys):
+            return self.Keys[self.i]
+        else:
+            rospy.logerr("[memory/map] MapPath too short ! Asked to access inexistent key")
+            return None
 
 # TODO not implemented yet
 class MapPathKey(object):
     def __init__(self, keystring):
-        if keystring.count('.') == 1:
-            rospy.logerr("Request path invalid ! '{}' needs to be of type 'key.extension'.".format(keystring))
-            raise ValueError
-        self.KeyName, self.Extension = keystring.split('.')
+        print keystring
+        if keystring.count('.') != 1:
+            pass#rospy.logerr("Request path invalid ! '{}' needs to be of type 'key.extension'.".format(keystring))
+            #raise ValueError
+        self.KeyName, self.Extension = keystring.split('.') if keystring.count('.') == 1 else (keystring, None)
+
+    def __repr__(self):
+        return str(self.KeyName) + '.' + str(self.Extension)
 
 
 class GetFilter(object):

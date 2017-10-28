@@ -24,7 +24,19 @@ class Map(MapElement):
 
     @staticmethod
     def get(mappath):
-        rospy.logwarn("got get request")
+        key = mappath.getNextKey()
+        if key.Extension == "list":
+            if key.KeyName == Map.Terrain.Name:
+                return Map.Terrain.get(mappath)
+            elif key.KeyName == Map.Entities.Name:
+                return Map.Entities.get(mappath)
+            elif key.KeyName == Map.Objects.Name:
+                return Map.Objects.get(mappath)
+            else:
+                rospy.logerr("[memory/map] GET request: Map couldn't find list named '{}'".format(key))
+        else:
+            rospy.logerr("[memory/map] GET request: Map got unrecognized path key extension '{}'".format(key))
+        rospy.logwarn("got get request, path is " + str(mappath.Keys))
 
     @staticmethod
     def set(mappath, new_value):
