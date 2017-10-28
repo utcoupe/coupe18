@@ -192,6 +192,7 @@ class ActionList(Task):
                     raise KeyError, "{} action instance(s) found with the name '{}'.".format(len(instances), node_xml.attrib["ref"])
                 i = copy.deepcopy(instances[0])
                 i.setParent(self)
+                i.setParameters(node_xml)
                 if nextneedsprevious:
                     i.Status = TaskStatus.NEEDSPREVIOUS;nextneedsprevious = False
                 self.TASKS.append(i)
@@ -200,8 +201,8 @@ class ActionList(Task):
                 if len(instances) != 1:
                     raise KeyError, "{} order instance(s) found with the name '{}'.".format(len(instances), node_xml.attrib["ref"])
                 i = copy.deepcopy(instances[0])
-                i.setParameters(node_xml)
                 i.setParent(self)
+                i.setParameters(node_xml)
                 if nextneedsprevious:
                     i.Status = TaskStatus.NEEDSPREVIOUS;nextneedsprevious = False
                 self.TASKS.append(i)
@@ -338,6 +339,43 @@ class Action(Task):
     def loadxml(self, xml, actions, orders):
         self.TASKS = ActionList(xml.find("actions"), actions, orders)
         self.TASKS.setParent(self)
+        self.fetchBoundParams(xml)
+
+    def getParamForBind(self, bind):
+        if bind in self.BoundParams:
+            return self.BoundParams[bind]
+
+    def fetchBoundParams(self, xml):
+        if "params" not in [node.tag for node in xml]:
+            return
+
+        boundParamsList = []
+
+        for param in xml.find("params"):
+            if "name" not in param.attrib:
+                raise KeyError("Parameters need a 'name' attribute ! (action '{}')".format(self.Name))
+
+            name = param.attrib["name"]
+            finalBind = None
+            for t in self.TASKS.TASKS:
+                if t.getParamForBind(name):
+                    finalBind = t.getParamForBind(name)
+                    boundParamsList.append(finalBind)
+
+            if not finalBind:
+                raise KeyError("No parameter binded with '{}' !".format(name))
+
+        self.BoundParams = {p.bind: p for p in boundParamsList}
+
+
+    def setParameters(self, orderref_xml):
+        for child in orderref_xml:
+            name = child.tag
+            if name not in self.BoundParams:
+                raise KeyError("No bind found for '{}' !".format(name))
+
+            self.BoundParams[name].parseValue(child)
+
 
     def getDuration(self):
         return self.TASKS.getDuration()
@@ -384,11 +422,20 @@ class Order(Task):
         #self.Ratio = self.Reward / self.Duration # TODO Implement ?
 
         self.Message = Message(xml.find("message"))
+        #self.BoundParams = { p.bind : p for p in self.Message.Parameters if p.bind }
+
         self.TimeTaken = None
 
     def setParameters(self, orderref_xml):
         childs = [child for child in orderref_xml]
         self.Message.setParameters(childs)
+
+    def getParamForBind(self, bind):
+        for p in self.Message.Parameters:
+            if hasattr(p, "bind") and p.bind == bind:
+                return p
+
+        return False
 
     def getDuration(self):
         return self.Duration
@@ -461,8 +508,14 @@ class Message():
                 raise KeyError("PARSE ERROR ! Param {} is preset, \
                                cannot modify it".format(param.name))
 
+            if "bind" in child.attrib:
+                param.bind = child.attrib["bind"]
+            else:
+                param.bind = None
+
             param.parseValue(child)
-        [p.checkValues() for p in self.Parameters]
+         # [p.checkValues() for p in self.Parameters]
+         # TODO : check values at the correct time
 
         self.RosParameters = {p.name: p.getRos() for p in self.Parameters}
 

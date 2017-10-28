@@ -11,7 +11,7 @@
 				<position>
 					<x>50</x>
 					<y>55</y>
-					<z>85</z>
+					<theta>85</theta>
 				</position>
 			</orderref>
 			<actionref ref="wait_for_jack"/>
@@ -29,13 +29,13 @@
 
 					<actionlist name="Load modules" exec="+" order="random">
 						<actionref ref = "load_module">
-							<position type="object" ref="map_object_module1" origin="robot_origin_gripper"/>
+							<position/>
 						</actionref>
 						<actionref ref = "load_module">
-							<ID>7</ID>
+							<position/>
 						</actionref>
 						<actionref ref = "load_module">
-							<ID>4</ID>
+							<position/>
 						</actionref>
 					</actionlist>
 

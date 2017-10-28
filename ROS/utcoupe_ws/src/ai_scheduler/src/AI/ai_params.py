@@ -81,6 +81,7 @@ class Param(object):    # base class for parsing xml to param object
         if "name" not in xml.attrib:
             raise KeyError("Parameters need a 'name' attribute")
 
+
         self.name = xml.attrib["name"].lower()
 
         self.preset = False
@@ -88,7 +89,7 @@ class Param(object):    # base class for parsing xml to param object
             self.preset = True
 
         self.optional = False
-        if "optional" in xml.attribute:
+        if "optional" in xml.attrib:
             self.optional = xml.attrib["optional"].lower() == "true"
 
         if self.preset and self.optional:

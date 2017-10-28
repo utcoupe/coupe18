@@ -3,17 +3,20 @@
 			No params, this only plays the load routine without moving the robot.-->
 	<action ref="takein_module">
 		<!-- The robot is already positioned, take it in -->
-		<params></params>
+		<params>
+			<param name="xx"/>
+			<param name="yy"/>
+		</params>
 		<conditions>
 			<chest ref = "robot_body_chest_modules" qty_left_min = "1" />
 		</conditions>
 		<actions exec="one">
 			<orderref ref="actuator_open">
-				<actuator_name>actu_1_tmtc</actuator_name>
+				<actuator_name bind="xx"/>
 			</orderref>
 			<orderref ref="ai_delay"/>
 			<orderref ref="actuator_close">
-				<actuator_name>actu_1_tmtc</actuator_name>
+				<actuator_name bind="yy"/>
 			</orderref>
 		</actions>
 	</action>
@@ -41,7 +44,7 @@
     		- position (position object) : position where the module is. Position origin must be 'robot_origin_modulegripper' -->
 	<action ref="load_module" name="Search and Load module" >
 		<params>
-			<param id="position"/>
+			<param name="position"/>
 		</params>
 		<conditions>
 			<chest ref="robot_body_chest_module_gripper" qty="full"/>
@@ -49,7 +52,7 @@
 		</conditions>
 		<actions exec="all" order="linear">
 			<orderref ref = "wheels_goto">
-
+				<position bind="position"/>
 			</orderref>
 			<nextneedsprevious/>
 			<actionref ref="takein_module"/>
@@ -58,14 +61,14 @@
 
 	<action ref="unload_module" name = "Goto place and Unload module" reward="20">
 		<params>
-			<param id="position"/>
+			<param name="position"/>
 		</params>
 		<conditions>
 			<chest ref = "robot_body_chest_modules" qty_in_min = "1" />
 		</conditions>
 		<actions exec="all" order="linear">
 			<orderref ref = "wheels_goto">
-
+				<position bind="position"/>
 			</orderref>
 			<nextneedsprevious/>
 			<actionref ref="takeout_module"/>

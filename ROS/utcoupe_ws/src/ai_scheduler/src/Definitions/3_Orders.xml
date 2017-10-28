@@ -66,7 +66,7 @@
 	<!-- Wheels -->
 	<order ref="wheels_goto" duration="1">
 		<message dest="/movement/navigator/goto">
-			<!--<param name="position" type="memory_map/Position"/> TODO oh gosh gotta do that too-->
+			<param name="position" type="pose2d"/>
 			<!--<param name="speed" type="movement_navigator/Speed" default="SPEED_FAST"/> TODO default is useful too..-->
 			<!--<param name="goal_type" type="string"/>  TODO precise, cercle d'approche, ...-->
 		</message>
