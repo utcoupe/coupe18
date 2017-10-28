@@ -7,6 +7,8 @@ import map_classes
 
 class Map(MapElement):
     Terrain = None
+    Zones = None
+    Waypoints = None
     Entities = None
     Objects = None
 
@@ -16,8 +18,11 @@ class Map(MapElement):
         initdict = MapLoader.loadFile(filename)
 
         # Loading objects from the YML dict
-        LoadingHelpers.checkKeysExist(initdict, "terrain", "entities", "objects")
+        LoadingHelpers.checkKeysExist(initdict, "terrain", "zones", "waypoints", "entities", "objects")
         Map.Terrain    = map_classes.Terrain("terrain", initdict["terrain"])
+        Map.Zones      = ListManager("zones", map_classes.Zone, initdict["zones"])
+        Map.Waypoints   = ListManager("waypoints", map_classes.Waypoint, initdict["waypoints"])
+
         Map.Entities   = ListManager("entities", map_classes.Entity, initdict["entities"])
         Map.Objects    = map_classes.ObjectContainer("objects", initdict) # Small hack to properly initialize ObjectContainer
         rospy.loginfo("[memory/map] Loaded map successfully.")
@@ -27,6 +32,10 @@ class Map(MapElement):
         key = mappath.getNextKey()
         if key.Extension == "list":
             if key.KeyName == Map.Terrain.Name:
+                return Map.Terrain.get(mappath)
+            elif key.KeyName == Map.Zones.Name:
+                return Map.Terrain.get(mappath)
+            elif key.KeyName == Map.Waypoints.Name:
                 return Map.Terrain.get(mappath)
             elif key.KeyName == Map.Entities.Name:
                 return Map.Entities.get(mappath)

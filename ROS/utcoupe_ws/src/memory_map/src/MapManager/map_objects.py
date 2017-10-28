@@ -136,12 +136,14 @@ class Shape():
 
 class Visual():
     def __init__(self, initdict):
+        LoadingHelpers.checkKeysExist(initdict, "ns", "id", "type", "z", "scale", "orientation", "color")
         self.Dict = initdict
         self.NS = initdict["ns"]
         self.ID = int(initdict["id"])
         markerType = {
             "cube": Marker.CUBE,
-            "sphere": Marker.SPHERE
+            "sphere": Marker.SPHERE,
+            "mesh": Marker.MESH_RESOURCE
             # TODO To Complete
         }
         self.Type = markerType[initdict["type"]]
@@ -149,6 +151,10 @@ class Visual():
         self.Scale = initdict["scale"]
         self.Orientation = initdict["orientation"]
         self.Color = initdict["color"]
+
+        if initdict["type"] == "mesh":
+            LoadingHelpers.checkKeysExist(initdict, "mesh_path")
+            self.mesh_path = initdict["mesh_path"]
     
     def get(self):
         return self.Dict
