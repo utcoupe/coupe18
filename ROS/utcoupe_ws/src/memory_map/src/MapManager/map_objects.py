@@ -163,6 +163,10 @@ class Trajectory():
     def __init__(self, initdict):
         pass
 
+    def get(self):
+        rospy.logerr("Trajectories not implemented yet.")
+        raise NotImplementedError
+
 
 class Color():
     def __init__(self, color):

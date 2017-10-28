@@ -41,7 +41,8 @@ class MarkersPublisher():
                 if o.Type == "object":
                     self.publishMarker(o.Position, o.Visual)
                 elif o.Type == "container":
-                    rospy.logwarn("Can't show containers yet, not implemented.")
+                    for e in o.Elements:
+                        self.publishMarker(e.Position, e.Visual) # TODO CAUTION can't show objezcts in a container in a container yet #23h
 
     def publishMarker(self, position, visual):
         marker = Marker()

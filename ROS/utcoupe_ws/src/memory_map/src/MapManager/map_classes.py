@@ -16,6 +16,21 @@ class Terrain(MapElement):
         self.Visual = Visual(initdict["visual"])
         self.Walls = initdict["walls"]  # self.Walls = ListManager("zones", map_objects.Zone, initdict["zones"])  # TODO implement
 
+    def get(self, mappath):
+        key = mappath.getNextKey()
+        if key.Extension == "attribute":
+            if key.KeyName == "shape":
+                return self.Shape.get()
+            elif key.KeyName == "visual":
+                return self.Visual.get()
+            elif key.KeyName == "walls":
+                return self.Walls
+            else:
+                rospy.logerr("[memory/map] GET request: Entity didn't find any attribute named '{}'".format(key.KeyName))
+                return None
+        else:
+            rospy.logerr("[memory/map] GET request: Entity couldn't recognize key extension '{}'".format(key.Extension))
+
 
 class Entity(MapElement):
     '''
@@ -33,12 +48,11 @@ class Entity(MapElement):
         self.Shape = Shape(initdict["shape"])
         self.Visual = Visual(initdict["visual"])
 
-        self.Chest = initdict["chest"] if "chest" in initdict else False # TODO
+        self.Chest = initdict["chest"] if "chest" in initdict else {} # TODO
         self.Trajectory = Trajectory(initdict["trajectory"])
         self.CurrentPath = []
 
     def get(self, mappath):
-        print "got until here"
         key = mappath.getNextKey()
         if key.Extension == "attribute":
             if key.KeyName == "position":
@@ -47,7 +61,9 @@ class Entity(MapElement):
                 return self.Shape.get()
             elif key.KeyName == "visual":
                 return self.Visual.get()
-            elif key.KeyName == "chest": #TODO complex ?
+            elif key.KeyName == "trajectory":
+                return self.Trajectory.get()
+            elif key.KeyName == "chest":
                 return self.Chest
             else:
                 rospy.logerr("[memory/map] GET request: Entity didn't find any attribute named '{}'".format(key.KeyName))
@@ -100,15 +116,19 @@ class Waypoint(MapElement):
     '''
 
     def __init__(self, name, initdict):
+        LoadingHelpers.checkKeysExist(initdict, "position", "visual")
         super(Waypoint, self).__init__("waypoint")
         self.Name = name
         self.Position = Position(initdict["position"])
-    
+        self.Visual = Visual(initdict["visual"])
+
     def get(self, mappath):
         key = mappath.getNextKey()
         if key.Extension == "attribute":
             if key.KeyName == "position":
                 return self.Position.get()
+            if key.KeyName == "visual":
+                return self.Visual.get()
             else:
                 rospy.logerr("[memory/map] GET request: Object didn't find any attribute named '{}'".format(key.KeyName))
                 return None
@@ -126,6 +146,7 @@ class ObjectContainer(ListManager):
         LoadingHelpers.checkKeysExist(initdict, "objects")
         super(ObjectContainer, self).__init__("objects", None, None)  # Manually initialise list (Can be several classes)
         self.Name = name
+        self.Type = "container"
 
         for k in initdict["objects"]:
             o = initdict["objects"][k]
@@ -138,7 +159,7 @@ class ObjectContainer(ListManager):
 
     def get(self, mappath):
         key = mappath.getNextKey()
-        if key.Extension == "object":
+        if key.Extension in ["container", "object"]:
             for o in self.Elements:
                 if key.KeyName == o.Name:
                     return o.get(mappath)
@@ -155,9 +176,10 @@ class Object(MapElement):
         self.Position = Position(initdict["position"])
         self.Shape = Shape(initdict["shape"])
         self.Visual = Visual(initdict["visual"])
-        self.Type = initdict["type"]
+        self.Type = "object"
+        # TODO properties tag in YML not loaded yet. useful ?
 
-        self.Chest = initdict["chest"] if "chest" in initdict else False # TODO
+        self.Chest = initdict["chest"] if "chest" in initdict else {} # TODO
         self.UserData = initdict["userdata"]
 
     def get(self, mappath):
@@ -169,7 +191,7 @@ class Object(MapElement):
                 return self.Shape.get()
             elif key.KeyName == "visual":
                 return self.Visual.get()
-            elif key.KeyName == "chest": #TODO complex ?
+            elif key.KeyName == "chest":
                 return self.Chest
             elif key.KeyName == "userdata":
                 if len(mappath.getKeysLeft()) > 0:

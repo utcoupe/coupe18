@@ -2,8 +2,8 @@
 import rospy
 
 class MapElement(object):
-    def __init__(self, classtype):
-        self.ClassType = classtype
+    def __init__(self, classname):
+        self.ClassName = classname
 
     def get(self, mappath):  # To be overritten.
         raise NotImplementedError("The get method needs to be overwritten.")
@@ -41,7 +41,7 @@ class ListManager(MapElement):
     def get(self, mappath):
         key = mappath.getNextKey()
         if len(self.Elements):
-            if key.Extension == self.Elements[0].ClassType: #TODO Hardcoded :/
+            if key.Extension == self.Elements[0].ClassName: #TODO Hardcoded :/
                 for e in self.Elements:
                     if key.KeyName == e.Name:
                         return e.get(mappath)

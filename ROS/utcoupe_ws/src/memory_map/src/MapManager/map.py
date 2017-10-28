@@ -30,23 +30,22 @@ class Map(MapElement):
     @staticmethod
     def get(mappath):
         key = mappath.getNextKey()
+        if key.KeyName == Map.Terrain.ClassName:
+            return Map.Terrain.get(mappath)
         if key.Extension == "list":
-            if key.KeyName == Map.Terrain.ClassType:
-                return Map.Terrain.get(mappath)
-            elif key.KeyName == Map.Zones.ClassType:
+            if key.KeyName == Map.Zones.ClassName:
                 return Map.Zones.get(mappath)
-            elif key.KeyName == Map.Waypoints.ClassType:
+            elif key.KeyName == Map.Waypoints.ClassName:
                 return Map.Waypoints.get(mappath)
-            elif key.KeyName == Map.Entities.ClassType:
+            elif key.KeyName == Map.Entities.ClassName:
                 return Map.Entities.get(mappath)
-            elif key.KeyName == Map.Objects.ClassType:
+            elif key.KeyName == Map.Objects.ClassName:
                 return Map.Objects.get(mappath)
             else:
                 rospy.logerr("[memory/map] GET request: Map couldn't find list named '{}'".format(key))
         else:
             rospy.logerr("[memory/map] GET request: Map got unrecognized path key extension '{}'".format(key))
-        rospy.logwarn("got get request, path is " + str(mappath.Keys))
 
     @staticmethod
     def set(mappath, new_value):
-        rospy.logwarn("got set request")
+        rospy.logwarn("Map got set request, not implemented yet")

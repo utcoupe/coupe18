@@ -81,7 +81,8 @@ entities:
             z: 0.175
             orientation: [0, 0, 0]
             color: [1, 0.2, 0.2, 1.0]
-        chest: null
+        chest:
+            notimplementedyet: True
         trajectory:
             history: null
             currentpath: null
@@ -969,77 +970,80 @@ objects:
 
 
 
-    ball_1:
-        type: object
-        position:
-            frame_id: /map
-            x: 0.015
-            y: 1.16
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: circle
-            radius: 0.044
-            color: [255, 140, 20] #TODO sert a rien
-        visual:
-            ns: balls
-            id: 1
-            type: sphere
-            scale: [0.044, 0.044, 0.044]
-            z: 0.65
-            orientation: [0, 0, 0]
-            color: [0.2, 1.0, 0.2, 1.0]
-        properties:
-            ground_obstacle: false
-        userdata:
-            color: green
+    balls:
+        type: container
+        objects:
+            ball_1:
+                type: object
+                position:
+                    frame_id: /map
+                    x: 0.015
+                    y: 1.16
+                    a: 0
+                    type: pickable #TODO usable value ?
+                shape:
+                    type: circle
+                    radius: 0.044
+                    color: [255, 140, 20] #TODO sert a rien
+                visual:
+                    ns: balls
+                    id: 1
+                    type: sphere
+                    scale: [0.044, 0.044, 0.044]
+                    z: 0.65
+                    orientation: [0, 0, 0]
+                    color: [0.2, 1.0, 0.2, 1.0]
+                properties:
+                    ground_obstacle: false
+                userdata:
+                    color: green
 
-    ball_2:
-        type: object
-        position:
-            frame_id: /map
-            x: 0.015
-            y: 1.16
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: circle
-            radius: 0.044
-            color: [255, 140, 20] #TODO sert a rien
-        visual:
-            ns: balls
-            id: 2
-            type: sphere
-            scale: [0.044, 0.044, 0.044]
-            z: 0.7
-            orientation: [0, 0, 0]
-            color: [0.2, 1.0, 0.2, 1.0]
-        properties:
-            ground_obstacle: false
-        userdata:
-            color: green
+            ball_2:
+                type: object
+                position:
+                    frame_id: /map
+                    x: 0.015
+                    y: 1.16
+                    a: 0
+                    type: pickable #TODO usable value ?
+                shape:
+                    type: circle
+                    radius: 0.044
+                    color: [255, 140, 20] #TODO sert a rien
+                visual:
+                    ns: balls
+                    id: 2
+                    type: sphere
+                    scale: [0.044, 0.044, 0.044]
+                    z: 0.7
+                    orientation: [0, 0, 0]
+                    color: [0.2, 1.0, 0.2, 1.0]
+                properties:
+                    ground_obstacle: false
+                userdata:
+                    color: green
 
-    ball_3:
-        type: object
-        position:
-            frame_id: /map
-            x: 0.015
-            y: 1.16
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: circle
-            radius: 0.044
-            color: [255, 140, 20] #TODO sert a rien
-        visual:
-            ns: balls
-            id: 3
-            type: sphere
-            scale: [0.044, 0.044, 0.044]
-            z: 0.75
-            orientation: [0, 0, 0]
-            color: [0.2, 1.0, 0.2, 1.0]
-        properties:
-            ground_obstacle: false
-        userdata:
-            color: green
+            ball_3:
+                type: object
+                position:
+                    frame_id: /map
+                    x: 0.015
+                    y: 1.16
+                    a: 0
+                    type: pickable #TODO usable value ?
+                shape:
+                    type: circle
+                    radius: 0.044
+                    color: [255, 140, 20] #TODO sert a rien
+                visual:
+                    ns: balls
+                    id: 3
+                    type: sphere
+                    scale: [0.044, 0.044, 0.044]
+                    z: 0.75
+                    orientation: [0, 0, 0]
+                    color: [0.2, 1.0, 0.2, 1.0]
+                properties:
+                    ground_obstacle: false
+                userdata:
+                    color: green
