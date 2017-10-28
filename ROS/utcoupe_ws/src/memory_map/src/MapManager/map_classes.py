@@ -9,15 +9,15 @@ class Terrain(MapElement):
     Terrain Metaclass. Holds the map general information, as well as
     general objects : Zones and Waypoints.
     '''
-    def __init__(self, name, initdict):
-        super(Terrain, self).__init__(name)
+    def __init__(self, initdict):
+        super(Terrain, self).__init__("terrain")
         LoadingHelpers.checkKeysExist(initdict, "shape", "visual", "walls")
         self.Shape = Shape(initdict["shape"])
         self.Visual = Visual(initdict["visual"])
         self.Walls = initdict["walls"]  # self.Walls = ListManager("zones", map_objects.Zone, initdict["zones"])  # TODO implement
 
 
-class Entity():
+class Entity(MapElement):
     '''
     Describes a dynamic robot, buddy or enemy. Holds information like
     the current robot's path and state, previous trajectories, containers, etc.
@@ -26,8 +26,8 @@ class Entity():
     '''
 
     def __init__(self, name, initdict):
+        super(Entity, self).__init__("entity")
         self.Name = name # TODO mixing entity name and class type xwith self.Name in MapElement
-        # TODO inherit from MapElement and call super
         LoadingHelpers.checkKeysExist(initdict, "position", "shape", "visual", "trajectory")
         self.Position = Position(initdict["position"])
         self.Shape = Shape(initdict["shape"])
@@ -38,6 +38,7 @@ class Entity():
         self.CurrentPath = []
 
     def get(self, mappath):
+        print "got until here"
         key = mappath.getNextKey()
         if key.Extension == "attribute":
             if key.KeyName == "position":
@@ -55,7 +56,7 @@ class Entity():
             rospy.logerr("[memory/map] GET request: Entity couldn't recognize key extension '{}'".format(key.Extension))
 
 
-class Zone():
+class Zone(MapElement):
     '''
     Describes a zone : can be useful for checking conditions (e.g. if an object or entity
     is in a certain area).
@@ -64,15 +65,33 @@ class Zone():
     '''
 
     def __init__(self, name, initdict):
+        LoadingHelpers.checkKeysExist(initdict, "position", "shape", "visual", "properties")
+        super(Zone, self).__init__("zone")
         self.Name = name
         self.Position = Position(initdict["position"])
         self.Shape = Shape(initdict["shape"])
         self.Visual = Visual(initdict["visual"])
+        self.Properties = initdict["properties"]
 
-        self.Walkable = initdict["properties"]["walkable"]
+    def get(self, mappath):
+        key = mappath.getNextKey()
+        if key.Extension == "attribute":
+            if key.KeyName == "position":
+                return self.Position.get()
+            elif key.KeyName == "shape":
+                return self.Shape.get()
+            elif key.KeyName == "visual":
+                return self.Visual.get()
+            elif key.KeyName == "properties":
+                return self.Properties
+            else:
+                rospy.logerr("[memory/map] GET request: Object didn't find any attribute named '{}'".format(key.KeyName))
+                return None
+        else:
+            rospy.logerr("[memory/map] GET request: Object couldn't recognize key extension '{}'".format(key.Extension))
 
 
-class Waypoint():
+class Waypoint(MapElement):
     '''
     Describes a static position that was given a name. Can be gotten from other packages
     for referencing a XY position while defining it only once here.
@@ -81,8 +100,20 @@ class Waypoint():
     '''
 
     def __init__(self, name, initdict):
+        super(Waypoint, self).__init__("waypoint")
         self.Name = name
         self.Position = Position(initdict["position"])
+    
+    def get(self, mappath):
+        key = mappath.getNextKey()
+        if key.Extension == "attribute":
+            if key.KeyName == "position":
+                return self.Position.get()
+            else:
+                rospy.logerr("[memory/map] GET request: Object didn't find any attribute named '{}'".format(key.KeyName))
+                return None
+        else:
+            rospy.logerr("[memory/map] GET request: Object couldn't recognize key extension '{}'".format(key.Extension))
 
 
 class ObjectContainer(ListManager):
@@ -93,7 +124,8 @@ class ObjectContainer(ListManager):
 
     def __init__(self, name, initdict):
         LoadingHelpers.checkKeysExist(initdict, "objects")
-        super(ObjectContainer, self).__init__(name, None, None)  # Manually initialise list (Can be several classes)
+        super(ObjectContainer, self).__init__("objects", None, None)  # Manually initialise list (Can be several classes)
+        self.Name = name
 
         for k in initdict["objects"]:
             o = initdict["objects"][k]
@@ -109,7 +141,6 @@ class ObjectContainer(ListManager):
         if key.Extension == "object":
             for o in self.Elements:
                 if key.KeyName == o.Name:
-                    print "helloo"
                     return o.get(mappath)
             rospy.logerr("[memory/map] GET request: ObjectContainer didn't find any object named '{}'".format(key.KeyName))
             return None
@@ -117,8 +148,9 @@ class ObjectContainer(ListManager):
             rospy.logerr("[memory/map] GET request: ObjectContainer couldn't recognize key extension '{}'".format(key.Extension))
 
 
-class Object():
+class Object(MapElement):
     def __init__(self, name, initdict):
+        super(Object, self).__init__("object")
         self.Name = name
         self.Position = Position(initdict["position"])
         self.Shape = Shape(initdict["shape"])

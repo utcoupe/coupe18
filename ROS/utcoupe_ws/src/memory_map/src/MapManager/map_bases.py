@@ -1,14 +1,15 @@
 #!/usr/bin/python
+import rospy
 
 class MapElement(object):
-    def __init__(self, name):
-        self.Name = name
+    def __init__(self, classtype):
+        self.ClassType = classtype
 
     def get(self, mappath):  # To be overritten.
-        pass
+        raise NotImplementedError("The get method needs to be overwritten.")
 
     def set(self, mappath, new_value):  # To be overritten.
-        pass
+        raise NotImplementedError("The set method needs to be overwritten.")
 
 '''
 CONSTRUCTOR
@@ -30,9 +31,23 @@ class ListGroup(MapElement):
 '''
 
 class ListManager(MapElement):
-    def __init__(self, name, classtype, initdict):
-        super(ListManager, self).__init__(name)
+    def __init__(self, listname, classdef, initdict):
+        super(ListManager, self).__init__(listname)
         self.Elements = []
         if initdict:  # Let the user create an empty list (override the loading process)
             for k in initdict.keys():
-                self.Elements.append(classtype(k, initdict[k]))
+                self.Elements.append(classdef(k, initdict[k]))
+
+    def get(self, mappath):
+        key = mappath.getNextKey()
+        if len(self.Elements):
+            if key.Extension == self.Elements[0].ClassType: #TODO Hardcoded :/
+                for e in self.Elements:
+                    if key.KeyName == e.Name:
+                        return e.get(mappath)
+                rospy.logerr("[memory/map] GET request: ObjectContainer didn't find any object named '{}'".format(key.KeyName))
+                return None
+            else:
+                rospy.logerr("[memory/map] GET request: ObjectContainer couldn't recognize key extension '{}'".format(key.Extension))
+        else:
+            return None

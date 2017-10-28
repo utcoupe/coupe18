@@ -19,7 +19,7 @@ class Map(MapElement):
 
         # Loading objects from the YML dict
         LoadingHelpers.checkKeysExist(initdict, "terrain", "zones", "waypoints", "entities", "objects")
-        Map.Terrain    = map_classes.Terrain("terrain", initdict["terrain"])
+        Map.Terrain    = map_classes.Terrain(initdict["terrain"])
         Map.Zones      = ListManager("zones", map_classes.Zone, initdict["zones"])
         Map.Waypoints   = ListManager("waypoints", map_classes.Waypoint, initdict["waypoints"])
 
@@ -31,15 +31,15 @@ class Map(MapElement):
     def get(mappath):
         key = mappath.getNextKey()
         if key.Extension == "list":
-            if key.KeyName == Map.Terrain.Name:
+            if key.KeyName == Map.Terrain.ClassType:
                 return Map.Terrain.get(mappath)
-            elif key.KeyName == Map.Zones.Name:
-                return Map.Terrain.get(mappath)
-            elif key.KeyName == Map.Waypoints.Name:
-                return Map.Terrain.get(mappath)
-            elif key.KeyName == Map.Entities.Name:
+            elif key.KeyName == Map.Zones.ClassType:
+                return Map.Zones.get(mappath)
+            elif key.KeyName == Map.Waypoints.ClassType:
+                return Map.Waypoints.get(mappath)
+            elif key.KeyName == Map.Entities.ClassType:
                 return Map.Entities.get(mappath)
-            elif key.KeyName == Map.Objects.Name:
+            elif key.KeyName == Map.Objects.ClassType:
                 return Map.Objects.get(mappath)
             else:
                 rospy.logerr("[memory/map] GET request: Map couldn't find list named '{}'".format(key))

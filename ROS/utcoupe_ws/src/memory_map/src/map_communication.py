@@ -1,8 +1,10 @@
 #!/usr/bin/python
 import json
+import time
+
 import rospy
-from MapManager import Map, MapPath
 import memory_map.srv
+from MapManager import Map, MapPath
 
 
 class Servers():
@@ -16,13 +18,14 @@ class GetServiceHandler():
         self.GetSERV = rospy.Service(Servers.GET_SERV, memory_map.srv.MapGetFromPath, self.on_get)
 
     def on_get(self, req):
+        s = time.time() * 1000
         rospy.loginfo("GET:" + str(req.request_path))
         parsed_path = MapPath(req.request_path)
         response = Map.get(parsed_path)
 
-        print "GET Response : " + str(response)
+        rospy.logdebug("    Responding: " + str(response))
+        rospy.logdebug("    Process took {0:.2f}ms".format(time.time() * 1000 - s))
         return memory_map.srv.MapGetFromPathResponse(json.dumps(response))
-
 
 
 class SetServiceHandler():
@@ -37,8 +40,8 @@ class ConditionsHandler():
     def __init__(self):
         self.ContainersSERV = rospy.Service(Servers.CONDITIONS_CONTAINERS_SERV,
                                             memory_map.srv.MapConditionContainer,
-                                            self.serv_handler_on_container_condition)
+                                            self.on_condition)
 
-    def serv_handler_on_container_condition(self, req):
+    def on_condition(self, req):
         result = None
         return memory_map.srv.MapConditionContainerResponse(result)

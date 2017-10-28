@@ -144,7 +144,6 @@ class Visual():
             "cube": Marker.CUBE,
             "sphere": Marker.SPHERE,
             "mesh": Marker.MESH_RESOURCE
-            # TODO To Complete
         }
         self.Type = markerType[initdict["type"]]
         self.z = float(initdict["z"])
@@ -155,7 +154,7 @@ class Visual():
         if initdict["type"] == "mesh":
             LoadingHelpers.checkKeysExist(initdict, "mesh_path")
             self.mesh_path = initdict["mesh_path"]
-    
+
     def get(self):
         return self.Dict
 

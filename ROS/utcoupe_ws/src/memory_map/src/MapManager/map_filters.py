@@ -27,7 +27,6 @@ class MapPath(object):
 
 class MapPathKey(object):
     def __init__(self, keystring):
-        print keystring
         if keystring.count('.') != 1:
             pass#rospy.logerr("Request path invalid ! '{}' needs to be of type 'key.extension'.".format(keystring))
             #raise ValueError
