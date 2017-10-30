@@ -27,13 +27,17 @@ class NavigatorNode:
         debugStr += pointToStr(req.posStart)
         debugStr += " to " + pointToStr(req.posEnd)
         rospy.logdebug(debugStr)
-        # sends the request to the pathfinder
-        path = self._pathfinderClient.FindPath(req.posStart, req.posEnd)
-        self._printPath (path)
-        # then sends the path point per point to the arduino_asserv
-        # TODO
-        # then return success
-        return True
+        try:
+            # sends the request to the pathfinder
+            path = self._pathfinderClient.FindPath(req.posStart, req.posEnd)
+            self._printPath (path)
+            # then sends the path point per point to the arduino_asserv
+            # TODO
+            # then return success
+            return True
+        except:
+            rospy.logdebug("Navigation failled!")
+            return False
 
     def _printPath (self, path):
         debugStr = "Received path: ["
