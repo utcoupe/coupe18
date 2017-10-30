@@ -11,7 +11,7 @@ terrain:
         z: 0.0
         orientation: [1.57079632679, 0, 0]
         color: [0.8, 0.8, 0.8, 1.0]
-        mesh_path: "package://memory_map/src/Definitions/arena_2018_beta_withoutobjects.stl"
+        mesh_path: "package://memory_map/def/arena_2018_beta_withoutobjects.stl"
     walls:
         sth: 0  # TODO create main map polygons.
 

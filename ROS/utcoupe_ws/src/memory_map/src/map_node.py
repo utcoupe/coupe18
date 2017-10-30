@@ -8,7 +8,7 @@ from Markers import MarkersPublisher
 class MapNode():
     def __init__(self):
         rospy.init_node('map', log_level=rospy.DEBUG)
-        MapManager.Map.load("../Definitions/map_2018.yml")  # TODO to be better when Definitions package available.
+        MapManager.Map.load("../../def/map_2018.yml")  # TODO to be better when Definitions package available.
 
         # Starting and publishing the table STL to RViz
         self.markers = MarkersPublisher()
