@@ -20,6 +20,7 @@ class GetServiceHandler():
     def on_get(self, req):
         s = time.time() * 1000
         rospy.loginfo("GET:" + str(req.request_path))
+
         parsed_path = MapPath(req.request_path)
         response = Map.get(parsed_path)
 
@@ -33,7 +34,15 @@ class SetServiceHandler():
         self.SetSERV = rospy.Service(Servers.SET_SERV, memory_map.srv.MapSet, self.on_set)
 
     def on_set(self, req):
-        pass
+        s = time.time() * 1000
+        rospy.loginfo("SET:" + str(req.request_path))
+
+        path = MapPath(req.request_path)
+        success = Map.set(path, req.new_value_dict)
+
+        rospy.logdebug("    Responding: " + str(success))
+        rospy.logdebug("    Process took {0:.2f}ms".format(time.time() * 1000 - s))
+        return memory_map.srv.MapSetResponse(success)
 
 
 class ConditionsHandler():

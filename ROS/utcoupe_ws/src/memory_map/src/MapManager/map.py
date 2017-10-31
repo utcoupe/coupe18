@@ -47,5 +47,20 @@ class Map(MapElement):
             rospy.logerr("[memory/map] GET request: Map got unrecognized path key extension '{}'".format(key))
 
     @staticmethod
-    def set(mappath, new_value):
-        rospy.logwarn("Map got set request, not implemented yet")
+    def set(mappath, new_value_dict):
+        key = mappath.getNextKey()
+        if key.KeyName == Map.Terrain.ClassName:
+            return Map.Terrain.set(mappath, new_value_dict)
+        if key.Extension == "list":
+            if key.KeyName == Map.Zones.ClassName:
+                return Map.Zones.set(mappath, new_value_dict)
+            elif key.KeyName == Map.Waypoints.ClassName:
+                return Map.Waypoints.set(mappath, new_value_dict)
+            elif key.KeyName == Map.Entities.ClassName:
+                return Map.Entities.set(mappath, new_value_dict)
+            elif key.KeyName == Map.Objects.ClassName:
+                return Map.Objects.set(mappath, new_value_dict)
+            else:
+                rospy.logerr("[memory/map] GET request: Map couldn't find list named '{}'".format(key))
+        else:
+            rospy.logerr("[memory/map] GET request: Map got unrecognized path key extension '{}'".format(key))

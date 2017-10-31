@@ -31,6 +31,22 @@ class Terrain(MapElement):
         else:
             rospy.logerr("[memory/map] GET request: Entity couldn't recognize key extension '{}'".format(key.Extension))
 
+    def set(self, mappath, new_value_dict):
+        key = mappath.getNextKey()
+        if key.Extension == "attribute":
+            if key.KeyName == "shape":
+                return self.Shape.set(new_value_dict)
+            elif key.KeyName == "visual":
+                return self.Visual.set(new_value_dict)
+            elif key.KeyName == "walls":
+                self.Walls = new_value_dict
+                return True
+            else:
+                rospy.logerr("[memory/map] GET request: Entity didn't find any attribute named '{}'".format(key.KeyName))
+                return None
+        else:
+            rospy.logerr("[memory/map] GET request: Entity couldn't recognize key extension '{}'".format(key.Extension))
+
 
 class Entity(MapElement):
     '''

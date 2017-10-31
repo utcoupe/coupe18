@@ -8,7 +8,7 @@ class MapElement(object):
     def get(self, mappath):  # To be overritten.
         raise NotImplementedError("The get method needs to be overwritten.")
 
-    def set(self, mappath, new_value):  # To be overritten.
+    def set(self, mappath, new_value_dict):  # To be overritten.
         raise NotImplementedError("The set method needs to be overwritten.")
 
 '''
