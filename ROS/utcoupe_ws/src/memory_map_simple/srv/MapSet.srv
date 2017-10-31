@@ -1,6 +1,0 @@
-string path # Gives the path to the element where the data will be replaced
-string json_new_value # JSON of the new data. Will completely replace what's currently inside the element
-
----
-int16 response_code
-string reason

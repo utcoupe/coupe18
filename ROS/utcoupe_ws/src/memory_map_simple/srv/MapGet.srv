@@ -1,7 +1,0 @@
-# SERVICE TO GET AN OBJECT'S ATTRIBUTE
-string request_path
----
-int16 res_code 
-string reason
-
-string res_json
