@@ -1,0 +1,9 @@
+string name
+int32 id = 0 #ignored if name is defined
+int32 timestamp = 0 #replace by default timestamp if 0
+string order
+string param
+string preset #ignored if param is set
+---
+bool success 
+---
