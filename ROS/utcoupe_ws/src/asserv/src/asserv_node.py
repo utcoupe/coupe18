@@ -53,10 +53,11 @@ class Asserv:
     def callback_goto(self, request):
         response = True
         # TODO manage the direction
+        # TODO check the angle
         if request.mode == request.GOTO:
-            self.send_serial_data(self._orders_dictionnary['GOTO'], [str(request.position.x*1000), str(request.position.y*1000), str(1)])
+            self.send_serial_data(self._orders_dictionnary['GOTO'], [str(int(request.position.x * 1000)), str(int(request.position.y * 1000)), str(1)])
         elif request.mode == request.GOTOA:
-            self.send_serial_data(self._orders_dictionnary['GOTOA'], [str(request.position.x*1000), str(request.position.y*1000), str(request.position.theta), str(1)])
+            self.send_serial_data(self._orders_dictionnary['GOTOA'], [str(int(request.position.x * 1000)), str(int(request.position.y * 1000)), str(request.position.theta), str(1)])
         elif request.mode == request.ROT:
             self.send_serial_data(self._orders_dictionnary['ROT'], [str(request.theta)])
         elif request.mode == request.ROTNOMODULO:
@@ -67,8 +68,8 @@ class Asserv:
         return GotoResponse(response)
 
     def callback_set_pos(self, request):
-        #TODO check why y and angle returned by arduino are wrong (overflow ?)
-        self.send_serial_data(self._orders_dictionnary['SET_POS'], [str(request.position.x*1000), str(request.position.y*1000), str(request.position.theta)])
+        # TODO check the angle (rad / degree ?)
+        self.send_serial_data(self._orders_dictionnary['SET_POS'], [str(int(request.position.x * 1000)), str(int(request.position.y * 1000)), str(request.position.theta)])
         return SetPosResponse(True)
 
     def callback_pwm(self, request):
@@ -147,6 +148,7 @@ class Asserv:
         elif data.find("~") != -1:
             receied_data_list = data.split(";")
             # rospy.loginfo("data sharp : " + receied_data_list[10])
+            # TODO data conversion mm to meters
             self._pub_robot_pose.publish(Pose2D(float(receied_data_list[2]), float(receied_data_list[3]), float(receied_data_list[4])))
             self._pub_robot_speed.publish(RobotSpeed(float(receied_data_list[5]), float(receied_data_list[6]), float(receied_data_list[7]), float(receied_data_list[8]), float(receied_data_list[9])))
         else:
