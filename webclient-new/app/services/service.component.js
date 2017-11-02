@@ -12,15 +12,9 @@ class ServiceController {
     this.$scope.$watchGroup(['service.type', 'service.active'], () => {
       this.setFileName();
     }, () => {});
-
-    /*this.ros.ros.getServiceType(this.service.name, (type) => {
-      this.service.type = type;
-      this.setFileName();
-    });*/
   }
 
   setFileName() {
-    console.log("value changed for "+this.service.name + " " + this.service.type);
     const path = 'app/services/';
 
 

@@ -68,10 +68,6 @@ function run($rootScope) {
       services: []
     }
   ];
-
-
-
-
 }
 
 

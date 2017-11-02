@@ -532,7 +532,8 @@ var DomainsService = function () {
       var result = [];
       angular.forEach(array, function (entry) {
         var nameArray = entry.name.split('/');
-        if (nameArray.length > 1 && nameArray[1] === domainName && entry.fetched) {
+        if (nameArray.length > 1 && nameArray[1] === domainName && entry.fetched && nameArray[2] !== "get_loggers" && //TODO : filter nicely <3 (maybe put the rcc filter back)
+        nameArray[2] !== "set_logger_level") {
           entry.abbr = nameArray.slice(2).join('/');
           result.push(entry);
         }
@@ -1666,18 +1667,12 @@ var ServiceController = function () {
       this.$scope.$watchGroup(['service.type', 'service.active'], function () {
         _this.setFileName();
       }, function () {});
-
-      /*this.ros.ros.getServiceType(this.service.name, (type) => {
-        this.service.type = type;
-        this.setFileName();
-      });*/
     }
   }, {
     key: 'setFileName',
     value: function setFileName() {
       var _this2 = this;
 
-      console.log("value changed for " + this.service.name + " " + this.service.type);
       var path = 'app/services/';
 
       this.fileName = path + 'default.html';
