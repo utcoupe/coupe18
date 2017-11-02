@@ -1,6 +1,4 @@
 # SetPos service sets the position of the robot
-uint16 x
-uint16 y
-float32 a
+geometry_msgs/Pose2D position
 ---
 bool response

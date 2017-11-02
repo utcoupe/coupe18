@@ -53,21 +53,22 @@ class Asserv:
     def callback_goto(self, request):
         response = True
         # TODO manage the direction
-        if request.command == request.GOTO:
-            self.send_serial_data(self._orders_dictionnary['GOTO'], [str(request.x), str(request.y), str(1)])
-        elif request.command == request.GOTOA:
-            self.send_serial_data(self._orders_dictionnary['GOTOA'], [str(request.x), str(request.y), str(request.a), str(1)])
-        elif request.command == request.ROT:
-            self.send_serial_data(self._orders_dictionnary['ROT'], [str(request.a)])
-        elif request.command == request.ROTNOMODULO:
-            self.send_serial_data(self._orders_dictionnary['ROTNOMODULO'], [str(request.a)])
+        if request.mode == request.GOTO:
+            self.send_serial_data(self._orders_dictionnary['GOTO'], [str(request.position.x*1000), str(request.position.y*1000), str(1)])
+        elif request.mode == request.GOTOA:
+            self.send_serial_data(self._orders_dictionnary['GOTOA'], [str(request.position.x*1000), str(request.position.y*1000), str(request.position.theta), str(1)])
+        elif request.mode == request.ROT:
+            self.send_serial_data(self._orders_dictionnary['ROT'], [str(request.theta)])
+        elif request.mode == request.ROTNOMODULO:
+            self.send_serial_data(self._orders_dictionnary['ROTNOMODULO'], [str(request.theta)])
         else:
             response = False
-            rospy.logerr("GOTO command %d does not exists...", request.command)
+            rospy.logerr("GOTO mode %d does not exists...", request.mode)
         return GotoResponse(response)
 
     def callback_set_pos(self, request):
-        self.send_serial_data(self._orders_dictionnary['SET_POS'], [str(request.x), str(request.y), str(request.a)])
+        #TODO check why y and angle returned by arduino are wrong (overflow ?)
+        self.send_serial_data(self._orders_dictionnary['SET_POS'], [str(request.position.x*1000), str(request.position.y*1000), str(request.position.theta)])
         return SetPosResponse(True)
 
     def callback_pwm(self, request):
@@ -84,36 +85,36 @@ class Asserv:
 
     def callback_asserv_param(self, request):
         response = True
-        if request.parameter == request.SPDMAX:
+        if request.mode == request.SPDMAX:
             self.send_serial_data(self._orders_dictionnary['SPDMAX'], [str(request.spd), str(request.spd_ratio)])
-        elif request.parameter == request.ACCMAX:
+        elif request.mode == request.ACCMAX:
             self.send_serial_data(self._orders_dictionnary['ACCMAX'], [str(request.acc)])
-        elif request.parameter == request.PIDRIGHT:
+        elif request.mode == request.PIDRIGHT:
             self.send_serial_data(self._orders_dictionnary['PIDRIGHT'], [str(request.p), str(request.i), str(request.d)])
-        elif request.parameter == request.PIDLEFT:
+        elif request.mode == request.PIDLEFT:
             self.send_serial_data(self._orders_dictionnary['PIDLEFT'], [str(request.p), str(request.i), str(request.d)])
-        elif request.parameter == request.PIDALL:
+        elif request.mode == request.PIDALL:
             self.send_serial_data(self._orders_dictionnary['PIDALL'], [str(request.p), str(request.i), str(request.d)])
         else:
             response = False
-            rospy.logerr("Parameters command %d does not exists...", request.parameter)
+            rospy.logerr("modes mode %d does not exists...", request.mode)
         return ParametersResponse(response)
 
     def callback_management(self, request):
         response = True
-        if request.command == request.KILLG:
+        if request.mode == request.KILLG:
             self.send_serial_data(self._orders_dictionnary['KILLG'], [])
-        elif request.command == request.CLEANG:
+        elif request.mode == request.CLEANG:
             self.send_serial_data(self._orders_dictionnary['CLEANG'], [])
-        elif request.command == request.PAUSE:
+        elif request.mode == request.PAUSE:
             self.send_serial_data(self._orders_dictionnary['PAUSE'], [])
-        elif request.command == request.RESUME:
+        elif request.mode == request.RESUME:
             self.send_serial_data(self._orders_dictionnary['RESUME'], [])
-        elif request.command == request.RESET_ID:
+        elif request.mode == request.RESET_ID:
             self.send_serial_data(self._orders_dictionnary['RESET_ID'], [])
         else:
             response = False
-            rospy.logerr("Management command %d does not exists...", request.command)
+            rospy.logerr("Management mode %d does not exists...", request.mode)
         return ManagementResponse(response)
 
     def data_receiver(self):
