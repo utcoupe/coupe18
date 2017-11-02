@@ -25,7 +25,7 @@ add_message_files(
 ## Generate services in the 'srv' folder
 add_service_files(
         FILES
-        AsservParameters.srv
+        Parameters.srv
         EmergencyStop.srv
         Goto.srv
         Management.srv

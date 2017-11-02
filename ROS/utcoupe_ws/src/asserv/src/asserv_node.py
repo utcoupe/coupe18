@@ -20,7 +20,7 @@ class Asserv:
         self._reception_queue = Queue.Queue()
         self._orders_dictionnary = protocol_parser.protocol_parse(os.environ['UTCOUPE_WORKSPACE'] + "/arduino/common/asserv/protocol.h")
         # Init ROS stuff
-        rospy.init_node('asserv', anonymous=True)
+        rospy.init_node('asserv', anonymous=False)
         self._pub_robot_pose = rospy.Publisher("robot/pose2d", Pose2D, queue_size=5)
         self._pub_robot_speed = rospy.Publisher("robot/speed", RobotSpeed, queue_size=5)
         # self._sub_arm = rospy.Subscriber("arm", 1, Asserv.callback_arm)
@@ -29,12 +29,11 @@ class Asserv:
         self._srv_speed = rospy.Service("asserv/controls/speed", Speed, self.callback_speed)
         self._srv_set_pos = rospy.Service("asserv/controls/set_pos", SetPos, self.callback_set_pos)
         self._srv_emergency_stop = rospy.Service("asserv/controls/emergency_stop", EmergencyStop, self.callback_emergency_stop)
-        self._srv_params = rospy.Service("asserv/parameters", AsservParameters, self.callback_asserv_param)
+        self._srv_params = rospy.Service("asserv/parameters", Parameters, self.callback_asserv_param)
         self._srv_management = rospy.Service("asserv/management", Management, self.callback_management)
         # Init the serial communication
         self._arduino_startep_flag = False
         self._order_id = 0
-        # TODO dynamic arduino port
         self._serial_com = None
         self._serial_receiver_thread = None
         self.start_serial_com_line(check_arduino.get_arduino_port("asserv"))
@@ -47,7 +46,6 @@ class Asserv:
             self._serial_receiver_thread.start()
         except serial.SerialException:
             rospy.logerr("Port : " + port + " is not available, make sure you have plugged the right arduino.")
-            # TODO exit or something like that ?
 
     def callback_arm(self, data):
         rospy.loginfo("ARM callback")
@@ -98,8 +96,8 @@ class Asserv:
             self.send_serial_data(self._orders_dictionnary['PIDALL'], [str(request.p), str(request.i), str(request.d)])
         else:
             response = False
-            rospy.logerr("AsservParameters command %d does not exists...", request.parameter)
-        return AsservParametersResponse(response)
+            rospy.logerr("Parameters command %d does not exists...", request.parameter)
+        return ParametersResponse(response)
 
     def callback_management(self, request):
         response = True
@@ -128,12 +126,17 @@ class Asserv:
                     self._reception_queue.put(received_data)
             except KeyboardInterrupt:
                 break
+            rospy.sleep(0.001)
 
     def start(self):
         while not rospy.is_shutdown():
             if not self._reception_queue.empty():
-                self.process_received_data(self._reception_queue.get_nowait())
-                self._reception_queue.task_done()
+                try:
+                    self.process_received_data(self._reception_queue.get())
+                    self._reception_queue.task_done()
+                except KeyboardInterrupt:
+                    break
+            rospy.sleep(0.001)
 
     def process_received_data(self, data):
         # rospy.loginfo("Process : " + data)
