@@ -43,9 +43,10 @@
 #include "pathfinding/pos_convertor.hpp"
 
 #define FAILED_STR "FAIL\n"
-const std::string TOPIC_DOORDER = "navigation/pathfinding/doorder";
-const std::string TOPIC_FINDPATH = "navigation/pathfinding/findpath";
-const std::pair<double,double> SIZE_TABLE_ROS = std::make_pair(3.0, 2.0); // TODO grap the parameters from a topic
+const std::string               TOPIC_DOORDER = "navigation/pathfinding/doorder";
+const std::string               TOPIC_FINDPATH = "navigation/pathfinding/findpath";
+const std::pair<double,double>  SIZE_TABLE_ROS = std::make_pair(3.0, 2.0);
+const bool                      INVERTED_Y = true;
 
 using namespace std;
 using namespace TCLAP;
@@ -359,7 +360,9 @@ int main(int argc, char **argv) {
              << "x" << map.get_map_h());
     
     pair<double,double> sizeMap = make_pair((double) map.get_map_w(), (double) map.get_map_h());
-    shared_ptr<PosConvertor> convertor = make_shared<PosConvertor>(PosConvertor(SIZE_TABLE_ROS, sizeMap));
+    shared_ptr<PosConvertor> convertor = make_shared<PosConvertor>(PosConvertor());
+    convertor->setSizes(SIZE_TABLE_ROS, sizeMap);
+    convertor->setInvertedY(INVERTED_Y);
     
     ros::NodeHandle n;
     

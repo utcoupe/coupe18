@@ -10,12 +10,9 @@ class PosConvertor
 {
 public:
     /**
-     * @brief Initialize the convertor. It takes a size in the ROS system and in the pthfinder one of the same object (for example the table's size) to make scales.
-     * @param sizeRos The size in ROS system
-     * @param sizeMap The size in pathfinding system
+     * @brief Initialize the convertor. Do nothing yet.
      */
-    PosConvertor(std::pair<double,double> sizeRos, std::pair<double,double> sizeMap):
-        _sizeRos(sizeRos), _sizeMap(sizeMap) {}
+    PosConvertor() {}
     
     /**
      * @brief Converts a coodinate from ROS system to pathfinding system using the scales.
@@ -31,7 +28,13 @@ public:
      */
     std::pair<double,double> fromMapToRosPos (const std::pair<double,double>& mapPos) const;
     
+    // Getters & Setters
+    void setSizes (std::pair<double,double> sizeRos, std::pair<double,double> sizeMap);
+    
+    void setInvertedY(bool invertedY) { _invertedY = invertedY; }
+    
 private:
+    bool _invertedY;
     std::pair<double,double> _sizeRos, _sizeMap;
 };
 
