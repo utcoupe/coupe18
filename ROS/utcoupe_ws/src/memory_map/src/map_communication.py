@@ -4,7 +4,7 @@ import time
 
 import rospy
 import memory_map.srv
-from MapManager import Map, MapPath
+from MapManager import Map, map_filters
 
 
 class Servers():
@@ -21,7 +21,7 @@ class GetServiceHandler():
         s = time.time() * 1000
         rospy.loginfo("GET:" + str(req.request_path))
 
-        parsed_path = MapPath(req.request_path)
+        parsed_path = map_filters.MapPath(req.request_path)
         response = Map.get(parsed_path)
 
         rospy.logdebug("    Responding: " + str(response))
@@ -37,8 +37,8 @@ class SetServiceHandler():
         s = time.time() * 1000
         rospy.loginfo("SET:" + str(req.request_path))
 
-        path = MapPath(req.request_path)
-        success = Map.set(path, req.new_value_dict)
+        path = map_filters.MapPath(req.request_path)
+        success = Map.set(path, json.loads(req.new_value_dict))
 
         rospy.logdebug("    Responding: " + str(success))
         rospy.logdebug("    Process took {0:.2f}ms".format(time.time() * 1000 - s))

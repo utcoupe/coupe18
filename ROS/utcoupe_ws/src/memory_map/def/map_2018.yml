@@ -32,7 +32,7 @@ zones:
             type: cube
             scale: [0.2, 0.4, 0.001]
             z: 0.001
-            orientation: [90, 0, 0]
+            orientation: [1.76, 0, 0]
             color: [0.1, 0.7, 0.1, 1.0]
 
         properties:
@@ -57,7 +57,7 @@ waypoints:
 
 
 entities:
-    ROBOT:
+    GR:
         position:
             frame_id: /map
             x: 0.1
@@ -86,7 +86,7 @@ entities:
         trajectory:
             history: null
             currentpath: null
-    buddy:
+    PR:
         position:
             frame_id: /map
             x: 1.243

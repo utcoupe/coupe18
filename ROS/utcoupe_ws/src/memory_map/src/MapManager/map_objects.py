@@ -42,29 +42,29 @@ class Position():
             response_dict["a"] = self.a
         return response_dict
 
-    def transform(self, add_x, add_y, add_a = 0.0):
-        '''
-        Returns a new Position object with the applied transformation.
-        '''
-        p = Position({"x": self.x + add_x, "y": self.y +
-                      add_y, "type": self.CollisionType})
-        if self.has_angle:
-            p.a = self.a + add_a
-            self.has_angle = True
-        return p
-
-    def angle(self):
-        return self.a if self.has_angle else 0.0
-
-    def tuple2(self):
-        return (self.x, self.y)
-
-    def tuple3(self):
-        return (self.x, self.y, self.a) if self.has_angle else None
+    def set(self, new_value_dict):
+        if "x" in new_value_dict:
+            self.x = float(new_value_dict["x"])
+        if "y" in new_value_dict:
+            self.x = float(new_value_dict["y"])
+        if "frame_id" in new_value_dict:
+            self.frame_id = float(new_value_dict["frame_id"])
+        if "type" in new_value_dict:
+            self.CollisionType = new_value_dict["type"]
+        if "has_angle" in new_value_dict:
+            self.has_angle = bool(new_value_dict["has_angle"])
+            if self.has_angle:
+                if not "a" in new_value_dict:
+                    raise ValueError("Missing 'a' field because 'has_angle' was set to true.")
+                self.a = new_value_dict["a"]
+            else:
+                self.a = None
+        return True
 
 
 class Shape():
     def __init__(self, initdict):
+        LoadingHelpers.checkKeysExist(initdict, "type")
         self.Type = initdict["type"]
         if "viz_color" in initdict:
             self.viz_color = Color(initdict["viz_color"])
@@ -72,7 +72,7 @@ class Shape():
         if self.Type == "rect":
             self.width = initdict["width"]
             self.height = initdict["height"]
-            self.points = [(0, 0), (self.width, 0), (self.width, self.height), (0, self.height)]
+            self.generateRectPoints()
         elif self.Type == "circle":
             self.radius = initdict["radius"]
         elif self.Type == "polygon":
@@ -82,6 +82,9 @@ class Shape():
             self.end = initdict["end"]
         else:
             raise ValueError("'{}' shape type not recognized or supported.".format(self.Type))
+
+    def generateRectPoints(self):
+        self.points = [(0, 0), (self.width, 0), (self.width, self.height), (0, self.height)]
 
     def get(self):
         response_dict = {
@@ -100,39 +103,38 @@ class Shape():
             response_dict["end"] = self.end
         return response_dict
 
-    def rotated(self, theta):
-        """Rotates the given polygon which consists of corners represented as (x,y),
-        around the ORIGIN, clock-wise, theta degrees"""
-        if theta == 0:
-            return self.points
-        if self.Type not in ["rect", "polygon", "polyline"]:
-            raise TypeError(
-                "This shape ({0}) cannot be rotated.".format(self.Type))
+    def set(self, new_value_dict):
 
-        rotatedPolygon = []
-        for corner in self.points:
-            rotatedPolygon.append((corner[0] * math.cos(theta) - corner[1] * math.sin(theta),
-                                   corner[0] * math.sin(theta) + corner[1] * math.cos(theta)))
-        return rotatedPolygon
-
-    def inflate(self, offset):
-        # returns a new shape bigger/smaller to the original one, given the offset amount.
-        if offset == 0:
-            return self
-
-        if self.Type == "circle":
-            return Shape({"type": "circle", "radius": self.radius + offset})
-        elif self.Type == "rect":
-            return Shape({"type": "rect", "width": self.width + offset, "height": self.height + offset})
-        elif self.Type == "polygon":
-            clipper = pyclipper.PyclipperOffset()
-            clipper.AddPath(self.points, pyclipper.JT_MITER,
-                            pyclipper.ET_CLOSEDPOLYGON)
-            solution = clipper.Execute(offset)[0]
-            return Shape({"type": "polygon", "points": solution})
+        LoadingHelpers.checkKeysExist(new_value_dict, "type")
+        if new_value_dict["type"] != self.Type:
+            rospy.logerr("SET Trying to change a shape type to another. Can't dynamically change shape type (NotImplemented)")
+            return False
         else:
-            raise TypeError("Can't inflate this shape type.")
-
+            if new_value_dict["type"] == "rect":
+                if "width" in new_value_dict:
+                    self.width = float(new_value_dict["width"])
+                    return True
+                if "height" in new_value_dict:
+                    self.height = float(new_value_dict["height"])
+                    return True
+                self.generateRectPoints()
+            elif new_value_dict["type"] == "circle":
+                if "radius" in new_value_dict:
+                    self.radius = float(new_value_dict["radius"])
+                    return True
+                else: return False
+            elif new_value_dict["type"] == "polygon":
+                if "radius" in new_value_dict:
+                    self.points = new_value_dict["points"]
+                    return True
+                else: return False
+            elif new_value_dict["type"] == "line":
+                if "start" in new_value_dict:
+                    self.start = float(new_value_dict["start"])
+                    return True
+                if "end" in new_value_dict:
+                    self.end = float(new_value_dict["end"])
+                    return True
 
 class Visual():
     def __init__(self, initdict):
@@ -158,12 +160,20 @@ class Visual():
     def get(self):
         return self.Dict
 
+    def set(self, new_value_dict):
+        self.__init__(new_value_dict)
+        return True
+
 
 class Trajectory():
     def __init__(self, initdict):
         pass
 
     def get(self):
+        rospy.logerr("Trajectories not implemented yet.")
+        raise NotImplementedError
+
+    def set(self, new_value_dict):
         rospy.logerr("Trajectories not implemented yet.")
         raise NotImplementedError
 

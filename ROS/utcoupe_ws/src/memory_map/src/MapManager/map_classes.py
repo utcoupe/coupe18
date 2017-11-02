@@ -40,12 +40,12 @@ class Terrain(MapElement):
                 return self.Visual.set(new_value_dict)
             elif key.KeyName == "walls":
                 self.Walls = new_value_dict
-                return True
             else:
-                rospy.logerr("[memory/map] GET request: Entity didn't find any attribute named '{}'".format(key.KeyName))
+                rospy.logerr("[memory/map] SET request: Entity didn't find any attribute named '{}'".format(key.KeyName))
                 return None
         else:
-            rospy.logerr("[memory/map] GET request: Entity couldn't recognize key extension '{}'".format(key.Extension))
+            rospy.logerr("[memory/map] SET request: Entity couldn't recognize key extension '{}'".format(key.Extension))
+        return True
 
 
 class Entity(MapElement):
@@ -87,6 +87,25 @@ class Entity(MapElement):
         else:
             rospy.logerr("[memory/map] GET request: Entity couldn't recognize key extension '{}'".format(key.Extension))
 
+    def set(self, mappath, new_value_dict):
+        key = mappath.getNextKey()
+        if key.Extension == "attribute":
+            if key.KeyName == "position":
+                return self.Position.set(new_value_dict)
+            elif key.KeyName == "shape":
+                return self.Shape.set(new_value_dict)
+            elif key.KeyName == "visual":
+                return self.Visual.set(new_value_dict)
+            elif key.KeyName == "trajectory":
+                return self.Trajectory.set(new_value_dict)
+            elif key.KeyName == "chest":
+                return self.Chest
+            else:
+                rospy.logerr("[memory/map] SET request: Entity didn't find any attribute named '{}'".format(key.KeyName))
+                return None
+        else:
+            rospy.logerr("[memory/map] SET request: Entity couldn't recognize key extension '{}'".format(key.Extension))
+
 
 class Zone(MapElement):
     '''
@@ -122,6 +141,22 @@ class Zone(MapElement):
         else:
             rospy.logerr("[memory/map] GET request: Object couldn't recognize key extension '{}'".format(key.Extension))
 
+    def set(self, mappath, new_value_dict):
+        key = mappath.getNextKey()
+        if key.Extension == "attribute":
+            if key.KeyName == "position":
+                return self.Position.set(new_value_dict)
+            elif key.KeyName == "shape":
+                return self.Shape.set(new_value_dict)
+            elif key.KeyName == "visual":
+                return self.Visual.set(new_value_dict)
+            elif key.KeyName == "properties":
+                self.Properties = new_value_dict["properties"]
+            else:
+                rospy.logerr("[memory/map] SET request: Object didn't find any attribute named '{}'".format(key.KeyName))
+                return None
+        else:
+            rospy.logerr("[memory/map] SET request: Object couldn't recognize key extension '{}'".format(key.Extension))
 
 class Waypoint(MapElement):
     '''
@@ -150,6 +185,19 @@ class Waypoint(MapElement):
                 return None
         else:
             rospy.logerr("[memory/map] GET request: Object couldn't recognize key extension '{}'".format(key.Extension))
+
+    def set(self, mappath, new_value_dict):
+        key = mappath.getNextKey()
+        if key.Extension == "attribute":
+            if key.KeyName == "position":
+                return self.Position.set(new_value_dict)
+            if key.KeyName == "visual":
+                return self.Visual.set(new_value_dict)
+            else:
+                rospy.logerr("[memory/map] SET request: Object didn't find any attribute named '{}'".format(key.KeyName))
+                return None
+        else:
+            rospy.logerr("[memory/map] SET request: Object couldn't recognize key extension '{}'".format(key.Extension))
 
 
 class ObjectContainer(ListManager):
@@ -184,6 +232,17 @@ class ObjectContainer(ListManager):
         else:
             rospy.logerr("[memory/map] GET request: ObjectContainer couldn't recognize key extension '{}'".format(key.Extension))
 
+    def set(self, mappath, new_value_dict):
+        key = mappath.getNextKey()
+        if key.Extension in ["container", "object"]:
+            for o in self.Elements:
+                if key.KeyName == o.Name:
+                    return o.set(mappath, new_value_dict)
+            rospy.logerr("[memory/map] SET request: ObjectContainer didn't find any object named '{}'".format(key.KeyName))
+            return False
+        else:
+            rospy.logerr("[memory/map] SET request: ObjectContainer couldn't recognize key extension '{}'".format(key.Extension))
+
 
 class Object(MapElement):
     def __init__(self, name, initdict):
@@ -216,6 +275,27 @@ class Object(MapElement):
                         if k.KeyName in d: d = d[k.KeyName]
                         else: return None
                     return d
+                else: return self.UserData
+            else:
+                rospy.logerr("[memory/map] GET request: Object didn't find any attribute named '{}'".format(key.KeyName))
+                return None
+        else:
+            rospy.logerr("[memory/map] GET request: Object couldn't recognize key extension '{}'".format(key.Extension))
+
+    def set(self, mappath, new_value_dict):
+        key = mappath.getNextKey()
+        if key.Extension == "attribute":
+            if key.KeyName == "position":
+                return self.Position.set(new_value_dict)
+            elif key.KeyName == "shape":
+                return self.Shape.set(new_value_dict)
+            elif key.KeyName == "visual":
+                return self.Visual.set(new_value_dict)
+            elif key.KeyName == "chest":
+                return self.Chest
+            elif key.KeyName == "userdata":
+                if len(mappath.getKeysLeft()) > 0:
+                    raise NotImplementedError
                 else: return self.UserData
             else:
                 rospy.logerr("[memory/map] GET request: Object didn't find any attribute named '{}'".format(key.KeyName))
