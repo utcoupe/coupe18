@@ -46,7 +46,7 @@ class Asserv:
             self._serial_receiver_thread = threading.Thread(target=self.data_receiver)
             self._serial_receiver_thread.start()
         except serial.SerialException:
-            rospy.logerr("Port : " + port + " is ot available, make sure you have plugged the right arduino.")
+            rospy.logerr("Port : " + port + " is not available, make sure you have plugged the right arduino.")
             # TODO exit or something like that ?
 
     def callback_arm(self, data):
