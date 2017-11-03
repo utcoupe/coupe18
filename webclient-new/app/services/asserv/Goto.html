@@ -55,9 +55,11 @@ class="panel-default" is-open="$ctrl.service.isOpen">
 
     <div class="row">
       <button class="btn btn-default btn-md pull-right" type="button" ng-click="$ctrl.callService({
-          x,
-          y,
-          a: a * 3.14159 / 180,
+          position: {
+            x,
+            y,
+            theta: a * 3.14159 / 180
+          },
           mode: command
       })">
         Go to {{ modes[command] | lowercase}}

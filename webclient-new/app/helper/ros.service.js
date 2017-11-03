@@ -137,6 +137,17 @@ class RosService {
           }
         }
       }
+
+      let expectedTopics = []
+
+      for(let d of this.$rootScope.domains) {
+        for(let t of d.topics) {
+          let name = '/'+d.name+'/'+t;
+          expectedTopics.push(name);
+        }
+      }
+
+      this.data.topics = _.sortBy(this.data.topics, (t) => _.findIndex(expectedTopics, (name) => name == t.name ) );
     });
 
     this.ros.getServices((services) => {
@@ -168,6 +179,18 @@ class RosService {
           }
         }
       }
+
+      let expectedServices = []
+
+      for(let d of this.$rootScope.domains) {
+        for(let s of d.services) {
+          let name = '/'+d.name+'/'+s;
+          expectedServices.push(name);
+        }
+      }
+
+      this.data.services = _.sortBy(this.data.services, (s) => _.findIndex(expectedServices, (name) => name == s.name ) );
+
     });
 
     this.ros.getParams((params) => {
