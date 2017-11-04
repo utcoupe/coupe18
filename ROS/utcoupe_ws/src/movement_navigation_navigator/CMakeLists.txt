@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   geometry_msgs
   pathfinding
+  asserv
 )
 
 ## System dependencies are found with CMake's conventions
