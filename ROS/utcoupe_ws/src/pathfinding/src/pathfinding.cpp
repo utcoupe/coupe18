@@ -40,10 +40,13 @@
 #include "pathfinding/FindPath.h"
 
 #include "pathfinding/map.hpp"
+#include "pathfinding/pos_convertor.hpp"
 
 #define FAILED_STR "FAIL\n"
-const std::string TOPIC_DOORDER = "navigation/pathfinding/doorder";
-const std::string TOPIC_FINDPATH = "navigation/pathfinding/findpath";
+const std::string               TOPIC_DOORDER = "navigation/pathfinding/doorder";
+const std::string               TOPIC_FINDPATH = "navigation/pathfinding/findpath";
+const std::pair<double,double>  SIZE_TABLE_ROS = std::make_pair(3.0, 2.0);
+const bool                      INVERTED_Y = true;
 
 using namespace std;
 using namespace TCLAP;
@@ -220,10 +223,11 @@ std::vector<vertex_descriptor> calcPath(MAP& map, unsigned int x_s,         unsi
 
 class CallBackService {
 public:
-    CallBackService (MAP& map): map(map) {};
+    CallBackService (MAP& map, shared_ptr<PosConvertor> convertor): _map(map), _convertor(convertor) {};
     
 protected:
-    MAP& map;
+    MAP& _map;
+    shared_ptr<PosConvertor> _convertor;
 };
 
 /**
@@ -232,7 +236,7 @@ protected:
  */
 class CallbackDoOrderService : public CallBackService {
 public:
-    CallbackDoOrderService(MAP& map): CallBackService(map) {}
+    CallbackDoOrderService(MAP& map, shared_ptr<PosConvertor> convertor): CallBackService(map, convertor) {}
     
     bool  callCallback (pathfinding::DoOrder::Request &req, pathfinding::DoOrder::Response &res) {
         string command, answer;
@@ -240,10 +244,10 @@ public:
         ROS_DEBUG_STREAM ("I heard \"" << command << "\"");
         switch (command[0]) {
             case 'D':
-                addDynamicObject(command, map);
+                addDynamicObject(command, _map);
                 break;
             case 'C':
-                answer = commandCalcPath(command, map);
+                answer = commandCalcPath(command, _map);
                 ROS_DEBUG_STREAM("Answering: " << answer);
                 res.msg = answer;
                 break;
@@ -263,7 +267,7 @@ inline string pointToStr(const geometry_msgs::Point& point) {
 
 class CallBackFindPathService : public CallBackService {
 public:
-    CallBackFindPathService (MAP& map) : CallBackService(map) {}
+    CallBackFindPathService (MAP& map, shared_ptr<PosConvertor> convertor) : CallBackService(map, convertor) {}
     
     bool callCallback (pathfinding::FindPath::Request &req, pathfinding::FindPath::Response &res) {
         vector<vertex_descriptor> path;
@@ -273,7 +277,11 @@ public:
         
         ROS_DEBUG_STREAM("FindPath: I heard : " << pointToStr(req.posStart) << ", " << pointToStr(req.posEnd));
         
-        path = calcPath(map, req.posStart.x, req.posStart.y, req.posEnd.x, req.posEnd.y, startChrono, distance);
+        pair<double,double> posStart, posEnd;
+        posStart = _convertor->fromRosToMapPos(make_pair(req.posStart.x, req.posStart.y));
+        posEnd = _convertor->fromRosToMapPos(make_pair(req.posEnd.x, req.posEnd.y));
+        
+        path = calcPath(_map, posStart.first, posStart.second, posEnd.first, posEnd.second, startChrono, distance);
         
         if (path.size() == 0) // there was an error in calcPath(...)
         {
@@ -285,8 +293,9 @@ public:
         
         for (auto &point: path) {
             geometry_msgs::Point p;
-            p.x = point[0];
-            p.y = point[1];
+            pair<double, double> newPos = _convertor->fromMapToRosPos(make_pair(point[0], point[1])); 
+            p.x = newPos.first;
+            p.y = newPos.second;
             res.path.push_back(p);
             strPath += pointToStr(p) + ", ";
         }
@@ -301,7 +310,7 @@ public:
             ROS_DEBUG_STREAM("Computing time : " << elapsedSeconds.count());
         }
         if (bmpRenderingFlag) {
-            map.generate_bmp("tmp.bmp");
+            _map.generate_bmp("tmp.bmp");
         }
         
         ROS_DEBUG_STREAM("Answering " << strPath << ", true");
@@ -350,13 +359,17 @@ int main(int argc, char **argv) {
     ROS_DEBUG_STREAM("Done, map size is : " << map.get_map_w()
              << "x" << map.get_map_h());
     
+    pair<double,double> sizeMap = make_pair((double) map.get_map_w(), (double) map.get_map_h());
+    shared_ptr<PosConvertor> convertor = make_shared<PosConvertor>(PosConvertor());
+    convertor->setSizes(SIZE_TABLE_ROS, sizeMap);
+    convertor->setInvertedY(INVERTED_Y);
+    
     ros::NodeHandle n;
     
-    // Why is this astrocity needed? Because neither std or boost detect the correct cast for boost::bind and std lanmbda.
-    CallbackDoOrderService callbackDoOrder(map);
+    CallbackDoOrderService callbackDoOrder(map, convertor);
     ros::ServiceServer serviceDoOrder = n.advertiseService(TOPIC_DOORDER, &CallbackDoOrderService::callCallback, &callbackDoOrder);
     
-    CallBackFindPathService callbackFindPath(map);
+    CallBackFindPathService callbackFindPath(map, convertor);
     ros::ServiceServer serviceFindPath = n.advertiseService(TOPIC_FINDPATH, &CallBackFindPathService::callCallback, &callbackFindPath);
     
     ROS_INFO ("pathfinding now ready to receive order!");
