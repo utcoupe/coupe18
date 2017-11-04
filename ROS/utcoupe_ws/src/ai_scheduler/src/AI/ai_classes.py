@@ -74,6 +74,7 @@ class ExecutionOrder():
 
 class Task(object):
     def __init__(self, xml, status = TaskStatus.FREE):
+
         self.Name = xml.attrib["name"] if "name" in xml.attrib else None
         self.Reward = int(xml.attrib["reward"]) if "reward" in xml.attrib else 0
         self.Status = status
@@ -229,9 +230,11 @@ class ActionList(Task):
         for task in self.TASKS: # Execute any pending task in any case  #TODO#1 will create problems ?
             if task.getStatus() == TaskStatus.PENDING: return task
 
+
         if   self.executionOrder == ExecutionOrder.LINEAR:
             for task in self.TASKS:
                 if task.getStatus() in [TaskStatus.FREE, TaskStatus.PENDING]: return task
+                print "{} :::  {}".format(task, task.getStatus())
 
         elif self.executionOrder == ExecutionOrder.RANDOM:
             free_tasks = [task for task in self.TASKS if task.getStatus() == TaskStatus.FREE]
@@ -255,6 +258,8 @@ class ActionList(Task):
                     record = task.getReward()
                     result = task
             return result
+
+
 
     def execute(self, communicator):
         if self.getStatus() in [TaskStatus.FREE, TaskStatus.PENDING]:
@@ -373,8 +378,8 @@ class Action(Task):
             name = child.tag
             if name not in self.BoundParams:
                 raise KeyError("No bind found for '{}' !".format(name))
-
             self.BoundParams[name].parseValue(child)
+
 
 
     def getDuration(self):
@@ -446,9 +451,15 @@ class Order(Task):
 
         response, self.TimeTaken = self.Message.send(communicator, self.callback)
 
+
     def callback(self, response):
         print "got response !! from Order class!!"
         # After response
+        #TODO check is success properly
+        if not hasattr(response, "response_code"):
+            self.setStatus(TaskStatus.SUCCESS)
+            return
+
         if response.response_code == 200:
             self.setStatus(TaskStatus.SUCCESS)
             rospy.logdebug("[AI] Order '{}' succeeded!".format(self.Name))
@@ -490,6 +501,7 @@ class Message():
 
     def send(self, communicator, callback):
         self.startTime = time.time()
+        self.RosParameters = {p.name: p.getRos() for p in self.Parameters}
         response = communicator.SendRequest(self.Destination,
                                             self.RosParameters, callback)
         return response, time.time() - self.startTime
@@ -516,8 +528,6 @@ class Message():
             param.parseValue(child)
          # [p.checkValues() for p in self.Parameters]
          # TODO : check values at the correct time
-
-        self.RosParameters = {p.name: p.getRos() for p in self.Parameters}
 
 class Colors():
     BOLD  = "\033[1m"
