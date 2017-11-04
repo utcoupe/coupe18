@@ -14,13 +14,15 @@ from geometry_msgs.msg import Point
 from movement_navigation_navigator.srv import Goto
 
 from Pathfinder import PathfinderClient
+#from Asserv import AsservClient
 
 def pointToStr(point):
     return "(" + str(point.x) + "," + str(point.y) + ")"
 
 class NavigatorNode:
     def __init__ (self):
-        self._pathfinderClient = PathfinderClient()
+        self._pathfinderClient = ""
+        self._asservClient = ""
 
     def _handle_goto(self, req):
         debugStr = "Asked to go from "
@@ -32,8 +34,12 @@ class NavigatorNode:
             path = self._pathfinderClient.FindPath(req.posStart, req.posEnd)
             self._printPath (path)
             # then sends the path point per point to the arduino_asserv
-            # TODO
+            """
+            for point in path:
+                self._asservClient.Goto(point)
+            """
             # then return success
+            rospy.logdebug("Success!")
             return True
         except:
             rospy.logdebug("Navigation failled!")
@@ -48,6 +54,9 @@ class NavigatorNode:
 
     def startNode(self):
         rospy.init_node ('navigator')
+
+        self._pathfinderClient = PathfinderClient()
+        #self._asservClient = AsservClient()
 
         self._s = rospy.Service ("/navigation/navigator/goto", Goto, self._handle_goto)
         rospy.loginfo ("Ready to navigate!")
