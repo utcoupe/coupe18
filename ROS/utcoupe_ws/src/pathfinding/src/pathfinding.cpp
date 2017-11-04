@@ -34,7 +34,7 @@
 #include "ros/console.h"
 #include "std_msgs/String.h"
 
-#include "geometry_msgs/Point.h"
+#include "geometry_msgs/Pose2D.h"
 
 #include "pathfinding/DoOrder.h"
 #include "pathfinding/FindPath.h"
@@ -259,7 +259,7 @@ public:
     }
 };
 
-inline string pointToStr(const geometry_msgs::Point& point) {
+inline string pos2DToStr(const geometry_msgs::Pose2D& point) {
     ostringstream str;
     str << "(" << point.x << "," << point.y << ")";
     return str.str();
@@ -275,7 +275,7 @@ public:
         chrono::duration<double> elapsedSeconds;
         double distance;
         
-        ROS_DEBUG_STREAM("FindPath: I heard : " << pointToStr(req.posStart) << ", " << pointToStr(req.posEnd));
+        ROS_DEBUG_STREAM("FindPath: I heard : " << pos2DToStr(req.posStart) << ", " << pos2DToStr(req.posEnd));
         
         pair<double,double> posStart, posEnd;
         posStart = _convertor->fromRosToMapPos(make_pair(req.posStart.x, req.posStart.y));
@@ -292,12 +292,12 @@ public:
         string strPath = "[";
         
         for (auto &point: path) {
-            geometry_msgs::Point p;
+            geometry_msgs::Pose2D p;
             pair<double, double> newPos = _convertor->fromMapToRosPos(make_pair(point[0], point[1])); 
             p.x = newPos.first;
             p.y = newPos.second;
             res.path.push_back(p);
-            strPath += pointToStr(p) + ", ";
+            strPath += pos2DToStr(p) + ", ";
         }
         if (strPath.size() >= 2)
             strPath.erase(strPath.end() - 2, strPath.end());
