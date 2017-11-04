@@ -15,7 +15,6 @@ import check_arduino
 __author__ = "Thomas Fuhrmann"
 __date__ = 21/10/2017
 
-
 class Asserv:
     def __init__(self):
         # Internal data members
@@ -61,7 +60,6 @@ class Asserv:
 
     def callback_goto(self, request):
         # TODO manage the direction
-        # TODO check the angle
         response = self.process_goto_order(request.mode, request.position.x, request.position.y, request.position.theta)
         if response:
             # TODO store something useful in dictionary ?
@@ -158,8 +156,7 @@ class Asserv:
         elif data.find("~") != -1:
             receied_data_list = data.split(";")
             # rospy.loginfo("data sharp : " + receied_data_list[10])
-            # TODO data conversion mm to meters
-            self._pub_robot_pose.publish(Pose2D(float(receied_data_list[2]), float(receied_data_list[3]), float(receied_data_list[4])))
+            self._pub_robot_pose.publish(Pose2D(float(receied_data_list[2]) / 1000, float(receied_data_list[3]) / 1000, float(receied_data_list[4])))
             self._pub_robot_speed.publish(RobotSpeed(float(receied_data_list[5]), float(receied_data_list[6]), float(receied_data_list[7]), float(receied_data_list[8]), float(receied_data_list[9])))
         # Received order ack
         elif data.find(";") == 1:
