@@ -21,7 +21,10 @@ class Asserv:
         # Internal data members
         self._reception_queue = Queue.Queue()
         self._orders_dictionary = protocol_parser.protocol_parse(os.environ['UTCOUPE_WORKSPACE'] + "/arduino/common/asserv/protocol.h")
+        # This dictionary stores the goals received by the DoGoto action and which are currently in processing
         self._goals_dictionary = {}
+        # This dictionary stores the goals received by the Goto service and which are currently in processing
+        self._goto_srv_dictionary = {}
         # Init ROS stuff
         rospy.init_node('asserv', anonymous=False)
         self._pub_robot_pose = rospy.Publisher("robot/pose2d", Pose2D, queue_size=5)
@@ -60,6 +63,12 @@ class Asserv:
         # TODO manage the direction
         # TODO check the angle
         response = self.process_goto_order(request.mode, request.position.x, request.position.y, request.position.theta)
+        if response:
+            # TODO store something useful in dictionary ?
+            # TODO make it proper...
+            self._goto_srv_dictionary[self._order_id - 1] = ""
+        else:
+            rospy.logerr("Service GOTO has failed... Mode probably does not exist.")
         return GotoResponse(response)
 
     def callback_set_pos(self, request):
@@ -114,10 +123,12 @@ class Asserv:
         return ManagementResponse(response)
 
     def callback_action_goto(self, goal_handled):
-        goal_handled.set_accepted()
-        self._goals_dictionary[self._order_id] = goal_handled
-        # TODO handle the false return (mode does not exists)
-        self.process_goto_order(goal_handled.get_goal().mode, goal_handled.get_goal().position.x, goal_handled.get_goal().position.y, goal_handled.get_goal().position.theta)
+        if self.process_goto_order(goal_handled.get_goal().mode, goal_handled.get_goal().position.x, goal_handled.get_goal().position.y, goal_handled.get_goal().position.theta):
+            goal_handled.set_accepted()
+            # TODO make it proper...
+            self._goals_dictionary[self._order_id - 1] = goal_handled
+        else:
+            rospy.logerr("Action GOTO has failed... Mode probably does not exist.")
 
     def data_receiver(self):
         while not rospy.is_shutdown():
@@ -159,10 +170,18 @@ class Asserv:
             else:
                 rospy.loginfo("Received order ack : %s", data)
                 ack_data = data.split(";")
+                ack_id = int(ack_data[0])
                 # TODO manage status
-                if int(ack_data[0]) in self._goals_dictionary:
-                    # rospy.loginfo("Found key %d in goal dictionary !", ack_data[0])
-                    self._goals_dictionary[int(ack_data[0])].set_succeeded()
+                if ack_id in self._goals_dictionary:
+                    # rospy.loginfo("Found key %d in goal dictionary !", ack_id)
+                    self._goals_dictionary[ack_id].set_succeeded()
+                    del self._goals_dictionary[ack_id]
+                elif ack_id in self._goto_srv_dictionary:
+                    rospy.loginfo("Found key %d in goto dictionary !", ack_id)
+                    # TODO something else ?
+                    del self._goto_srv_dictionary[ack_id]
+                else:
+                    rospy.logerr("Ack received but does not exist...")
         else:
             rospy.loginfo("Debug string : %s", data)
 
@@ -186,6 +205,7 @@ class Asserv:
             to_return = False
             rospy.loginfo("Goal GOTO mode %d does not exists...", mode)
         return to_return
+
 
 if __name__ == "__main__":
     Asserv()
