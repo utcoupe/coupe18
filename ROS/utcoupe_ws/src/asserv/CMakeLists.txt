@@ -12,17 +12,20 @@ find_package(catkin REQUIRED COMPONENTS
         std_msgs
         geometry_msgs
         message_generation
+        genmsg
+        actionlib_msgs
+        actionlib
 )
 
 catkin_python_setup()
 
-## Generate messages in the 'msg' folder
+## Generate messages
 add_message_files(
         FILES
         RobotSpeed.msg
 )
 
-## Generate services in the 'srv' folder
+## Generate services
 add_service_files(
         FILES
         Parameters.srv
@@ -34,11 +37,15 @@ add_service_files(
         Speed.srv
 )
 
+## Generate actions
+add_action_files(DIRECTORY action FILES DoGoto.action)
+
 # Generate added messages and services with any dependencies listed here
 generate_messages(
         DEPENDENCIES
         std_msgs
         geometry_msgs
+        actionlib_msgs
 )
 
 catkin_package(
