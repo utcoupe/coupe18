@@ -1,0 +1,9 @@
+<orders>
+  <order ref="wheels_goto" duration="1">
+		<message dest="/movement/navigator/goto">
+			<param name="position" type="pose2d"/>
+			<param name="speed" type="float" optional="true">5.4</param> <!-- this is a default value -->
+			<param name="goal_type" type="string" preset="true">point</param>
+		</message>
+	</order>
+</orders>

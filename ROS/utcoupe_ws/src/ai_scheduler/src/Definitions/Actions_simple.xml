@@ -1,0 +1,19 @@
+<actions>
+  <action ref="goto_spawn">
+		<params>
+			<param name="speed"/>
+		</params>
+		<actions exec="all" order="linear">
+			<orderref ref="wheels_goto">
+				<position>
+          <x>6.5</x>
+          <y>7.5</y>
+          <theta>7</theta>
+        </position>
+        <speed bind="speed"/>
+			</orderref>
+		</actions>
+	</action>
+
+
+</actions>

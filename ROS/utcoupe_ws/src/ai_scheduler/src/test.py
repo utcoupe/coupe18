@@ -9,7 +9,7 @@ def handle(req):
 
 def server():
     rospy.init_node('server_test')
-    s = rospy.Service('test', test, handle)
+    s = rospy.Service("movement/navigator/goto", test, handle)
     print "Ready."
     rospy.spin()
 

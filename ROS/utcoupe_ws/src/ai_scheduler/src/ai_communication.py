@@ -11,7 +11,7 @@ class AICommunication():
         servers = {
             "/ai/timer":          (RequestTypes.SERVICE, ai_scheduler.srv.AIGenericCommand),
             "/ai/scheduler":      (RequestTypes.SERVICE, ai_scheduler.srv.AIGenericCommand),
-            "/test":         (RequestTypes.SERVICE, ai_scheduler.srv.test)
+            "/movement/navigator/goto":         (RequestTypes.SERVICE, ai_scheduler.srv.test),
         }
         def getRequestType(dest):
             return servers[dest][0]
@@ -28,7 +28,7 @@ class AICommunication():
             else:
                 raise NotImplementedError, "Can't send a message of this type (yet ? NotImplemented ?)."
         else:
-            raise ValueError, "Message destination '{}' was not recognized. Has it been added to ai_conditions.py definition dict, or misspelled ?".format(dest)
+            raise ValueError, "Message destination '{}' was not recognized. Has it been added to ai_communication.py definition dict, or misspelled ?".format(dest)
 
     def sendService(self, dest, srv_class, params):
         rospy.wait_for_service(dest)
