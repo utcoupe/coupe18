@@ -19,7 +19,7 @@
 		<params>
 		</params>
 		<actions exec="all" order="linear">
-			<actionref ref="wheels_goto">
+			<actionref ref="goto_spawn">
 				<speed>900000000</speed>
 			</actionref>
 		</actions>

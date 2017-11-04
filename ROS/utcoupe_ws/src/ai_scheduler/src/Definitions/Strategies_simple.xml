@@ -5,8 +5,7 @@
 		</game>
 
     <actions name="In-Game Actions">
-			<actionref ref="goto_spawn">
-				<speed>999</speed>
+			<actionref ref="goto_spawn_fast">
 			</actionref>
     </actions>
 
