@@ -53,7 +53,7 @@ class DomainsService {
       if (
         nameArray.length > 1 &&
         nameArray[1] === domainName &&
-        entry.fetched &&
+        (entry.fetched || !entry.active) &&
         nameArray[2] !== "get_loggers" && //TODO : filter nicely <3 (maybe put the rcc filter back)
         nameArray[2] !== "set_logger_level"
       ) {

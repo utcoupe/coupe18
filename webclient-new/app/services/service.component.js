@@ -9,7 +9,7 @@ class ServiceController {
 
   $onInit() {
 
-    this.$scope.$watchGroup(['service.type', 'service.active'], () => {
+    this.$scope.$watchGroup(['$ctrl.service.type', '$ctrl.service.active'], () => {
       this.setFileName();
     }, () => {});
   }

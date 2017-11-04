@@ -57,7 +57,8 @@ class SettingsService {
       advanced: false,
       hokuyo_1: '/sensors/hokuyo_1_raw',
       hokuyo_2: '/sensors/hokuyo_2_raw',
-      maxConsoleEntries: 200
+      maxConsoleEntries: 200,
+      refresh_rate: 1
     };
   }
 }

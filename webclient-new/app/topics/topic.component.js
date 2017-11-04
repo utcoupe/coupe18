@@ -19,7 +19,7 @@ class TopicController {
     const path = 'app/topics/';
     this.fileName = `${path}default.html`;
 
-    this.$scope.$watchGroup(['topic.type', 'topic.active'], () => {
+    this.$scope.$watchGroup(['$ctrl.topic.type', '$ctrl.topic.active'], () => {
       if(!this.topic.active) {
         this.fileName = `${path}disabled.html`;
         this.isSubscribing = false;

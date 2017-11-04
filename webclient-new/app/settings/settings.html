@@ -53,6 +53,13 @@
             </div>
 
             <div class="form-group">
+              <label class="col-sm-2 control-label">ROS refresh rate (Hz)</label>
+              <div class="col-sm-4">
+                <input type="number" class="form-control" placeholder="1" ng-model="$ctrl.settings[$ctrl.index].refresh_rate" ng-change="$ctrl.save()"></input>
+              </div>
+            </div>
+
+            <div class="form-group">
               <label class="col-sm-2 control-label">Hokuyo 1</label>
               <div class="col-sm-4">
                 <input type="text" class="form-control" placeholder="Hokuyo 1" ng-model="$ctrl.settings[$ctrl.index].hokuyo_1" ng-change="$ctrl.save()"></input>
