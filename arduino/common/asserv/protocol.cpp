@@ -56,7 +56,7 @@ unsigned char flagArduinoConnected = 0;
 
 //order is order;id_servo;params
 void parseAndExecuteOrder(const String& order) {
-    static char receivedOrder[15];
+    static char receivedOrder[25];
     char* receivedOrderPtr = receivedOrder;
     order.toCharArray(receivedOrder, order.length());
     char orderChar = receivedOrder[ORDER_INDEX];
