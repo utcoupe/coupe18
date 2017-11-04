@@ -12,7 +12,9 @@ class PathfinderClient:
         self._ConnectToServer ()
     
     def _ConnectToServer (self):
+        rospy.loginfo('Waiting for "' + self.PATHFINDER_FINDPATH_SERVICE_NAME + '"...')
         rospy.wait_for_service (self.PATHFINDER_FINDPATH_SERVICE_NAME)
+        rospy.loginfo('Pathfinder found.')
         try:
             self.pathfinderFindPathService = rospy.ServiceProxy(self.PATHFINDER_FINDPATH_SERVICE_NAME, FindPath)
         except rospy.ServiceException, e:
