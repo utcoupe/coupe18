@@ -2,7 +2,7 @@
 # -*-coding:Utf-8 -*
 
 import rospy
-from geometry_msgs.msg import Point
+from geometry_msgs.msg import Pose2D
 from pathfinding.srv import *
 
 class PathfinderClient:

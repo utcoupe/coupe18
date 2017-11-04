@@ -1,6 +1,4 @@
-# Takes 2 points and returns status
-# Only x and y coordinates will be used
-geometry_msgs/Point posStart
-geometry_msgs/Point posEnd
+# Takes 1 point and returns status
+geometry_msgs/Pose2D targetPos
 ---
 bool success

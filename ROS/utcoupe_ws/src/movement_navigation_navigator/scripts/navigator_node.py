@@ -1,16 +1,9 @@
 #!/usr/bin/env python
 # -*-coding:Utf-8 -*
 
-# reçoit ordre de ai deplacement de posinit à posfin
-#--> demande chemin pathfinding
-#----> si impossible retourne impossible à ai
-#--> envoi chemin à arduino_asserv point par point
-#----> si impossible retourne impossible à ai
-#--> retourner travail_fini à ai
-
 import rospy
 
-from geometry_msgs.msg import Point
+from geometry_msgs.msg import Pose2D
 from movement_navigation_navigator.srv import Goto
 
 from Pathfinder import PathfinderClient
@@ -25,13 +18,16 @@ class NavigatorNode:
         self._asservClient = ""
 
     def _handle_goto(self, req):
+        # TODO Grabs current position from asserv
+        posStart = Pose2D(1.0,1.0,0.0)
+
         debugStr = "Asked to go from "
-        debugStr += pointToStr(req.posStart)
-        debugStr += " to " + pointToStr(req.posEnd)
+        debugStr += pointToStr(posStart)
+        debugStr += " to " + pointToStr(req.targetPos)
         rospy.logdebug(debugStr)
         try:
             # sends the request to the pathfinder
-            path = self._pathfinderClient.FindPath(req.posStart, req.posEnd)
+            path = self._pathfinderClient.FindPath(posStart, req.targetPos)
             self._printPath (path)
             # then sends the path point per point to the arduino_asserv
             """
