@@ -39,7 +39,17 @@
     </div>
 
     <div style="width:calc(100% / 3); height:33%; display: inline-block">
-      <div style="margin:0 auto;">
+
+      <uib-accordion>
+        <cc-service service="{ name: '/asserv/parameters',
+                               type: 'asserv/Parameters',
+                               isOpen: true,
+                               fetched: true,
+                               active: true
+                               }"></cc-service>
+      </uib-accordion>
+
+      <!-- <div style="margin:0 auto;">
         <center>
           <div class="col-sm-2">
             <label>P</label>
@@ -58,7 +68,7 @@
             <button class="btn btn-default pull-right" type="button" style="margin-left: 10px;" ng-click="$ctrl.setPID()">Set PID</button>
           </div>
         </center>
-      </div>
+      </div> -->
     </div>
 
 

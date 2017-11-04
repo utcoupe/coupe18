@@ -1,12 +1,22 @@
 class AsservController {
   constructor (Ros) {
-    this.ros = Ros
+    this.ros = Ros.ros;
 
-    Ros.listen('/asserv/test', function (e) {
-      for (let i = 0; i < 8; i++) {
-        this.charts[i].data.push(e.data)
-        this.charts[i].labels.push(this.charts[i].labels[this.charts[i].labels.length - 1] + 0.1)
-      }
+
+
+    Ros.listen('/robot/pose2d', function (e) {
+      this.pushDataToChart(2, e.x);
+      this.pushDataToChart(3, e.theta);
+      this.pushDataToChart(4, e.y);
+    }.bind(this))
+
+    Ros.listen('/robot/speed', function (e) {
+      this.pushDataToChart(0, e.pwm_speed_left);
+      this.pushDataToChart(1, e.pwm_speed_right);
+      this.pushDataToChart(5, e.wheel_speed_right);
+      this.pushDataToChart(7, e.wheel_speed_right);
+      this.pushDataToChart(6, e.linear_speed);
+
     }.bind(this))
 
     // topics to listen to
@@ -19,7 +29,7 @@ class AsservController {
       '/asserv/x',
       '/asserv/x',
       '/asserv/x'
-    ]
+    ];
 
     this.options = {
       scales: {
@@ -38,7 +48,7 @@ class AsservController {
         text: 'Custom Chart Title',
         fontSize: 20
       }
-    }
+    };
 
     this.datasetOverride = {
       label: 'Sinus',
@@ -46,31 +56,28 @@ class AsservController {
       borderWidth: 2,
       pointRadius: 0,
       fill: false
-    }
+    };
 
-    this.charts = []
+    this.charts = [];
 
     for (let i = 0; i < 8; i++) {
-      let d = [], l = []
-
-      for (let y = 0; y < 10; y += 0.1) {
-        d.push(Math.sin(y))
-        l.push(y)
-      }
 
       this.charts.push({
-        data: d,
-        labels: l,
+        data: [0],
+        labels: [0],
         options: JSON.parse(JSON.stringify(this.options)),
         datasetOverride: this.datasetOverride
       })
     }
 
-    this.charts[0].options.title.text = 'Linear Speed'
-    this.charts[1].options.title.text = 'Angular Speed'
-    this.charts[2].options.title.text = 'X Position'
+    this.charts[0].options.title.text = 'PWM speed left'
+    this.charts[1].options.title.text = 'PWM speed right'
+    this.charts[2].options.title.text = 'X position'
     this.charts[3].options.title.text = 'Orientation'
-    this.charts[4].options.title.text = 'Y Position'
+    this.charts[4].options.title.text = 'Y position'
+    this.charts[5].options.title.text = 'Wheel speed left'
+    this.charts[7].options.title.text = 'Wheel speed right'
+    this.charts[6].options.title.text = 'Linear speed'
 
     var canvas = document.getElementsByTagName('canvas')
     for (let c of canvas) { fitToContainer(c) }
@@ -85,10 +92,11 @@ class AsservController {
     }
   }
 
-  setPID () {
-
-    // TODO
+  pushDataToChart(i, e) {
+    this.charts[i].data.push(e);
+    this.charts[i].labels.push(this.charts[i].labels[this.charts[i].labels.length - 1] + 0.1);
   }
+
 
   $onInit () {
     var canvas = document.querySelector('canvas')

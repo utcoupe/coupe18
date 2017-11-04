@@ -1,32 +1,15 @@
 {
-  "name": "ros-control-center",
-  "version": "0.5.0",
-  "description": "A universal web-based control center for ROS robots.",
+  "name": "utcoupe-webclient-18",
+  "version": "0.1.0",
+  "description": "The webclient used for coupe18.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pantor/ros-control-center.git"
+    "url": "git+https://github.com/utcoupe/coupe18.git"
   },
-  "author": "Lars Berscheid",
+  "author": "Alexandre Milesi",
   "license": "BSD-3-Clause",
-  "bugs": {
-    "url": "https://github.com/pantor/ros-control-center/issues"
-  },
   "dependencies": {
-    "angular": "^1.6.4",
-    "angular-animate": "^1.6.4",
-    "angular-chart.js": "^1.1.1",
-    "angular-local-storage": "^0.6.0",
-    "angular-route": "^1.6.4",
-    "angular-ui-bootstrap": "^2.5.0",
-    "bootstrap": "^3.3.7",
-    "chart.js": "^2.7.0",
-    "eventemitter2": "^4.1.0",
-    "http-server": "^0.10.0",
-    "jquery": "^2.1.1",
-    "raphael": "^2.2.7",
-    "three": "^0.87.1",
-    "three-collada-loader": "0.0.1",
-    "underscore": "^1.8.3"
+    "http-server": "^0.10.0"
   },
   "devDependencies": {
     "babel-preset-es2015": "^6.18.0",
@@ -45,6 +28,20 @@
     "gulp-babel": "^6.1.1",
     "gulp-concat": "^2.6.1",
     "gulp-eslint": "^3.0.1",
-    "three-orbit-controls": "^82.1.0"
+    "three-orbit-controls": "^82.1.0",
+    "jquery": "^2.1.1",
+    "raphael": "^2.2.7",
+    "three": "^0.87.1",
+    "three-collada-loader": "0.0.1",
+    "underscore": "^1.8.3",
+    "angular": "^1.6.4",
+    "angular-animate": "^1.6.4",
+    "angular-chart.js": "^1.1.1",
+    "angular-local-storage": "^0.6.0",
+    "angular-route": "^1.6.4",
+    "angular-ui-bootstrap": "^2.5.0",
+    "bootstrap": "^3.3.7",
+    "chart.js": "^2.7.0",
+    "eventemitter2": "^4.1.0"
   }
 }
