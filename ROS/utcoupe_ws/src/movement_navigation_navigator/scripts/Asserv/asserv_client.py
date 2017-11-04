@@ -58,4 +58,4 @@ class AsservClient:
             raise Exception
         else:
             if not response:
-                raise Exception
+                raise Exception("Path valid but can't reach a point.")

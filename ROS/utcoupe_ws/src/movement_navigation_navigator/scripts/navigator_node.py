@@ -39,7 +39,7 @@ class NavigatorNode:
             return True
 
         except Exception, e:
-            rospy.logdebug("Navigation failled! : " + e.message)
+            rospy.logdebug("Navigation failled: " + e.message)
             return False
 
     def _printPath (self, path):

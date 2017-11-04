@@ -35,6 +35,6 @@ class PathfinderClient:
             raise Exception
         else:
             if (not path.success) or (len(path.path) == 0):
-                raise Exception
+                raise Exception("No path found.")
             else:
                 return path.path
