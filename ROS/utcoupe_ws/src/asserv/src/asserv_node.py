@@ -256,7 +256,6 @@ class Asserv:
         elif data.find("~") != -1:
             rospy.logdebug("[ASSERV] Received status data.")
             receied_data_list = data.split(";")
-            rospy.loginfo("reception : " + receied_data_list[4])
             # rospy.loginfo("data sharp : " + receied_data_list[10])
             self._pub_robot_pose.publish(Pose2D(float(receied_data_list[2]) / 1000, float(receied_data_list[3]) / 1000, float(receied_data_list[4]) / 1000))
             self._pub_robot_speed.publish(RobotSpeed(float(receied_data_list[5]), float(receied_data_list[6]), float(receied_data_list[7]), float(receied_data_list[8]), float(receied_data_list[9])))
