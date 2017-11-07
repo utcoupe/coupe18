@@ -106,7 +106,7 @@ class Asserv:
         @rtype:         SetPosResponse
         """
         rospy.logdebug("[ASSERV] Received a request (set_pos service).")
-        self.send_serial_data(self._orders_dictionary['SET_POS'], [str(int(request.position.x * 1000)), str(int(request.position.y * 1000)), str(request.position.theta)])
+        self.send_serial_data(self._orders_dictionary['SET_POS'], [str(int(request.position.x * 1000)), str(int(request.position.y * 1000)), str(int(request.position.theta * 1000.0))])
         return SetPosResponse(True)
 
     def callback_pwm(self, request):
@@ -256,19 +256,23 @@ class Asserv:
         elif data.find("~") != -1:
             rospy.logdebug("[ASSERV] Received status data.")
             receied_data_list = data.split(";")
+            rospy.loginfo("reception : " + receied_data_list[4])
             # rospy.loginfo("data sharp : " + receied_data_list[10])
-            self._pub_robot_pose.publish(Pose2D(float(receied_data_list[2]) / 1000, float(receied_data_list[3]) / 1000, float(receied_data_list[4])))
+            self._pub_robot_pose.publish(Pose2D(float(receied_data_list[2]) / 1000, float(receied_data_list[3]) / 1000, float(receied_data_list[4]) / 1000))
             self._pub_robot_speed.publish(RobotSpeed(float(receied_data_list[5]), float(receied_data_list[6]), float(receied_data_list[7]), float(receied_data_list[8]), float(receied_data_list[9])))
         # Received order ack
         elif data.find(";") == 1:
             # Special order ack, the first one concern the Arduino activation
-            if data.find("0;") != -1:
+            if data.find("0;") == 0:
                 rospy.loginfo("[ASSERV] Arduino started")
                 self._arduino_started_flag = True
             else:
                 rospy.logdebug("[ASSERV] Received order ack : %s", data)
                 ack_data = data.split(";")
-                ack_id = int(ack_data[0])
+                try:
+                    ack_id = int(ack_data[0])
+                except:
+                    ack_id = -1
                 # TODO manage status
                 if ack_id in self._goals_dictionary:
                     rospy.logdebug("[ASSERV] Found key %d in goal dictionary !", ack_id)
@@ -294,7 +298,8 @@ class Asserv:
         """
         if self._serial_com is not None:
             args_list.insert(0, str(self._order_id))
-            self._serial_com.write(order_type + ';' + ';'.join(args_list))
+            # rospy.loginfo(order_type + ';' + ';'.join(args_list))
+            self._serial_com.write(order_type + ';' + ';'.join(args_list) + ';')
             self._order_id += 1
         else:
             rospy.logerr("[ASSERV] Try to send data but serial line is not connected...")
@@ -317,11 +322,11 @@ class Asserv:
         if mode == GotoRequest.GOTO:
             self.send_serial_data(self._orders_dictionary['GOTO'], [str(int(x * 1000)), str(int(y * 1000)), str(1)])
         elif mode == GotoRequest.GOTOA:
-            self.send_serial_data(self._orders_dictionary['GOTOA'], [str(int(x * 1000)), str(int(y * 1000)), str(a), str(1)])
+            self.send_serial_data(self._orders_dictionary['GOTOA'], [str(int(x * 1000)), str(int(y * 1000)), str(a * 1000), str(1)])
         elif mode == GotoRequest.ROT:
-            self.send_serial_data(self._orders_dictionary['ROT'], [str(a)])
+            self.send_serial_data(self._orders_dictionary['ROT'], [str(a * 1000)])
         elif mode == GotoRequest.ROTNOMODULO:
-            self.send_serial_data(self._orders_dictionary['ROTNOMODULO'], [str(a)])
+            self.send_serial_data(self._orders_dictionary['ROTNOMODULO'], [str(a * 1000)])
         else:
             to_return = False
             rospy.logerr("[ASSERV] GOTO mode %d does not exists...", mode)
