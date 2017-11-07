@@ -56,13 +56,14 @@ unsigned char flagArduinoConnected = 0;
 
 //order is order;id_servo;params
 void parseAndExecuteOrder(const String& order) {
-    static char receivedOrder[15];
+    static char receivedOrder[25];
     char* receivedOrderPtr = receivedOrder;
-    order.toCharArray(receivedOrder, order.length());
+    // + 1 because of terminal character
+    order.toCharArray(receivedOrder, order.length() + 1);
     char orderChar = receivedOrder[ORDER_INDEX];
     uint16_t order_id = (uint16_t) atoi(&receivedOrder[ID_INDEX]);
     uint8_t numberDigits = getLog10(order_id);
-    SerialSender::SerialSend(SERIAL_INFO, "order : %c, id : %d (digits : %d)", orderChar, order_id, numberDigits);
+    SerialSender::SerialSend(SERIAL_INFO, "%s", receivedOrder);
     // Move to the first parameter of the order
     receivedOrderPtr +=  ID_INDEX + numberDigits + (uint8_t)1;
     switch (orderChar) {
@@ -195,10 +196,10 @@ void parseAndExecuteOrder(const String& order) {
         {
             int x, y, a_int;
             float angle;
-            sscanf(receivedOrderPtr, "%i;%i;%i", &x, &y, &a_int);
+            sscanf(receivedOrderPtr, "%i;%i;%i;", &x, &y, &a_int);
             angle = a_int / (float)FLOAT_PRECISION;
             RobotStateSetPos(x, y, angle);
-            SerialSender::SerialSend(SERIAL_INFO, "%d;", order_id);
+            SerialSender::SerialSend(SERIAL_INFO, "%d;%i;", order_id, a_int);
             break;
         }
         case GET_POS:
@@ -209,7 +210,7 @@ void parseAndExecuteOrder(const String& order) {
             x = round(current_pos.x);
             y = round(current_pos.y);
             a_int = a * (float)FLOAT_PRECISION;
-            SerialSender::SerialSend(SERIAL_INFO, "%d;%d;%d;%d", order_id, x, y, a_int);
+            SerialSender::SerialSend(SERIAL_INFO, "%d;%d;%d;%d;", order_id, x, y, a_int);
             break;
         }
         case GET_SPD:
@@ -217,7 +218,7 @@ void parseAndExecuteOrder(const String& order) {
             int l, r;
             l = wheels_spd.left;
             r = wheels_spd.right;
-            SerialSender::SerialSend(SERIAL_INFO, "%d;%d;%d", order_id, l, r);
+            SerialSender::SerialSend(SERIAL_INFO, "%d;%d;%d;", order_id, l, r);
             break;
         }
         case GET_TARGET_SPD:
@@ -225,7 +226,7 @@ void parseAndExecuteOrder(const String& order) {
             int left_spd, right_spd;
             left_spd = control.speeds.linear_speed - control.speeds.angular_speed;
             right_spd = control.speeds.linear_speed + control.speeds.angular_speed;
-            SerialSender::SerialSend(SERIAL_INFO, "%d;%d;%d", order_id, left_spd, right_spd);
+            SerialSender::SerialSend(SERIAL_INFO, "%d;%d;%d;", order_id, left_spd, right_spd);
             break;
         }
         case GET_POS_ID:
@@ -236,7 +237,7 @@ void parseAndExecuteOrder(const String& order) {
             x = round(current_pos.x);
             y = round(current_pos.y);
             a_int = a * (float)FLOAT_PRECISION;
-            SerialSender::SerialSend(SERIAL_INFO, "%d;%d;%d;%d", order_id, x, y, a_int, control.last_finished_id);
+            SerialSender::SerialSend(SERIAL_INFO, "%d;%d;%d;%d;", order_id, x, y, a_int, control.last_finished_id);
             break;
         }
         case SPDMAX:
