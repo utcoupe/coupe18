@@ -16,9 +16,14 @@ class NavigatorNode:
     def __init__ (self):
         self._pathfinderClient = ""
         self._asservClient = ""
+        self._waitedResults = {}
+    
+    def _callbackForResults(id):
+        self._waitedResults[id] = False
 
     def _handle_goto(self, req):
-        posStart = self._asservClient.currentPose
+        #posStart = self._asservClient.currentPose
+        posStart = Pose2D(1.0,1.0,0.0)
 
         debugStr = "Asked to go from "
         debugStr += pointToStr(posStart)
@@ -31,8 +36,12 @@ class NavigatorNode:
             # then sends the path point per point to the arduino_asserv
             path.pop()
             for point in path:
-                self._asservClient.goto(point, False)
-            self._asservClient.goto(point, True)
+                self._asservClient.doGoto(point, False)
+            id = self._asservClient.doGoto(req.targetPos, True, self._callbackForResults)
+            self._waitedResults[id] = True
+            rate = rospy.Rate(10)
+            while self._waitedResults[id]:
+                rate.sleep()
             
             # then return success
             rospy.logdebug("Success!")

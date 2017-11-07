@@ -19,6 +19,8 @@ class AsservClient:
         self._asservGotoActionClient = ""
 
         self.currentPose = Pose2D(0.0, 0.0, 0.0)
+
+        self._callbacksDoGoto = {}
         
         self._connectToServers()
     
@@ -30,8 +32,8 @@ class AsservClient:
         # Goto service
         try:
             self._asservGotoService = rospy.ServiceProxy(self.ASSERV_GOTO_SERVICE_NAME, Goto)
-            self._asservGotoActionClient = actionlib.SimpleActionClient(self.ASSERV_GOTOACTION_NAME, Dogot)
-            client.wait_for_server()
+            self._asservGotoActionClient = actionlib.ActionClient(self.ASSERV_GOTOACTION_NAME, DoGotoAction)
+            self._asservGotoActionClient.wait_for_server()
         except rospy.ServiceException, e:
             error_str = "Error when trying to connect to "
             error_str += self.ASSERV_GOTO_SERVICE_NAME
@@ -65,9 +67,30 @@ class AsservClient:
             if not response:
                 raise Exception("Path valid but can't reach a point.")
     
-    def doGoto (self, pos, hasAngle):
-
+    def _getId(self, clientDoGotoHandle):
+        str_id = clientDoGotoHandle.comm_state_machine.action_goal.goal_id.id
+        idAct = int(str_id.split('-')[1])
+        rospy.logdebug("ID: " + str(idAct))
+        return idAct
     
-    def _handleDoGoto (self, data):
-        if not data.result:
-            raise Exception("Path valid but can't reach a point.")
+    def doGoto (self, pos, hasAngle=False, callback=None):
+        mode = DoGotoGoal.GOTO
+        if hasAngle:
+            mode = DoGotoGoal.GOTOA
+        goal = DoGotoGoal(mode=mode, position=pos)
+        goalHandle = self._asservGotoActionClient.send_goal(goal, self._handleDoGotoResult)
+        idAct = self._getId(goalHandle)
+
+        if callback:
+            self._callbacksDoGoto[idAct] = callback
+        
+        return idAct
+    
+    def _handleDoGotoResult (self, clientDoGotoHandle):
+        if clientDoGotoHandle.get_comm_state() == "DONE":
+            if not clientDoGotoHandle.get_result().result:
+                raise Exception("Path valid but can't reach a point.")
+            idAct = self._getId(clientDoGotoHandle)
+            if idAct in self._callbacksDoGoto:
+                self._callbacksDoGoto[idAct](idAct)
+                del self._callbacksDoGoto[idAct]
