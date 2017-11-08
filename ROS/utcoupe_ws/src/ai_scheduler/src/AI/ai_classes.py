@@ -380,6 +380,10 @@ class Action(Task):
                 raise KeyError("No bind found for '{}' !".format(name))
             self.BoundParams[name].parseValue(child)
 
+        for p in self.BoundParams:
+            if self.BoundParams[p].bind == p:
+                self.BoundParams[p].checkValues()
+
 
 
 
@@ -523,8 +527,8 @@ class Message():
                                cannot modify it".format(param.name))
 
             param.parseValue(child)
-         # [p.checkValues() for p in self.Parameters]
-         # TODO : check values at the correct time
+
+        [p.checkValues() for p in self.Parameters if not p.bind]
 
 
 class Colors():
