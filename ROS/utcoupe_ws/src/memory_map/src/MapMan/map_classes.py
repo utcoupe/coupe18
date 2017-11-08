@@ -1,6 +1,6 @@
 #!/usr/bin/python
 from map_loader import LoadingHelpers
-from map_bases import DictManager, ListManager, NakedDictManager
+from map_bases import DictManager, ListManager
 from map_attributes import Position2D, Shape2D, MarkerRViz, Trajectory
 
 
@@ -21,7 +21,7 @@ class Zone(DictManager):
             "position": Position2D(initdict["position"]),
             "shape": Shape2D(initdict["shape"]),
             "marker": MarkerRViz(initdict["marker"]),
-            "properties": NakedDictManager(initdict["properties"])
+            "properties": DictManager(initdict["properties"])
         })
 
 
@@ -53,5 +53,5 @@ class Object(DictManager):
             "position": Position2D(initdict["position"]),
             "shape": Shape2D(initdict["shape"]),
             "marker": MarkerRViz(initdict["marker"]),
-            "properties": NakedDictManager(initdict["properties"]),
+            "properties": DictManager(initdict["properties"]),
         })

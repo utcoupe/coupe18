@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import rospy
 import MapMan
-#import map_communication
+import map_communication
 # from Markers import MarkersPublisher
 
 import time
@@ -12,6 +12,7 @@ class MapNode():
 
         s = time.time() * 1000
         MapMan.Map.load("../../def/map_2018.yml")  # TODO to be better when Definitions package available.
+        print MapMan.Map.get(MapMan.RequestPath("/zones/construction_site_green/shape/width"))
         print "loaded map in (ms) " + str(time.time() * 1000 - s)
 
         # Starting and publishing the table STL to RViz
@@ -19,14 +20,15 @@ class MapNode():
         # self.markers.publishTable(MapMan.Map)
 
         # Starting the Get, Set and Conditions service handlers
-        # map_communication.GetServiceHandler()
+        map_communication.GetServiceHandler()
         # map_communication.SetServiceHandler()
         # map_communication.ConditionsHandler()
         rospy.loginfo("[memory/map] Map request servers ready.")
-        # self.run()
+        self.run()
 
     def run(self):
         r = rospy.Rate(30)
+        rospy.spin()
         while not rospy.is_shutdown():
             self.markers.publishZones(MapMan.Map)
             self.markers.publishObjects(MapMan.Map)

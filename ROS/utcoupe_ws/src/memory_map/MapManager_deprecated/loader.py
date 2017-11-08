@@ -37,7 +37,7 @@ class MapLoader():
     def loadFile(filename):
         '''
         Gets the YML Map description file from the specified method
-        Please change the method correspondingly to what is currently used in your package.
+        Please change the method here correspondingly to the method you want to use.
         '''
         return MapLoader.loadYamlFromFile(filename)
 
