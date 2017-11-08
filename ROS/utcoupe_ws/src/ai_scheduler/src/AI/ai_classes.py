@@ -346,9 +346,11 @@ class Action(Task):
         self.TASKS.setParent(self)
         self.fetchBoundParams(xml)
 
+
     def getParamForBind(self, bind):
-        if bind in self.BoundParams:
-            return self.BoundParams[bind]
+        for t in self.TASKS.TASKS:
+            if t.getParamForBind(bind):
+                return t.getParamForBind(bind)
 
     def fetchBoundParams(self, xml):
         if "params" not in [node.tag for node in xml]:
@@ -361,17 +363,15 @@ class Action(Task):
                 raise KeyError("Parameters need a 'name' attribute ! (action '{}')".format(self.Name))
 
             name = param.attrib["name"]
-            finalBind = None
-            for t in self.TASKS.TASKS:
-                if t.getParamForBind(name):
-                    finalBind = t.getParamForBind(name)
-                    boundParamsList.append(finalBind)
+
+            finalBind = self.getParamForBind(name)
 
             if not finalBind:
-                raise KeyError("No parameter binded with '{}' !".format(name))
+                raise KeyError("No parameter bound with '{}' !".format(name))
+            else:
+                boundParamsList.append(finalBind)
 
         self.BoundParams = {p.bind: p for p in boundParamsList}
-
 
     def setParameters(self, orderref_xml):
         for child in orderref_xml:
@@ -379,6 +379,7 @@ class Action(Task):
             if name not in self.BoundParams:
                 raise KeyError("No bind found for '{}' !".format(name))
             self.BoundParams[name].parseValue(child)
+
 
 
 
@@ -437,8 +438,9 @@ class Order(Task):
 
     def getParamForBind(self, bind):
         for p in self.Message.Parameters:
-            if hasattr(p, "bind") and p.bind == bind:
-                return p
+            for b in p.getBoundParams():
+                if b.bind == bind:
+                    return b
 
         return False
 
@@ -520,14 +522,10 @@ class Message():
                 raise KeyError("PARSE ERROR ! Param {} is preset, \
                                cannot modify it".format(param.name))
 
-            if "bind" in child.attrib:
-                param.bind = child.attrib["bind"]
-            else:
-                param.bind = None
-
             param.parseValue(child)
          # [p.checkValues() for p in self.Parameters]
          # TODO : check values at the correct time
+
 
 class Colors():
     BOLD  = "\033[1m"

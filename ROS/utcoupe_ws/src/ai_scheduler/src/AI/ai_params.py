@@ -54,7 +54,8 @@ class Param(object):    # base class for parsing xml to param object
             return
 
         for k in self.value:
-            if isinstance(self.value[k], Param) and not self.value[k].optional:
+            if isinstance(self.value[k]
+                          , Param) and not self.value[k].optional:
                 try:
                     self.value[k].checkValues()
                 except KeyError as e:
@@ -63,8 +64,26 @@ class Param(object):    # base class for parsing xml to param object
             elif self.value[k] is None:
                 raise KeyError("A value for the parameter '{}' is needed !"
                                .format(self.name))
+    def getBoundParams(self):
+        b = []
+        if hasattr(self, "bind") and self.bind is not None:
+            b.append(self)
+
+        for p in self.value:
+            if isinstance(self.value[p], Param):
+                b = b + self.value[p].getBoundParams()
+
+        return b
+
+    def parseBind(self, xml):
+        if "bind" in xml.attrib:
+            self.bind = xml.attrib["bind"]
+        else:
+            self.bind = None
 
     def parseValue(self, xml):  # parse the content, in orderref or for presets
+        self.parseBind(xml)
+
         for child in xml:
             if child.tag in self.value:
                 if isinstance(self.value[child.tag], Param):
@@ -80,7 +99,6 @@ class Param(object):    # base class for parsing xml to param object
     def parseDefinition(self, xml):  # parse name, type, required and preset
         if "name" not in xml.attrib:
             raise KeyError("Parameters need a 'name' attribute")
-
 
         self.name = xml.attrib["name"].lower()
 
@@ -124,6 +142,7 @@ class StringParser(Param):
         super(StringParser, self).__init__(xml)
 
     def parseValue(self, xml):
+        self.parseBind(xml)
         if xml.text:
             self.value["data"] = xml.text
 
@@ -142,6 +161,7 @@ class IntParser(Param):
         super(IntParser, self).__init__(xml)
 
     def parseValue(self, xml):
+        self.parseBind(xml)
         if xml.text:
             self.value["data"] = int(xml.text)
 
@@ -160,6 +180,7 @@ class FloatParser(Param):
         super(FloatParser, self).__init__(xml)
 
     def parseValue(self, xml):
+        self.parseBind(xml)
         if xml.text:
             self.value["data"] = float(xml.text)
 

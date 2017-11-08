@@ -17,12 +17,12 @@
 
   <action ref="goto_spawn_fast">
 		<params>
+      <param name="speed"/>
 		</params>
 		<actions exec="all" order="linear">
 			<actionref ref="goto_spawn">
-				<speed>900000000</speed>
+				<speed bind="speed">777</speed>
 			</actionref>
 		</actions>
 	</action>
-
 </actions>
