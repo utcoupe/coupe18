@@ -4,17 +4,21 @@ class Attribute():
     pass
 
 
-class Position(Attribute):
-    pass
+class Position2D(Attribute):
+    def __init__(self, initdict):
+        pass
 
 
 class Shape2D(Attribute):
-    pass
+    def __init__(self, initdict):
+        pass
 
 
-class Visual(Attribute):
-    pass
+class MarkerRViz(Attribute):
+    def __init__(self, initdict):
+        pass
 
 
-class Color(Attribute):
-    pass
+class Trajectory(Attribute):
+    def __init__(self, initdict):
+        pass

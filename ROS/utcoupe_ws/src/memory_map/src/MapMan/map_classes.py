@@ -1,48 +1,57 @@
 #!/usr/bin/python
-from map_bases import DictManager, ListManager
-from map_attributes import Position, Shape2D, Visual, Color
+from map_loader import LoadingHelpers
+from map_bases import DictManager, ListManager, NakedDictManager
+from map_attributes import Position2D, Shape2D, MarkerRViz, Trajectory
 
 
 class Terrain(DictManager):
     def __init__(self, initdict):
+        LoadingHelpers.checkKeysExist(initdict, "shape", "marker", "walls")
         super(Terrain, self).__init__({
             "shape": Shape2D(initdict["shape"]),
-            "visual": Visual(initdict["shape"]),
-            "walls": ListManager(Shape2D, initdict["shape"]),
+            "marker": MarkerRViz(initdict["marker"]),
+            "walls": ListManager(Shape2D, initdict["walls"]),
         })
 
 
-class Zones(DictManager):
+class Zone(DictManager):
     def __init__(self, initdict):
-        super(Zones, self).__init__({
+        LoadingHelpers.checkKeysExist(initdict, "position", "shape", "marker", "properties")
+        super(Zone, self).__init__({
+            "position": Position2D(initdict["position"]),
             "shape": Shape2D(initdict["shape"]),
-            "visual": Visual(initdict["shape"]),
-            "walls": ListManager(Shape2D, initdict["shape"]),
+            "marker": MarkerRViz(initdict["marker"]),
+            "properties": NakedDictManager(initdict["properties"])
         })
 
 
-class Waypoints(DictManager):
+class Waypoint(DictManager):
     def __init__(self, initdict):
-        super(Waypoints, self).__init__({
-            "shape": Shape2D(initdict["shape"]),
-            "visual": Visual(initdict["shape"]),
-            "walls": ListManager(Shape2D, initdict["shape"]),
+        LoadingHelpers.checkKeysExist(initdict, "position", "marker")
+        super(Waypoint, self).__init__({
+            "position": Position2D(initdict["position"]),
+            "marker": MarkerRViz(initdict["marker"])
         })
 
 
-class Entities(DictManager):
+class Entity(DictManager):
     def __init__(self, initdict):
-        super(Entities, self).__init__({
+        LoadingHelpers.checkKeysExist(initdict, "position", "shape", "marker", "chest", "trajectory")
+        super(Entity, self).__init__({
+            "position": Position2D(initdict["position"]),
             "shape": Shape2D(initdict["shape"]),
-            "visual": Visual(initdict["shape"]),
-            "walls": ListManager(Shape2D, initdict["shape"]),
+            "marker": MarkerRViz(initdict["marker"]),
+            "chest": None, # TODO Implement
+            "trajectory": Trajectory(initdict["trajectory"])
         })
 
 
-class Objects(DictManager):
+class Object(DictManager):
     def __init__(self, initdict):
-        super(Objects, self).__init__({
+        LoadingHelpers.checkKeysExist(initdict, "position", "shape", "marker", "properties")
+        super(Object, self).__init__({
+            "position": Position2D(initdict["position"]),
             "shape": Shape2D(initdict["shape"]),
-            "visual": Visual(initdict["shape"]),
-            "walls": ListManager(Shape2D, initdict["shape"]),
+            "marker": MarkerRViz(initdict["marker"]),
+            "properties": NakedDictManager(initdict["properties"]),
         })
