@@ -4,7 +4,7 @@ import rospy
 class MapElement(object):
     def get(self, requestpath):
         raise NotImplementedError("This is the super class. Needs to be overwritten from the child class.")
-    def set(self, parameter_list):
+    def set(self, requestpath, new_value):
         raise NotImplementedError("This is the super class. Needs to be overwritten from the child class.")
 
 
@@ -34,6 +34,19 @@ class DictManager(MapElement):
             else: return self.Dict[keyname].get(requestpath)
         rospy.logerr("    ERROR Couldn't find request path key '{}'.".format(keyname))
 
+    def set(self, requestpath, new_value):
+        if isinstance(requestpath, str): # TODO remove for set ?
+            requestpath = RequestPath(requestpath)
+        keyname = requestpath.getNextKey()
+        if keyname in self.Dict.keys():
+            if requestpath.isLast():
+                if not isinstance(self.Dict[keyname], DictManager):
+                    self.Dict[keyname] = new_value
+                    return True
+                else: raise ValueError("    ERROR Can't SET a whole DictManager to a new value. Aborting.")
+            else: return self.Dict[keyname].set(requestpath, new_value)
+        rospy.logerr("    ERROR Couldn't find request path key '{}'.".format(keyname))
+
 
 class RequestPath():
     def __init__(self, pathstring):
@@ -46,7 +59,7 @@ class RequestPath():
             self.Counter += 1
             return self.Keys[self.Counter]
         else:
-            raise ValueError("ERROR Not enough levels in path ! Trying to reach farther than the last path key.")
+            raise ValueError("ERROR Not enough levels in path ! Can't reach farther than the last path key.")
 
     def isLast(self):
         return self.Counter == len(self.Keys) - 1

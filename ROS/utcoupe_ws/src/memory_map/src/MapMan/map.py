@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import time
 import rospy
 from map_loader import MapLoader, LoadingHelpers
 from map_bases import DictManager, ListManager, RequestPath
@@ -9,6 +10,7 @@ class Map():
 
     @staticmethod
     def load(filename):
+        starttime = time.time() * 1000
         initdict = MapLoader.loadFile(filename)
         LoadingHelpers.checkKeysExist(initdict, "terrain", "zones", "waypoints", "entities", "objects")
 
@@ -30,10 +32,10 @@ class Map():
             "entities": DictManager(initdict["entities"]),
             "objects": DictManager(initdict["objects"])
         })
+        rospy.loginfo("Loaded map in {0:.2f} ms.".format(time.time() * 1000 - starttime))
 
     @staticmethod
     def get(requestpath):
-        rospy.loginfo("GET:" + str(requestpath))
         return Map.MapDict.get(RequestPath(requestpath))
 
     @staticmethod

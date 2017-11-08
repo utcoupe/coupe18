@@ -16,7 +16,7 @@ class MarkersPublisher():
             rospy.sleep(0.2)
             count += 1
             if count > 5:
-                rospy.logwarn("WARNING RViz not detected. Won't publish markers.")
+                rospy.logwarn("WARNING RViz not detected. Map won't publish markers.")
                 self.RvizConnected = False
                 break # Cancel connection
 

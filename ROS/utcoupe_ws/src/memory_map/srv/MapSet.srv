@@ -1,4 +1,4 @@
 string request_path
-string new_value_dict
+string new_value
 ---
-bool response_code
+bool success
