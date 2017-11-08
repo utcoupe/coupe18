@@ -4,7 +4,7 @@ import time
 
 import rospy
 import memory_map.srv
-from MapMan import Map, DictManager
+from MapManager import Map, DictManager
 
 
 class Servers():
@@ -15,17 +15,27 @@ class Servers():
 
 class GetServiceHandler():
     def __init__(self):
-        self.GetSERV = rospy.Service(Servers.GET_SERV, memory_map.srv.MapGetFromPath, self.on_get)
+        self.GetSERV = rospy.Service(Servers.GET_SERV, memory_map.srv.MapGet, self.on_get)
 
     def on_get(self, req):
         s = time.time() * 1000
         rospy.loginfo("GET:" + str(req.request_path))
-        response = Map.get(req.request_path)
-        if isinstance(response, DictManager):
-            response = response.Dict
+
+        success = False
+        try:
+            response = Map.get(req.request_path)
+            if isinstance(response, DictManager):
+                response = response.Dict
+        except Exception as e:
+            rospy.logerr("    GET Request failed : " + str(e))
+            response = None
+
+        if response != None:
+            success = True
+
         rospy.logdebug("    Responding: " + str(response))
         rospy.logdebug("    Process took {0:.2f}ms".format(time.time() * 1000 - s))
-        return memory_map.srv.MapGetFromPathResponse(json.dumps(response))
+        return memory_map.srv.MapGetResponse(success, json.dumps(response))
 
 
 class SetServiceHandler():
@@ -35,7 +45,13 @@ class SetServiceHandler():
     def on_set(self, req):
         s = time.time() * 1000
         rospy.loginfo("SET:" + str(req.request_path))
-        success = Map.set(req.request_path, json.loads(req.new_value))
+
+        success = False
+        try:
+            success = Map.set(req.request_path, json.loads(req.new_value))
+        except Exception as e:
+            rospy.logerr("    SET Request failed : " + str(e))
+
         rospy.logdebug("    Responding: " + str(success))
         rospy.logdebug("    Process took {0:.2f}ms".format(time.time() * 1000 - s))
         return memory_map.srv.MapSetResponse(success)
@@ -48,5 +64,5 @@ class ConditionsHandler():
                                             self.on_condition)
 
     def on_condition(self, req):
-        result = None
-        return memory_map.srv.MapConditionContainerResponse(result)
+        raise NotImplementedError
+        return memory_map.srv.MapConditionContainerResponse(False)

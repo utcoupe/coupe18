@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import math
 import rospy
-from MapMan import map_attributes
+from MapManager import map_attributes
 from visualization_msgs.msg import Marker
 
 

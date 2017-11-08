@@ -32,7 +32,7 @@ class DictManager(MapElement):
         if keyname in self.Dict.keys():
             if requestpath.isLast(): return self.Dict[keyname]
             else: return self.Dict[keyname].get(requestpath)
-        rospy.logerr("    ERROR Couldn't find request path key '{}'.".format(keyname))
+        rospy.logerr("    GET Request failed : Couldn't find request path key '{}'.".format(keyname))
 
     def set(self, requestpath, new_value):
         if isinstance(requestpath, str): # TODO remove for set ?
@@ -43,9 +43,10 @@ class DictManager(MapElement):
                 if not isinstance(self.Dict[keyname], DictManager):
                     self.Dict[keyname] = new_value
                     return True
-                else: raise ValueError("    ERROR Can't SET a whole DictManager to a new value. Aborting.")
+                else:
+                    raise ValueError("    SET Request failed : Can't SET a whole DictManager to a new value. Aborting.")
             else: return self.Dict[keyname].set(requestpath, new_value)
-        rospy.logerr("    ERROR Couldn't find request path key '{}'.".format(keyname))
+        rospy.logerr("    SET Request failed : Couldn't find request path key '{}'.".format(keyname))
 
 
 class RequestPath():

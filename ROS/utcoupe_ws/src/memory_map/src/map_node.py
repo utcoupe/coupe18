@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import rospy
-import MapMan
+import MapManager
 import map_communication
 from Markers import MarkersPublisher
 
@@ -11,11 +11,11 @@ class MapNode():
         rospy.init_node("map", log_level=rospy.DEBUG)
         rospy.logdebug("Started /memory/map node.")
 
-        MapMan.Map.load("../../def/map_2018.yml")  # TODO to be better when Definitions package available.
+        MapManager.Map.load("../../def/map_2018.yml")  # TODO to be better when Definitions package available.
 
         # Starting and publishing the table STL to RViz
         self.markers = MarkersPublisher()
-        self.markers.publishTable(MapMan.Map)
+        self.markers.publishTable(MapManager.Map)
 
         # Starting the Get, Set and Conditions service handlers
         map_communication.GetServiceHandler()
@@ -27,7 +27,7 @@ class MapNode():
     def run(self):
         r = rospy.Rate(30)
         while not rospy.is_shutdown():
-            self.markers.publishMarkers(MapMan.Map)
+            self.markers.publishMarkers(MapManager.Map)
             r.sleep()
 
 

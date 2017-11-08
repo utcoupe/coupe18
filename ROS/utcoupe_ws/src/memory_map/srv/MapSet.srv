@@ -1,4 +1,8 @@
+# Service to override the desired value(s) in the map database.
+# Please refer to the README file on how to override a specific datum.
 string request_path
 string new_value
 ---
+# A false response most probably means the request path or new value isn't valid.
+# Try to refer to the map logs. A failed SET request will generate a ROS error log on /rosout.
 bool success
