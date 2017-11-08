@@ -5,11 +5,14 @@ from map_bases import DictManager, ListManager
 from map_classes import Terrain, Zone, Waypoint, Entity, Object
 
 class Map(DictManager):
-    def __init__(self, filename):
+    MapDict = None
+
+    @staticmethod
+    def load(filename):
         initdict = MapLoader.loadFile(filename)
 
         LoadingHelpers.checkKeysExist(initdict, "terrain", "zones", "waypoints", "entities", "objects")
-        super(Map, self).__init__({
+        Map.MapDict = DictManager({
             "terrain": Terrain(initdict["terrain"]),
             "zones": ListManager(Zone, initdict["zones"]),
             "waypoints": ListManager(Waypoint, initdict["waypoints"]),

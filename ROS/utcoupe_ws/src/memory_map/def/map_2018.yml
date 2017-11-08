@@ -13,7 +13,10 @@ terrain:
         color: [0.8, 0.8, 0.8, 1.0]
         mesh_path: "package://memory_map/def/arena_2018_beta_withoutobjects.stl"
     walls:
-        sth: 0  # TODO create main map polygons.
+        shape:
+            type: rect
+            width: 80
+            height: 450  # TODO create main map polygons.
 
 zones:
     construction_site_green:
