@@ -39,7 +39,7 @@ class MapPathKey(object):
 class GetFilter(object):
     '''
     Base class for handling get filters.
-    Filters are useful for conducting complex get and set requests.abs
+    Filters are useful for conducting complex get and set requests.
         E.g. get the closest red cube from the robot's gripper position.
     '''
 

@@ -136,6 +136,7 @@ class Shape():
                     self.end = float(new_value_dict["end"])
                     return True
 
+
 class Visual():
     def __init__(self, initdict):
         LoadingHelpers.checkKeysExist(initdict, "ns", "id", "type", "z", "scale", "orientation", "color")
