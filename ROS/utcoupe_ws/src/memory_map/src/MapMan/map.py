@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import rospy
 from map_loader import MapLoader, LoadingHelpers
-from map_bases import DictManager, ListManager
+from map_bases import DictManager, ListManager, RequestPath
 from map_classes import Terrain, Zone, Waypoint, Entity, Object
 
 class Map():
@@ -34,7 +34,7 @@ class Map():
     @staticmethod
     def get(requestpath):
         rospy.loginfo("GET:" + str(requestpath))
-        return Map.MapDict.get(requestpath)
+        return Map.MapDict.get(RequestPath(requestpath))
 
     @staticmethod
     def set(requestpath, new_value):

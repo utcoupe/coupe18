@@ -22,7 +22,12 @@ class DictManager(MapElement):
             if isinstance(k, dict):
                 raise ValueError("Inner dicts as values NOT allowed. '{}' has a dict inside.".format(k))
 
+    def toList(self):
+        return self.Dict.values()
+
     def get(self, requestpath):
+        if isinstance(requestpath, str):
+            requestpath = RequestPath(requestpath)
         keyname = requestpath.getNextKey()
         if keyname in self.Dict.keys():
             if requestpath.isLast(): return self.Dict[keyname]
@@ -30,29 +35,11 @@ class DictManager(MapElement):
         rospy.logerr("    ERROR Couldn't find request path key '{}'.".format(keyname))
 
 
-'''
-    Simple Python dict manager with get and set methods for accessing it from the map.
-    CAUTION : The dict is NOT allowed to have inner dicts as values. This is a python
-    restriction that does not allow us to set an inner dict from the set method.
-'''
-'''
-class NakedDictManager(MapElement):
-    def __init__(self, nakeddict):
-        self.Dict = nakeddict
-        # TODO Check if no inner dicts
-'''
-
-
 class RequestPath():
     def __init__(self, pathstring):
         self.pathstring = pathstring
-        if pathstring[0] != '/':
-            raise ValueError("ERROR Request path must start with '/' by convention.")
-        if "/" in pathstring:
-            self.Keys = [p for p in pathstring.split('/') if p != '']
-            self.Counter = -1
-        else:
-            raise ValueError("ERROR Request path must contain at least one separator '/'.")
+        self.Keys = [p for p in pathstring.split('/') if p != '']
+        self.Counter = -1
 
     def getNextKey(self):
         if self.Counter < len(self.Keys) - 1:

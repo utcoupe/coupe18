@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import math
 import rospy
-from MapManager import map_objects
+from MapMan import map_attributes
 from visualization_msgs.msg import Marker
 
 
@@ -16,69 +16,76 @@ class MarkersPublisher():
             rospy.sleep(0.2)
             count += 1
             if count > 5:
+                rospy.logwarn("WARNING RViz not detected. Won't publish markers.")
                 self.RvizConnected = False
                 break # Cancel connection
 
     def publishTable(self, world):
         if self.RvizConnected:
-            pos = map_objects.Position({
+            pos = map_attributes.Position2D({
                 "frame_id": "/map",
                 "x": -0.022,
                 "y": 0.022 + 2,
                 "type": "fixed"
             })
-            self.publishMarker(pos, world.Terrain.Visual)
+            self.publishMarker(pos, world.get("/terrain/marker"))
             rospy.logdebug("[memory/map] Published table to RViz.")
+
+    def publishMarkers(self, world):
+        self.publishZones(world)
+        self.publishObjects(world)
 
     def publishZones(self, world):
         if self.RvizConnected:
-            for z in world.Zones.Elements:
-                self.publishMarker(z.Position, z.Visual)
+            for z in world.get("zones").toList():
+                self.publishMarker(z.get("position"), z.get("marker"))
 
     def publishObjects(self, world):
         if self.RvizConnected:
-            for o in world.Objects.Elements:
-                if o.Type == "object":
-                    self.publishMarker(o.Position, o.Visual)
-                elif o.Type == "container":
-                    for e in o.Elements:
-                        self.publishMarker(e.Position, e.Visual) # TODO CAUTION can't show objezcts in a container in a container yet #23h
+            for o in world.get("objects").toList():
+                if o.get("type") == "object":
+                    self.publishMarker(o.get("position"), o.get("marker"))
+                elif o.get("type") == "container":
+                    for e in o.toList():
+                        self.publishMarker(e.get("position"), e.get("marker")) # TODO CAUTION can't show objects in a container in a container yet #23h
 
     def publishMarker(self, position, visual):
+        markertypes = {
+            "cube": Marker.CUBE,
+            "sphere": Marker.SPHERE,
+            "mesh": Marker.MESH_RESOURCE
+        }
         marker = Marker()
-        marker.header.frame_id = position.frame_id
-        marker.type = visual.Type
-        marker.ns = visual.NS
-        marker.id = visual.ID
+        marker.header.frame_id = position.get("frame_id")
+        marker.type = markertypes[visual.get("type")]
+        marker.ns = visual.get("ns")
+        marker.id = visual.get("id")
 
         marker.action = Marker.ADD
-        marker.scale.x = visual.Scale[0]
-        marker.scale.z = visual.Scale[1]
-        marker.scale.y = visual.Scale[2]
-        marker.color.r = visual.Color[0]
-        marker.color.g = visual.Color[1]
-        marker.color.b = visual.Color[2]
-        marker.color.a = visual.Color[3]
-        marker.pose.position.x = position.x
-        marker.pose.position.y = position.y
-        marker.pose.position.z = visual.z
-        orientation = self.eulerToQuaternion(visual.Orientation)
+        marker.scale.x = visual.get("scale")[0]
+        marker.scale.z = visual.get("scale")[1]
+        marker.scale.y = visual.get("scale")[2]
+        marker.color.r = visual.get("color")[0]
+        marker.color.g = visual.get("color")[1]
+        marker.color.b = visual.get("color")[2]
+        marker.color.a = visual.get("color")[3]
+        marker.pose.position.x = position.get("x")
+        marker.pose.position.y = position.get("y")
+        marker.pose.position.z = visual.get("z")
+        orientation = self.eulerToQuaternion(visual.get("orientation"))
         marker.pose.orientation.x = orientation[0]
         marker.pose.orientation.y = orientation[1]
         marker.pose.orientation.z = orientation[2]
         marker.pose.orientation.w = orientation[3]
 
-        marker.mesh_resource = visual.mesh_path if visual.Type == Marker.MESH_RESOURCE else ''
+        marker.mesh_resource = visual.get("mesh_path") if marker.type == Marker.MESH_RESOURCE else ''
 
         self.MarkersPUBL.publish(marker)
 
     def eulerToQuaternion(self, xyz):
-        cr = math.cos(xyz[0] * 0.5)
-        sr = math.sin(xyz[0] * 0.5)
-        cp = math.cos(xyz[1] * 0.5)
-        sp = math.sin(xyz[1] * 0.5)
-        cy = math.cos(xyz[2] * 0.5)
-        sy = math.sin(xyz[2] * 0.5)
+        cr, sr = math.cos(xyz[0] * 0.5), math.sin(xyz[0] * 0.5)
+        cp, sp = math.cos(xyz[1] * 0.5), math.sin(xyz[1] * 0.5)
+        cy, sy = math.cos(xyz[2] * 0.5), math.sin(xyz[2] * 0.5)
         return (cy * sr * cp - sy * cr * sp,  # qx
                 cy * cr * sp + sy * sr * cp,  # qy
                 sy * cr * cp - cy * sr * sp,  # qz

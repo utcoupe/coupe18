@@ -48,8 +48,9 @@ class Entity(DictManager):
 
 class Object(DictManager):
     def __init__(self, initdict):
-        LoadingHelpers.checkKeysExist(initdict, "position", "shape", "marker", "properties")
+        LoadingHelpers.checkKeysExist(initdict, "type", "position", "shape", "marker", "properties")
         super(Object, self).__init__({
+            "type": initdict["type"],
             "position": Position2D(initdict["position"]),
             "shape": Shape2D(initdict["shape"]),
             "marker": MarkerRViz(initdict["marker"]),
