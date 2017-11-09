@@ -35,11 +35,11 @@ class Map():
             "entities": DictManager(initdict_entities),
             "objects": DictManager(initdict_objects)
         })
-        rospy.loginfo("Loaded map in {0:.2f} ms.".format(time.time() * 1000 - starttime))
+        rospy.loginfo("Loaded map in {0:.2f}ms.".format(time.time() * 1000 - starttime))
 
     @staticmethod
     def get(requestpath):
-        return Map.MapDict.get(RequestPath(requestpath))
+        return Map.MapDict.get(requestpath)
 
     @staticmethod
     def set(requestpath, new_value):

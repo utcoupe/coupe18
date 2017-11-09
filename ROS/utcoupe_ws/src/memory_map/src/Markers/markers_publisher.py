@@ -19,7 +19,7 @@ class MarkersPublisher():
                 rospy.logwarn("WARNING RViz not detected. Map won't publish markers.")
                 self.RvizConnected = False
                 break # Cancel connection
-        if self.RvizConnected: rospy.loginfo("Map connected to RViz.")
+        if self.RvizConnected: rospy.loginfo("Map connected to RViz. Will publish markers.")
 
     def publishTable(self, world):
         if self.RvizConnected:
@@ -32,11 +32,11 @@ class MarkersPublisher():
             self.publishMarker(pos, world.get("/terrain/marker"))
             rospy.logdebug("[memory/map] Published table to RViz.")
 
-    def publishMarkers(self, world):
-        self.publishZones(world)
+    def updateMarkers(self, world):
+        self.updateZones(world)
         self.publishObjects(world)
 
-    def publishZones(self, world):
+    def updateZones(self, world):
         if self.RvizConnected:
             for z in world.get("zones").toList():
                 self.publishMarker(z.get("position"), z.get("marker"))

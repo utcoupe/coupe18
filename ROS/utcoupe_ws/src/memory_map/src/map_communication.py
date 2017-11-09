@@ -22,12 +22,9 @@ class GetServiceHandler():
         rospy.loginfo("GET:" + str(req.request_path))
 
         success = False
-        try:
-            response = Map.get(req.request_path)
-            if isinstance(response, DictManager):
-                response = response.toDict()
-        except Exception as e:
-            rospy.logerr("    GET Request failed : " + str(e))
+        response = Map.get(req.request_path)
+        if isinstance(response, DictManager):
+            rospy.logerr("    GET Request failed : Must include a '*' dict operator at the end to get a full dict.")
             response = None
 
         if response != None:
