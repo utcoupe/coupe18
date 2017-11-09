@@ -1,0 +1,98 @@
+entities:
+    GR:
+        position:
+            frame_id: /map
+            x: 0.1
+            y: 0.6
+            a: 0.002
+            type: dynamic
+        shape:
+            type: polygon
+            points:
+                - [ 29, -140]
+                - [ 85, -84 ]
+                - [ 85,  140]
+                - [-85,  140]
+                - [-85, -84 ]
+                - [-29, -140]
+        marker:
+            ns: robots
+            id: 0
+            type: cube
+            scale: [0.4, 0.4, 0.35]
+            z: 0.175
+            orientation: [0, 0, 0]
+            color: [1, 0.2, 0.2, 1.0]
+        chest:
+            notimplementedyet: True
+        trajectory:
+            history: null
+            currentpath: null
+    PR:
+        position:
+            frame_id: /map
+            x: 1.243
+            y: 0.42
+            a: 3.1415
+            type: dynamic
+        shape:
+            type: polygon
+            points:
+                - [ 29, -140] # TODO complete
+        marker:
+            ns: robots
+            id: 1
+            type: cube
+            scale: [0.4, 0.4, 0.35]
+            z: 0.175
+            orientation: [0, 0, 0]
+            color: [1, 0.2, 0.2, 1.0]
+        chest: null
+        trajectory:
+            history: null
+            currentpath: null
+    GE:
+        position:
+            frame_id: /map
+            x: 0.33
+            y: 0.42
+            a: 3.1415
+            type: dynamic
+        shape:
+            type: circle
+            radius: 0.02
+        marker:
+            ns: robots
+            id: 2
+            type: cube
+            scale: [0.4, 0.4, 0.35]
+            z: 0.175
+            orientation: [0, 0, 0]
+            color: [1, 0.2, 0.2, 1.0]
+        chest: null
+        trajectory:
+            history: null
+            currentpath: null
+    PE:
+        position:
+            frame_id: /map
+            x: 243
+            y: 42
+            a: 3.1415
+            type: dynamic
+        shape:
+            type: polygon
+            points:
+                - [ 29, -140] # TODO complete
+        marker:
+            ns: robots
+            id: 3
+            type: cube
+            scale: [0.4, 0.4, 0.35]
+            z: 0.175
+            orientation: [0, 0, 0]
+            color: [1, 0.2, 0.2, 1.0]
+        chest: null
+        trajectory:
+            history: null
+            currentpath: null

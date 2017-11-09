@@ -11,7 +11,7 @@ class MapNode():
         rospy.init_node("map", log_level=rospy.DEBUG)
         rospy.logdebug("Started /memory/map node.")
 
-        MapManager.Map.load("../../def/map_2018.yml")  # TODO to be better when Definitions package available.
+        MapManager.Map.load()  # TODO to be better when Definitions package available.
 
         # Starting and publishing the table STL to RViz
         self.markers = MarkersPublisher()
