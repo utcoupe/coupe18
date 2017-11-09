@@ -25,6 +25,13 @@ class DictManager(MapElement):
     def toList(self):
         return self.Dict.values()
 
+    def toDict(self):
+        for k in self.Dict.values():
+            if isinstance(k, DictManager):
+                rospy.logerr("    ERROR Trying to transform a DictManager that has other DictManagers inside.")
+                return None
+        return self.Dict
+
     def get(self, requestpath):
         if isinstance(requestpath, str):
             requestpath = RequestPath(requestpath)

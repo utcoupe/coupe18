@@ -4,7 +4,7 @@ import time
 
 import rospy
 import memory_map.srv
-from MapManager import Map, DictManager
+from MapManager import Map, MapElement, DictManager
 
 
 class Servers():
@@ -25,7 +25,7 @@ class GetServiceHandler():
         try:
             response = Map.get(req.request_path)
             if isinstance(response, DictManager):
-                response = response.Dict
+                response = response.toDict()
         except Exception as e:
             rospy.logerr("    GET Request failed : " + str(e))
             response = None

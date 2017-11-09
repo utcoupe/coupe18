@@ -7,10 +7,26 @@ from map_attributes import Position2D, Shape2D, MarkerRViz, Trajectory
 class Terrain(DictManager):
     def __init__(self, initdict):
         LoadingHelpers.checkKeysExist(initdict, "shape", "marker", "walls")
+
+        # Instantiate the walls before creating the dict
+        for layer in initdict["walls"]:
+            for wall in initdict["walls"][layer]:
+                initdict["walls"][layer][wall] = Wall(initdict["walls"][layer][wall])
+            initdict["walls"][layer] = DictManager(initdict["walls"][layer])
+
         super(Terrain, self).__init__({
             "shape": Shape2D(initdict["shape"]),
             "marker": MarkerRViz(initdict["marker"]),
-            "walls": ListManager(Shape2D, initdict["walls"]),
+            "walls": DictManager(initdict["walls"]),
+        })
+
+
+class Wall(DictManager):
+    def __init__(self, initdict):
+        LoadingHelpers.checkKeysExist(initdict, "position", "shape")
+        super(Wall, self).__init__({
+            "position": Position2D(initdict["position"]),
+            "shape": Shape2D(initdict["shape"])
         })
 
 

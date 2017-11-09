@@ -19,6 +19,7 @@ class MarkersPublisher():
                 rospy.logwarn("WARNING RViz not detected. Map won't publish markers.")
                 self.RvizConnected = False
                 break # Cancel connection
+        if self.RvizConnected: rospy.loginfo("Map connected to RViz.")
 
     def publishTable(self, world):
         if self.RvizConnected:
