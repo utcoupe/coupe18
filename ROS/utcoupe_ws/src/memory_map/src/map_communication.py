@@ -24,7 +24,7 @@ class GetServiceHandler():
         success = False
         response = Map.get(req.request_path)
         if isinstance(response, DictManager):
-            rospy.logerr("    GET Request failed : Must include a '*' dict operator at the end to get a full dict.")
+            rospy.logerr("    GET Request failed : '^' dict operator not allowed in services.")
             response = None
 
         if response != None:

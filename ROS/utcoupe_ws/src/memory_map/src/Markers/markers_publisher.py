@@ -29,7 +29,7 @@ class MarkersPublisher():
                 "y": 0.022 + 2,
                 "type": "fixed"
             })
-            self.publishMarker(pos, world.get("/terrain/marker"))
+            self.publishMarker(pos, world.get("/terrain/marker/^"))
             rospy.logdebug("[memory/map] Published table to RViz.")
 
     def updateMarkers(self, world):
@@ -38,17 +38,17 @@ class MarkersPublisher():
 
     def updateZones(self, world):
         if self.RvizConnected:
-            for z in world.get("zones").toList():
-                self.publishMarker(z.get("position"), z.get("marker"))
+            for z in world.get("zones/^").toList():
+                self.publishMarker(z.get("position/^"), z.get("marker/^"))
 
     def publishObjects(self, world):
         if self.RvizConnected:
-            for o in world.get("objects").toList():
+            for o in world.get("objects/^").toList():
                 if o.get("type") == "object":
-                    self.publishMarker(o.get("position"), o.get("marker"))
+                    self.publishMarker(o.get("position/^"), o.get("marker/^"))
                 elif o.get("type") == "container":
                     for e in o.toList():
-                        self.publishMarker(e.get("position"), e.get("marker")) # TODO CAUTION can't show objects in a container in a container yet #23h
+                        self.publishMarker(e.get("position/^"), e.get("marker/^")) # TODO CAUTION can't show objects in a container in a container yet #23h
 
     def publishMarker(self, position, visual):
         markertypes = {

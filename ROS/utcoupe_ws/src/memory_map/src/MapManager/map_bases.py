@@ -29,10 +29,8 @@ class DictManager(MapElement):
         if recursive:
             d = {}
             for item in self.Dict:
-                if isinstance(self.Dict[item], DictManager):
-                    d[item] = self.Dict[item].toDict(recursive = True)
-                else:
-                    d[item] = self.Dict[item]
+                if isinstance(self.Dict[item], DictManager): d[item] = self.Dict[item].toDict(recursive = True)
+                else: d[item] = self.Dict[item]
             return d
         else:
             for k in self.Dict.values():
@@ -50,10 +48,16 @@ class DictManager(MapElement):
 
         if requestpath.isLast():
             if keyname in self.Dict.keys():
-                return self.Dict[keyname]
+                if not isinstance(self.Dict[keyname], DictManager):
+                    return self.Dict[keyname]
+                rospy.logerr("    GET Request failed : Must include a '*' or '^' dict operator at the end to get a full dict json or object.")
+            elif keyname == '^':
+                return self
+                # rospy.logerr("    GET Request failed : Asked to get a DictManager object with key operator '^' but '{}' points to a '{}' object.".format(keyname, type(self.Dict[keyname])))
             elif keyname == '*':
                 return self.toDict(recursive = True)
-            rospy.logerr("    GET Request failed : Unrecognized last key dict operator '{}'.".format(keyname))
+            else:
+                rospy.logerr("    GET Request failed : Unrecognized last key dict operator '{}'.".format(keyname))
         else:
             if keyname in self.Dict.keys():
                 if isinstance(self.Dict[keyname], DictManager):
