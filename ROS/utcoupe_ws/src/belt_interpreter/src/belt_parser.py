@@ -1,5 +1,8 @@
+#!/usr/bin/env python
+
 import xml.etree.ElementTree as ET
 import rospy
+
 
 class BeltParser(object):
     """Class used to parse the definition XML"""
@@ -24,7 +27,7 @@ class BeltParser(object):
         if root.find("sensors") is None:
             raise KeyError("A 'sensors' element is required in the definition")
 
-        self.Sensors = []
+        sensors = []
         for sensor in root.find("sensors"):
             if "id" not in sensor.attrib:
                 raise KeyError("A 'sensor' element need an 'id' atttribute")
@@ -35,9 +38,11 @@ class BeltParser(object):
                     raise KeyError("A '{}' element is required in the sensor"
                                    .format(p))
 
-            self.Sensors.append({
+            sensors.append({
                 "id": sensor.attrib["id"],
                 "x": float(sensor.find("x").text),
                 "y": float(sensor.find("y").text),
                 "a": float(sensor.find("a").text)
             })
+
+        self.Sensors = {s["id"]: s for s in sensors}
