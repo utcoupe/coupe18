@@ -3,6 +3,7 @@ import rospy
 import MapManager
 import map_communication
 from Markers import MarkersPublisher
+from Occupancy import OccupancyGenerator
 
 
 class MapNode():
@@ -11,6 +12,10 @@ class MapNode():
         rospy.logdebug("Started /memory/map node.")
 
         MapManager.Map.load()
+
+        # Generate static occupancy images for pathfinder, etc.
+        self.occupancy = OccupancyGenerator()
+        self.occupancy.generateTerrainImages(MapManager.Map)
 
         # Starting and publishing the table STL to RViz
         self.markers = MarkersPublisher()
