@@ -14,7 +14,7 @@ class MapNode():
         MapManager.Map.load()
 
         # Generate static occupancy images for pathfinder, etc.
-        self.occupancy = OccupancyGenerator()
+        self.occupancy = OccupancyGenerator(MapManager.Map)
         self.occupancy.generateTerrainImages(MapManager.Map)
 
         # Starting and publishing the table STL to RViz

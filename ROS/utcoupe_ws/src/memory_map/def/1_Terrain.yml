@@ -14,6 +14,25 @@ terrain:
         mesh_path: "package://memory_map/def/arena_2018_beta_withoutobjects.stl"
     walls:
         layer_ground:
+            test:
+                position:
+                    frame_id: /map
+                    x: 0
+                    y: 0
+                    type: fixed
+                shape:
+                    type: rect
+                    width: 1.5
+                    height: 0.5
+            circle:
+                position:
+                    frame_id: /map
+                    x: 0.6
+                    y: 0.6
+                    type: fixed
+                shape:
+                    type: circle
+                    radius: 0.3
             wall_top:
                 position:
                     frame_id: /map
