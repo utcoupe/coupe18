@@ -15,7 +15,7 @@ class MarkersPublisher():
         while not self.MarkersPUBL.get_num_connections():  # wait for RViz to connect, breaks after a few tries
             rospy.sleep(0.2)
             count += 1
-            if count > 5:
+            if count > 3:
                 rospy.logwarn("WARNING RViz not detected. Map won't publish markers.")
                 self.RvizConnected = False
                 break # Cancel connection

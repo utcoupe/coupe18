@@ -45,9 +45,17 @@ class DictManager(MapElement):
             requestpath = RequestPath(requestpath)
             if not requestpath.Valid: return None
         keyname = requestpath.getNextKey()
-
         if requestpath.isLast():
-            if keyname in self.Dict.keys():
+            if "," in keyname:
+                keys = keyname.split(",")
+                d = {}
+                for k in keys:
+                    if not isinstance(self.Dict[k], DictManager):
+                        d[k] = self.Dict[k]
+                    else:
+                        rospy.logerr("    GET Request failed : Must include a '*' or '^' dict operator at the end to get a full dict json or object.")
+                return d
+            elif keyname in self.Dict.keys():
                 if not isinstance(self.Dict[keyname], DictManager):
                     return self.Dict[keyname]
                 rospy.logerr("    GET Request failed : Must include a '*' or '^' dict operator at the end to get a full dict json or object.")
@@ -62,9 +70,22 @@ class DictManager(MapElement):
             if keyname in self.Dict.keys():
                 if isinstance(self.Dict[keyname], DictManager):
                     return self.Dict[keyname].get(requestpath)
-                rospy.logerr("    GET Request failed : '{}' key points to '{}' object, not dict. Can't reach the next key(s).".format(keyname, type(self.Dict[keyname])))
+                else:
+                    return self.Dict[keyname]
+            elif keyname == "*":
+                d = {}
+                current_level = requestpath.Counter
+                for item in self.Dict:
+                    if isinstance(self.Dict[item], DictManager):
+                        d[item] = self.Dict[item].get(requestpath)
+                        requestpath.Counter = current_level
+                    else:
+                        d[item] = self.Dict[item]
+                return d
+            # else:
+            #     rospy.logerr("    GET Request failed : '{}' key points to '{}' object, not dict. Can't reach the next key(s).".format(keyname, type(self.Dict[keyname])))
             else:
-                rospy.logerr("    GET Request failed : Couldn't find request path key '{}'.".format(keyname))
+                rospy.logerr("    GET Request failed : Couldn't recognize request path key '{}'.".format(keyname))
 
     def set(self, requestpath, new_value):
         if isinstance(requestpath, str): # TODO remove for set ?

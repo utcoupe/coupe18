@@ -16,7 +16,6 @@ class Map():
         initdict_waypoints = MapLoader.loadFile("../../def/3_Waypoints.yml")["waypoints"]
         initdict_entities  = MapLoader.loadFile("../../def/4_Entities.yml")["entities"]
         initdict_objects   = MapLoader.loadFile("../../def/5_Objects.yml")["objects"]
-
         # Instantiate objects before creating the map dict
         for zone in initdict_zones:
             initdict_zones[zone] = Zone(initdict_zones[zone])
@@ -26,6 +25,7 @@ class Map():
             initdict_entities[entity] = Entity(initdict_entities[entity])
         for obj in initdict_objects:
             initdict_objects[obj] = Object(initdict_objects[obj])
+        rospy.loginfo("Loaded files in {0:.2f}ms.".format(time.time() * 1000 - starttime))
 
         # Create main Map dict
         Map.MapDict = DictManager({

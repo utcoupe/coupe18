@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import os
+import yaml
 import rospy
 
 class LoadingHelpers():
@@ -47,7 +48,6 @@ class MapLoader():
         Loads the description file simply by getting the file in disk.
         The file MUST be in the package's directory to avoid any problems.
         '''
-        import yaml
         with open(os.path.dirname(__file__) + "/" + filename, 'r') as stream:
             try:
                 return yaml.load(stream)

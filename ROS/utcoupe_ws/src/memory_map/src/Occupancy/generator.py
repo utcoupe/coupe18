@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import os
+import time
 import rospy
 from PIL import Image, ImageDraw
 
@@ -10,10 +11,11 @@ class OccupancyGenerator():
         self.ImgSize = (self.ImgWidth, int(self.ImgWidth * (self.WorldSize[1] / self.WorldSize[0])))
 
     def generateTerrainImages(self, world):
+        s = time.time() * 1000
         layers = world.get("/terrain/walls/^").toList()
         for layer in layers:
             self.generateStaticOccupancy(layer)
-        rospy.loginfo("Generated static terrain images.")
+        rospy.loginfo("Generated static terrain images in {0:.2f}ms.".format(time.time() * 1000 - s))
 
     def generateStaticOccupancy(self, layer):
         img = Image.new("RGB", self.ImgSize)
