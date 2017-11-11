@@ -4,23 +4,26 @@ from definitions.srv import *
 import rospy
 import os
 
-EXTENSIONS = ["xml", "yml"]
-
 
 def callback(req):
     curr_dir = os.path.dirname(os.path.abspath(__file__))
     def_dir = os.path.join(curr_dir, "definitions")
+    req_split = req.request.split('/')
+    
+    if req_split[0] in ["rviz", "map"]:
+        req_final = req.request
+    else
+        req_final = "robots/{}/{}".format(rospy.get_param("/robot").lower(), req.request)
 
-    for ext in EXTENSIONS:
-        path = os.path.join(def_dir, "{}/{}.{}"
-                            .format(req.domain, req.name.title(), ext))
-        if(os.path.isfile(path)):
-            return GetDefinitionResponse(path, True)
 
-    #  no file found with any of the extensions
-    rospy.logerr("[MEMORY] Request failed, file {} does not exist !"
-                 .format(path))
-    return GetDefinitionResponse("", False)
+    path = os.path.join(def_dir, req_final)
+    if(os.path.isfile(path)):
+        return GetDefinitionResponse(path, True)
+
+    else:
+        rospy.logerr("[MEMORY] Request failed, file {} does not exist !"
+                     .format(path))
+        return GetDefinitionResponse("", False)
 
 
 def server():

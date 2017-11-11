@@ -1,5 +1,4 @@
-string domain # ex : ai
-string name # ex : actions
+string request # ex : processing/Belt.xml
 ---
 string path
 bool success
