@@ -14,22 +14,22 @@ class BeltInterpreter(object):
         super(BeltInterpreter, self).__init__()
 
         rospy.init_node("belt_interpreter")
-        rospy.loginfo("[RECOGNITION] belt_interpreter node started")
+        rospy.loginfo("[PROCESSING] belt_interpreter node started")
 
         rospy.wait_for_service('/memory/definitions')
         get_def = rospy.ServiceProxy('/memory/definitions', GetDefinition)
 
         try:
-            res = get_def("recognition", "belt")
+            res = get_def("processing/Belt.xml")
             if not res.success:
-                rospy.logerr("[RECOGNITION] Error when fetching belt definition file")
+                rospy.logerr("[PROCESSING] Error when fetching belt definition file")
 
             def_filename = res.path
         except rospy.ServiceException as exc:
-            rospy.logerr("[RECOGNITION] Error when fetching belt definition file: {}"
+            rospy.logerr("[PROCESSING] Error when fetching belt definition file: {}"
                          .format(str(exc)))
 
-        rospy.loginfo("[RECOGNITION] Belt definition file fetched")
+        rospy.loginfo("[PROCESSING] Belt definition file fetched")
 
         self.BeltParser = BeltParser(def_filename)
         self.Topics = []
@@ -40,7 +40,7 @@ class BeltInterpreter(object):
 
         rospy.Subscriber("/recognition/localizer", Pose2D, self.callbackPos)
 
-        rospy.loginfo("[RECOGNITION] belt_interpreter subscribed to sensors topics")
+        rospy.loginfo("[PROCESSING] belt_interpreter subscribed to sensors topics")
 
         self.StaticShapes = []
         # TODO: fetch all map shapes
@@ -53,11 +53,11 @@ class BeltInterpreter(object):
 
     def callback(self, sensor_id, data):
         if self.RobotPos is None:
-            rospy.logdebug("[RECOGNITION] belt_interpreter : Sensor data received but no position received yet from localizer")
+            rospy.logdebug("[PROCESSING] belt_interpreter : Sensor data received but no position received yet from localizer")
             return
 
         if data.sensor_id != sensor_id:
-            rospy.logerr("[RECOGNITION] Belt received wrong sensor id for this topic !")
+            rospy.logerr("[PROCESSING] Belt received wrong sensor id for this topic !")
 
         range = data.range
         sensor = self.BeltParser.Sensors[sensor_id]
