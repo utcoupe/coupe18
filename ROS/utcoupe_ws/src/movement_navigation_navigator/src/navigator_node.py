@@ -113,7 +113,7 @@ class NavigatorNode:
         """
         Start the node and the clients.
         """
-        rospy.init_node ('navigator')
+        rospy.init_node ('navigator', anonymous=False, log_level=rospy.DEBUG)
 
         self._pathfinderClient = PathfinderClient()
         self._asservClient = AsservClient()
