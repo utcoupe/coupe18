@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(belt_interpreter)
+project(processing_belt_interpreter)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -100,7 +100,7 @@ find_package(catkin REQUIRED COMPONENTS message_generation geometry_msgs)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES belt_interpreter
+#  LIBRARIES processing_belt_interpreter
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )
@@ -118,7 +118,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/belt_interpreter.cpp
+#   src/${PROJECT_NAME}/processing_belt_interpreter.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -129,7 +129,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/belt_interpreter_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/processing_belt_interpreter_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -186,7 +186,7 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_belt_interpreter.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_processing_belt_interpreter.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
