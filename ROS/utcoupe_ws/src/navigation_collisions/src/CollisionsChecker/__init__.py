@@ -1,0 +1,1 @@
+from collisions_checker import CollisionChecker
