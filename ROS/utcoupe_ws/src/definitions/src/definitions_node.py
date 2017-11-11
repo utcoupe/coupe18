@@ -12,7 +12,7 @@ def callback(req):
     
     if req_split[0] in ["rviz", "map"]:
         req_final = req.request
-    else
+    else:
         req_final = "robots/{}/{}".format(rospy.get_param("/robot").lower(), req.request)
 
 
@@ -28,7 +28,7 @@ def callback(req):
 
 def server():
     rospy.init_node('definitions')
-    s = rospy.Service('memory/definitions', GetDefinition, callback)
+    s = rospy.Service('/memory/definitions', GetDefinition, callback)
     print "[MEMORY] Definitions server ready"
     rospy.spin()
 
