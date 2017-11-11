@@ -9,6 +9,10 @@ from movement_navigation_navigator.srv import Goto
 from Pathfinder import PathfinderClient
 from Asserv import AsservClient
 
+WAITING = 0
+SUCCESS = 1
+FAILURE = 2
+
 def pointToStr(point):
     return "(" + str(point.x) + "," + str(point.y) + ")"
 
@@ -18,12 +22,23 @@ class NavigatorNode:
         self._asservClient = ""
         self._waitedResults = {}
     
-    def _callbackForResults(id):
-        self._waitedResults[id] = False
+    def _callbackForResults(self, idAct, result):
+        if result:
+            self._waitedResults[idAct] = SUCCESS
+        else:
+            self._waitedResults[idAct] = FAILURE
+    
+    def _waitResult(self, idAct):
+        self._waitedResults[idAct] = WAITING
+        rate = rospy.Rate(10)
+        while self._waitedResults[idAct] == WAITING:
+            rate.sleep()
+        
+        if self._waitedResults[idAct] == FAILURE:
+            raise Exception("Path found but asserv can't reach a point!")
 
     def _handle_goto(self, req):
-        #posStart = self._asservClient.currentPose
-        posStart = Pose2D(1.0,1.0,0.0)
+        posStart = self._asservClient.currentPose
 
         debugStr = "Asked to go from "
         debugStr += pointToStr(posStart)
@@ -37,11 +52,8 @@ class NavigatorNode:
             path.pop()
             for point in path:
                 self._asservClient.doGoto(point, False)
-            id = self._asservClient.doGoto(req.targetPos, True, self._callbackForResults)
-            self._waitedResults[id] = True
-            rate = rospy.Rate(10)
-            while self._waitedResults[id]:
-                rate.sleep()
+            idAct = self._asservClient.doGoto(req.targetPos, True, self._callbackForResults)
+            self._waitResult(idAct)
             
             # then return success
             rospy.logdebug("Success!")

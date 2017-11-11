@@ -3,6 +3,7 @@
 
 import rospy
 import actionlib
+from actionlib.action_client import CommState
 
 from geometry_msgs.msg import Pose2D
 
@@ -21,6 +22,7 @@ class AsservClient:
         self.currentPose = Pose2D(0.0, 0.0, 0.0)
 
         self._callbacksDoGoto = {}
+        self._currentActions = {}
         
         self._connectToServers()
     
@@ -78,19 +80,21 @@ class AsservClient:
         if hasAngle:
             mode = DoGotoGoal.GOTOA
         goal = DoGotoGoal(mode=mode, position=pos)
-        goalHandle = self._asservGotoActionClient.send_goal(goal, self._handleDoGotoResult)
+        goalHandle = self._asservGotoActionClient.send_goal(goal, transition_cb=self._handleDoGotoResult)
         idAct = self._getId(goalHandle)
 
         if callback:
             self._callbacksDoGoto[idAct] = callback
         
+        self._currentActions[idAct] = goalHandle
+
         return idAct
     
     def _handleDoGotoResult (self, clientDoGotoHandle):
-        if clientDoGotoHandle.get_comm_state() == "DONE":
-            if not clientDoGotoHandle.get_result().result:
-                raise Exception("Path valid but can't reach a point.")
+        if clientDoGotoHandle.get_comm_state() == CommState.DONE:
+            rospy.logdebug("DONE")
             idAct = self._getId(clientDoGotoHandle)
             if idAct in self._callbacksDoGoto:
-                self._callbacksDoGoto[idAct](idAct)
+                self._callbacksDoGoto[idAct](idAct, clientDoGotoHandle.get_result().result)
                 del self._callbacksDoGoto[idAct]
+                del self._currentActions[idAct]
