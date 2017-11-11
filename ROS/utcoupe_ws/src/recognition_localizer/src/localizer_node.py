@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import rospy
-from geometry_msgs.msg import Pose2D
+import tf
+import tf2_ros
+from geometry_msgs.msg import Pose2D, TransformStamped
 
 
 class Localizer(object):
@@ -9,19 +11,18 @@ class Localizer(object):
 
         rospy.init_node('localizer', anonymous=False)
 
-        self.pub = rospy.Publisher('/recognition/localizer', Pose2D,
-                                   queue_size=10)
+        self._br = tf2_ros.TransformBroadcaster()
 
         # TODO : subscribe to all sources of info
-        self.subAsserv = rospy.Subscriber("/robot/pose2d", Pose2D,
-                                          self.callbackAsserv)
+        self._sub_asserv = rospy.Subscriber("/robot/pose2d", Pose2D,
+                                          self.callback_asserv)
 
-        self.dataAsserv = None
+        self._data_asserv = None
 
         rospy.loginfo("Localizer node initialized")
 
-    def callbackAsserv(self, data):
-        self.dataAsserv = data
+    def callback_asserv(self, data):
+        self._data_asserv = data
 
     def run(self):
         rospy.loginfo("Localizer node started")
@@ -29,13 +30,27 @@ class Localizer(object):
         while not rospy.is_shutdown():
             data = self.calculate()
             if data:
-                self.pub.publish(self.calculate())
+                t = TransformStamped()
+
+                t.header.stamp = rospy.Time.now()
+                t.header.frame_id = "map"
+                t.child_frame_id = "robot"
+                t.transform.translation.x = data.x
+                t.transform.translation.y = data.y
+                t.transform.translation.z = 0.0
+                q = tf.transformations.quaternion_from_euler(0, 0, data.theta)
+                t.transform.rotation.x = q[0]
+                t.transform.rotation.y = q[1]
+                t.transform.rotation.z = q[2]
+                t.transform.rotation.w = q[3]
+
+                self._br.sendTransform(t)
+
             rate.sleep()
 
     #  TODO : merge all data gathered
     def calculate(self):
-        return self.dataAsserv
-
+        return self._data_asserv
 
 if __name__ == '__main__':
     loc = Localizer()
