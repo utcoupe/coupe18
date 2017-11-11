@@ -11,7 +11,7 @@ from asserv.msg import *
 
 from asserv.srv import *
 
-class AsservClient:
+class AsservClient(object):
     def __init__ (self):
         self.ASSERV_GOTO_SERVICE_NAME = "asserv/controls/goto"
         self.ASSERV_POSE_TOPIC_NAME = "robot/pose2d"

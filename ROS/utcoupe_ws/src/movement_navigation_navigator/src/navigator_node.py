@@ -23,7 +23,7 @@ def pointToStr(point):
     """
     return "(" + str(point.x) + "," + str(point.y) + ")"
 
-class NavigatorNode:
+class NavigatorNode(object):
     """
     The NavigatorNode class is the link between the AI, the Pathfinder and the Asserv.
     This node gets a movement order on ROS service. It can accept many at a time but is not design to.
