@@ -4,18 +4,23 @@ from definitions.srv import *
 import rospy
 import os
 
+EXTENSIONS = ["xml", "yml"]
+
 
 def callback(req):
     curr_dir = os.path.dirname(os.path.abspath(__file__))
     def_dir = os.path.join(curr_dir, "definitions")
-    path = os.path.join(def_dir, '{}/{}.xml'
-                        .format(req.domain, req.name.title()))
-    if(os.path.isfile(path)):
-        return GetDefinitionResponse(path, True)
-    else:
-        rospy.logerr("[MEMORY] Request failed, file {} does not exist !"
-                     .format(path))
-        return GetDefinitionResponse("", False)
+
+    for ext in EXTENSIONS:
+        path = os.path.join(def_dir, "{}/{}.{}"
+                            .format(req.domain, req.name.title(), ext))
+        if(os.path.isfile(path)):
+            return GetDefinitionResponse(path, True)
+
+    #  no file found with any of the extensions
+    rospy.logerr("[MEMORY] Request failed, file {} does not exist !"
+                 .format(path))
+    return GetDefinitionResponse("", False)
 
 
 def server():
