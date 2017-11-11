@@ -1,5 +1,0 @@
-string domain # ex : ai
-string name # ex : actions
----
-string path
-bool success
