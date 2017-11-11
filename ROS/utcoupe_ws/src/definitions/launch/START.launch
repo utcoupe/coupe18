@@ -1,0 +1,7 @@
+<launch>
+	<param name="robot"  value="GR" />
+	
+	<group ns="memory">
+		<node pkg="definitions" name="definitions" type="definitions_node.py"/>
+	</group> 
+</launch>
