@@ -12,8 +12,11 @@ from geometry_msgs.msg import Pose2D, TransformStamped, PointStamped
 
 
 class BeltInterpreter(object):
+
     def __init__(self):
         super(BeltInterpreter, self).__init__()
+
+        self.SENSOR_FRAME_ID = "belt_{}" # {} will be replaced by the sensor name
 
         rospy.init_node("belt_interpreter")
         rospy.loginfo("[PROCESSING] belt_interpreter node started")
@@ -75,7 +78,7 @@ class BeltInterpreter(object):
 
             point = PointStamped()
             point.header.stamp = rospy.Time.now()
-            point.header.frame_id = "belt_{}".format(sensor_id)
+            point.header.frame_id = self.SENSOR_FRAME_ID.format(sensor_id)
             point.point.x = range
 
             point_in_map = self._tl.transformPoint("map", point)
@@ -103,7 +106,7 @@ class BeltInterpreter(object):
 
             tr.header.stamp = rospy.Time.now()
             tr.header.frame_id = "robot"
-            tr.child_frame_id = "belt_{}".format(id)
+            tr.child_frame_id = self.SENSOR_FRAME_ID.format(id)
 
             tr.transform.translation.x = s["x"]
             tr.transform.translation.y = s["y"]

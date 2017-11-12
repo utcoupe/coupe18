@@ -12,7 +12,7 @@
     <sensor id="non">
       <x>-0.1</x>
       <y>-0.1</y>
-      <a>3.1415</a>
+      <a>-3.1415</a>
     </sensor>
   </sensors>
 </belt>
