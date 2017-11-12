@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from definitions.srv import *
+from memory_definitions.srv import *
 import rospy
 import os
 
