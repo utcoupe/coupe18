@@ -7,7 +7,12 @@ project(processing_belt_interpreter)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS message_generation geometry_msgs)
+find_package(catkin REQUIRED COMPONENTS
+    message_generation
+    geometry_msgs
+    tf2
+    tf2_ros
+    rospy)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)

@@ -3,12 +3,13 @@
 import rospy
 from math import pi, cos, sin
 from belt_parser import BeltParser
+import tf
+import tf2_ros
+
 from memory_definitions.srv import GetDefinition
 from processing_belt_interpreter.msg import *
-from geometry_msgs.msg import Pose2D, Point32
-from functools import partial
+from geometry_msgs.msg import Pose2D, TransformStamped, PointStamped
 
-# TODO: use tf
 
 class BeltInterpreter(object):
     def __init__(self):
@@ -17,6 +18,7 @@ class BeltInterpreter(object):
         rospy.init_node("belt_interpreter")
         rospy.loginfo("[PROCESSING] belt_interpreter node started")
 
+        # get definition file
         rospy.wait_for_service('/memory/definitions')
         get_def = rospy.ServiceProxy('/memory/definitions', GetDefinition)
 
@@ -33,11 +35,16 @@ class BeltInterpreter(object):
 
         rospy.loginfo("[PROCESSING] Belt definition file fetched")
 
+        # parse definition file
         self._belt_parser = BeltParser(def_filename)
+
+        for s in self._belt_parser.Sensors:
+            pub_static_transform(s["id"], s["x"], s["y"], s["a"])
 
         self._sensors_sub = rospy.Subscriber("/sensors/belt", RangeList, self.callback)
         self._localizer_sub = rospy.Subscriber("/recognition/localizer", Pose2D, self.callbackPos)
         self._pub = rospy.Publisher("/processing/belt_interpreter", BeltFiltered, queue_size=10)
+        self._tl = tf.TransformListener()
 
         rospy.loginfo("[PROCESSING] belt_interpreter subscribed to sensors topics")
 
@@ -64,21 +71,15 @@ class BeltInterpreter(object):
             range = data.range
             sensor = self._belt_parser.Sensors[sensor_id]
 
-            angle = sensor["a"] * pi / 180
+            point = PointStamped()
+            point.header.stamp = rospy.Time.now()
+            point.header.frame_id = "belt_{}".format(sensor_id)
+            point.point.x = range
 
-            #  absolute pos of sensor
-            s_x = self._robot_pos.x + cos(self._robot_pos.theta)*sensor["x"] \
-                - sin(self._robot_pos.theta)*sensor["y"]
-            s_y = self._robot_pos.y + cos(self._robot_pos.theta)*sensor["y"] \
-                + sin(self._robot_pos.theta)*sensor["x"]
+            point_in_map = self._tl.transformPoint("map", point)
 
-            dx = range * cos(angle + self._robot_pos.theta)
-            dy = range * sin(angle + self._robot_pos.theta)
-
-            x = s_x + dx
-            y = s_y + dy
-
-            point = Point32(x, y, 0)
+            x = point_in_map.point.x
+            y = point_in_map.point.y
 
             isStatic = False
             for s in self._static_shapes:
@@ -87,11 +88,31 @@ class BeltInterpreter(object):
                     break
 
             if isStatic:
-                staticPoints.append(point)
+                staticPoints.append(point_in_map)
             else:
-                dynamicPoints.append(point)
+                dynamicPoints.append(point_in_map)
 
-        self._pub.publish("/map", staticPoints, dynamicPoints)
+        self._pub.publish("map", staticPoints, dynamicPoints)
+
+    def pub_static_transform(name, x, y, theta):
+        broadcaster = tf2_ros.StaticTransformBroadcaster()
+        tf = Transform()
+
+        tf.header.stamp = rospy.Time.now()
+        tf.header.frame_id = "robot"
+        tf.child_frame_id = "belt_{}".format(name)
+
+        tf.transform.translation.x = x
+        tf.transform.translation.y = y
+        tf.transform.translation.z = 0
+
+        quat = tf.transformations.quaternion_from_euler(0, 0, theta)
+        tf.transform.rotation.x = quat[0]
+        tf.transform.rotation.y = quat[1]
+        tf.transform.rotation.z = quat[2]
+        tf.transform.rotation.w = quat[3]
+
+        broadcaster.sendTransform(static_transformStamped)
 
 
 if __name__ == '__main__':
