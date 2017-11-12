@@ -3,12 +3,15 @@
 import rospy
 from math import pi, cos, sin
 from belt_parser import BeltParser
+from shapes import *
 import tf
 import tf2_ros
+import json
 
 from memory_definitions.srv import GetDefinition
 from processing_belt_interpreter.msg import *
 from geometry_msgs.msg import Pose2D, TransformStamped, PointStamped
+from memory_map.srv import MapGet
 
 
 class BeltInterpreter(object):
@@ -54,7 +57,26 @@ class BeltInterpreter(object):
         rospy.loginfo("[PROCESSING] belt_interpreter subscribed to sensors topics")
 
         self._static_shapes = []
-        # TODO: fetch all map shapes
+
+        get_map = rospy.ServiceProxy('/memory/map/get', MapGet)
+        map = j = json.loads(get_map("/terrain/*"))
+        for v in map["walls"]["layer_ground"].values():
+            x = float(v["position"]["x"])
+            y = float(v["position"]["y"])
+            type = v["shape"]["type"]
+
+            if type == "rect":
+                w = float(v["shape"]["width"])
+                h = float(v["shape"]["height"])
+                shape = Rectangle(x, y, w, h)
+
+            elif type == "circle":
+                r = float(v["shape"]["radius"])
+                shape = Circle(x, y, r)
+            else: # TODO POLYGONS
+                pass
+
+            self._static_shapes.append(shape)
 
         self._robot_pos = None
         rospy.spin()
