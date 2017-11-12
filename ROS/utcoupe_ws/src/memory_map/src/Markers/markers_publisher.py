@@ -38,12 +38,12 @@ class MarkersPublisher():
 
     def updateZones(self, world):
         if self.RvizConnected:
-            for z in world.get("zones/^").toList():
+            for z in world.get("/zones/^").toList():
                 self.publishMarker(z.get("position/^"), z.get("marker/^"))
 
     def publishObjects(self, world):
         if self.RvizConnected:
-            for o in world.get("objects/^").toList():
+            for o in world.get("/objects/^").toList():
                 if o.get("type") == "object":
                     self.publishMarker(o.get("position/^"), o.get("marker/^"))
                 elif o.get("type") == "container":

@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw
 class OccupancyGenerator():
     def __init__(self, world):
         self.ImgWidth = 500 # Width of the generated images. Height will be calculated based on the map aspect ratio.
-        self.WorldSize = (float(world.get("terrain/shape/width")), float(world.get("terrain/shape/height")))
+        self.WorldSize = (float(world.get("/terrain/shape/width")), float(world.get("/terrain/shape/height")))
         self.ImgSize = (self.ImgWidth, int(self.ImgWidth * (self.WorldSize[1] / self.WorldSize[0])))
 
     def generateTerrainImages(self, world):
