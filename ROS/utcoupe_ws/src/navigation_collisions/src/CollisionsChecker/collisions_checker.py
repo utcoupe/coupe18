@@ -2,15 +2,15 @@
 import rospy
 
 class CollisionChecker():
-    def __init__(self):
-        pass
+    def __init__(self, robot):
+        self.Robot = robot
 
-    def checkGlobal(self, robot, path, static_objects, dynamic_objects):
-        self.checkStatic(robot, path, static_objects)
-        self.checkDynamic(robot, path, dynamic_objects)
+    def checkGlobal(self, data):
+        self.checkStatic(data.CurrentPath, data.StaticObjects)
+        self.checkDynamic(data.CurrentPath, data.DynamicObjects)
 
-    def checkStatic(self, robot, path, static_objects):
+    def checkStatic(self, path, static_objects):
         rospy.logdebug("Checking collisions with static objects...")
 
-    def checkDynamic(self, robot, path, dynamic_objects):
+    def checkDynamic(self, path, dynamic_objects):
         rospy.logdebug("Checking collisions with dynamic objects...")
