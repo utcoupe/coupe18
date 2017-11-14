@@ -47,7 +47,7 @@ class BeltInterpreter(object):
 
         self._sensors_sub = rospy.Subscriber("/sensors/belt", RangeList, self.callback)
         self._localizer_sub = rospy.Subscriber("/recognition/localizer", Pose2D, self.callbackPos)
-        self._pub = rospy.Publisher("/processing/belt_interpreter", BeltFiltered, queue_size=10)
+        self._pub = rospy.Publisher("/processing/belt_interpreter/points", BeltFiltered, queue_size=10)
         self._tl = tf.TransformListener()
         self._broadcaster = tf2_ros.StaticTransformBroadcaster()
 
