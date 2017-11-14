@@ -28,7 +28,7 @@ def callback(req):
 
 def server():
     rospy.init_node('definitions')
-    s = rospy.Service('/memory/definitions', GetDefinition, callback)
+    s = rospy.Service('/memory/definitions/get', GetDefinition, callback)
     print "[MEMORY] Definitions server ready"
     rospy.spin()
 
