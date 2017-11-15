@@ -41,8 +41,12 @@ class Map():
     def get(requestpath):
         if requestpath[0] != "/":
             rospy.logerr("    GET Request failed : global search needs to start with '/'.")
+            return None
         return Map.MapDict.get(requestpath)
 
     @staticmethod
-    def set(requestpath, new_value):
-        return Map.MapDict.set(requestpath, new_value)
+    def set(requestpath):
+        if requestpath[0] != "/":
+            rospy.logerr("    GET Request failed : global search needs to start with '/'.")
+            return None
+        return Map.MapDict.set(requestpath)

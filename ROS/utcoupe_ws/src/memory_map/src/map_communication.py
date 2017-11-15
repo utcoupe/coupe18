@@ -45,7 +45,7 @@ class SetServiceHandler():
 
         success = False
         try:
-            success = Map.set(req.request_path, json.loads(req.new_value))
+            success = Map.set(req.request_path)
         except Exception as e:
             rospy.logerr("    SET Request failed : " + str(e))
 

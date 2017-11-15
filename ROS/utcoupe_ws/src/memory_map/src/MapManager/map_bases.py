@@ -82,25 +82,43 @@ class DictManager(MapElement):
                     else:
                         d[item] = self.Dict[item]
                 return d
-            # else:
-            #     rospy.logerr("    GET Request failed : '{}' key points to '{}' object, not dict. Can't reach the next key(s).".format(keyname, type(self.Dict[keyname])))
             else:
                 rospy.logerr("    GET Request failed : Couldn't recognize request path key '{}'.".format(keyname))
 
-    def set(self, requestpath, new_value):
-        if isinstance(requestpath, str): # TODO remove for set ?
+    def set(self, requestpath):
+        if isinstance(requestpath, str):
             requestpath = RequestPath(requestpath)
             if not requestpath.Valid: return None
         keyname = requestpath.getNextKey()
-        if keyname in self.Dict.keys():
-            if requestpath.isLast():
-                if not isinstance(self.Dict[keyname], DictManager):
-                    self.Dict[keyname] = new_value
-                    return True
+
+        if requestpath.isLast():
+            success = False
+            for s in keyname.split(','):
+                if s.count("=") != 1:
+                    rospy.logerr("    SET Request failed : invalid key part '{}', must have one '=' operator.".format(s))
+                    return None
+                key, new_value = s.split("=")
+                if not key in self.Dict: # Remove this check if need to authorize to create keys
+                    rospy.logerr("    SET Request failed : key '{}' does not already exist in dict.".format(key))
+                    return None
+
+                if not isinstance(self.Dict[key], DictManager):
+                    try:
+                        new_value = type(self.Dict[key])(new_value)
+                        self.Dict[key] = new_value
+                        success = True
+                    except (TypeError, ValueError):
+                        rospy.logerr("    SET Request failed : new value '{}' not castable to the old value '{}''s type.".format(new_value, self.Dict[keyname]))
+                    except KeyError:
+                        rospy.logerr("    SET Request failed : Couldn't find existing key '{}'.".format(key))
                 else:
                     raise ValueError("    SET Request failed : Can't SET a whole DictManager to a new value. Aborting.")
-            else: return self.Dict[keyname].set(requestpath, new_value)
-        rospy.logerr("    SET Request failed : Couldn't find request path key '{}'.".format(keyname))
+            return success
+        else:
+            if '=' in keyname:
+                rospy.logerr("    SET Request failed : '=' assign operator must only be applied on the last path key.")
+            if keyname in self.Dict:
+                return self.Dict[keyname].set(requestpath)
 
 
 class RequestPath():
