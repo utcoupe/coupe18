@@ -24,6 +24,7 @@ class MapNode():
         # Starting the Get, Set and Conditions service handlers
         map_communication.GetServiceHandler()
         map_communication.SetServiceHandler()
+        map_communication.GetOccupancyServiceHandler()
         rospy.loginfo("[memory/map] Map request servers ready.")
 
         self.run()

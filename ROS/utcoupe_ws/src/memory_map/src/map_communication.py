@@ -5,12 +5,14 @@ import time
 import rospy
 import memory_map.srv
 from MapManager import Map, MapElement, DictManager
+from Occupancy import OccupancyGenerator
 
 
 class Servers():
     CONDITIONS_CONTAINERS_SERV = "/memory/map/conditions/containers"
     GET_SERV = "/memory/map/get"
     SET_SERV = "/memory/map/set"
+    OCCUPANCY_SERV = "/memory/map/get_occupancy"
 
 
 class GetServiceHandler():
@@ -52,6 +54,24 @@ class SetServiceHandler():
         rospy.logdebug("    Responding: " + str(success))
         rospy.logdebug("    Process took {0:.2f}ms".format(time.time() * 1000 - s))
         return memory_map.srv.MapSetResponse(success)
+
+
+class GetOccupancyServiceHandler():
+    def __init__(self):
+        self.SetSERV = rospy.Service(Servers.OCCUPANCY_SERV, memory_map.srv.MapGetOccupancy, self.on_get)
+
+    def on_get(self, req):
+        s = time.time() * 1000
+        rospy.loginfo("GET_OCCUPANCY:" + str(req.layer_name))
+
+        try:
+            path = OccupancyGenerator.getImagePath(req.layer_name)
+        except Exception as e:
+            rospy.logerr("    Request failed : " + str(e))
+
+        rospy.logdebug("    Responding: " + str(path))
+        rospy.logdebug("    Process took {0:.2f}ms".format(time.time() * 1000 - s))
+        return memory_map.srv.MapGetOccupancyResponse(path)
 
 
 class ConditionsHandler():
