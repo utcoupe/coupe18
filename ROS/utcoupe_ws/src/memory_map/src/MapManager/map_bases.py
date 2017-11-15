@@ -92,33 +92,39 @@ class DictManager(MapElement):
         keyname = requestpath.getNextKey()
 
         if requestpath.isLast():
-            success = False
+            assignments = []
             for s in keyname.split(','):
                 if s.count("=") != 1:
                     rospy.logerr("    SET Request failed : invalid key part '{}', must have one '=' operator.".format(s))
-                    return None
+                    return False
                 key, new_value = s.split("=")
                 if not key in self.Dict: # Remove this check if need to authorize to create keys
                     rospy.logerr("    SET Request failed : key '{}' does not already exist in dict.".format(key))
-                    return None
-
+                    return False
                 if not isinstance(self.Dict[key], DictManager):
                     try:
                         new_value = type(self.Dict[key])(new_value)
-                        self.Dict[key] = new_value
-                        success = True
+                        assignments.append((key, new_value))
                     except (TypeError, ValueError):
                         rospy.logerr("    SET Request failed : new value '{}' not castable to the old value '{}''s type.".format(new_value, self.Dict[keyname]))
+                        return False
                     except KeyError:
                         rospy.logerr("    SET Request failed : Couldn't find existing key '{}'.".format(key))
+                        return False
                 else:
-                    raise ValueError("    SET Request failed : Can't SET a whole DictManager to a new value. Aborting.")
-            return success
+                    raise ValueError("    SET Request failed : Can't SET a whole DictManager to a new value.")
+
+            for assignment in assignments:
+                self.Dict[assignment[0]] = assignment[1]
+            return True
+
         else:
             if '=' in keyname:
                 rospy.logerr("    SET Request failed : '=' assign operator must only be applied on the last path key.")
+                return False
             if keyname in self.Dict:
                 return self.Dict[keyname].set(requestpath)
+
 
 
 class RequestPath():

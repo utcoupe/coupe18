@@ -47,7 +47,7 @@ class SetServiceHandler():
         try:
             success = Map.set(req.request_path)
         except Exception as e:
-            rospy.logerr("    SET Request failed : " + str(e))
+            rospy.logerr("    SET Request failed (python reason) : " + str(e))
 
         rospy.logdebug("    Responding: " + str(success))
         rospy.logdebug("    Process took {0:.2f}ms".format(time.time() * 1000 - s))
