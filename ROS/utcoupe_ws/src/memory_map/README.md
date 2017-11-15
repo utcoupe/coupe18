@@ -27,11 +27,11 @@ shape, visual, etc). You must ask for a dict which only has simple values, not d
 
 ### Setting a value
 
-For now, one SET request can only set one specific value at a time. It will soon support replacing multiple values inside a dict, or even automatic modifications 
-based on filters (e.g. change the color of all blue balls).
+The SET service allows you to change multiple values at a time of a same dict (that dosn't have any sub-dict inside as a value).
 
-Use the same request path structure as the GET service. The last key you indicate will be the one replaced by your `new_value`. Trying to set a new value to an
-entire dict will return an error (for now).
+Use the same request path structure as the GET service, except you must put `=new_value_here` after each attribute in your path. An example of a valid path would be `/objects/cube_13/position/x=0.42,y=0.84`, wich will change the specified values and leave the others untouched. Trying to set a new value to an entire dict will return an error (for now, TODO needed ?).
+
+__Note__ : A protection has been set that does not allow you to create new keys in the dicts. TODO Remove it ? 
 
 # Topics
 
