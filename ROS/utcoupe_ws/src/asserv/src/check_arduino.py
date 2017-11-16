@@ -35,7 +35,8 @@ def get_arduino_port(arduino):
     arduino_id = ""
     for port in available_port_list:
         # The timeout is necessary and must be greater than the sending time of the Arduino (currently it's set to 100ms)
-        com_line = serial.Serial(port, 57600, timeout=0.11)
+        # With tests, it seems like it has to be greater than 0.6s, no mater the frequency of the sending Arduino ID...
+        com_line = serial.Serial(port, 57600, timeout=0.6)
         try:
             # First line may be empty
             com_line.readline()
