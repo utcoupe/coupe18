@@ -1,16 +1,32 @@
 #!/usr/bin/python
 import rospy
+from collisions_classes import NavStatus, CollisionLevel, Collision
 
 class CollisionChecker():
     def __init__(self, robot):
+        self.STOP_DISTANCE   = 0.4 #m
+        self.DANGER_DISTANCE = 2.0 #m
         self.Robot = robot
 
-    def checkGlobal(self, data):
-        self.checkStatic(data.CurrentPath, data.StaticObjects)
-        self.checkDynamic(data.CurrentPath, data.DynamicObjects)
+    def check(self, robot, obstacles):
+        collisions = []
 
-    def checkStatic(self, path, static_objects):
-        rospy.logdebug("Checking collisions with static objects...")
+        if robot.NavMode != NavStatus.STOPPED:
+            rospy.logdebug("Checking collisions...")
 
-    def checkDynamic(self, path, dynamic_objects):
-        rospy.logdebug("Checking collisions with dynamic objects...")
+            path_shapes = robot.CurrentPath.toShapes()
+
+            for path_shape in path_shapes:
+                for obstacle in obstacles:
+                    # Check if obstacle intersects with one of the path shapes
+                    if path_shape.intersects(obstacle):
+                        collision_distance = robot.CurrentPath.distanceToCollision(path_shape, obstacle)
+
+                        if collision_distance <= self.STOP_DISTANCE:
+                            rospy.logdebug("Found freaking close collision, please stop!!")
+                            collisions.append(Collision(obstacle, CollisionLevel.LEVEL_STOP))
+                        elif collision_distance <= self.DANGER_DISTANCE:
+                            rospy.logdebug("Found dangerous collision.")
+                            collisions.append(Collision(obstacle, CollisionLevel.LEVEL_DANGER))
+
+        return collisions

@@ -4,7 +4,14 @@ import rospy
 
 class Shape(object):
     def __init__(self):
-        pass
+        self.Type = None
+
+    def intersects(self, obstacle):
+        return True
+
+
+class PathShape(Shape):
+    
 
 
 class Position(object):
