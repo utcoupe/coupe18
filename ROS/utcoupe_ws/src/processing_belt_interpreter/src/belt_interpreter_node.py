@@ -25,8 +25,8 @@ class BeltInterpreter(object):
         rospy.loginfo("[PROCESSING] belt_interpreter node started")
 
         # get definition file
-        rospy.wait_for_service('/memory/definitions')
-        get_def = rospy.ServiceProxy('/memory/definitions', GetDefinition)
+        rospy.wait_for_service('/memory/definitions/get')
+        get_def = rospy.ServiceProxy('/memory/definitions/get', GetDefinition)
 
         try:
             res = get_def("processing/Belt.xml")
