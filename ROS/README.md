@@ -27,3 +27,9 @@ extérieurs (ATTENTION : avec un `/` au début pour créer un nom absolu), `serv
 ### Python
 
 - Afin de respecter le PEP8 : 4 espaces d'intentation (et non tabs).
+
+### Données
+
+- Unités de distance en mètres, transportées par des `float32`.
+
+- Lors de la description d'une position d'une forme (cercle, ligne, rectangle, point...), donner la position par rapport au centre de la forme (sauf précision explicite et nécessaire). Par exemple, donner la position du centre d'un rectangle et non d'un coin.
