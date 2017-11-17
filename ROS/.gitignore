@@ -155,3 +155,4 @@ CATKIN_IGNORE
 #CUSTOM ADDS
 nohup.out
 *.swp
+.vscode/

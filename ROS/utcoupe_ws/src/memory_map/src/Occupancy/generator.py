@@ -38,7 +38,7 @@ class OccupancyGenerator():
             pos = self.world_to_img_pos((position["x"], position["y"]))
             if shape["type"] == "rect":
                 w, h = self.world_to_img_scale(shape["width"]), self.world_to_img_scale(shape["height"])
-                draw.rectangle((pos[0], pos[1], pos[0] + w, pos[1] - h), fill=(0, 0, 0))
+                draw.rectangle((pos[0] - w/2.0, pos[1] - h/2.0, pos[0] + w/2.0, pos[1] + h/2.0), fill=(0, 0, 0))
             elif shape["type"] == "circle":
                 r = self.world_to_img_scale(shape["radius"])
                 draw.ellipse((pos[0] - r, pos[1] - r, pos[0] + r, pos[1] + r), fill = (0, 0, 0))

@@ -1,7 +1,0 @@
-Get msgs:
-    - MapGetDict
-    - MapGetPose2D
-    - MapGetShape
-    - MapGetString
-    - MapGetInt
-    - MapGetFloat
