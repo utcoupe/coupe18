@@ -63,5 +63,5 @@ class Rectangle(Shape):
         self.h = h
 
     def contains(self, x, y):
-        return x >= self.x and x <= self.x + self.w and y >= self.y \
-                           and y <= self.y + self.h
+        return x >= self.x - self.w / 2 and x <= self.x + self.w / 2 and y >= self.y + self.h / 2 \
+                           and y <= self.y + self.h / 2
