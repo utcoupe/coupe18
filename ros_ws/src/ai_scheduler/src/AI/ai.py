@@ -6,7 +6,7 @@ from timer import *
 
 class RobotAI():
     def __init__(self, strategyname):
-        self.xml_dirpath = os.path.dirname(__file__) + "/../Definitions/"
+        self.xml_dirpath = os.path.dirname(__file__) + "/../../def/"
         self.AvailableStrategies = None # loaded later (TODO Populate! used to be sent to the robot's onboard display)
 
         orders = self.loadOrders()
@@ -14,7 +14,7 @@ class RobotAI():
         self.Timer = GameTimer()
 
     def loadOrders(self):
-        self.XML_ORDERS = ET.parse(self.xml_dirpath + "Orders_simple.xml").getroot()
+        self.XML_ORDERS = ET.parse(self.xml_dirpath + "orders_simple.xml").getroot()
 
         orders = []
         for order_xml in self.XML_ORDERS:
@@ -22,7 +22,7 @@ class RobotAI():
         return orders
 
     def loadActions(self, orders):
-        self.XML_ACTIONS = ET.parse(self.xml_dirpath + "Actions_simple.xml").getroot()
+        self.XML_ACTIONS = ET.parse(self.xml_dirpath + "actions_simple.xml").getroot()
 
         actionnames = [action.attrib["ref"] for action in self.XML_ACTIONS]
         actions = []
@@ -31,7 +31,7 @@ class RobotAI():
         return actions
 
     def loadStrategy(self, strategyname, actions, orders):
-        self.XML_STRATEGIES = ET.parse(self.xml_dirpath + "Strategies_simple.xml").getroot()
+        self.XML_STRATEGIES = ET.parse(self.xml_dirpath + "strategies_simple.xml").getroot()
         self.AvailableStrategies = [child.attrib["name"] for child in self.XML_STRATEGIES]
 
         strategy_xml = self.XML_STRATEGIES.findall("strategy[@name='" + strategyname + "']")
