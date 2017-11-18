@@ -3,7 +3,7 @@ import json
 import rospy
 import tf2_ros
 
-from Collisions import MapObstacles, MapObstacle, MapRobot, RobotStatus
+from collisions import MapObstacles, MapObstacle, MapRobot, RobotStatus
 
 # from memory_map.msg import MapGet
 
