@@ -5,7 +5,6 @@ import rospy
 import actionlib
 import actuators.msg
 
-
 class ActuatorsNode():
     """Dispatch commands from AI to the correct node"""
 
@@ -13,16 +12,20 @@ class ActuatorsNode():
 
     def __init__(self):
         self._node = rospy.init_node('actuators', log_level=rospy.DEBUG)
-        self._action_name = 'dispatcher'
+        self._namespace = '/movement/actuators/'
+        self._action_name = '{}dispatch'.format(self._namespace)
         self._action_server = actionlib.SimpleActionServer(self._action_name, actuators.msg.dispatchAction, execute_cb=self.dispatch, auto_start = False)
+        
+        # TODO: rename arduino
         self._arduino_client = actionlib.SimpleActionClient(
-            'arduino', actuators.msg.arduinoAction)
+            '{}arduino'.format(self._namespace), actuators.msg.arduinoAction)
         self._action_server.start()
 
     def dispatch(self, command):
         rospy.logdebug('Command received !')
         if command.name != '':
-            
+            pass
+
         self._action_server.set_succeeded(False)
 
     def sendToArduino(self, ):

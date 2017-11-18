@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-    <name>actuators</name>
+    <name>movement_actuators</name>
     <version>0.0.1</version>
     <description>The actuators package</description>
     <author>P. Potiron</author>
