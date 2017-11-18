@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
 <package>
-    <name>asserv</name>
+    <name>drivers_ard_asserv</name>
     <version>0.0.1</version>
-    <description>The asserv driver package</description>
-    <maintainer email="tomesman@gmail.com">Thomas Fuhrmann</maintainer>
-    <license>TODO</license>
+    <description>
+        The package that manages a serial communication between the arduino in charge of the asserv and the ros system. It provides services that redirects commands to the arduino, and topics that convey information from it.
+    </description>
+    <maintainer email="utcoupe@assos.utc.fr">utcoupe</maintainer>
+    <author email="tomesman@gmail.com">Thomas Fuhrmann</author>
+    <license>GPLv3</license>
 
     <buildtool_depend>catkin</buildtool_depend>
     <build_depend>rospy</build_depend>
