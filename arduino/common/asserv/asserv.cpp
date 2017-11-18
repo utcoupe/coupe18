@@ -80,7 +80,7 @@ void loop() {
     serialRead();
     if (!flagArduinoConnected) {
         SerialSender::SerialSend(SERIAL_INFO, "%s", ARDUINO_ID);
-        delay(100);
+        delay(1000);
     } else {
         asservLoopTimer.Update();
     }
