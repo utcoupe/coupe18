@@ -5,7 +5,7 @@ import rospy
 from geometry_msgs.msg import Pose2D
 from pathfinding.srv import *
 
-class PathfinderClient:
+class PathfinderClient(object):
     def __init__ (self):
         self.PATHFINDER_FINDPATH_SERVICE_NAME = "navigation/pathfinding/findpath"
         self.pathfinderFindPathService = "";

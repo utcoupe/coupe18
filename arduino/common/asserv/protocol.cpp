@@ -63,7 +63,6 @@ void parseAndExecuteOrder(const String& order) {
     char orderChar = receivedOrder[ORDER_INDEX];
     uint16_t order_id = (uint16_t) atoi(&receivedOrder[ID_INDEX]);
     uint8_t numberDigits = getLog10(order_id);
-    SerialSender::SerialSend(SERIAL_INFO, "%s", receivedOrder);
     // Move to the first parameter of the order
     receivedOrderPtr +=  ID_INDEX + numberDigits + (uint8_t)1;
     switch (orderChar) {
