@@ -1,0 +1,6 @@
+# Takes 1 point and returns status
+geometry_msgs/Pose2D targetPos
+---
+bool success
+---
+# No feedback

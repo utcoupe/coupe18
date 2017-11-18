@@ -163,3 +163,6 @@ nohup.out
 
 # SymLink to default ROS CMakeLists.txt
 utcoupe_ws/src/CMakeLists.txt
+
+# JetBrains IDE generated files
+.idea

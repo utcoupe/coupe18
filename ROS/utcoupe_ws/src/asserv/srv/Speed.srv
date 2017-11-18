@@ -1,0 +1,6 @@
+# Send a SPD (speed) command, linear and angular, the duration is in ms
+uint16 linear
+uint16 angular
+uint16 duration
+---
+bool response
