@@ -1,24 +1,16 @@
 <?xml version="1.0"?>
-<package>
-  <name>recognition_localizer</name>
-  <version>0.0.0</version>
-  <description>The recognition_localizer package</description>
-  <author email="pielaclau@gmail.com">MadeInPierre</author>
-  <maintainer email="utcoupe@asso.utc.fr">utcoupe</maintainer>
-  <license>GPLv3</license>
-
-  <buildtool_depend>catkin</buildtool_depend>
-
-  <build_depend>rospy</build_depend>
-  <build_depend>geometry_msgs</build_depend>
-  <build_depend>tf2</build_depend>
-  <build_depend>tf2_ros</build_depend>
-
-  <run_depend>rospy</run_depend>
-  <run_depend>geometry_msgs</run_depend>
-  <run_depend>tf2</run_depend>
-  <run_depend>tf2_ros</run_depend>
-
-  <export>
-  </export>
+<package format="2">
+    <name>recognition_localizer</name>
+    <version>0.0.0</version>
+    <description>The recognition_localizer package</description>
+    <license>GPLv3</license>
+    <author email="pielaclau@gmail.com">MadeInPierre</author>
+    <maintainer email="utcoupe@asso.utc.fr">UTCoupe</maintainer>
+    <buildtool_depend>catkin</buildtool_depend>
+    <depend>rospy</depend>
+    <depend>geometry_msgs</depend>
+    <depend>tf2</depend>
+    <depend>tf2_ros</depend>
+    <export>
+    </export>
 </package>

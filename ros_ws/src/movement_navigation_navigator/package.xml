@@ -3,26 +3,18 @@
     <name>movement_navigation_navigator</name>
     <version>0.0.2</version>
     <description>The movement/navigation/navigator package for coupe18</description>
-    <maintainer email="utcoupe@assos.utc.fr">UTCoupe</maintainer>
-    <license>TODO</license>
+    <license>GLPv3</license>
     <author email="mindstan@hotmail.fr">Gaëtan Blond</author>
+    <maintainer email="utcoupe@assos.utc.fr">UTCoupe</maintainer>
     <buildtool_depend>catkin</buildtool_depend>
-    <build_depend>rospy</build_depend>
-    <build_depend>std_msgs</build_depend>
-    <build_depend>actionlib</build_depend>
-    <build_depend>actionlib_msgs</build_depend>
-    <build_depend>navigation_pathfinder</build_depend>
-    <build_depend>asserv</build_depend>
-    <build_export_depend>rospy</build_export_depend>
-    <build_export_depend>std_msgs</build_export_depend>
-    <build_export_depend>actionlib</build_export_depend>
-    <build_export_depend>actionlib_msgs</build_export_depend>
-    <exec_depend>rospy</exec_depend>
-    <exec_depend>std_msgs</exec_depend>
-    <exec_depend>actionlib</exec_depend>
-    <exec_depend>actionlib_msgs</exec_depend>
+    <build_depend>message_generation</build_depend>
+    <depend>rospy</depend>
+    <depend>std_msgs</depend>
+    <depend>actionlib</depend>
+    <depend>actionlib_msgs</depend>
+    <exec_depend>message_runtime</exec_depend>
     <exec_depend>navigation_pathfinder</exec_depend>
-    <exec_depend>asserv</exec_depend>
+    <exec_depend>drivers_ard_asserv</exec_depend>
     <export>
     </export>
 </package>

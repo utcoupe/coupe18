@@ -3,9 +3,9 @@
     <name>actuators</name>
     <version>0.0.1</version>
     <description>The actuators package</description>
+    <license>GPLv3</license>
     <author>P. Potiron</author>
     <maintainer email="utcoupe@assos.utc.fr">UTCoupe</maintainer>
-    <license>GPLv3</license>
     <buildtool_depend>catkin</buildtool_depend>
     <depend>rospy</depend>
     <depend>std_msgs</depend>
