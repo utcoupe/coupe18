@@ -1,8 +1,9 @@
 #!/usr/bin/python
+import json
 import rospy
 import tf2_ros
 
-from CollisionsChecker import Robot
+from Collisions import MapObstacles, MapObstacle, MapRobot, RobotStatus
 
 from memory_map.msg import MapGet
 
@@ -12,16 +13,6 @@ from drivers_asser.msg import RobotSpeed
 
 from geometry_msgs.msg import Pose2D
 from navigation_collisions.msg import PredictedCollision
-
-
-class Data():
-    Enemies = []
-    BeltPoints = []
-    LidarObjects = []
-
-    @staticmethod
-    def toList():
-        return Data.Enemies + Data.BeltPoints + Data.LidarObjects
 
 
 class CollisionsNode(object):
@@ -43,21 +34,22 @@ class CollisionsNode(object):
         self.pub = rospy.Publisher("/navigation/collisions/", PredictedCollision, queue_size=10)
 
         # Getting the robot shape and creating the robot instance
-        map_get_client = rospy.ServiceProxy("/memory/map/get", MapGet)
-        map_get_client.wait_for_service()
-        self.Robot = Robot(map_get_client("/entities/{}/shape/*".format(rospy.get_param("/robotname"))))
+        try:
+            map_get_client = rospy.ServiceProxy("/memory/map/get", MapGet)
+            map_get_client.wait_for_service()
+            shape = Shape(json.loads(map_get_client("/entities/{}/shape/*".format(rospy.get_param("/robotname")))))
+        except:
+            shape = Shape({"type": "rect", "width": 0.3, "height": 0.3})
+        self.Robot = MapRobot(shape)
 
         self.run()
 
     def run(self):
         r = rospy.Rate(50)
         while not rospy.is_shutdown():
-            try:
-                self.Robot.Position = self.tf2_pos_buffer.lookup_transform("robot", "map", rospy.Time())
-            except Exception as e:
-                rospy.logwarn("Collisions could not get the robot's transform : {}".format(str(e)))
+            self.updateRobotPosition()
 
-            predicted_collisions = self.Robot.collisions.checkCollisions(Data.toList())
+            predicted_collisions = self.Robot.Path.checkCollisions(MapObstacles.toList())
             for pd in predicted_collisions:
                 self.publishCollision(pd)
 
@@ -68,22 +60,37 @@ class CollisionsNode(object):
         m.danger_level = collision.danger_level
         self.pub.publish(m)
 
+    def updateRobotPosition(self):
+        try:
+            self.Robot.updatePosition(self.tf2_pos_buffer.lookup_transform("robot", "map", rospy.Time()))
+        except Exception as e:
+            rospy.logwarn("Collisions could not get the robot's pos transform : {}".format(str(e)))
+
     def on_nav_status(self, msg):
-        self.Robot.NavStatus = msg.status # TODO
+        if msg.status == msg.NAV_STOPPED:
+            self.Robot.NavStatus = RobotStatus.NAV_STOPPED
+        elif msg.status == msg.NAV_STRAIGHT:
+            self.Robot.NavStatus = RobotStatus.NAV_STRAIGHT
+        elif msg.status == msg.NAV_TURNING:
+            self.Robot.NavStatus = RobotStatus.NAV_TURNING
+        else:
+            rospy.logerr("ERROR : Unrecognized robot status type.")
+
+        self.Robot.updatePath(msg.path) # TODO
 
     def on_belt(self, msg): # TODO
         points_frame = msg.frame_id
-        Data.BeltPoints = [StaticObject(p) for p in msg.static_points + msg.dynamic_points]
+        MapObstacles.BeltPoints = [MapObstacle(p) for p in msg.static_points + msg.dynamic_points]
 
     def on_lidar_points(self, msg):
-        Data.LidarObjects = [] # TODO
+        MapObstacles.LidarObjects = [] # TODO
 
     def on_enemy(self, msg): # TODO
         pass
 
     def on_robot_speed(self, msg):
-        self.Robot.Speed.Linear = msg.linear_speed
-        self.Robot.Speed.Angular = msg.wheel_speed_right - msg.wheel_speed_left # TODO
+        self.Robot.Velocity.Linear = msg.linear_speed
+        self.Robot.Velocity.Angular = msg.wheel_speed_right - msg.wheel_speed_left # TODO
 
 
 
