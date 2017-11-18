@@ -7,8 +7,8 @@ import os
 import rospy
 from geometry_msgs.msg import Pose2D
 import actionlib
-from asserv.srv import *
-from asserv.msg import *
+from drivers_ard_asserv.srv import *
+from drivers_ard_asserv.msg import *
 import protocol_parser
 import check_arduino
 
