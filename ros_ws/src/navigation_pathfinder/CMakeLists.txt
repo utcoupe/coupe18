@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(pathfinding)
+project(navigation_pathfinder)
 
 add_compile_options(-std=c++14)
 
@@ -36,8 +36,6 @@ generate_messages(
 ## Declare ROS dynamic reconfigure parameters ##
 ################################################
 
-
-
 ###################################
 ## catkin specific configuration ##
 ###################################
@@ -50,35 +48,28 @@ catkin_package(
 ## Build ##
 ###########
 
-## Specify additional locations of header files
-## Your package locations should be listed before other locations
 include_directories(
     include
     ${TCLAP_INCLUDE_DIR}
     ${catkin_INCLUDE_DIRS}
 )
 
-## Declare a C++ executable
 file(
     GLOB_RECURSE
-    source_files_pathfinding
-    src/pathfinding/*
+    source_files_pathfinder
+    src/pathfinder/*
 )
-add_executable(pathfinding ${source_files_pathfinding} src/pathfinding.cpp)
 
-## Specify libraries to link a library or executable target against
-target_link_libraries(pathfinding ${catkin_LIBRARIES})
+add_executable(pathfinder_node ${source_files_pathfinder} src/pathfinder.cpp)
 
-add_dependencies(pathfinding ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(pathfinder_node ${catkin_LIBRARIES})
+
+add_dependencies(pathfinder_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 #############
 ## Install ##
 #############
 
-
-
 #############
 ## Testing ##
 #############
-
-

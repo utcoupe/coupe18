@@ -3,17 +3,17 @@
  * \author	Quentin Chateau
  * \author	Thomas Fuhrmann <tomesman@gmail.com>
  * \author  Gaëtan Blond
- * \brief 	Main file of the pathfinding project.
+ * \brief 	Main file of the pathfinder project.
  * \date  	26/09/2018
  * \copyright Copyright (c) 2018 UTCoupe All rights reserved.
  *
- * The pathfinding program is communicating using string commands.
+ * The pathfinder program is communicating using string commands.
  * The protocol is defined as follow : cmd;x1;y1;x2;y2;...\n
  * Where cmd can be :
  *  C : compute a path (args are x_start:y_start;x_end;y_end)
  *  D : refresh the internal dynamic objects (args are x;y;radius)
  * Except the cmd, all the other values are integers.
- * The pathfinding answers a computing command with the valid path found,
+ * The pathfinder answers a computing command with the valid path found,
  * with respect of the format : x_start;y_start;x1;y1;...;x_end;y_end;path_length\n
  * In this case, all values are integers, except the path_length which is float.
  */
@@ -36,15 +36,15 @@
 
 #include "geometry_msgs/Pose2D.h"
 
-#include "pathfinding/DoOrder.h"
-#include "pathfinding/FindPath.h"
+#include "navigation_pathfinder/DoOrder.h"
+#include "navigation_pathfinder/FindPath.h"
 
 #include "pathfinding/map.hpp"
 #include "pathfinding/pos_convertor.hpp"
 
 #define FAILED_STR "FAIL\n"
-const std::string               TOPIC_DOORDER = "navigation/pathfinding/doorder";
-const std::string               TOPIC_FINDPATH = "navigation/pathfinding/findpath";
+const std::string               TOPIC_DOORDER = "navigation/pathfinder/do_order";
+const std::string               TOPIC_FINDPATH = "navigation/pathfinder/find_path";
 const std::pair<double,double>  SIZE_TABLE_ROS = std::make_pair(3.0, 2.0);
 const bool                      INVERTED_Y = true;
 
@@ -238,7 +238,7 @@ class CallbackDoOrderService : public CallBackService {
 public:
     CallbackDoOrderService(MAP& map, shared_ptr<PosConvertor> convertor): CallBackService(map, convertor) {}
     
-    bool  callCallback (pathfinding::DoOrder::Request &req, pathfinding::DoOrder::Response &res) {
+    bool  callCallback (pathfinder::DoOrder::Request &req, pathfinder::DoOrder::Response &res) {
         string command, answer;
         command = req.msg;
         ROS_DEBUG_STREAM ("I heard \"" << command << "\"");
@@ -269,7 +269,7 @@ class CallBackFindPathService : public CallBackService {
 public:
     CallBackFindPathService (MAP& map, shared_ptr<PosConvertor> convertor) : CallBackService(map, convertor) {}
     
-    bool callCallback (pathfinding::FindPath::Request &req, pathfinding::FindPath::Response &res) {
+    bool callCallback (pathfinder::FindPath::Request &req, pathfinder::FindPath::Response &res) {
         vector<vertex_descriptor> path;
         chrono::time_point<chrono::system_clock> startChrono, endChrono;
         chrono::duration<double> elapsedSeconds;
@@ -328,10 +328,10 @@ int main(int argc, char **argv) {
     ROS_DEBUG("DEBUG");*/
     
     
-    //ros::init(argc, argv, "pathfinding");
+    //ros::init(argc, argv, "pathfinder");
     int one = 1;
-    ros::init(one, argv, "pathfinding");
-    ROS_INFO("Starting pathfinding...");
+    ros::init(one, argv, "pathfinder");
+    ROS_INFO("Starting pathfinder...");
     
     // Parse the command line options
     parseOptions(argc, argv);
@@ -372,12 +372,12 @@ int main(int argc, char **argv) {
     CallBackFindPathService callbackFindPath(map, convertor);
     ros::ServiceServer serviceFindPath = n.advertiseService(TOPIC_FINDPATH, &CallBackFindPathService::callCallback, &callbackFindPath);
     
-    ROS_INFO ("pathfinding now ready to receive order!");
+    ROS_INFO ("pathfinder now ready to receive order!");
     ROS_DEBUG ("TODO: Change parsed string messages to structured messages");
 
     ros::spin();
 
-    ROS_FATAL("Communication with system failed, stop the pathfinding");
+    ROS_FATAL("Communication with system failed, stop the pathfinder");
     return EXIT_FAILURE;
 }
 
@@ -385,11 +385,11 @@ void parseOptions(int argc, char **argv) {
     try {
         CmdLine cmd("Command description message", ' ', "0.1");
 
-        ValueArg<string> mapArg("m", "map", "Path to the map used to compute pathfinding.", true, "", "string");
+        ValueArg<string> mapArg("m", "map", "Path to the map used to compute pathfinder.", true, "", "string");
         cmd.add(mapArg);
 
         ValueArg<uint8_t> heuristicArg("e", "heuristic",
-                                       "Heuristic mode for pathfinding computing (EUCLIDIEAN = 0, NORM1 = 1).", false,
+                                       "Heuristic mode for pathfinder computing (EUCLIDIEAN = 0, NORM1 = 1).", false,
                                        1, "uint8_t");
         cmd.add(heuristicArg);
 
