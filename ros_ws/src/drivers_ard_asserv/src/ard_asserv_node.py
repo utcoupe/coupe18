@@ -15,6 +15,7 @@ import check_arduino
 __author__ = "Thomas Fuhrmann"
 __date__ = 21/10/2017
 
+NODE_NAME = "ard_asserv"
 
 class Asserv:
     """
@@ -36,20 +37,20 @@ class Asserv:
         # This dictionary stores the goals received by the Goto service and which are currently in processing
         self._goto_srv_dictionary = {}
         # Init ROS stuff
-        rospy.init_node('asserv', anonymous=False, log_level=rospy.DEBUG)
-        self._pub_robot_pose = rospy.Publisher("robot/pose2d", Pose2D, queue_size=5)
-        self._pub_robot_speed = rospy.Publisher("robot/speed", RobotSpeed, queue_size=5)
+        rospy.init_node(NODE_NAME, anonymous=False, log_level=rospy.DEBUG)
+        self._pub_robot_pose = rospy.Publisher("/drivers/" + NODE_NAME + "/pose2d", Pose2D, queue_size=5)
+        self._pub_robot_speed = rospy.Publisher("/drivers/" + NODE_NAME + "/speed", RobotSpeed, queue_size=5)
         # self._sub_arm = rospy.Subscriber("arm", 1, Asserv.callback_arm)
-        self._srv_goto = rospy.Service("asserv/controls/goto", Goto, self.callback_goto)
-        self._srv_pwm = rospy.Service("asserv/controls/pwm", Pwm, self.callback_pwm)
-        self._srv_speed = rospy.Service("asserv/controls/speed", Speed, self.callback_speed)
-        self._srv_set_pos = rospy.Service("asserv/controls/set_pos", SetPos, self.callback_set_pos)
-        self._srv_emergency_stop = rospy.Service("asserv/controls/emergency_stop", EmergencyStop, self.callback_emergency_stop)
-        self._srv_params = rospy.Service("asserv/parameters", Parameters, self.callback_asserv_param)
-        self._srv_management = rospy.Service("asserv/management", Management, self.callback_management)
+        self._srv_goto = rospy.Service("/drivers/" + NODE_NAME + "/goto", Goto, self.callback_goto)
+        self._srv_pwm = rospy.Service("/drivers/" + NODE_NAME + "/pwm", Pwm, self.callback_pwm)
+        self._srv_speed = rospy.Service("/drivers/" + NODE_NAME + "/speed", Speed, self.callback_speed)
+        self._srv_set_pos = rospy.Service("/drivers/" + NODE_NAME + "/set_pos", SetPos, self.callback_set_pos)
+        self._srv_emergency_stop = rospy.Service("/drivers/" + NODE_NAME + "/emergency_stop", EmergencyStop, self.callback_emergency_stop)
+        self._srv_params = rospy.Service("/drivers/" + NODE_NAME + "/parameters", Parameters, self.callback_asserv_param)
+        self._srv_management = rospy.Service("/drivers/" + NODE_NAME + "/management", Management, self.callback_management)
         self._tmr_serial_send = rospy.Timer(rospy.Duration(0.1), self.callback_timer_serial_send)
         # Note : no cancel callback is used, the reason is that the asserv code does not manage cancelling a specific order
-        self._act_goto = actionlib.ActionServer("asserv/controls/goto_action", DoGotoAction, self.callback_action_goto, auto_start=False)
+        self._act_goto = actionlib.ActionServer("/drivers/" + NODE_NAME + "/goto_action", DoGotoAction, self.callback_action_goto, auto_start=False)
         # Init the serial communication
         # Flag to tell that the connected Arduino is started : we can send it orders
         self._arduino_started_flag = False
