@@ -16,7 +16,7 @@
     <depend>message_generation</depend>
     <depend>tf2</depend>
     <depend>tf2_ros</depend>
-    <run_depend>message_runtime</run_depend>
+    <exec_depend>message_runtime</exec_depend>
     <export>
     </export>
 </package>
