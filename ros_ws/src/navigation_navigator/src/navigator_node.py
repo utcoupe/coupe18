@@ -5,11 +5,11 @@ import rospy
 import actionlib
 
 from geometry_msgs.msg import Pose2D
-from movement_navigation_navigator.srv import Goto
-from movement_navigation_navigator.msg import *
+from navigation_navigator.srv import Goto
+from navigation_navigator.msg import *
 
-from Pathfinder import PathfinderClient
-from Asserv import AsservClient
+from pathfinder import PathfinderClient
+from asserv import AsservClient
 
 __author__ = "Gaëtan Blond"
 __date__ = 17/10/2017

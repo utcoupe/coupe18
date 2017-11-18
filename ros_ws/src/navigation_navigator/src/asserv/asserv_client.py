@@ -7,15 +7,15 @@ from actionlib.action_client import CommState
 
 from geometry_msgs.msg import Pose2D
 
-from asserv.msg import *
+from drivers_ard_asserv.msg import *
 
-from asserv.srv import *
+from drivers_ard_asserv.srv import *
 
 class AsservClient(object):
     def __init__ (self):
-        self.ASSERV_GOTO_SERVICE_NAME = "asserv/controls/goto"
-        self.ASSERV_POSE_TOPIC_NAME = "robot/pose2d"
-        self.ASSERV_GOTOACTION_NAME = "asserv/controls/goto_action"
+        self.ASSERV_GOTO_SERVICE_NAME = "drivers/ard_asserv/goto"
+        self.ASSERV_POSE_TOPIC_NAME = "drivers/ard_asserv/pose2d"
+        self.ASSERV_GOTOACTION_NAME = "drivers/ard_asserv/goto_action"
         self._asservGotoService = ""
         self._asservGotoActionClient = ""
 
