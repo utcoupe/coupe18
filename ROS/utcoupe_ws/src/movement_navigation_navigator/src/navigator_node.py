@@ -2,9 +2,11 @@
 # -*-coding:Utf-8 -*
 
 import rospy
+import actionlib
 
 from geometry_msgs.msg import Pose2D
 from movement_navigation_navigator.srv import Goto
+from movement_navigation_navigator.msg import *
 
 from Pathfinder import PathfinderClient
 from Asserv import AsservClient
@@ -33,6 +35,10 @@ class NavigatorNode(object):
         """
         Initialize the node. Does not start it.
         """
+
+        self._actionSrv_Dogoto = ""
+        self._handledGoals = {}
+
         self._pathfinderClient = ""
         self._asservClient = ""
         self._waitedResults = {}
@@ -108,6 +114,42 @@ class NavigatorNode(object):
             debugStr += pointToStr(point)
         debugStr += "]"
         rospy.logdebug (debugStr)
+    
+    def _callbackAsservForDoGotoAction (self, handledGoal, resultAsserv):
+        result = DoGotoResult(True)
+        if not resultAsserv:
+            result.success = False
+        
+        handledGoal.set_succeded(result)
+    
+    def _handleDoGotoRequest (self, handledGoal):
+        posStart = self._asservClient.currentPose
+
+        debugStr = "Asked to go from "
+        debugStr += pointToStr(posStart)
+        debugStr += " to " + pointToStr(handledGoal.get_goal().targetPos)
+        rospy.logdebug(debugStr)
+
+        handledGoal.set_accepted()
+        id = handledGoal.status.goal_id.id
+        self._handledGoals[id] = handledGoal
+
+        try:
+            # sends the request to the pathfinder
+            path = self._pathfinderClient.FindPath(posStart, handledGoal.get_goal().targetPos)
+            self._printPath (path)
+            # then sends the path point per point to the arduino_asserv
+            path.pop()
+            for point in path:
+                self._asservClient.doGoto(point, False)
+            
+            idAct = self._asservClient.doGoto(req.targetPos, True, self._callbackForResults)
+            self._waitResult(idAct)
+
+        except Exception, e:
+            rospy.logdebug("Navigation failled: " + e.message)
+            result = DoGotoResult(False)
+            self._handledGoals[id].set_succeeded(result)
 
     def startNode(self):
         """
@@ -119,6 +161,7 @@ class NavigatorNode(object):
         self._asservClient = AsservClient()
 
         self._s = rospy.Service ("/navigation/navigator/goto", Goto, self._handle_goto)
+        self._actionSrv_Dogoto = actionlib.ActionServer("/navigation/navigator/dogoto", DoGotoAction, self._handleDoGotoRequest)
         rospy.loginfo ("Ready to navigate!")
         rospy.spin ()
 
