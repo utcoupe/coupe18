@@ -1,0 +1,75 @@
+terrain:
+    shape:
+        type: rect
+        width: 3.0
+        height: 2.0
+    marker:
+        ns: table
+        id: 0
+        type: mesh
+        scale: [0.001, 0.001, 0.001]
+        z: 0.0
+        orientation: [1.57079632679, 0, 0]
+        color: [0.8, 0.8, 0.8, 1.0]
+        mesh_path: "package://memory_map/def/robotcities2018_map.stl"
+    walls:
+        layer_ground:
+            test:
+                position:
+                    frame_id: /map
+                    x: 0
+                    y: 0
+                    type: fixed
+                shape:
+                    type: rect
+                    width: 1.5
+                    height: 0.5
+            circle:
+                position:
+                    frame_id: /map
+                    x: 0.6
+                    y: 0.6
+                    type: fixed
+                shape:
+                    type: circle
+                    radius: 0.3
+            wall_top:
+                position:
+                    frame_id: /map
+                    x: -0.022
+                    y: 2.022
+                    type: fixed
+                shape:
+                    type: rect
+                    width: 3.044
+                    height: 0.022
+            wall_bottom:
+                position:
+                    frame_id: /map
+                    x: -0.022
+                    y: -0.022
+                    type: fixed
+                shape:
+                    type: rect
+                    width: 3.044
+                    height: 0.022
+            wall_left:
+                position:
+                    frame_id: /map
+                    x: -0.022
+                    y: 2.022
+                    type: fixed
+                shape:
+                    type: rect
+                    width: 0.022
+                    height: 3.044
+            wall_right:
+                position:
+                    frame_id: /map
+                    x: 3
+                    y: 2.022
+                    type: fixed
+                shape:
+                    type: rect
+                    width: 0.022
+                    height: 3.044

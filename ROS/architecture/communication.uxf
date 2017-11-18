@@ -1,0 +1,1363 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>9</zoom_level>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>351</x>
+      <y>387</y>
+      <w>243</w>
+      <h>162</h>
+    </coordinates>
+    <panel_attributes>*Scheduler*
+--
+ai_node.py
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>351</x>
+      <y>612</y>
+      <w>243</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>*Scripts*
+--
+scripts_node.py
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>351</x>
+      <y>756</y>
+      <w>243</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>*Timer*
+--
+timer_node.py
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>819</x>
+      <y>387</y>
+      <w>216</w>
+      <h>162</h>
+    </coordinates>
+    <panel_attributes>*Map*
+--
+map_node.py
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>333</x>
+      <y>342</y>
+      <w>279</w>
+      <h>585</h>
+    </coordinates>
+    <panel_attributes>ai
+--
+bg=light_gray
+lt=..</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>801</x>
+      <y>342</y>
+      <w>252</w>
+      <h>423</h>
+    </coordinates>
+    <panel_attributes>memory
+--
+bg=light_gray
+lt=..</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>819</x>
+      <y>639</y>
+      <w>216</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>*Definitions*
+--
+/No nodes./
+No communication. Files
+are retrieved thanks to the
+ros_retrieve package.
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>1359</x>
+      <y>378</y>
+      <w>243</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>*WebClient*
+--
+/Linked with /
+/Rosbridge/
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>1341</x>
+      <y>333</y>
+      <w>279</w>
+      <h>486</h>
+    </coordinates>
+    <panel_attributes>feedback
+--
+bg=light_gray
+lt=..</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>1359</x>
+      <y>522</y>
+      <w>243</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>*Display*
+--
+display_node.py
+halign=left
+valign=top
+bg=magenta
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>333</x>
+      <y>963</y>
+      <w>846</w>
+      <h>513</h>
+    </coordinates>
+    <panel_attributes>perception
+--
+bg=light_gray
+lt=..</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>729</x>
+      <y>1179</y>
+      <w>153</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>*CubeFinder*
+--
+finder_node.py
+
+/(2018 Specific)/
+halign=left
+valign=top
+bg=pink
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>729</x>
+      <y>1053</y>
+      <w>153</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>*EnemyTracker*
+--
+tracker_node.py
+halign=left
+valign=top
+bg=magenta
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>702</x>
+      <y>999</y>
+      <w>450</w>
+      <h>441</h>
+    </coordinates>
+    <panel_attributes>recognition
+--
+bg=light_gray
+lt=..
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>369</x>
+      <y>999</y>
+      <w>270</w>
+      <h>441</h>
+    </coordinates>
+    <panel_attributes>processing
+--
+bg=light_gray
+lt=..
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>396</x>
+      <y>1053</y>
+      <w>162</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>*LidarObjects*
+--
+lidarobjects_node.py
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>729</x>
+      <y>1305</y>
+      <w>153</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>*BallsFinder*
+--
+finder_node.py
+
+/(2018 Specific)/
+halign=left
+valign=top
+bg=pink
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>972</x>
+      <y>1053</y>
+      <w>153</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>*CPRecognizer*
+--
+tracker_node.py
+/(Recognizes the/
+/construction plan)/
+/(2018 Specific)/
+halign=left
+valign=top
+bg=pink
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>972</x>
+      <y>1179</y>
+      <w>153</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>*CubeFinder*
+--
+finder_node.py
+
+/(2018 Specific)/
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>315</x>
+      <y>117</y>
+      <w>144</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/Made with Umlet/
+lt=..</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>1278</x>
+      <y>999</y>
+      <w>531</w>
+      <h>441</h>
+    </coordinates>
+    <panel_attributes>navigation
+--
+bg=light_gray
+lt=..</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>1296</x>
+      <y>1179</y>
+      <w>225</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>*pathfinder*
+--
+pathfinder_node.cpp
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>1566</x>
+      <y>1152</y>
+      <w>225</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>*localizer*
+--
+localizer_node.py
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>1566</x>
+      <y>1035</y>
+      <w>225</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>*collisions*
+--
+collisions_node.py
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>1296</x>
+      <y>1035</y>
+      <w>225</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>*navigator*
+--
+navigator_node.py
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>1242</x>
+      <y>963</y>
+      <w>1026</w>
+      <h>513</h>
+    </coordinates>
+    <panel_attributes>movement
+--
+bg=light_gray
+lt=..</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>1989</x>
+      <y>1017</y>
+      <w>225</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>*actuators*
+--
+actuators_node.py
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>783</x>
+      <y>1602</y>
+      <w>927</w>
+      <h>531</h>
+    </coordinates>
+    <panel_attributes>drivers
+--
+bg=light_gray
+lt=..</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>819</x>
+      <y>1638</y>
+      <w>504</w>
+      <h>477</h>
+    </coordinates>
+    <panel_attributes>sensors
+--
+bg=light_gray
+lt=..
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>1404</x>
+      <y>1638</y>
+      <w>270</w>
+      <h>477</h>
+    </coordinates>
+    <panel_attributes>movement
+--
+bg=light_gray
+lt=..
+layer=2
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>837</x>
+      <y>1692</y>
+      <w>225</w>
+      <h>135</h>
+    </coordinates>
+    <panel_attributes>*lidar*
+--
+/urg_node package/
+/for the Hokuyo./
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>1080</x>
+      <y>1692</y>
+      <w>225</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>*imu*
+--
+see if package exists
+already ?
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>837</x>
+      <y>1845</y>
+      <w>225</w>
+      <h>153</h>
+    </coordinates>
+    <panel_attributes>*camera*
+--
+camera_node.py
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>1080</x>
+      <y>1809</y>
+      <w>225</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>*displacement*
+--
+see if official node
+exists already ?
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>1080</x>
+      <y>1926</y>
+      <w>225</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>*arduino_sensors*
+--
+arduinosen_node.py
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>1431</x>
+      <y>1692</y>
+      <w>225</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>*ax12*
+--
+see if official package
+exists already ?
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>1431</x>
+      <y>1809</y>
+      <w>225</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>*arduino_actuators*
+--
+arduinoact_node.py
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>1431</x>
+      <y>1908</y>
+      <w>225</w>
+      <h>189</h>
+    </coordinates>
+    <panel_attributes>*arduino_asserv*
+--
+arduinoasserv_node.py
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>369</x>
+      <y>441</y>
+      <w>162</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/ai/scheduler/config
+layer=15
+bg=green
+transparency=0
+halign=left</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>837</x>
+      <y>513</y>
+      <w>189</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/memory/map/conditions
+layer=15
+transparency=0
+halign=left
+bg=green</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>369</x>
+      <y>666</y>
+      <w>198</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/ai/scripts/aiconditions
+layer=15
+bg=green
+transparency=0</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>369</x>
+      <y>702</y>
+      <w>135</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/ai/scripts/script
+layer=15
+bg=red
+transparency=0</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>369</x>
+      <y>810</y>
+      <w>117</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/game_timer
+layer=15
+bg=yellow
+transparency=0
+valign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>837</x>
+      <y>441</y>
+      <w>153</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/memory/map/get
+layer=15
+bg=green
+transparency=0</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>837</x>
+      <y>477</y>
+      <w>153</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/memory/map/set
+layer=15
+bg=green
+transparency=0</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>477</x>
+      <y>378</y>
+      <w>171</w>
+      <h>459</h>
+    </coordinates>
+    <panel_attributes>lt=[v]-[&gt;]
+layer=20
+fg=gray</panel_attributes>
+    <additional_attributes>100.0;30.0;100.0;10.0;170.0;10.0;170.0;490.0;10.0;490.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>513</x>
+      <y>306</y>
+      <w>585</w>
+      <h>387</h>
+    </coordinates>
+    <panel_attributes>lt=..[DEF]
+layer=20</panel_attributes>
+    <additional_attributes>580.0;410.0;630.0;410.0;630.0;10.0;20.0;10.0;20.0;110.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>585</x>
+      <y>441</y>
+      <w>270</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>lt=[&gt;]-
+layer=20
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;10.0;130.0;10.0;130.0;90.0;280.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>585</x>
+      <y>414</y>
+      <w>270</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=[&gt;]-
+layer=20
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;10.0;150.0;10.0;150.0;80.0;280.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>585</x>
+      <y>513</y>
+      <w>270</w>
+      <h>153</h>
+    </coordinates>
+    <panel_attributes>lt=[&gt;]-
+layer=20
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;150.0;130.0;150.0;130.0;10.0;280.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>369</x>
+      <y>846</y>
+      <w>153</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/ai/timer/activate
+layer=15
+bg=green
+transparency=0</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>288</x>
+      <y>522</y>
+      <w>99</w>
+      <h>351</h>
+    </coordinates>
+    <panel_attributes>lt=[&lt;]-
+layer=20
+fg=blue</panel_attributes>
+    <additional_attributes>70.0;10.0;10.0;10.0;10.0;370.0;90.0;370.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>477</x>
+      <y>603</y>
+      <w>171</w>
+      <h>234</h>
+    </coordinates>
+    <panel_attributes>lt=[v]-[&gt;]
+layer=20
+fg=gray</panel_attributes>
+    <additional_attributes>100.0;30.0;100.0;10.0;170.0;10.0;170.0;240.0;10.0;240.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>0</x>
+      <y>369</y>
+      <w>207</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>*Fixed package*
+--
+Generic package reusable 
+year after year.
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>0</x>
+      <y>459</y>
+      <w>207</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>*2018 package*
+--
+Package used for UTCoupe
+2018-specific features.
+halign=left
+valign=top
+layer=10
+bg=pink</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>0</x>
+      <y>549</y>
+      <w>207</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>*Feature package*
+--
+Package useful for certain
+aplications (robot arm, ...).
+Can be freely removed if 
+building a new robot.
+halign=left
+valign=top
+layer=10
+bg=magenta</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>54</x>
+      <y>0</y>
+      <w>243</w>
+      <h>252</h>
+    </coordinates>
+    <panel_attributes>*Scheduler*
+--
+ai_node.py
+
+*Handlers*
+-
+
+
+
+*Requests (service or topic)*
+-
+
+
+halign=left
+valign=top
+bg=orange
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>1989</x>
+      <y>1170</y>
+      <w>225</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>*arm*
+--
+arm_node.py
+halign=left
+valign=top
+bg=magenta
+layer=10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>306</x>
+      <y>288</y>
+      <w>1350</w>
+      <h>288</h>
+    </coordinates>
+    <panel_attributes>lt=[&gt;]-
+layer=20
+fg=blue</panel_attributes>
+    <additional_attributes>1440.0;300.0;1480.0;300.0;1480.0;10.0;10.0;10.0;10.0;180.0;70.0;180.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1377</x>
+      <y>576</y>
+      <w>207</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/feedback/display/activate
+layer=15
+bg=green
+transparency=0
+halign=left</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>585</x>
+      <y>495</y>
+      <w>810</w>
+      <h>432</h>
+    </coordinates>
+    <panel_attributes>lt=[&gt;]-
+layer=20
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;10.0;70.0;10.0;70.0;460.0;810.0;460.0;810.0;100.0;880.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>585</x>
+      <y>468</y>
+      <w>270</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=[&gt;]-
+layer=20
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;10.0;90.0;10.0;90.0;60.0;280.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>585</x>
+      <y>522</y>
+      <w>738</w>
+      <h>594</h>
+    </coordinates>
+    <panel_attributes>lt=[&gt;]-
+layer=20
+fg=red</panel_attributes>
+    <additional_attributes>10.0;10.0;90.0;10.0;90.0;450.0;710.0;450.0;710.0;640.0;800.0;640.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1305</x>
+      <y>1089</y>
+      <w>207</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/navigation/navigator/goto
+layer=15
+bg=red
+transparency=0</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>306</x>
+      <y>522</y>
+      <w>378</w>
+      <h>207</h>
+    </coordinates>
+    <panel_attributes>lt=[&gt;]-
+layer=20
+fg=red</panel_attributes>
+    <additional_attributes>320.0;10.0;400.0;10.0;400.0;50.0;10.0;50.0;10.0;210.0;70.0;210.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>585</x>
+      <y>522</y>
+      <w>1431</w>
+      <h>576</h>
+    </coordinates>
+    <panel_attributes>lt=[&gt;]-
+layer=20
+fg=red</panel_attributes>
+    <additional_attributes>10.0;10.0;90.0;10.0;90.0;450.0;1540.0;450.0;1540.0;620.0;1570.0;620.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1440</x>
+      <y>2025</y>
+      <w>72</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/odom
+layer=15
+bg=yellow
+transparency=0
+valign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1998</x>
+      <y>1071</y>
+      <w>153</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/actuators/action
+layer=15
+bg=red
+transparency=0</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>585</x>
+      <y>693</y>
+      <w>99</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=[&gt;]-
+layer=20
+fg=red</panel_attributes>
+    <additional_attributes>10.0;10.0;90.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1485</x>
+      <y>936</y>
+      <w>360</w>
+      <h>1116</h>
+    </coordinates>
+    <panel_attributes>lt=[v]-[&gt;]
+layer=20
+fg=gray</panel_attributes>
+    <additional_attributes>10.0;130.0;10.0;10.0;380.0;10.0;380.0;1220.0;30.0;1220.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>585</x>
+      <y>477</y>
+      <w>270</w>
+      <h>216</h>
+    </coordinates>
+    <panel_attributes>lt=[&gt;]-
+layer=20
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;220.0;150.0;220.0;150.0;10.0;280.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>675</x>
+      <y>477</y>
+      <w>243</w>
+      <h>630</h>
+    </coordinates>
+    <panel_attributes>lt=[&gt;]-
+layer=20
+fg=blue</panel_attributes>
+    <additional_attributes>230.0;680.0;250.0;680.0;250.0;520.0;10.0;520.0;10.0;10.0;180.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>441</x>
+      <y>171</y>
+      <w>72</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=[needed?].&gt;
+fg=red</panel_attributes>
+    <additional_attributes>40.0;10.0;10.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>846</x>
+      <y>1791</y>
+      <w>153</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/drivers/lidar/points
+layer=15
+bg=yellow
+transparency=0
+valign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1089</x>
+      <y>1755</y>
+      <w>135</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/drivers/imu/data
+layer=15
+bg=yellow
+transparency=0
+valign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>846</x>
+      <y>1926</y>
+      <w>207</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/drivers/camera/get_image
+layer=15
+transparency=0
+valign=center
+bg=green</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1089</x>
+      <y>1872</y>
+      <w>207</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/drivers/displacement/data
+layer=15
+bg=yellow
+transparency=0
+valign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1089</x>
+      <y>1971</y>
+      <w>198</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/drivers/arduino_sen/data
+layer=15
+bg=yellow
+transparency=0
+valign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>846</x>
+      <y>1962</y>
+      <w>162</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/drivers/camera/feed
+layer=15
+bg=yellow
+transparency=0
+valign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>846</x>
+      <y>1890</y>
+      <w>126</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/drivers/camera
+layer=15
+transparency=0
+valign=center
+bg=green</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>846</x>
+      <y>1755</y>
+      <w>117</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/drivers/lidar
+layer=15
+transparency=0
+valign=center
+bg=green</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1440</x>
+      <y>1755</y>
+      <w>135</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/drivers/ax12/set
+layer=15
+transparency=0
+valign=center
+bg=green</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1440</x>
+      <y>1854</y>
+      <w>189</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/drivers/arduino_act/set
+layer=15
+transparency=0
+valign=center
+bg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1440</x>
+      <y>1953</y>
+      <w>189</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/drivers/asserv/goto
+layer=15
+transparency=0
+valign=center
+bg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1440</x>
+      <y>1989</y>
+      <w>189</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/drivers/arduino_act/set
+layer=15
+transparency=0
+valign=center
+bg=green</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1215</x>
+      <y>1134</y>
+      <w>243</w>
+      <h>846</h>
+    </coordinates>
+    <panel_attributes>lt=[&lt;]-
+layer=20
+fg=red</panel_attributes>
+    <additional_attributes>90.0;10.0;10.0;10.0;10.0;490.0;190.0;490.0;190.0;920.0;250.0;920.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1620</x>
+      <y>1044</y>
+      <w>684</w>
+      <h>837</h>
+    </coordinates>
+    <panel_attributes>lt=[&gt;]-
+layer=20
+fg=red</panel_attributes>
+    <additional_attributes>660.0;10.0;740.0;10.0;740.0;910.0;10.0;910.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1440</x>
+      <y>2061</y>
+      <w>162</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>/odom/debugvalues
+layer=15
+bg=yellow
+transparency=0
+valign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

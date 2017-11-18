@@ -1,0 +1,22 @@
+zones:
+    construction_site_green:
+        position:
+            x: 0.2
+            y: 0.4
+            type: fixed
+            frame_id: map
+        shape:
+            type: rect
+            width: 80
+            height: 450
+        marker:
+            ns: zones
+            id: 1
+            type: cube
+            scale: [0.2, 0.4, 0.001]
+            z: 0.001
+            orientation: [1.76, 0, 0]
+            color: [0.1, 0.7, 0.1, 1.0]
+
+        properties:
+            walkable: true

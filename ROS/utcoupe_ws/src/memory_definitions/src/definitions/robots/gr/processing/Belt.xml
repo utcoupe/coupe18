@@ -1,0 +1,18 @@
+<belt>
+  <params>
+    <max_range>3</max_range>
+    <angle>10</angle>
+  </params>
+  <sensors>
+    <sensor id="oui"> <!-- x, y in meters, a in rad -->
+      <x>0.1</x>
+      <y>0.1</y>
+      <a>3.1415</a>
+    </sensor>
+    <sensor id="non">
+      <x>-0.1</x>
+      <y>-0.1</y>
+      <a>-3.1415</a>
+    </sensor>
+  </sensors>
+</belt>
