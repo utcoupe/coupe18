@@ -7,7 +7,7 @@ import os
 
 def callback(req):
     curr_dir = os.path.dirname(os.path.abspath(__file__))
-    def_dir = os.path.join(curr_dir, "definitions")
+    def_dir = os.path.join(curr_dir, "../def")
     req_split = req.request.split('/')
     
     if req_split[0] in ["rviz", "map"]:
