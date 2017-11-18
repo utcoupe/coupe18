@@ -1,6 +1,6 @@
 string name
 int32 id = -1 #ignored if name is defined
-int32 timestamp = -1 #is replaced by default timestamp if negative
+int32 timeout = -1 #is replaced by a default timeout if negative
 string order
 string param
 string preset #ignored if param is set
