@@ -238,7 +238,7 @@ class CallbackDoOrderService : public CallBackService {
 public:
     CallbackDoOrderService(MAP& map, shared_ptr<PosConvertor> convertor): CallBackService(map, convertor) {}
     
-    bool  callCallback (pathfinder::DoOrder::Request &req, pathfinder::DoOrder::Response &res) {
+    bool  callCallback (navigation_pathfinder::DoOrder::Request &req, navigation_pathfinder::DoOrder::Response &res) {
         string command, answer;
         command = req.msg;
         ROS_DEBUG_STREAM ("I heard \"" << command << "\"");
@@ -269,7 +269,7 @@ class CallBackFindPathService : public CallBackService {
 public:
     CallBackFindPathService (MAP& map, shared_ptr<PosConvertor> convertor) : CallBackService(map, convertor) {}
     
-    bool callCallback (pathfinder::FindPath::Request &req, pathfinder::FindPath::Response &res) {
+    bool callCallback (navigation_pathfinder::FindPath::Request &req, navigation_pathfinder::FindPath::Response &res) {
         vector<vertex_descriptor> path;
         chrono::time_point<chrono::system_clock> startChrono, endChrono;
         chrono::duration<double> elapsedSeconds;
@@ -330,7 +330,7 @@ int main(int argc, char **argv) {
     
     //ros::init(argc, argv, "pathfinder");
     int one = 1;
-    ros::init(one, argv, "pathfinder");
+    ros::init(one, argv, "pathfinder_node");
     ROS_INFO("Starting pathfinder...");
     
     // Parse the command line options

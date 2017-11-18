@@ -8,7 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
     geometry_msgs
     actionlib
     actionlib_msgs
-    pathfinding
+    navigation_pathfinder
     drivers_ard_asserv
 )
 
