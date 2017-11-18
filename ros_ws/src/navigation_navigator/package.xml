@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-    <name>movement_navigation_navigator</name>
+    <name>navigation_navigator</name>
     <version>0.0.2</version>
     <description>The movement/navigation/navigator package for coupe18</description>
     <license>GLPv3</license>
