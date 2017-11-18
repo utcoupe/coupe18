@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cake_minimum_required(VERSION 2.8.3)
 project(movement_navigation_navigator)
 
 find_package(catkin REQUIRED COMPONENTS
@@ -9,7 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
     actionlib
     actionlib_msgs
     pathfinding
-    asserv
+    drivers_ard_asserv
 )
 
 ################################################
