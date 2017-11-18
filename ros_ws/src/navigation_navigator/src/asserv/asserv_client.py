@@ -7,9 +7,9 @@ from actionlib.action_client import CommState
 
 from geometry_msgs.msg import Pose2D
 
-from asserv.msg import *
+from drivers_ard_asserv.msg import *
 
-from asserv.srv import *
+from drivers_ard_asserv.srv import *
 
 class AsservClient(object):
     def __init__ (self):
