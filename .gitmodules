@@ -1,0 +1,7 @@
+[submodule "ros_ws/src/drivers_ax12"]
+	path = ros_ws/src/drivers_ax12
+	url = https://github.com/arebgun/dynamixel_motor.git
+[submodule "ros_ws/src/drivers_lidar"]
+	path = ros_ws/src/drivers_lidar
+	url = https://github.com/ros-drivers/urg_node.git
+	branch=indigo-devel
