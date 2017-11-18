@@ -18,8 +18,8 @@ class ActuatorsNode():
         self._action_server.start()
 
     def dispatch(self, command):
-        rospy.loginfo('Command received !')
-        self._action_server.set_succeeded(True)
+        #rospy.loginfo('Command received !')
+        self._action_server.set_succeeded(False)
 
 if __name__ == '__main__':
     actuators_node = ActuatorsNode()
