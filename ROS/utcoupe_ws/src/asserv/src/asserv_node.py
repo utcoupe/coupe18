@@ -47,7 +47,7 @@ class Asserv:
         self._srv_emergency_stop = rospy.Service("asserv/controls/emergency_stop", EmergencyStop, self.callback_emergency_stop)
         self._srv_params = rospy.Service("asserv/parameters", Parameters, self.callback_asserv_param)
         self._srv_management = rospy.Service("asserv/management", Management, self.callback_management)
-        self._tmr_serial_send = rospy.Timer(rospy.Duration(0.05), self.callback_timer_serial_send)
+        self._tmr_serial_send = rospy.Timer(rospy.Duration(0.1), self.callback_timer_serial_send)
         # Note : no cancel callback is used, the reason is that the asserv code does not manage cancelling a specific order
         self._act_goto = actionlib.ActionServer("asserv/controls/goto_action", DoGotoAction, self.callback_action_goto, auto_start=False)
         # Init the serial communication
@@ -224,7 +224,7 @@ class Asserv:
                     self._reception_queue.put(received_data.replace('\r\n', ''))
             except KeyboardInterrupt:
                 break
-            rospy.sleep(0.001)
+            rospy.sleep(0.01)
 
     def start(self):
         """
@@ -238,7 +238,7 @@ class Asserv:
                     self._reception_queue.task_done()
                 except KeyboardInterrupt:
                     break
-            rospy.sleep(0.001)
+            rospy.sleep(0.01)
 
     def process_received_data(self, data):
         """
@@ -255,8 +255,7 @@ class Asserv:
         # TODO split data by _ to check if pr or gr and of asserv or others
         if (not self._arduino_started_flag) and data.find("asserv") != -1:
             rospy.logdebug("[ASSERV] Asserv Arduino identified, start it.")
-            self.send_serial_data(self._orders_dictionary['START'], [])
-            self._arduino_started_flag = True
+            self._sending_queue.put(self._orders_dictionary['START'] + ";0;\n")
         # Received status
         elif data.find("~") != -1:
             rospy.logdebug("[ASSERV] Received status data.")
@@ -269,7 +268,8 @@ class Asserv:
             # Special order ack, the first one concern the Arduino activation
             if data.find("0;") == 0:
                 rospy.loginfo("[ASSERV] Arduino started")
-                # self._arduino_started_flag = True
+                self._arduino_started_flag = True
+                self._order_id += 1
             else:
                 rospy.logdebug("[ASSERV] Received order ack : %s", data)
                 ack_data = data.split(";")
@@ -302,7 +302,8 @@ class Asserv:
         """
         if self._serial_com is not None:
             args_list.insert(0, str(self._order_id))
-            self._sending_queue.put(order_type + ';' + ';'.join(args_list) + ';')
+            # TODO check if \n is necessary  + '\n'
+            self._sending_queue.put(order_type + ";" + ";".join(args_list) + ";\n")
             self._order_id += 1
         else:
             rospy.logerr("[ASSERV] Try to send data but serial line is not connected...")
