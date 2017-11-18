@@ -5,13 +5,13 @@ import tf2_ros
 
 from Collisions import MapObstacles, MapObstacle, MapRobot, RobotStatus
 
-from memory_map.msg import MapGet
+# from memory_map.msg import MapGet
 
-from processing_belt_interpreter.msg import BeltFiltered
-from navigation_navigator.msg import NavStatus
-from drivers_asser.msg import RobotSpeed
+# from processing_belt_interpreter.msg import BeltFiltered
+# from navigation_navigator.msg import NavStatus
+# from drivers_asser.msg import RobotSpeed
 
-from geometry_msgs.msg import Pose2D
+# from geometry_msgs.msg import Pose2D
 from navigation_collisions.msg import PredictedCollision
 
 
@@ -25,24 +25,25 @@ class CollisionsNode(object):
         self.tf2_pos_listener = tf2_ros.TransformListener(self.tf2_pos_buffer)
 
         # Subscribing to the dependencies
-        rospy.Subscriber("/navigation/navigator/status", NavStatus, self.on_nav_status)
-        rospy.Subscriber("/processing/belt_interpreter/points_filtered", BeltFiltered, self.on_belt)
-        rospy.Subscriber("/recognition/enemy_tracker/enemies", Enemy, self.on_enemy)
-        rospy.Subscriber("/drivers/ard_asserv/robot_speed", RobotSpeed, self.on_robot_speed)
+        # rospy.Subscriber("/navigation/navigator/status", NavStatus, self.on_nav_status)
+        # rospy.Subscriber("/processing/belt_interpreter/points_filtered", BeltFiltered, self.on_belt)
+        # rospy.Subscriber("/recognition/enemy_tracker/enemies", Enemy, self.on_enemy)
+        # rospy.Subscriber("/drivers/ard_asserv/robot_speed", RobotSpeed, self.on_robot_speed)
 
         # Creating the publisher where the collisions will be notified in
         self.pub = rospy.Publisher("/navigation/collisions/", PredictedCollision, queue_size=10)
 
         # Getting the robot shape and creating the robot instance
-        try:
-            map_get_client = rospy.ServiceProxy("/memory/map/get", MapGet)
-            map_get_client.wait_for_service()
-            shape = Shape(json.loads(map_get_client("/entities/{}/shape/*".format(rospy.get_param("/robotname")))))
-        except:
-            shape = Shape({"type": "rect", "width": 0.3, "height": 0.3})
-        self.Robot = MapRobot(shape)
+        # try:
+        #     map_get_client = rospy.ServiceProxy("/memory/map/get", MapGet)
+        #     map_get_client.wait_for_service()
+        #     shape = Shape(json.loads(map_get_client("/entities/{}/shape/*".format(rospy.get_param("/robotname")))))
+        # except:
+        #     shape = Shape({"type": "rect", "width": 0.3, "height": 0.3})
+        # self.Robot = MapRobot(shape)
 
-        self.run()
+        # self.run()
+        rospy.spin()
 
     def run(self):
         r = rospy.Rate(50)

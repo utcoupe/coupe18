@@ -8,8 +8,11 @@ class Waypoint(Position):
     pass
 
 
-class PathRect(Shape):
+class PathRect(Obstacle):
     def __init__(self, width, height):
+        pass
+
+    def distanceToCollision(self, obstacle):
         pass
 
 
