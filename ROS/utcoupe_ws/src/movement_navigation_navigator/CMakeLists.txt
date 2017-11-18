@@ -33,6 +33,7 @@ generate_messages(
     DEPENDENCIES
     std_msgs
     geometry_msgs
+    actionlib_msgs
 )
 
 ################################################
