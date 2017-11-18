@@ -1,8 +1,8 @@
 #!/usr/bin/python
 import rospy, time
-from ai_communication import AICommunication
-from ai_services import AIServices
-from AI import RobotAI, TaskStatus
+from scheduler_communication import AICommunication
+from scheduler_services import AIServices
+from ai import RobotAI, TaskStatus
 
 from ai_scheduler.msg import AICommand
 

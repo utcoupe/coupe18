@@ -13,7 +13,7 @@ class PathRect(Obstacle):
         pass
 
     def distanceToCollision(self, obstacle):
-        pass
+        obs_pos = obstacle.Position
 
 
 class RobotPath(object):

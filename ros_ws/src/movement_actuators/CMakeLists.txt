@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(actuators)
+project(movement_actuators)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
@@ -28,7 +28,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## Generate actions in the 'action' folder
 add_action_files(
-    DIRECTORY msg
+    DIRECTORY action
     FILES
         dispatch.action
         arduino.action
@@ -56,7 +56,7 @@ generate_messages(
 ###################################
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES actuators
+#  LIBRARIES movement_actuators
 #  CATKIN_DEPENDS roscpp rospy std_msgs
 #  DEPENDS system_lib
   

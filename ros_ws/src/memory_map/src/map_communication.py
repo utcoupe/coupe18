@@ -4,8 +4,8 @@ import time
 
 import rospy
 import memory_map.srv
-from MapManager import Map, MapElement, DictManager
-from Occupancy import OccupancyGenerator
+from map_manager import Map, MapElement, DictManager
+from occupancy import OccupancyGenerator
 
 
 class Servers():

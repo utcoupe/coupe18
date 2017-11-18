@@ -9,7 +9,9 @@ class CollisionLevel(object):
 
 
 class Collision(object):
-    def __init__(self, collision_level, obstacle, travel_distance, time = None):
+    def __init__(self, collision_level, obstacle, travel_distance):
+        self.Distance = travel_distance
+        self.Obstacle = obstacle
         self.Level = collision_level
 
 
@@ -28,10 +30,10 @@ class PathChecker(object):
                     travel_distance = path_rect.distanceToCollision(obstacle)
 
                     if travel_distance <= self.STOP_DISTANCE:
-                        rospy.logwarn("Found freaking close collision, please stop!!")
+                        rospy.logwarn("[COLLISION] Found freaking close collision, please stop!!")
                         level = CollisionLevel.LEVEL_STOP
                     elif travel_distance <= self.DANGER_DISTANCE:
-                        rospy.loginfo("Found dangerous collision.")
+                        rospy.loginfo("[COLLISION] Found dangerous collision.")
                         level = CollisionLevel.LEVEL_DANGER
 
                     collisions.append(Collision(level, obstacle, travel_distance))
