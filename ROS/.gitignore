@@ -166,3 +166,4 @@ utcoupe_ws/src/CMakeLists.txt
 
 # JetBrains IDE generated files
 .idea
+.vscode/
