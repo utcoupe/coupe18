@@ -49,3 +49,6 @@ config.js
 *liburg_c.a
 *.swp
 tmp.bmp
+
+# SymLink to default ROS CMakeLists.txt
+ros_ws/src/CMakeLists.txt

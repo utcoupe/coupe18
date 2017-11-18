@@ -31,7 +31,7 @@
 	<!-- DEPARTMENT AI -->
 	<group ns="ai">
 		<node name= "timer" 		pkg="robot_ai_timer"				type="ai_timer_node.py"			output="screen"/>
-		<node name= "scheduler"		pkg="robot_ai_scheduler"			type="ai_node.py" 				output="screen"/>
+		<node name= "scheduler"		pkg="robot_ai_scheduler"			type="scheduler_node.py" 		output="screen"/>
 	</group>
 
 	<!-- DEPARTMENT Feedbck -->

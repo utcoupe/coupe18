@@ -9,7 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
     actionlib
     actionlib_msgs
     pathfinding
-    asserv
+    drivers_ard_asserv
 )
 
 ################################################
