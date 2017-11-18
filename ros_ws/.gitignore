@@ -160,6 +160,3 @@ CATKIN_IGNORE
 nohup.out
 *.swp
 
-
-# SymLink to default ROS CMakeLists.txt
-utcoupe_ws/src/CMakeLists.txt
