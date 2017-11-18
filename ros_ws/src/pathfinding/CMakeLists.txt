@@ -20,16 +20,16 @@ SET(TCLAP_INCLUDE_DIR $ENV{UTCOUPE_WORKSPACE}/libs/tclap-1.2.1/include)
 
 ## Generate services in the 'srv' folder
 add_service_files(
-  FILES
-  DoOrder.srv
-  FindPath.srv
+    FILES
+    DoOrder.srv
+    FindPath.srv
 )
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
-  DEPENDENCIES
-  std_msgs
-  geometry_msgs
+    DEPENDENCIES
+    std_msgs
+    geometry_msgs
 )
 
 ################################################
