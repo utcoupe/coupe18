@@ -18,6 +18,7 @@
   <run_depend>geometry_msgs</run_depend>
   <run_depend>tf2</run_depend>
   <run_depend>tf2_ros</run_depend>
+  <run_depend>drivers_ard_asserv</run_depend>
 
   <export>
   </export>

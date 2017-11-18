@@ -30,7 +30,7 @@ class BeltInterpreter(object):
         get_def = rospy.ServiceProxy('/memory/definitions/get', GetDefinition)
 
         try:
-            res = get_def("processing/Belt.xml")
+            res = get_def("processing/belt.xml")
             if not res.success:
                 rospy.logerr("[PROCESSING] Error when fetching belt definition file")
 
@@ -61,8 +61,9 @@ class BeltInterpreter(object):
         self._static_shapes = []
 
         get_map = rospy.ServiceProxy('/memory/map/get', MapGet)
-        map = j = json.loads(get_map("/terrain/walls/layer_ground/*"))
-        for v in map.values():
+        map_obj = json.loads(get_map("/terrain/*").response)
+
+        for v in map_obj["walls"]["layer_ground"].values():
             x = float(v["position"]["x"])
             y = float(v["position"]["y"])
             type = v["shape"]["type"]

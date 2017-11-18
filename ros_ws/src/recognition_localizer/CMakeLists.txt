@@ -7,40 +7,10 @@ find_package(catkin REQUIRED COMPONENTS
     tf2
     tf2_ros)
 
-
-
-################################################
-## Declare ROS messages, services and actions ##
-################################################
-
-################################################
-## Declare ROS dynamic reconfigure parameters ##
-################################################
-
-
-###################################
-## catkin specific configuration ##
-###################################
 catkin_package(
 
 )
 
-###########
-## Build ##
-###########
 include_directories(
 
 )
-
-
-#############
-## Install ##
-#############
-
-
-
-#############
-## Testing ##
-#############
-
-
