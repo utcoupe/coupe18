@@ -34,8 +34,9 @@ def get_arduino_port(arduino):
     # Create the dictionary of connected arduino
     arduino_id = ""
     for port in available_port_list:
-        # TODO optimize time, each Arduino ID is sent every 1 second but to check all ports is takes too much time... (send it faster in Arduino ?)
-        com_line = serial.Serial(port, 57600, timeout=1.1)
+        # The timeout is necessary and must be greater than the sending time of the Arduino (currently it's set to 100ms)
+        # With tests, it seems like it has to be greater than 0.6s, no mater the frequency of the sending Arduino ID...
+        com_line = serial.Serial(port, 57600, timeout=1.2)
         try:
             # First line may be empty
             com_line.readline()

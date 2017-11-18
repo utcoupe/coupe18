@@ -40,6 +40,7 @@ static unsigned char flagConnected = 0;
 void serialRead() {
     String receivedString;
     receivedString = Serial.readStringUntil('\n');
+    // SerialSender::SerialSend(SERIAL_INFO, receivedString);
     receivedString.replace("\n", "");
     if (receivedString != "") {
         parseAndExecuteOrder(receivedString);
