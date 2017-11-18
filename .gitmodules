@@ -1,7 +1,12 @@
-[submodule "ros_ws/src/drivers_ax12"]
-	path = ros_ws/src/drivers_ax12
+[submodule "ros_ws/src/external_nodes/laser_proc"]
+	path = ros_ws/src/external_nodes/laser_proc
+	url = https://github.com/ros-perception/laser_proc.git
+[submodule "ros_ws/src/external_nodes/dynamixel_motor"]
+	path = ros_ws/src/external_nodes/dynamixel_motor
 	url = https://github.com/arebgun/dynamixel_motor.git
-[submodule "ros_ws/src/drivers_lidar"]
-	path = ros_ws/src/drivers_lidar
+[submodule "ros_ws/src/external_nodes/urg_node"]
+	path = ros_ws/src/external_nodes/urg_node
 	url = https://github.com/ros-drivers/urg_node.git
-	branch=indigo-devel
+[submodule "ros_ws/src/external_nodes/urg_c"]
+	path = ros_ws/src/external_nodes/urg_c
+	url = https://github.com/ros-drivers/urg_c.git
