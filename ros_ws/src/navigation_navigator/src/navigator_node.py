@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*-coding:Utf-8 -*
 
+from functools import partial
+
 import rospy
 import actionlib
 
@@ -37,7 +39,6 @@ class NavigatorNode(object):
         """
 
         self._actionSrv_Dogoto = ""
-        self._handledGoals = {}
 
         self._pathfinderClient = ""
         self._asservClient = ""
@@ -115,7 +116,7 @@ class NavigatorNode(object):
         debugStr += "]"
         rospy.logdebug (debugStr)
     
-    def _callbackAsservForDoGotoAction (self, handledGoal, resultAsserv):
+    def _callbackAsservForDoGotoAction (self, handledGoal, idAct, resultAsserv):
         result = DoGotoResult(True)
         if not resultAsserv:
             result.success = False
@@ -131,8 +132,6 @@ class NavigatorNode(object):
         rospy.logdebug(debugStr)
 
         handledGoal.set_accepted()
-        id = handledGoal.status.goal_id.id
-        self._handledGoals[id] = handledGoal
 
         try:
             # sends the request to the pathfinder
@@ -142,14 +141,13 @@ class NavigatorNode(object):
             path.pop()
             for point in path:
                 self._asservClient.doGoto(point, False)
-            
-            idAct = self._asservClient.doGoto(req.targetPos, True, self._callbackForResults)
-            self._waitResult(idAct)
+
+            self._asservClient.doGoto(handledGoal.get_goal().targetPos, True, partial(self._callbackAsservForDoGotoAction, handledGoal))
 
         except Exception, e:
             rospy.logdebug("Navigation failled: " + e.message)
             result = DoGotoResult(False)
-            self._handledGoals[id].set_succeeded(result)
+            handledGoal.set_succeded(result)
 
     def startNode(self):
         """
@@ -161,7 +159,7 @@ class NavigatorNode(object):
         self._asservClient = AsservClient()
 
         self._s = rospy.Service ("/navigation/navigator/goto", Goto, self._handle_goto)
-        self._actionSrv_Dogoto = actionlib.ActionServer("/navigation/navigator/dogoto", DoGotoAction, self._handleDoGotoRequest)
+        self._actionSrv_Dogoto = actionlib.ActionServer("/navigation/navigator/goto_action", DoGotoAction, self._handleDoGotoRequest)
         rospy.loginfo ("Ready to navigate!")
         rospy.spin ()
 
