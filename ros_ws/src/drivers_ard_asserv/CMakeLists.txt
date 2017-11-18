@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(ard_asserv)
+project(drivers_ard_asserv)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -16,8 +16,6 @@ find_package(catkin REQUIRED COMPONENTS
     actionlib_msgs
     actionlib
 )
-
-catkin_python_setup()
 
 ## Generate messages
 add_message_files(
