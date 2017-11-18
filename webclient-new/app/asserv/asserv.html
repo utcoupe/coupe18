@@ -1,0 +1,96 @@
+<div style="width:100%; height: 100%;">
+    <div style="width:calc(100% / 3); height:33%; float:left">
+      <canvas id="line" width="1" height="1" class="chart chart-line"
+              chart-data="$ctrl.charts[0].data" chart-labels="$ctrl.charts[0].labels" chart-series="$ctrl.charts[0].series"
+              chart-options="$ctrl.charts[0].options" chart-dataset-override="$ctrl.charts[0].datasetOverride"
+              chart-click="$ctrl.charts[0].onClick"></canvas>
+    </div>
+
+
+    <div style="width:calc(100% / 3); height:33%; float:right">
+      <canvas id="line" width="1" height="1" class="chart chart-line"
+              chart-data="$ctrl.charts[2].data" chart-labels="$ctrl.charts[2].labels" chart-series="$ctrl.charts[2].series"
+              chart-options="$ctrl.charts[2].options" chart-dataset-override="$ctrl.charts[2].datasetOverride"
+              chart-click="$ctrl.charts[2].onClick"></canvas>
+    </div>
+
+    <div style="width:calc(100% / 3); height:33%; display: inline-block">
+      <canvas id="line" width="1" height="1" class="chart chart-line"
+              chart-data="$ctrl.charts[1].data" chart-labels="$ctrl.charts[1].labels" chart-series="$ctrl.charts[1].series"
+              chart-options="$ctrl.charts[1].options" chart-dataset-override="$ctrl.charts[1].datasetOverride"
+              chart-click="$ctrl.charts[1].onClick"></canvas>
+    </div>
+
+
+
+
+    <div style="width:calc(100% / 3); height:33%; float:right">
+      <canvas id="line" width="1" height="1" class="chart chart-line"
+              chart-data="$ctrl.charts[4].data" chart-labels="$ctrl.charts[4].labels" chart-series="$ctrl.charts[4].series"
+              chart-options="$ctrl.charts[4].options" chart-dataset-override="$ctrl.charts[4].datasetOverride"
+              chart-click="$ctrl.charts[4].onClick"></canvas>
+    </div>
+
+    <div style="width:calc(100% / 3); height:33%; float:left">
+      <canvas id="line" width="1" height="1" class="chart chart-line"
+              chart-data="$ctrl.charts[3].data" chart-labels="$ctrl.charts[3].labels" chart-series="$ctrl.charts[3].series"
+              chart-options="$ctrl.charts[3].options" chart-dataset-override="$ctrl.charts[3].datasetOverride"
+              chart-click="$ctrl.charts[3].onClick"></canvas>
+    </div>
+
+    <div style="width:calc(100% / 3); height:33%; display: inline-block">
+
+      <uib-accordion>
+        <cc-service service="{ name: '/asserv/parameters',
+                               type: 'asserv/Parameters',
+                               isOpen: true,
+                               fetched: true,
+                               active: true
+                               }"></cc-service>
+      </uib-accordion>
+
+      <!-- <div style="margin:0 auto;">
+        <center>
+          <div class="col-sm-2">
+            <label>P</label>
+            <input type="number" class="form-control" ng-model="$ctrl.pid.p"></input>
+          </div>
+          <div class="col-sm-2">
+            <label>I</label>
+            <input type="number" class="form-control" ng-model="$ctrl.pid.i"></input>
+          </div>
+          <div class="col-sm-2">
+            <label>D</label>
+            <input type="number" class="form-control" ng-model="$ctrl.pid.d"></input>
+          </div>
+          <div class="col-sm-2">
+            <label></label>
+            <button class="btn btn-default pull-right" type="button" style="margin-left: 10px;" ng-click="$ctrl.setPID()">Set PID</button>
+          </div>
+        </center>
+      </div> -->
+    </div>
+
+
+
+    <div style="width:calc(100% / 3); height:33%; float:left">
+      <canvas id="line" width="1" height="1" class="chart chart-line"
+              chart-data="$ctrl.charts[5].data" chart-labels="$ctrl.charts[5].labels" chart-series="$ctrl.charts[5].series"
+              chart-options="$ctrl.charts[5].options" chart-dataset-override="$ctrl.charts[5].datasetOverride"
+              chart-click="$ctrl.charts[5].onClick"></canvas>
+    </div>
+
+    <div style="width:calc(100% / 3); height:33%; float:right">
+      <canvas id="line" width="1" height="1" class="chart chart-line"
+              chart-data="$ctrl.charts[6].data" chart-labels="$ctrl.charts[6].labels" chart-series="$ctrl.charts[6].series"
+              chart-options="$ctrl.charts[6].options" chart-dataset-override="$ctrl.charts[6].datasetOverride"
+              chart-click="$ctrl.charts[6].onClick"></canvas>
+    </div>
+
+    <div style="width:calc(100% / 3); height:33%; display: inline-block">
+      <canvas id="line" width="1" height="1" class="chart chart-line"
+              chart-data="$ctrl.charts[7].data" chart-labels="$ctrl.charts[7].labels" chart-series="$ctrl.charts[7].series"
+              chart-options="$ctrl.charts[7].options" chart-dataset-override="$ctrl.charts[7].datasetOverride"
+              chart-click="$ctrl.charts[7].onClick"></canvas>
+    </div>
+</div>

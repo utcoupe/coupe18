@@ -1,0 +1,47 @@
+<div uib-accordion-group
+ng-class="{'panel-default' : $ctrl.flashState == -1,
+           'panel-info' : $ctrl.flashState == 0,
+           'panel-success' : $ctrl.flashState == 1,
+           'panel-danger' : $ctrl.flashState == 2}"
+class="panel-default" is-open="$ctrl.service.isOpen">
+  <uib-accordion-heading>
+    {{ $ctrl.service.abbr }}
+    <div style="float: right">  <small style="font-size: 12px;">({{ $ctrl.service.type }})</small></div>
+    <div style="clear: both;"></div>
+  </uib-accordion-heading>
+
+  <form class="form-margin">
+    <div class="row">
+
+      <div class="form-group col-lg-4">
+        <label>Linear</label>
+        <div class="input-group">
+          <input type="number" class="form-control" ng-model="$ctrl.message.linear">
+          <span class="input-group-addon">m/s</span>
+        </div>
+      </div>
+
+      <div class="form-group col-lg-4">
+        <label>Angular</label>
+        <div class="input-group">
+          <input type="number" class="form-control" ng-model="$ctrl.message.angular">
+          <span class="input-group-addon">rad/s</span>
+        </div>
+      </div>
+
+      <div class="form-group col-lg-4">
+        <label>Duration</label>
+        <div class="input-group">
+          <input type="number" class="form-control" ng-model="$ctrl.message.duration">
+          <span class="input-group-addon">ms</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <button class="btn btn-default btn-md pull-right" type="button" ng-click="$ctrl.callService($ctrl.message)">
+        Set speed
+      </button>
+    </div>
+  </form>
+</div>

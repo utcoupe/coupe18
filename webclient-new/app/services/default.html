@@ -1,0 +1,29 @@
+<div uib-accordion-group
+ng-class="{'panel-default' : $ctrl.flashState == -1,
+           'panel-info' : $ctrl.flashState == 0,
+           'panel-success' : $ctrl.flashState == 1,
+           'panel-danger' : $ctrl.flashState == 2}"
+            is-open="$ctrl.service.isOpen">
+  <uib-accordion-heading>
+    {{ $ctrl.service.abbr }}
+    <div style="float: right">  <small style="font-size: 12px;">({{ $ctrl.service.type }} / Default)</small></div>
+    <div style="clear: both;"></div>
+  </uib-accordion-heading>
+
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-sm-6">
+        <form class="input-group">
+          <input type="text" class="form-control" ng-model="input" placeholder="JSON"></input>
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button" ng-click="$ctrl.callService(input, true)">Call</button>
+          </span>
+        </form>
+      </div>
+
+      <div class="col-sm-6">
+        <p ng-show="$ctrl.result">Result: {{ $ctrl.result }}</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,26 @@
+<div uib-accordion-group
+ng-class="{'panel-default' : $ctrl.flashState == -1,
+           'panel-info' : $ctrl.flashState == 0,
+           'panel-success' : $ctrl.flashState == 1,
+           'panel-danger' : $ctrl.flashState == 2}"
+class="panel-default" is-open="$ctrl.service.isOpen">
+  <uib-accordion-heading>
+    {{ $ctrl.service.abbr }}
+    <div style="float: right">  <small style="font-size: 12px;">({{ $ctrl.service.type }})</small></div>
+    <div style="clear: both;"></div>
+  </uib-accordion-heading>
+
+  <div ng-show="false"
+  ng-init="commands = ['KILLG', 'CLEANG', 'PAUSE', 'RESUME', 'RESET_ID']"></div>
+
+  <form class="form-margin">
+    <div class="row">
+      <div class="col-lg-1"></div>
+      <div ng-repeat="c in commands" class="col-lg-2">
+        <button class="btn btn-default btn-md" type="button"  ng-click="$ctrl.callService({mode: $index})">
+          {{ c }}
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

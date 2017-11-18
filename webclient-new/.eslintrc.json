@@ -1,0 +1,20 @@
+{
+    "extends": ["eslint:recommended"],
+    "parserOptions": {
+      "ecmaVersion": 6
+    },
+    "env": {
+      "browser": true
+    },
+    "globals": {
+      "angular": false,
+      "_": false,
+      "ROSLIB": false,
+      "Raphael": false,
+      "$": false
+    },
+    "rules": {
+        "no-console": "off"
+    }
+
+}
