@@ -4,6 +4,7 @@ import rospy
 from math import pi, cos, sin
 from belt_parser import BeltParser
 from shapes import *
+from marker_publisher import MarkersPublisher
 import tf
 import tf2_ros
 import json
@@ -50,6 +51,7 @@ class BeltInterpreter(object):
         self._pub = rospy.Publisher("/processing/belt_interpreter/points", BeltFiltered, queue_size=10)
         self._tl = tf.TransformListener()
         self._broadcaster = tf2_ros.StaticTransformBroadcaster()
+        self._markers_pub = MarkersPublisher()
 
 
         self.pub_static_transforms()
@@ -59,8 +61,8 @@ class BeltInterpreter(object):
         self._static_shapes = []
 
         get_map = rospy.ServiceProxy('/memory/map/get', MapGet)
-        map = j = json.loads(get_map("/terrain/*"))
-        for v in map["walls"]["layer_ground"].values():
+        map = j = json.loads(get_map("/terrain/walls/layer_ground/*"))
+        for v in map.values():
             x = float(v["position"]["x"])
             y = float(v["position"]["y"])
             type = v["shape"]["type"]
@@ -120,6 +122,9 @@ class BeltInterpreter(object):
                 dynamicPoints.append(point_in_map)
 
         self._pub.publish("map", staticPoints, dynamicPoints)
+        self._markers_pub.publish_markers(
+                [p.point for p in dynamicPoints],
+                [p.point for p in staticPoints])
 
     def pub_static_transforms(self):
         tr_list = []
