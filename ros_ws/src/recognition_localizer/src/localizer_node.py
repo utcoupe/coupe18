@@ -9,7 +9,7 @@ class Localizer(object):
     def __init__(self):
         super(Localizer, self).__init__()
 
-        rospy.init_node('localizer', anonymous=False)
+        rospy.init_node('localizer_node', anonymous=False)
 
         self._br = tf2_ros.TransformBroadcaster()
 
