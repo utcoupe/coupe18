@@ -1,9 +1,9 @@
 #!/usr/bin/python
 import rospy
-import MapManager
+import map_manager
 import map_communication
-from Markers import MarkersPublisher
-from Occupancy import OccupancyGenerator
+from markers import MarkersPublisher
+from occupancy import OccupancyGenerator
 
 
 class MapNode():
@@ -11,15 +11,15 @@ class MapNode():
         rospy.init_node("map", log_level=rospy.DEBUG)
         rospy.logdebug("Started /memory/map node.")
 
-        MapManager.Map.load()
+        map_manager.Map.load()
 
         # Generate static occupancy images for pathfinder, etc.
-        self.occupancy = OccupancyGenerator(MapManager.Map)
-        self.occupancy.generateTerrainImages(MapManager.Map)
+        self.occupancy = OccupancyGenerator(map_manager.Map)
+        self.occupancy.generateTerrainImages(map_manager.Map)
 
         # Starting and publishing the table STL to RViz
         self.markers = MarkersPublisher()
-        self.markers.publishTable(MapManager.Map)
+        self.markers.publishTable(map_manager.Map)
 
         # Starting the Get, Set and Conditions service handlers
         map_communication.GetServiceHandler()
@@ -32,7 +32,7 @@ class MapNode():
     def run(self):
         r = rospy.Rate(30)
         while not rospy.is_shutdown():
-            self.markers.updateMarkers(MapManager.Map)
+            self.markers.updateMarkers(map_manager.Map)
             r.sleep()
 
 
