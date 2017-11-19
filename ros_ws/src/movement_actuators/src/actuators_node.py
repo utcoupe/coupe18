@@ -12,7 +12,7 @@ class ActuatorsNode():
     _result = movement_actuators.msg.dispatchResult()
 
     def __init__(self):
-        self._node = rospy.init_node('actuators', log_level=rospy.DEBUG)
+        self._node = rospy.init_node('actuators')
         self._namespace = '/movement/actuators/'
         self._action_name = '{}dispatch'.format(self._namespace)
         self._action_server = actionlib.SimpleActionServer(
@@ -24,14 +24,13 @@ class ActuatorsNode():
         self._action_server.start()
 
     def dispatch(self, command):
-        rospy.logdebug('Command received !')
         #-----Actuator check
         try:
             actuator = actuators_properties.getActuatorsList()[command.name]
         except KeyError as identifier:
             rospy.logwarn('The action dispatch should be called with a name instead of an id.')
             for actuator in actuators_properties.getActuatorsList().values():
-                if actuator.id==command.id:
+                if actuator.id == str(command.id):
                     break
                 actuator = None
             if actuator == None:
@@ -53,7 +52,7 @@ class ActuatorsNode():
             param = command.param
         #-----Timeout check
         timeout = None
-        if command.timeout==-1:
+        if command.timeout<=0:
             timeout = actuator.default_timeout
         else:
             timeout = command.timeout
