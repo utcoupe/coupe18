@@ -17,15 +17,16 @@ function run($rootScope) {
 
   $rootScope.domains = [
     {
-      name: 'asserv',
-      topics: [],
-      services: ['controls/emergency_stop',
-                 'controls/goto',
-                 'controls/set_pos',
-                 'controls/speed',
-                 'controls/pwm',
-                 'management',
-                 'parameters']
+      name: 'drivers',
+      topics: ['ard_asserv/pose2d',
+               'ard_asserv/speed'],
+      services: ['ard_asserv/emergency_stop',
+                 'ard_asserv/goto',
+                 'ard_asserv/set_pos',
+                 'ard_asserv/speed',
+                 'ard_asserv/pwm',
+                 'ard_asserv/management',
+                 'ard_asserv/parameters']
     },
     {
       name: 'ai',
