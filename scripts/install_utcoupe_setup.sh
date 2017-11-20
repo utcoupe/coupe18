@@ -113,7 +113,7 @@ function install_ros_workspace() {
 	git submodule update --init --recursive
 	# Install the UTCoupe ROS specific packages
 	#TODO use the requirements system
-	sudo pip install pyserial numpy scipy pymongo
+	sudo pip install pyserial numpy scipy pymongo pyclipper pillow
 }
 
 ### Main install_script function, ask the user to install each main components
