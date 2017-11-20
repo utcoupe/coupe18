@@ -121,7 +121,7 @@ class NavigatorNode(object):
         if not resultAsserv:
             result.success = False
         
-        handledGoal.set_succeded(result)
+        handledGoal.set_succeeded(result)
     
     def _handleDoGotoRequest (self, handledGoal):
         posStart = self._asservClient.currentPose
@@ -147,7 +147,7 @@ class NavigatorNode(object):
         except Exception, e:
             rospy.logdebug("Navigation failled: " + e.message)
             result = DoGotoResult(False)
-            handledGoal.set_succeded(result)
+            handledGoal.set_succeeded(result)
 
     def startNode(self):
         """
