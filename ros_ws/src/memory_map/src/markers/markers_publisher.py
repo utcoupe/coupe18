@@ -7,7 +7,7 @@ from visualization_msgs.msg import Marker
 
 class MarkersPublisher():
     def __init__(self):
-        self.MARKERS_TOPIC = "visualization_markers"
+        self.MARKERS_TOPIC = "/visualization_markers"
         self.MarkersPUBL = rospy.Publisher(self.MARKERS_TOPIC, Marker, queue_size=10)
 
         count = 0  # TODO HARDCODED
