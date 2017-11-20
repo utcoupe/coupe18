@@ -10,3 +10,6 @@
 [submodule "ros_ws/src/external_nodes/urg_c"]
 	path = ros_ws/src/external_nodes/urg_c
 	url = https://github.com/ros-drivers/urg_c.git
+[submodule "ros_ws/src/external_nodes/rosbridge_suite"]
+	path = ros_ws/src/external_nodes/rosbridge_suite
+	url = https://github.com/RobotWebTools/rosbridge_suite.git
