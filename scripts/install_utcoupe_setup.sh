@@ -64,9 +64,9 @@ function env_setup() {
 		green_echo "Env variable is not set."
 		if [ "$SHELL" = "/bin/zsh" ]; then
 			echo "export UTCOUPE_WORKSPACE=$PWD" >> $HOME/.zshrc
-
-			printf "Warning :\n"
-			printf "Please \"source ~/.zshrc\" and run again this script if necessary\n"
+			echo "export ROS_LANG_DISABLE=genlisp:geneus" >> $HOME/.zshrc
+			red_echo "Warning :\n"
+			red_echo "Please \"source ~/.zshrc\" and run again this script if necessary\n"
 			exit 1
 		else
 			echo "export UTCOUPE_WORKSPACE=$PWD" >> $HOME/.bashrc
@@ -95,8 +95,11 @@ function env_setup() {
 		sudo chown $USER:$USER /var/log/utcoupe
 	fi
 	# Untar all libraries
-	#TODO untar only if it does not exist
-	for f in $UTCOUPE_WORKSPACE/libs/*.tar; do tar -C $UTCOUPE_WORKSPACE/libs xzf $f; done
+	for f in $UTCOUPE_WORKSPACE/libs/*; do
+		if [ ! -d $f ]; then	
+			tar -C $UTCOUPE_WORKSPACE/libs -xzf $f
+		fi
+	done
 	# "Install" Arduino libs
 	if [ ! -L "/opt/arduino-1.0" ]; then
 		sudo ln -s $UTCOUPE_WORKSPACE/libs/arduino-1.0 /opt/
