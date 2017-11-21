@@ -4,7 +4,7 @@
 import xml.etree.ElementTree as ET
 import os
 
-_xml_path = os.path.dirname(__file__) + '/../definitions/actuators.xml'
+_xml_path = os.path.dirname(__file__) + '/../def/actuators.xml'
 _actuators_list = None
 #ActuatorsProperties
 class ActuatorsProperties():
@@ -23,12 +23,13 @@ class ActuatorsProperties():
             self.preset[preset.get('name')] = preset.get('value')
 
 def getActuatorsList():
+    global _actuators_list, _xml_path
     if _actuators_list == None:
-        xml_root = ET.parse(xml_path).getroot()
+        xml_root = ET.parse(_xml_path).getroot()
         _actuators_list = {}
         for child in xml_root.iter('act'):
             _actuators_list[child.get('name')] = ActuatorsProperties(child)
     return _actuators_list
 
 if __name__ == '__main__':
-    getActuatorsList()
+    print getActuatorsList()
