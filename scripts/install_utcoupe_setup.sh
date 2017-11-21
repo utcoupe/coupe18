@@ -84,9 +84,9 @@ function env_setup() {
 	        sudo usermod -a -G dialout $USER
 	fi
 	# Setup GPIO + add the current user to the gpio group (to r/w in /dev files)
-	if ! id -Gn $USER | grep -qw "gpio"; then
-			sudo chgrp -R gpio /sys/class/gpio
-			sudo chmod -R g+rw /sys/class/gpio
+	if grep -q "gpio" /etc/group && ! id -Gn $USER | grep -qw "gpio"; then
+		sudo chgrp -R gpio /sys/class/gpio
+		sudo chmod -R g+rw /sys/class/gpio
 	        sudo usermod -a -G gpio $USER
 	fi
 	# Create the utcoupe folder where log files are stored
