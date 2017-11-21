@@ -1,9 +1,9 @@
 #!/usr/bin/python
-import json
+import json, time
 import rospy
 import tf2_ros
 
-from collisions import MapObstacles, MapObstacle, MapRobot, RobotStatus
+from collisions import *
 
 # from memory_map.msg import MapGet
 
@@ -31,7 +31,7 @@ class CollisionsNode(object):
         # rospy.Subscriber("/drivers/ard_asserv/robot_speed", RobotSpeed, self.on_robot_speed)
 
         # Creating the publisher where the collisions will be notified in
-        self.pub = rospy.Publisher("/navigation/collisions/", PredictedCollision, queue_size=10)
+        self.pub = rospy.Publisher("/navigation/collisions/warner", PredictedCollision, queue_size=10)
 
         # Getting the robot shape and creating the robot instance
         # try:
@@ -42,17 +42,24 @@ class CollisionsNode(object):
         #     shape = Shape({"type": "rect", "width": 0.3, "height": 0.3})
         # self.Robot = MapRobot(shape)
 
-        # self.run()
-        rospy.spin()
+        self.Robot = MapRobot(Rect(0.42, 0.28)) # TODO handle circles
+        self.Robot.updatePath(RobotPath([(0.35, 0.75), (0.4, 0.7), (0.8, 1.6)]))
+        self.Robot.NavStatus = RobotStatus.NAV_STRAIGHT
+
+        MapObstacles.BeltPoints = [(3.6, 1.4), (0.75, 0.5)]
+
+        time.sleep(0.2)  # wait for tfs to arrive
+        self.run()
 
     def run(self):
         r = rospy.Rate(50)
         while not rospy.is_shutdown():
             self.updateRobotPosition()
 
-            predicted_collisions = self.Robot.Path.checkCollisions(MapObstacles.toList())
+            predicted_collisions = self.Robot.checkPathCollisions(MapObstacles.toList())
             for pd in predicted_collisions:
-                self.publishCollision(pd)
+                print pd.Distance, pd.Level
+                # self.publishCollision(pd)
 
             r.sleep()
 
@@ -63,7 +70,10 @@ class CollisionsNode(object):
 
     def updateRobotPosition(self):
         try:
-            self.Robot.updatePosition(self.tf2_pos_buffer.lookup_transform("robot", "map", rospy.Time()))
+            t = self.tf2_pos_buffer.lookup_transform("robot", "map", rospy.Time())
+            tx, ty = t.transform.translation.x, t.transform.translation.y
+            rz = t.transform.rotation.z
+            self.Robot.updatePosition(Position(tx, ty, angle = rz))
         except Exception as e:
             rospy.logwarn("Collisions could not get the robot's pos transform : {}".format(str(e)))
 

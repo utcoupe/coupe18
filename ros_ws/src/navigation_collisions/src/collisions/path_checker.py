@@ -19,15 +19,15 @@ class PathChecker(object):
     STOP_DISTANCE = 0.4 #m
     DANGER_DISTANCE = 2.0 #m
 
-    def checkCollisions(self, robot, path, obstacles):
+    def checkCollisions(self, robot, path_shapes, obstacles):
         collisions = []
 
         distance_to_collision = 0.0
-        for path_rect in path:
+        for path_segment in path_shapes:
             for obstacle in obstacles:
                 # Check if obstacle intersects with one of the path shapes
-                if path_rect.intersects(obstacle):
-                    travel_distance = path_rect.distanceToCollision(obstacle)
+                if path_segment.intersects(obstacle):
+                    travel_distance = path_segment.distanceToCollision(obstacle)
 
                     if travel_distance <= self.STOP_DISTANCE:
                         rospy.logwarn("[COLLISION] Found freaking close collision, please stop!!")
@@ -37,6 +37,6 @@ class PathChecker(object):
                         level = CollisionLevel.LEVEL_DANGER
 
                     collisions.append(Collision(level, obstacle, travel_distance))
-            distance_to_collision += path_rect.Width
+            distance_to_collision += path_segment.Shape.Width
 
         return collisions

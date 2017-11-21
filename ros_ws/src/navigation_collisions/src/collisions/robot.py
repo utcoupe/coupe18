@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from map_classes import MapObstacle
+from map_classes import MapObstacle, Velocity
 from robot_path import RobotPath
 
 
@@ -12,8 +12,8 @@ class RobotStatus(object): # Status given by navigation/nagivator.
 
 class MapRobot(MapObstacle):
     def __init__(self, shape):
-        super(MapRobot, self).__init__(shape, None, None)
-        self.NavStatus = RobotStatus.NAV_STOPPED
+        super(MapRobot, self).__init__(shape, None, Velocity()) # TODO velocicty
+        self.NavStatus = RobotStatus.NAV_IDLE
         self.Path = RobotPath()
 
     def isInitialized(self):
@@ -30,8 +30,9 @@ class MapRobot(MapObstacle):
 
     def checkPathCollisions(self, map_obstacles):
         collisions = []
-        if map_obstacles.hasData() and self.Path.hasPath() and self.isInitialized():
+        if map_obstacles is not None and self.Path.hasPath() and self.isInitialized():
             if self.NavStatus != RobotStatus.NAV_IDLE:
-                collisions = self.Path.checkCollisions(map_obstacles)
+                print "Started checking collisions in the way..."
+                collisions = self.Path.checkCollisions(self, map_obstacles)
 
         return collisions

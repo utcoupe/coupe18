@@ -5,7 +5,10 @@ class Velocity(object):
 
 
 class Position(object):
-    pass
+    def __init__(self, x, y, angle = 0.0):
+        self.X = x
+        self.Y = y
+        self.A = angle
 
 
 class Shape(object):
@@ -19,7 +22,9 @@ class Rect(Shape):
         self.Height = height
 
 class Circle(Shape):
-    pass
+    def __init__(self, radius):
+        super(Circle, self).__init__()
+        self.Radius = radius
 
 class Point(Shape):
     pass
@@ -27,6 +32,11 @@ class Point(Shape):
 
 class MapObstacle(object):
     def __init__(self, shape, position, velocity = None):
-        self.Position = Position()
-        self.Shape = Shape()
-        self.Velocity = Velocity()
+        self.Position = position
+        self.Shape = shape
+        self.Velocity = velocity
+
+    def intersects(self, obstacle):
+        return True  # TODO Not implemented, returns true for now
+    def distanceToCollision(self, obstacle):
+        return 0.2 # TODO Not implemented
