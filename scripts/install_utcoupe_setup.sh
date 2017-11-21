@@ -125,7 +125,7 @@ function launch_script() {
 	read answer
 	if [ "$answer" = "" ] || [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
 		install_apt
-		if [ ! -f "/opt/ros" ]; then
+		if [ ! -d "/opt/ros" ]; then
 			printf "ROS has not been detected in /opt/ros, launch the installation process..."
 			install_ros
 		fi
