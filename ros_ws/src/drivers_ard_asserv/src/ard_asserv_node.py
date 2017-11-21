@@ -281,7 +281,7 @@ class Asserv:
                 # TODO manage status
                 if ack_id in self._goals_dictionary:
                     rospy.logdebug("[ASSERV] Found key %d in goal dictionary !", ack_id)
-                    self._goals_dictionary[ack_id].set_succeeded()
+                    self._goals_dictionary[ack_id].set_succeeded(DoGotoResult(result=True))
                     del self._goals_dictionary[ack_id]
                 elif ack_id in self._goto_srv_dictionary:
                     rospy.logdebug("[ASSERV] Found key %d in goto dictionary !", ack_id)
