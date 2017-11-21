@@ -240,7 +240,7 @@ class RosService {
   getDomains() {
     if(!this.data)
       return;
-    const allData = this.data.topics.concat(this.data.services, this.data.nodes);
+    const allData = this.data.topics.concat(this.data.services, this.data.nodes, this.data.parameters);
     const domains = this.Domains.getDomains(allData);
 
     let expectedD = _.pluck(this.$rootScope.domains, 'name');

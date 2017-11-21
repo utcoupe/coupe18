@@ -20,7 +20,7 @@
           <!-- Domains -->
           <div class="panel panel-default panel-domain"
                ng-class="{ 'panel-active': ($ctrl.activeDomain == domain),
-                           'panel-danger': !$ctrl.isDomainActiveForTopics(domain) }"
+                           'panel-danger': !$ctrl.isDomainActive(domain) }"
                ng-repeat="domain in $ctrl.ros.getExpectedDomains()"
                ng-click="$ctrl.setActiveDomain(domain)">
 
@@ -40,8 +40,8 @@
                         'glyphicon-chevron-up' : $ctrl.showUnexpected }"></span>
             </div>
           </div></center>
-          <br/>
-          <hr ng-if="$ctrl.setting.showUnexpected"/>
+
+
 
           <div class="panel panel-default panel-domain"
                ng-class="{ 'panel-active': ($ctrl.activeDomain == domain)}"
@@ -54,6 +54,11 @@
 
              </div>
           </div>
+
+          <hr/>
+
+          <!-- Global parameters -->
+          <cc-parameter ng-repeat="parameter in $ctrl.Domains.getGlobalParameters($ctrl.ros.data.parameters)" ng-show="$ctrl.Domains.filterAdvanced(parameter.name, false)" parameter="parameter"></cc-parameter>
         </div>
 
         <div class="col-sm-9">

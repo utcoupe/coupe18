@@ -60,13 +60,13 @@ var AsservController = function () {
 
     this.ros = Ros.ros;
 
-    Ros.listen('/robot/pose2d', function (e) {
+    Ros.listen('/drivers/ard_asserv/pose2d', function (e) {
       this.pushDataToChart(2, e.x);
       this.pushDataToChart(3, e.theta);
       this.pushDataToChart(4, e.y);
     }.bind(this));
 
-    Ros.listen('/robot/speed', function (e) {
+    Ros.listen('/drivers/ard_asserv/speed', function (e) {
       this.pushDataToChart(0, e.pwm_speed_left);
       this.pushDataToChart(1, e.pwm_speed_right);
       this.pushDataToChart(5, e.wheel_speed_right);
@@ -273,15 +273,8 @@ var ControlController = function () {
       this.ros.loadData();
     }
   }, {
-    key: 'isDomainActiveForTopics',
-    value: function isDomainActiveForTopics(domain) {
-      return _.some(this.ros.getTopicsForDomain(domain), function (t) {
-        return t.active == true;
-      });
-    }
-  }, {
-    key: 'isDomainActiveForServices',
-    value: function isDomainActiveForServices(domain) {
+    key: 'isDomainActive',
+    value: function isDomainActive(domain) {
       return _.some(this.ros.getServicesForDomain(domain), function (t) {
         return t.active == true;
       });
@@ -535,8 +528,8 @@ var DomainsService = function () {
       var result = [];
       angular.forEach(array, function (entry) {
         var nameArray = entry.name.split('/');
-        if (nameArray.length > 1 && nameArray[1] === domainName && (entry.fetched || !entry.active) && nameArray[2] !== "get_loggers" && //TODO : filter nicely <3 (maybe put the rcc filter back)
-        nameArray[2] !== "set_logger_level") {
+        if (nameArray.length > 1 && nameArray[1] === domainName && (entry.fetched || !entry.active) && !_.contains(nameArray, "get_loggers") && //TODO : filter nicely <3 (maybe put the rcc filter back)
+        !_.contains(nameArray, "set_logger_level")) {
           entry.abbr = nameArray.slice(2).join('/');
           result.push(entry);
         }
@@ -873,7 +866,7 @@ var RosService = function () {
     key: 'getDomains',
     value: function getDomains() {
       if (!this.data) return;
-      var allData = this.data.topics.concat(this.data.services, this.data.nodes);
+      var allData = this.data.topics.concat(this.data.services, this.data.nodes, this.data.parameters);
       var domains = this.Domains.getDomains(allData);
 
       var expectedD = _.pluck(this.$rootScope.domains, 'name');
