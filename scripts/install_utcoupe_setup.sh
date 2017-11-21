@@ -70,6 +70,7 @@ function env_setup() {
 			exit 1
 		else
 			echo "export UTCOUPE_WORKSPACE=$PWD" >> $HOME/.bashrc
+			echo "export ROS_LANG_DISABLE=genlisp:geneus" >> $HOME/.bashrc
             		source $HOME/.bashrc
 		fi
 	fi
