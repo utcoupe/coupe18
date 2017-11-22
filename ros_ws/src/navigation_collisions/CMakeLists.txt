@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
     rospy
     std_msgs
     geometry_msgs
+    memory_map
     message_generation
 )
 
