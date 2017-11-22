@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
+
 class Velocity(object):
-    pass
+    pass # TODO
 
 
 class Position(object):
@@ -10,24 +11,8 @@ class Position(object):
         self.Y = y
         self.A = angle
 
-
-class Shape(object):
-    def __init__(self):
-        pass
-
-class Rect(Shape):
-    def __init__(self, width, height):
-        super(Rect, self).__init__()
-        self.Width = width
-        self.Height = height
-
-class Circle(Shape):
-    def __init__(self, radius):
-        super(Circle, self).__init__()
-        self.Radius = radius
-
-class Point(Shape):
-    pass
+    def tuple2(self):
+        return (self.X, self.Y)
 
 
 class MapObstacle(object):
@@ -37,6 +22,4 @@ class MapObstacle(object):
         self.Velocity = velocity
 
     def intersects(self, obstacle):
-        return True  # TODO Not implemented, returns true for now
-    def distanceToCollision(self, obstacle):
-        return 0.2 # TODO Not implemented
+        return self.Shape.intersects(self.Position, obstacle)
