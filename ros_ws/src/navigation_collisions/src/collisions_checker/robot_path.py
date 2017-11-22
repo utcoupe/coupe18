@@ -48,7 +48,13 @@ class RobotPath(object):
                 d = math.sqrt( (w.X - p_w.X) ** 2 + (w.Y - p_w.Y) ** 2)
                 pos = Position((w.X + p_w.X) / 2.0, (w.Y + p_w.Y) / 2.0, angle = math.atan((w.Y - p_w.Y) / (w.X - p_w.X)))
 
-                shapes.append(MapObstacle(Rect(d, robot.Shape.Width), pos, velocity = None))
+                if isinstance(robot.Shape, Rect):
+                    width = robot.Shape.Width
+                elif isinstance(robot.Shape.Radius):
+                    width = robot.Shape.Radius * 2.0
+                else:
+                    raise ValueError("Robot shape type not supported.")
+                shapes.append(MapObstacle(Rect(d, width), pos, velocity = None))
 
                 # TODO Create a circle at each waypoint position
             return shapes

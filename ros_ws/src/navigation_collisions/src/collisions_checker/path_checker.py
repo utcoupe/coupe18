@@ -38,5 +38,5 @@ class PathChecker(object):
 
                     collisions.append(Collision(level, obstacle, travel_distance))
             distance_to_collision += path_segment.Shape.Width
-
+        print collisions
         return collisions

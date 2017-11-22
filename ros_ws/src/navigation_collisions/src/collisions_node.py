@@ -3,7 +3,7 @@ import json, time
 import rospy
 import tf2_ros
 
-from collisions import *
+from collisions_checker import *
 
 # from memory_map.msg import MapGet
 
@@ -42,11 +42,12 @@ class CollisionsNode(object):
         #     shape = Shape({"type": "rect", "width": 0.3, "height": 0.3})
         # self.Robot = MapRobot(shape)
 
+        # TESTS
         self.Robot = MapRobot(Rect(0.42, 0.28)) # TODO handle circles
-        self.Robot.updatePath(RobotPath([(0.35, 0.75), (0.4, 0.7), (0.8, 1.6)]))
+        self.Robot.updatePath(RobotPath([(0.35, 0.75), (0.4, 0.7), (0.8, 1.6), (1, 0.78)]))
         self.Robot.NavStatus = RobotStatus.NAV_STRAIGHT
 
-        MapObstacles.BeltPoints = [(3.6, 1.4), (0.75, 0.5)]
+        MapObstacles.BeltPoints = [(3.6, 1.4), (0.75, 0.5), (2.5, 0.33)]
 
         time.sleep(0.2)  # wait for tfs to arrive
         self.run()
