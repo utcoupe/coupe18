@@ -36,7 +36,7 @@ class PathChecker(object):
                         rospy.loginfo("[COLLISION] Found dangerous collision.")
                         level = CollisionLevel.LEVEL_DANGER
 
-                    collisions.append(Collision(level, obstacle, travel_distance))
+                    collisions.append(Collision(level, obstacle, distance_to_collision + travel_distance))
             distance_to_collision += path_segment.Shape.Width
         print collisions
         return collisions

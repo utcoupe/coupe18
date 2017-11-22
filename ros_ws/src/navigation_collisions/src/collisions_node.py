@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import json, time
+import json
 import rospy
 import tf2_ros
 
@@ -13,6 +13,7 @@ from collisions_checker import *
 
 # from geometry_msgs.msg import Pose2D
 from navigation_collisions.msg import PredictedCollision
+from geometry_msgs.msg import Pose2D
 
 
 class CollisionsNode(object):
@@ -37,19 +38,25 @@ class CollisionsNode(object):
         # try:
         #     map_get_client = rospy.ServiceProxy("/memory/map/get", MapGet)
         #     map_get_client.wait_for_service()
-        #     shape = Shape(json.loads(map_get_client("/entities/{}/shape/*".format(rospy.get_param("/robotname")))))
+        #     shape = json.loads(map_get_client("/entities/{}/shape/*".format(rospy.get_param("/robotname"))))
+        #     if shape["type"] == "rect":
+        #         shape = Rect(shape["width"], shape["height"])
+        #     elif shape["type"] == "circle":
+        #         shape = Circle(shape["radius"])
         # except:
-        #     shape = Shape({"type": "rect", "width": 0.3, "height": 0.3})
+        #     rospy.logerr("ERROR Collisions couldn't get the robot's shape from map.")
+        #     shape = Rect(0.3, 0.3)
         # self.Robot = MapRobot(shape)
 
         # TESTS
-        self.Robot = MapRobot(Rect(0.42, 0.28)) # TODO handle circles
+        self.Robot = MapRobot(Circle(0.28)) # Can create a rect or circle
         self.Robot.updatePath(RobotPath([(0.35, 0.75), (0.4, 0.7), (0.8, 1.6), (1, 0.78)]))
         self.Robot.NavStatus = RobotStatus.NAV_STRAIGHT
 
-        MapObstacles.BeltPoints = [(3.6, 1.4), (0.75, 0.5), (2.5, 0.33)]
+        MapObstacles.BeltPoints = [MapObstacle(Rect(3.6, 1.4), Position(0.2, 0.1)),
+                                   MapObstacle(Rect(0.24, 0.5), Position(0.6, 0.18)),
+                                   MapObstacle(Rect(1.2, 1.98), Position(42, 0.12))]
 
-        time.sleep(0.2)  # wait for tfs to arrive
         self.run()
 
     def run(self):
@@ -60,13 +67,25 @@ class CollisionsNode(object):
             predicted_collisions = self.Robot.checkPathCollisions(MapObstacles.toList())
             for pd in predicted_collisions:
                 print pd.Distance, pd.Level
-                # self.publishCollision(pd)
+                self.publishCollision(pd)
 
             r.sleep()
 
     def publishCollision(self, collision): # TODO
         m = PredictedCollision()
-        m.danger_level = collision.danger_level
+        m.danger_level = collision.Level
+
+        obs = collision.Obstacle
+        m.obstacle_pos = Pose2D(obs.Position.X, obs.Position.Y, obs.Position.A)
+        if isinstance(obs, Rect):
+            m.obstacle_type = m.TYPE_RECT
+            m.width, m.height = obs.Shape.Width, obs.Shape.Height
+        elif isinstance(obs, Circle):
+            m.obstacle_type = m.TYPE_CIRCLE
+            m.radius = obs.Shape.Radius
+        # elif isinstance(obs, Point):
+        #     m.obstacle_type = m.TYPE_POINT
+
         self.pub.publish(m)
 
     def updateRobotPosition(self):
