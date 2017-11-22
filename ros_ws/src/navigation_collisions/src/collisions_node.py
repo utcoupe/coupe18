@@ -5,7 +5,7 @@ import tf2_ros
 
 from collisions_checker import *
 
-# from memory_map.msg import MapGet
+from memory_map.srv import MapGet
 
 # from processing_belt_interpreter.msg import BeltFiltered
 # from navigation_navigator.msg import NavStatus
@@ -35,25 +35,28 @@ class CollisionsNode(object):
         self.pub = rospy.Publisher("/navigation/collisions/warner", PredictedCollision, queue_size=10)
 
         # Getting the robot shape and creating the robot instance
-        # try:
-        #     map_get_client = rospy.ServiceProxy("/memory/map/get", MapGet)
-        #     map_get_client.wait_for_service()
-        #     shape = json.loads(map_get_client("/entities/{}/shape/*".format(rospy.get_param("/robotname"))))
-        #     if shape["type"] == "rect":
-        #         shape = Rect(shape["width"], shape["height"])
-        #     elif shape["type"] == "circle":
-        #         shape = Circle(shape["radius"])
-        # except:
-        #     rospy.logerr("ERROR Collisions couldn't get the robot's shape from map.")
-        #     shape = Rect(0.3, 0.3)
-        # self.Robot = MapRobot(shape)
+        try:
+            map_get_client = rospy.ServiceProxy("/memory/map/get", MapGet)
+            map_get_client.wait_for_service()
+            shape = json.loads(map_get_client("/entities/GR/shape/*").response) # TODO GR must not appear
+            if shape["type"] == "rect":
+                shape = Rect(shape["width"], shape["height"])
+            elif shape["type"] == "circle":
+                shape = Circle(shape["radius"])
+            else:
+                raise ValueError("Robot shape type not supported here.")
+            print "got map!"
+        except Exception as e:
+            rospy.logerr("ERROR Collisions couldn't get the robot's shape from map : " + str(e))
+            shape = Rect(0.3, 0.3)
+        print shape
 
         # TESTS
         self.Robot = MapRobot(Circle(0.28)) # Can create a rect or circle
         self.Robot.updatePath(RobotPath([(0.35, 0.75), (0.4, 0.7), (0.8, 1.6), (1, 0.78)]))
         self.Robot.NavStatus = RobotStatus.NAV_STRAIGHT
 
-        MapObstacles.BeltPoints = [MapObstacle(Rect(3.6, 1.4), Position(0.2, 0.1)),
+        MapObstacles.BeltPoints = [MapObstacle(Rect(3.6, 1.4),  Position(0.2, 0.1)),
                                    MapObstacle(Rect(0.24, 0.5), Position(0.6, 0.18)),
                                    MapObstacle(Rect(1.2, 1.98), Position(42, 0.12))]
 
@@ -66,7 +69,7 @@ class CollisionsNode(object):
 
             predicted_collisions = self.Robot.checkPathCollisions(MapObstacles.toList())
             for pd in predicted_collisions:
-                print pd.Distance, pd.Level
+                # print pd.Distance, pd.Level
                 self.publishCollision(pd)
 
             r.sleep()
