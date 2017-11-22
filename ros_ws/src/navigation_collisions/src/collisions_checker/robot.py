@@ -1,27 +1,38 @@
 #!/usr/bin/python
-
-class Path(object):
-    def __init__(self):
-        pass
-
-    def getWaypoints(self):
-        pass
-
-    def toShapes(self):
-        pass
+from map_classes import MapObstacle, Velocity
+from robot_path import RobotPath
 
 
-class NavStatus(object):
-    STOPPED = 0
-    MOVING_STRAIGHT = 1
-    MOVING_TURNING = 2
+class RobotStatus(object): # Status given by navigation/nagivator.
+    NAV_IDLE     = 0 # No movement planned.
+    NAV_STOPPED  = 1 # Robot stopped, but still has movement plans pending.
+    NAV_STRAIGHT = 2 # Robot moving in a straight line.
+    NAV_TURNING  = 3 # Robot turning around itself.
 
 
-class Robot(MapObject):
+class MapRobot(MapObstacle):
     def __init__(self, shape):
-        position = None # TODO
-        super(Robot, self).__init__(shape, position)
-        self.NavMode = NavStatus.STOPPED
-        self.CurrentPath = Path()
+        super(MapRobot, self).__init__(shape, None, Velocity()) # TODO velocicty
+        self.NavStatus = RobotStatus.NAV_IDLE
+        self.Path = RobotPath()
 
-        self.collisions = CollisionChecker()
+    def isInitialized(self):
+        return self.Shape != None and self.Position != None and self.Velocity != None # TODO implement check if true data in there
+
+    def updatePosition(self, new_position):
+        self.Position = new_position
+
+    def updatePath(self, new_path):
+        self.Path = new_path
+
+    def updateVelocity(self, new_velocity):
+        self.Velocity = new_velocity
+
+    def checkPathCollisions(self, map_obstacles):
+        collisions = []
+        if map_obstacles is not None and self.Path.hasPath() and self.isInitialized():
+            if self.NavStatus != RobotStatus.NAV_IDLE:
+                print "Started checking collisions in the way..."
+                collisions = self.Path.checkCollisions(self, map_obstacles)
+
+        return collisions
