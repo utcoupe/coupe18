@@ -29,6 +29,10 @@
     <group ns="movement">
 		<node pkg="movement_actuators" name="actuators" type="actuators_node.py"/>
 	</group> 
-	
+
+    <group ns="external_nodes">
+        <node pkg="tf2_web_republisher" name="tf2_web_republisher" type="tf2_web_republisher"/>
+        <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
+    </group>
     
 </launch>
