@@ -5,6 +5,7 @@ import tf2_ros
 
 from collisions_checker import *
 from collisions_subscriptions import CollisionsSubscriptions
+from markers_publisher import MarkersPublisher
 
 from memory_map.srv import MapGet
 
@@ -27,10 +28,12 @@ class CollisionsNode(object):
         # Creating the publisher where the collisions will be notified in
         self.pub = rospy.Publisher("/navigation/collisions/warner", PredictedCollision, queue_size=10)
 
+        self.markers = MarkersPublisher()
+
         # Getting the robot shape and creating the robot instance
         try:
             map_get_client = rospy.ServiceProxy("/memory/map/get", MapGet)
-            map_get_client.wait_for_service()
+            map_get_client.wait_for_service(2.0)
             shape = json.loads(map_get_client("/entities/GR/shape/*").response) # TODO GR must not appear
             if shape["type"] == "rect":
                 shape = Rect(shape["width"], shape["height"])
@@ -45,7 +48,7 @@ class CollisionsNode(object):
 
         # TESTS While dependencies not available.
         Map.Robot = MapRobot(shape) # Can create a rect or circle
-        Map.Robot.updatePath(RobotPath([Point(0.35, 0.75), Point(0.4, 0.7), Point(0.8, 1.6), Point(1, 0.78)]))
+        Map.Robot.updatePath(RobotPath([Point(0.8, 0.75), Point(1.4, 0.7), Point(0.8, 1.6), Point(1.8, 0.78)]))
         Map.Robot.NavStatus = RobotStatus.NAV_STRAIGHT
 
         Map.BeltPoints = [MapObstacle(Rect(3.6, 1.4),  Position(0.2, 0.1)),
@@ -63,6 +66,8 @@ class CollisionsNode(object):
             for pd in predicted_collisions:
                 # print pd.Distance, pd.Level
                 self.publishCollision(pd)
+
+            self.markers.publishPathShapes(Map.Robot)
 
             r.sleep()
 
