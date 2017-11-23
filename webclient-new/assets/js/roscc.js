@@ -54,148 +54,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var AsservController = function () {
-  function AsservController(Ros) {
-    _classCallCheck(this, AsservController);
-
-    this.ros = Ros.ros;
-
-    Ros.listen('/drivers/ard_asserv/pose2d', function (e) {
-      this.pushDataToChart(2, e.x);
-      this.pushDataToChart(3, e.theta);
-      this.pushDataToChart(4, e.y);
-    }.bind(this));
-
-    Ros.listen('/drivers/ard_asserv/speed', function (e) {
-      this.pushDataToChart(0, e.pwm_speed_left);
-      this.pushDataToChart(1, e.pwm_speed_right);
-      this.pushDataToChart(5, e.wheel_speed_right);
-      this.pushDataToChart(7, e.wheel_speed_right);
-      this.pushDataToChart(6, e.linear_speed);
-    }.bind(this));
-
-    // topics to listen to
-    this.topics = ['/asserv/x', '/asserv/x', '/asserv/x', '/asserv/x', '/asserv/x', '/asserv/x', '/asserv/x', '/asserv/x'];
-
-    this.options = {
-      scales: {
-        xAxes: [{
-          ticks: {
-            display: false
-          },
-          gridLines: {
-            display: false
-          }
-        }]
-      },
-      animation: false,
-      title: {
-        display: true,
-        text: 'Custom Chart Title',
-        fontSize: 20
-      }
-    };
-
-    this.datasetOverride = {
-      label: 'Sinus',
-      borderColor: 'rgb(75, 192, 192)',
-      borderWidth: 2,
-      pointRadius: 0,
-      fill: false
-    };
-
-    this.charts = [];
-
-    for (var i = 0; i < 8; i++) {
-
-      this.charts.push({
-        data: [0],
-        labels: [0],
-        options: JSON.parse(JSON.stringify(this.options)),
-        datasetOverride: this.datasetOverride
-      });
-    }
-
-    this.charts[0].options.title.text = 'PWM speed left';
-    this.charts[1].options.title.text = 'PWM speed right';
-    this.charts[2].options.title.text = 'X position';
-    this.charts[3].options.title.text = 'Orientation';
-    this.charts[4].options.title.text = 'Y position';
-    this.charts[5].options.title.text = 'Wheel speed left';
-    this.charts[7].options.title.text = 'Wheel speed right';
-    this.charts[6].options.title.text = 'Linear speed';
-
-    var canvas = document.getElementsByTagName('canvas');
-    var _iteratorNormalCompletion = true;
-    var _didIteratorError = false;
-    var _iteratorError = undefined;
-
-    try {
-      for (var _iterator = canvas[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-        var c = _step.value;
-        fitToContainer(c);
-      }
-    } catch (err) {
-      _didIteratorError = true;
-      _iteratorError = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion && _iterator.return) {
-          _iterator.return();
-        }
-      } finally {
-        if (_didIteratorError) {
-          throw _iteratorError;
-        }
-      }
-    }
-
-    function fitToContainer(canvas) {
-      // Make it visually fill the positioned parent
-      canvas.style.width = '100%';
-      canvas.style.height = '100%';
-      // ...then set the internal size to match
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-    }
-  }
-
-  _createClass(AsservController, [{
-    key: 'pushDataToChart',
-    value: function pushDataToChart(i, e) {
-      this.charts[i].data.push(e);
-      this.charts[i].labels.push(this.charts[i].labels[this.charts[i].labels.length - 1] + 0.1);
-    }
-  }, {
-    key: '$onInit',
-    value: function $onInit() {
-      var canvas = document.querySelector('canvas');
-      fitToContainer(canvas);
-
-      function fitToContainer(canvas) {
-        // Make it visually fill the positioned parent
-        canvas.style.width = '100%';
-        canvas.style.height = '100%';
-        // ...then set the internal size to match
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
-      }
-    }
-  }]);
-
-  return AsservController;
-}();
-
-angular.module('roscc').component('ccAsserv', {
-  templateUrl: 'app/asserv/asserv.html',
-  controller: AsservController
-});
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 var ControlController = function () {
   function ControlController($rootScope, $timeout, $interval, Settings, Domains, Ros, Console) {
     var _this = this;
@@ -411,6 +269,148 @@ var DiagnosticController = function () {
 angular.module('roscc').component('ccDiagnostic', {
   templateUrl: 'app/diagnostic/diagnostic.html',
   controller: DiagnosticController
+});
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var AsservController = function () {
+  function AsservController(Ros) {
+    _classCallCheck(this, AsservController);
+
+    this.ros = Ros.ros;
+
+    Ros.listen('/drivers/ard_asserv/pose2d', function (e) {
+      this.pushDataToChart(2, e.x);
+      this.pushDataToChart(3, e.theta);
+      this.pushDataToChart(4, e.y);
+    }.bind(this));
+
+    Ros.listen('/drivers/ard_asserv/speed', function (e) {
+      this.pushDataToChart(0, e.pwm_speed_left);
+      this.pushDataToChart(1, e.pwm_speed_right);
+      this.pushDataToChart(5, e.wheel_speed_right);
+      this.pushDataToChart(7, e.wheel_speed_right);
+      this.pushDataToChart(6, e.linear_speed);
+    }.bind(this));
+
+    // topics to listen to
+    this.topics = ['/asserv/x', '/asserv/x', '/asserv/x', '/asserv/x', '/asserv/x', '/asserv/x', '/asserv/x', '/asserv/x'];
+
+    this.options = {
+      scales: {
+        xAxes: [{
+          ticks: {
+            display: false
+          },
+          gridLines: {
+            display: false
+          }
+        }]
+      },
+      animation: false,
+      title: {
+        display: true,
+        text: 'Custom Chart Title',
+        fontSize: 20
+      }
+    };
+
+    this.datasetOverride = {
+      label: 'Sinus',
+      borderColor: 'rgb(75, 192, 192)',
+      borderWidth: 2,
+      pointRadius: 0,
+      fill: false
+    };
+
+    this.charts = [];
+
+    for (var i = 0; i < 8; i++) {
+
+      this.charts.push({
+        data: [0],
+        labels: [0],
+        options: JSON.parse(JSON.stringify(this.options)),
+        datasetOverride: this.datasetOverride
+      });
+    }
+
+    this.charts[0].options.title.text = 'PWM speed left';
+    this.charts[1].options.title.text = 'PWM speed right';
+    this.charts[2].options.title.text = 'X position';
+    this.charts[3].options.title.text = 'Orientation';
+    this.charts[4].options.title.text = 'Y position';
+    this.charts[5].options.title.text = 'Wheel speed left';
+    this.charts[7].options.title.text = 'Wheel speed right';
+    this.charts[6].options.title.text = 'Linear speed';
+
+    var canvas = document.getElementsByTagName('canvas');
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+      for (var _iterator = canvas[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var c = _step.value;
+        fitToContainer(c);
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator.return) {
+          _iterator.return();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
+    }
+
+    function fitToContainer(canvas) {
+      // Make it visually fill the positioned parent
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+      // ...then set the internal size to match
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    }
+  }
+
+  _createClass(AsservController, [{
+    key: 'pushDataToChart',
+    value: function pushDataToChart(i, e) {
+      this.charts[i].data.push(e);
+      this.charts[i].labels.push(this.charts[i].labels[this.charts[i].labels.length - 1] + 0.1);
+    }
+  }, {
+    key: '$onInit',
+    value: function $onInit() {
+      var canvas = document.querySelector('canvas');
+      fitToContainer(canvas);
+
+      function fitToContainer(canvas) {
+        // Make it visually fill the positioned parent
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        // ...then set the internal size to match
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+      }
+    }
+  }]);
+
+  return AsservController;
+}();
+
+angular.module('roscc').component('ccAsserv', {
+  templateUrl: 'app/asserv/asserv.html',
+  controller: AsservController
 });
 'use strict';
 
@@ -843,15 +843,28 @@ var RosService = function () {
 
       this.ros.getParams(function (params) {
         //TODO : update like topics
-        _this4.data.parameters = [];
         angular.forEach(params, function (name) {
-          var param = new ROSLIB.Param({ ros: _this4.ros, name: name });
-          _this4.data.parameters.push({ name: name });
 
+          var foundParam = _.findWhere(_this4.data.parameters, { name: name });
+          if (!foundParam) {
+            _this4.data.parameters.push({ name: name });
+          }
+
+          var param = new ROSLIB.Param({ ros: _this4.ros, name: name });
           param.get(function (value) {
             _.findWhere(_this4.data.parameters, { name: name }).value = value;
+            _.findWhere(_this4.data.parameters, { name: name }).fetched = true;
           });
         });
+
+        for (var i = _this4.data.parameters.length - 1; i >= 0; i--) {
+          //angular foreach not working for this
+          var p = _this4.data.parameters[i];
+
+          if (!_.contains(params, p.name)) {
+            _this4.data.parameters.splice(i, 1);
+          }
+        }
       });
 
       this.ros.getNodes(function (nodes) {

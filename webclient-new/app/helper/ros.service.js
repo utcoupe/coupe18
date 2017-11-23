@@ -217,15 +217,27 @@ class RosService {
     }); // end getServices
 
     this.ros.getParams((params) => { //TODO : update like topics
-      this.data.parameters = [];
       angular.forEach(params, (name) => {
-        const param = new ROSLIB.Param({ ros: this.ros, name });
-        this.data.parameters.push({ name });
 
+        let foundParam = _.findWhere(this.data.parameters, { name });
+        if(!foundParam) {
+          this.data.parameters.push({ name });
+        }
+
+        const param = new ROSLIB.Param({ ros: this.ros, name });
         param.get((value) => {
           _.findWhere(this.data.parameters, { name }).value = value;
+          _.findWhere(this.data.parameters, { name }).fetched = true;
         });
       });
+
+      for(let i = this.data.parameters.length - 1; i >= 0; i--) { //angular foreach not working for this
+        let p = this.data.parameters[i];
+
+        if(!_.contains(params, p.name)) {
+            this.data.parameters.splice(i, 1);
+        }
+      }
     });
 
     this.ros.getNodes((nodes) => { //TODO : update like topics
