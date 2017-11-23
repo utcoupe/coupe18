@@ -43,5 +43,9 @@
     "bootstrap": "^3.3.7",
     "chart.js": "^2.7.0",
     "eventemitter2": "^4.1.0"
+  },
+  "scripts": {
+    "start": "http-server",
+    "dev": "http-server -c-1"
   }
 }
