@@ -23,7 +23,7 @@ class BeltInterpreter(object):
         self.SENSOR_FRAME_ID = "belt_{}" # {} will be replaced by the sensor name
 
         rospy.init_node("belt_interpreter")
-        rospy.loginfo("[PROCESSING] belt_interpreter node started")
+        rospy.logdebug("Node started")
 
         # get definition file
         rospy.wait_for_service('/memory/definitions/get')
@@ -32,22 +32,21 @@ class BeltInterpreter(object):
         try:
             res = get_def("processing/belt.xml")
             if not res.success:
-                rospy.logerr("[PROCESSING] Error when fetching belt definition file")
+                rospy.logerr("Error when fetching belt definition file")
 
             def_filename = res.path
         except rospy.ServiceException as exc:
-            rospy.logerr("[PROCESSING] Error when fetching belt definition file: {}"
+            rospy.logerr("Error when fetching belt definition file: {}"
                          .format(str(exc)))
             raise Exception()
 
-        rospy.loginfo("[PROCESSING] Belt definition file fetched")
+        rospy.logdebug("Belt definition file fetched")
 
         # parse definition file
         self._belt_parser = BeltParser(def_filename)
 
 
         self._sensors_sub = rospy.Subscriber("/sensors/belt", RangeList, self.callback)
-        self._localizer_sub = rospy.Subscriber("/recognition/localizer", Pose2D, self.callbackPos)
         self._pub = rospy.Publisher("/processing/belt_interpreter/points", BeltFiltered, queue_size=10)
         self._tl = tf.TransformListener()
         self._broadcaster = tf2_ros.StaticTransformBroadcaster()
@@ -56,42 +55,39 @@ class BeltInterpreter(object):
 
         self.pub_static_transforms()
 
-        rospy.loginfo("[PROCESSING] belt_interpreter subscribed to sensors topics")
+        rospy.logdebug("Subscribed to sensors topics")
 
         self._static_shapes = []
 
+        rospy.wait_for_service('/memory/map/get')
         get_map = rospy.ServiceProxy('/memory/map/get', MapGet)
-        map_obj = json.loads(get_map("/terrain/*").response)
+        response = get_map("/terrain/*")
+        if not response.success:
+            rospy.logerr("Error when fetching objects from map")
+        else:
+            map_obj = json.loads(get_map("/terrain/*").response)
 
-        for v in map_obj["walls"]["layer_ground"].values():
-            x = float(v["position"]["x"])
-            y = float(v["position"]["y"])
-            type = v["shape"]["type"]
+            for v in map_obj["walls"]["layer_ground"].values():
+                x = float(v["position"]["x"])
+                y = float(v["position"]["y"])
+                type = v["shape"]["type"]
 
-            if type == "rect":
-                w = float(v["shape"]["width"])
-                h = float(v["shape"]["height"])
-                shape = Rectangle(x, y, w, h)
+                if type == "rect":
+                    w = float(v["shape"]["width"])
+                    h = float(v["shape"]["height"])
+                    shape = Rectangle(x, y, w, h)
 
-            elif type == "circle":
-                r = float(v["shape"]["radius"])
-                shape = Circle(x, y, r)
-            else: # TODO POLYGONS
-                pass
+                elif type == "circle":
+                    r = float(v["shape"]["radius"])
+                    shape = Circle(x, y, r)
+                else: # TODO POLYGONS
+                    pass
 
-            self._static_shapes.append(shape)
+                self._static_shapes.append(shape)
 
-        self._robot_pos = None
         rospy.spin()
 
-    def callbackPos(self, data):
-        self._robot_pos = data
-
     def callback(self, data_list):
-        if self._robot_pos is None:
-            rospy.logdebug("[PROCESSING] belt_interpreter : Sensor data received but no position received yet from localizer")
-            return
-
         staticPoints = []
         dynamicPoints = []
 
