@@ -1,15 +1,17 @@
 #!/usr/bin/python
 
 
-class MapObstacles(object):
+class Map(object):
+    Robot = None
+
     Enemies = []
     BeltPoints = []
     LidarObjects = []
 
     @staticmethod
     def toList():
-        return MapObstacles.Enemies + MapObstacles.BeltPoints + MapObstacles.LidarObjects
+        return Map.Enemies + Map.BeltPoints + Map.LidarObjects
 
     @staticmethod
     def hasData():
-        return MapObstacles.Enemies or MapObstacles.BeltPoints or MapObstacles.LidarObjects
+        return Map.Enemies or Map.BeltPoints or Map.LidarObjects
