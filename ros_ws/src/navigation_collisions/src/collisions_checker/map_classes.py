@@ -5,10 +5,14 @@ class Velocity(object):
     pass # TODO
 
 
-class Position(object):
-    def __init__(self, x, y, angle = 0.0):
+class Point(object):
+    def __init__(self, x, y):
         self.X = x
         self.Y = y
+
+class Position(Point):
+    def __init__(self, x, y, angle = 0.0):
+        super(Position, self).__init__(x, y)
         self.A = angle
 
     def tuple2(self):
@@ -22,4 +26,4 @@ class MapObstacle(object):
         self.Velocity = velocity
 
     def intersects(self, obstacle):
-        return self.Shape.intersects(self.Position, obstacle)
+        raise NotImplementedError
