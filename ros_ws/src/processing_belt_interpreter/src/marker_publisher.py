@@ -8,7 +8,7 @@ MARKERS_NAMESPACE = "belt_data"
 class MarkersPublisher(object):
     def __init__(self):
         super(MarkersPublisher, self).__init__()
-        self._pub = rospy.Publisher("visualization_markers", Marker, queue_size=10)
+        self._pub = rospy.Publisher("/visualization_markers", Marker, queue_size=10)
 
     def publish_markers(self, static_points, dynamic_points):
         marker = Marker()
