@@ -17,7 +17,7 @@ ARCH=$(uname -m)
 ### Install the linux packages
 function install_apt() {
 	green_echo "Install missing packages..."
-	sudo apt-get install git build-essential python python-pip cmake libboost-dev libsdl1.2-dev gcc-avr avrdude avr-libc
+	sudo apt-get install git build-essential python python-pip cmake libboost-dev libsdl1.2-dev gcc-avr avrdude avr-libc libsfml-dev
 
 	# Check if it's a PC or a raspi
 	if [ "$ARCH" = "x86_64" ]; then
