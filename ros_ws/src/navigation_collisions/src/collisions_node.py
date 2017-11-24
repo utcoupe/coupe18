@@ -51,9 +51,9 @@ class CollisionsNode(object):
         Map.Robot.updatePath(RobotPath([Point(2.0, 1.7), Point(0.6, 0.7), Point(2.2, 0.6), Point(2.7, 0.3)]))
         Map.Robot.NavStatus = RobotStatus.NAV_STRAIGHT
 
-        Map.BeltPoints = [MapObstacle(Rect(0.1, 0.2),  Position(0.25, 1.3, 0.78539816339)),
-                          MapObstacle(Rect(0.24, 0.5), Position(1.6, 1.1, 0.9)),
-                          MapObstacle(Circle(0.25 / 2), Position(2.55, 0.55))]
+        Map.BeltPoints = [RectObstacle(Rect(0.1, 0.2),  Position(0.25, 1.3, 0.78539816339)),
+                          RectObstacle(Rect(0.24, 0.5), Position(1.6, 0.9, 3.14 / 2)),
+                          RectObstacle(Circle(0.25 / 2), Position(2.55, 0.55))]
 
         self.run()
 

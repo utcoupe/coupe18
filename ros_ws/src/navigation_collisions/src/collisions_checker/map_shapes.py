@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import math
 
 
 class Shape(object):
@@ -13,6 +14,7 @@ class Rect(Shape):
 
     def __repr__(self):
         return "rect"
+
 
 class Circle(Shape):
     def __init__(self, radius):
