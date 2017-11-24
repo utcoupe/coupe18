@@ -38,7 +38,7 @@ class PathChecker(object):
                         level = CollisionLevel.LEVEL_DANGER
 
                     collisions.append(Collision(level, obstacle, distance_to_collision + travel_distance))
-            distance_to_collision += path_segment.Shape.Width
+            distance_to_collision += path_segment.Shape.Width if str(path_segment.Shape) == "rect" else 0
         return collisions
 
 class Intersections():
