@@ -12,6 +12,7 @@ from navigation_navigator.msg import *
 
 from pathfinder import PathfinderClient
 from asserv import AsservClient
+from localizer import LocalizerClient
 
 __author__ = "Gaëtan Blond"
 __date__ = 17/10/2017
@@ -39,9 +40,11 @@ class NavigatorNode(object):
         """
 
         self._actionSrv_Dogoto = ""
+        self._gotoSrv = ""
 
         self._pathfinderClient = ""
         self._asservClient = ""
+        self._localizerClient = ""
         self._waitedResults = {}
     
     def _callbackForResults(self, idAct, result):
@@ -80,7 +83,8 @@ class NavigatorNode(object):
         Else it will return success=True
         @param req:     Request containing the target position
         """
-        posStart = self._asservClient.currentPose
+        # posStart = self._asservClient.currentPose
+        posStart = self._localizerClient.getLastKnownPos()
 
         debugStr = "Asked to go from "
         debugStr += pointToStr(posStart)
@@ -124,7 +128,8 @@ class NavigatorNode(object):
         handledGoal.set_succeeded(result)
     
     def _handleDoGotoRequest (self, handledGoal):
-        posStart = self._asservClient.currentPose
+        #posStart = self._asservClient.currentPose
+        posStart = self._localizerClient.getLastKnownPos()
 
         debugStr = "Asked to go from "
         debugStr += pointToStr(posStart)
@@ -157,8 +162,9 @@ class NavigatorNode(object):
 
         self._pathfinderClient = PathfinderClient()
         self._asservClient = AsservClient()
+        self._localizerClient = LocalizerClient()
 
-        self._s = rospy.Service ("/navigation/navigator/goto", Goto, self._handle_goto)
+        self._gotoSrv = rospy.Service ("/navigation/navigator/goto", Goto, self._handle_goto)
         self._actionSrv_Dogoto = actionlib.ActionServer("/navigation/navigator/goto_action", DoGotoAction, self._handleDoGotoRequest)
         rospy.loginfo ("Ready to navigate!")
         rospy.spin ()
