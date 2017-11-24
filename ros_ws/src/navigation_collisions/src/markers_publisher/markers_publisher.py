@@ -6,7 +6,7 @@ from visualization_msgs.msg import Marker
 
 class MarkersPublisher(object):
     def __init__(self):
-        self.MARKERS_TOPIC = "visualization_markers"
+        self.MARKERS_TOPIC = "navigation_markers"
         self.MarkersPUBL = rospy.Publisher(self.MARKERS_TOPIC, Marker, queue_size=10)
 
         count = 0  # TODO HARDCODED
@@ -24,31 +24,35 @@ class MarkersPublisher(object):
         if self.RvizConnected:
             # Publish path collision shapes
             for i, path_shape in enumerate(robot.Path.toShapes(robot)):
-                self.publishPathShape(path_shape.Position, path_shape.Shape, i)
+                self.publishMarker("collisions_path", i, path_shape.Shape, path_shape.Position, 0.02, 0.01, (1.0, 0.2, 0.4, 0.6))
 
-    def publishPathShape(self, position, shape, i):
+    def publishObstacles(self, obstacles): # Temporaire ?
+        for i, obs in enumerate(obstacles):
+            self.publishMarker("collisions_obstacles", i, obs.Shape, obs.Position, 0.35, 0.35 / 2.0, (1.0, 0.8, 0.3, 0.8))
+
+    def publishMarker(self, ns, index, shape, position, z_scale, z_height, color):
         markertypes = {
-            "cube": Marker.CUBE,
-            "sphere": Marker.SPHERE,
+            "rect": Marker.CUBE,
+            "circle": Marker.CYLINDER,
             "mesh": Marker.MESH_RESOURCE
         }
         marker = Marker()
         marker.header.frame_id = "/map"
-        marker.type = markertypes["cube"]
-        marker.ns = "path_collisions"
-        marker.id = i
+        marker.type = markertypes[str(shape)] # TODO
+        marker.ns = ns
+        marker.id = index
 
         marker.action = Marker.ADD
-        marker.scale.x = shape.Width
-        marker.scale.y = shape.Height
-        marker.scale.z = 0.02
-        marker.color.r = 1.0
-        marker.color.g = 0.2
-        marker.color.b = 0.4
-        marker.color.a = 0.6
+        marker.scale.x = shape.Width  if str(shape) == "rect" else shape.Radius * 2
+        marker.scale.y = shape.Height if str(shape) == "rect" else shape.Radius * 2
+        marker.scale.z = z_scale
+        marker.color.r = color[0]
+        marker.color.g = color[1]
+        marker.color.b = color[2]
+        marker.color.a = color[3]
         marker.pose.position.x = position.X
         marker.pose.position.y = position.Y
-        marker.pose.position.z = 0.01
+        marker.pose.position.z = z_height
         orientation = self.eulerToQuaternion([0, 0, position.A])
         marker.pose.orientation.x = orientation[0]
         marker.pose.orientation.y = orientation[1]

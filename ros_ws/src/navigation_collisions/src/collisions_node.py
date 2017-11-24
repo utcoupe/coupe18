@@ -44,16 +44,16 @@ class CollisionsNode(object):
             print "got map!"
         except Exception as e:
             rospy.logerr("ERROR Collisions couldn't get the robot's shape from map : " + str(e))
-            shape = Rect(0.3, 0.3)
+            shape = Rect(0.3, 0.2)
 
         # TESTS While dependencies not available.
         Map.Robot = MapRobot(shape) # Can create a rect or circle
-        Map.Robot.updatePath(RobotPath([Point(0.8, 0.75), Point(1.4, 0.7), Point(0.8, 1.6), Point(1.8, 0.78)]))
+        Map.Robot.updatePath(RobotPath([Point(2.0, 1.7), Point(0.6, 0.7), Point(2.2, 0.6), Point(2.7, 0.3)]))
         Map.Robot.NavStatus = RobotStatus.NAV_STRAIGHT
 
-        Map.BeltPoints = [MapObstacle(Rect(3.6, 1.4),  Position(0.2, 0.1)),
-                          MapObstacle(Rect(0.24, 0.5), Position(0.6, 0.18)),
-                          MapObstacle(Rect(1.2, 1.98), Position(42, 0.12))]
+        Map.BeltPoints = [MapObstacle(Rect(0.1, 0.2),  Position(0.25, 1.3, 0.78539816339)),
+                          MapObstacle(Rect(0.24, 0.5), Position(1.6, 1.1, 0.9)),
+                          MapObstacle(Circle(0.25 / 2), Position(2.55, 0.55))]
 
         self.run()
 
@@ -68,6 +68,7 @@ class CollisionsNode(object):
                 self.publishCollision(pd)
 
             self.markers.publishPathShapes(Map.Robot)
+            self.markers.publishObstacles(Map.toList())
 
             r.sleep()
 
@@ -90,7 +91,7 @@ class CollisionsNode(object):
 
     def updateRobotPosition(self):
         try:
-            t = self.tf2_pos_buffer.lookup_transform("robot", "map", rospy.Time())
+            t = self.tf2_pos_buffer.lookup_transform("map", "robot", rospy.Time())
             tx, ty = t.transform.translation.x, t.transform.translation.y
             rz = t.transform.rotation.z
             Map.Robot.updatePosition(Position(tx, ty, angle = rz))

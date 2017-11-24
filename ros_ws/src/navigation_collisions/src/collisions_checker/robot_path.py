@@ -30,6 +30,7 @@ class PathRect(MapObstacle):
                abs(self.Position.Y - p_prime[1]) <= self.Shape.Height / 2.0
 
     def rect_touching_self(self, rect, check_other = True):
+        return False
         for p in rect.corners(): # Check if one corner of rect ins inside this one
             if self.point_in_self(p):
                 return True
@@ -55,6 +56,9 @@ class PathCircle(MapObstacle):
     def distanceToCollision(self, obstacle):
         return 0.35 # TODO Not implemented
 
+    def intersects(self, obstacle):
+        return False
+
 
 
 class RobotPath(object):
@@ -79,17 +83,23 @@ class RobotPath(object):
                 w   = self.Waypoints[i]
 
                 d = math.sqrt( (w.X - p_w.X) ** 2 + (w.Y - p_w.Y) ** 2)
-                pos = Position((w.X + p_w.X) / 2.0, (w.Y + p_w.Y) / 2.0, angle = math.atan((w.Y - p_w.Y) / (w.X - p_w.X)))
+                angle = math.atan((w.Y - p_w.Y) / (w.X - p_w.X))
+                pos = Position((w.X + p_w.X) / 2.0, (w.Y + p_w.Y) / 2.0, angle = angle)
 
                 if isinstance(robot.Shape, Rect):
                     width = robot.Shape.Width
+                    height = robot.Shape.Height
                 elif isinstance(robot.Shape, Circle):
                     width = robot.Shape.Radius * 2.0
+                    height = robot.Shape.Radius * 2.0
                 else:
                     raise ValueError("Robot shape type not supported.")
                 shapes.append(PathRect(Rect(d, width), pos))
 
-                # TODO Create a circle at each waypoint position
+                if i == len(self.Waypoints) - 1:
+                    shapes.append(PathRect(Rect(height, width), Position(w.X, w.Y, angle)))
+                else:
+                    shapes.append(PathCircle(Circle(width / 2.0), Position(w.X, w.Y)))
             return shapes
         else:
             rospy.logerr("Path can't create shapes : less than two waypoints in path")
