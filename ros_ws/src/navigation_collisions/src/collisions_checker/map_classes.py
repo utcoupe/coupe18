@@ -41,9 +41,6 @@ class CircleObstacle(MapObstacle):
     def distanceToCollision(self, obstacle):
         return 0.35 # TODO Not implemented
 
-    def intersects(self, obstacle):
-        return False
-
     def __repr__(self):
         return "circle"
 
@@ -55,7 +52,7 @@ class RectObstacle(MapObstacle):
     def corners(self): # Calculs persos, a verifier DEPRECATED
         corners = []
         l = math.sqrt((self.Shape.Width / 2.0) ** 2 + (self.Shape.Height / 2.0) ** 2)
-        corner_phi = math.atan2(self.Shape.Height , self.Shape.Width)
+        corner_phi = math.atan2(self.Shape.Height, self.Shape.Width)
         for angle_phi in [0, math.pi]:
             for i in range(2):
                 phi = angle_phi  + ((-1) ** (i + 1)) * corner_phi
