@@ -17,7 +17,7 @@ ARCH=$(uname -m)
 ### Install the linux packages
 function install_apt() {
 	green_echo "Install missing packages..."
-	sudo apt-get install git build-essential python python-pip cmake libboost-dev libsdl1.2-dev gcc-avr avrdude avr-libc libsfml-dev libarmadillo-dev
+	sudo apt-get install git build-essential python python-pip cmake libboost-dev libsdl1.2-dev gcc-avr avrdude avr-libc libsfml-dev libarmadillo-dev libavcodec-dev libswscale-dev
 
 	# Check if it's a PC or a raspi
 	if [ "$ARCH" = "x86_64" ]; then
@@ -29,6 +29,7 @@ function install_apt() {
 		sudo apt-get remove npm nodejs nodejs-legacy
 		curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
 		sudo npm install npm@3.5.2 -g
+		#TODO be sure that all is correct for raspi
 	elif [ "$ARCH" = "armv6l" ]; then
 		sudo apt-get install raspberrypi-kernel-headers
 		sudo apt-get remove npm nodejs nodejs-legacy
@@ -52,7 +53,7 @@ function install_ros() {
 		if [ "$ARCH" = "x86_64" ]; then
 			sudo apt-get install ros-kinetic-desktop-full
 		elif [ "$ARCH" = "armv7l" ]; then
-			sudo apt-get install ros-kinetic-ros-base
+			sudo apt-get install ros-kinetic-ros-base ros-kinetic-tf2 ros-kinetic-tf2-ros ros-kinetic-rviz ros-kinetic-diagnostic-updater ros-kinetic-roslint ros-kinetic-camera-info-manager 
 		fi
 		sudo rosdep init
 		rosdep update
@@ -62,6 +63,7 @@ function install_ros() {
 }
 
 ### Setup the variable environment to taget the UTCoupe main folder
+### This function use $PWD instead of $UTCOUPE_WORKSPACE because if the env variable is not set before running the script, $UTCOUPE_WORKSPACE is unknown
 function env_setup() {
 	# Add the UTCOUPE_WORKSPACE env variable, default consider as bash shell
 	if [ -z "$UTCOUPE_WORKSPACE" ]; then
@@ -99,14 +101,14 @@ function env_setup() {
 		sudo chown $USER:$USER /var/log/utcoupe
 	fi
 	# Untar all libraries
-	for f in $UTCOUPE_WORKSPACE/libs/*; do
+	for f in $PWD/libs/*; do
 		if [ ! -d $f ]; then	
-			tar -C $UTCOUPE_WORKSPACE/libs -xzf $f
+			tar -C $PWD/libs -xzf $f
 		fi
 	done
 	# "Install" Arduino libs
 	if [ ! -L "/opt/arduino-1.0" ]; then
-		sudo ln -s $UTCOUPE_WORKSPACE/libs/arduino-1.0 /opt/
+		sudo ln -s $PWD/libs/arduino-1.0 /opt/
 	fi
 	# Add the Ethernet IP address of raspberry pi to have a shortcut
 	if ! grep "utcoupe" /etc/hosts > /dev/null; then
@@ -156,5 +158,6 @@ printf "Launch install script ? [Y/n]?"
 read answer
 if [ "$answer" = "" ] || [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
 	launch_script
+	echo "If you run the install script for the first time, please reboot your computer to apply all modifications."
 fi
 
