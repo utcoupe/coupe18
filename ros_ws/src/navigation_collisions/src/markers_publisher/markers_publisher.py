@@ -20,15 +20,19 @@ class MarkersPublisher(object):
                 break # Cancel connection
         if self.RvizConnected: rospy.loginfo("Map connected to RViz. Will publish markers.")
 
-    def publishPathShapes(self, robot):
+    def publishCheckZones(self, robot):
         if self.RvizConnected:
             # Publish path collision shapes
-            for i, path_shape in enumerate(robot.Path.toShapes(robot)):
-                self.publishMarker("collisions_path", i, path_shape.Shape, path_shape.Position, 0.02, 0.01, (1.0, 0.2, 0.4, 0.6))
+            if robot.isInitialized():
+                for i, path_shape in enumerate(robot.Path.toShapes(robot)):
+                    self.publishMarker("collisions_path", i + 1, path_shape.Shape, path_shape.Position, 0.02, 0.01, (1.0, 0.5, 0.1, 0.8))
+                    stop_rect = robot.getStopRect()
+                self.publishMarker("collisions_path", 0, stop_rect.Shape, stop_rect.Position, 0.02, 0.01, (1.0, 0.0, 0.0, 0.8))
 
     def publishObstacles(self, obstacles): # Temporaire ?
-        for i, obs in enumerate(obstacles):
-            self.publishMarker("collisions_obstacles", i, obs.Shape, obs.Position, 0.35, 0.35 / 2.0, (1.0, 0.8, 0.3, 0.8))
+        if self.RvizConnected:
+            for i, obs in enumerate(obstacles):
+                self.publishMarker("collisions_obstacles", i, obs.Shape, obs.Position, 0.35, 0.35 / 2.0, (1.0, 0.8, 0.3, 0.8))
 
     def publishMarker(self, ns, index, shape, position, z_scale, z_height, color):
         markertypes = {

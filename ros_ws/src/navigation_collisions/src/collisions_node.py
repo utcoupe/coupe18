@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import json
+import math
 import rospy
 import tf2_ros
 
@@ -50,6 +51,7 @@ class CollisionsNode(object):
         Map.Robot = MapRobot(shape) # Can create a rect or circle
         Map.Robot.updatePath(RobotPath([Point(2.0, 1.7), Point(0.6, 0.7), Point(2.2, 0.6), Point(2.7, 0.3)]))
         Map.Robot.NavStatus = RobotStatus.NAV_STRAIGHT
+        Map.Robot.updateVelocity(2.0, 0.33)
 
         Map.BeltPoints = [RectObstacle(Rect(0.1, 0.2),     Position(0.25, 1.3, 0.78539816339)),
                           RectObstacle(Rect(0.24, 0.5),    Position(1.6, 0.9, 3.14 / 2)),
@@ -58,16 +60,15 @@ class CollisionsNode(object):
         self.run()
 
     def run(self):
-        r = rospy.Rate(50)
+        r = rospy.Rate(15)
         while not rospy.is_shutdown():
             self.updateRobotPosition()
 
-            predicted_collisions = Map.Robot.checkPathCollisions(Map.toList())
+            predicted_collisions = Map.Robot.checkCollisions(Map.toList())
             for pd in predicted_collisions:
-                # print pd.Distance, pd.Level
                 self.publishCollision(pd)
 
-            self.markers.publishPathShapes(Map.Robot)
+            self.markers.publishCheckZones(Map.Robot)
             self.markers.publishObstacles(Map.toList())
 
             r.sleep()
@@ -75,6 +76,11 @@ class CollisionsNode(object):
     def publishCollision(self, collision): # TODO
         m = PredictedCollision()
         m.danger_level = collision.Level
+
+        if collision.Level == CollisionLevel.LEVEL_STOP:
+            rospy.logwarn("[COLLISIONS] Found freaking close collision, please stop !!")
+        elif collision.Level == CollisionLevel.LEVEL_DANGER:
+            rospy.loginfo("[COLLISIONS] Found collision intersecting with the path.")
 
         obs = collision.Obstacle
         m.obstacle_pos = Pose2D(obs.Position.X, obs.Position.Y, obs.Position.A)
@@ -90,10 +96,27 @@ class CollisionsNode(object):
         self.pub.publish(m)
 
     def updateRobotPosition(self):
+        def quaternion_to_euler_angle(quaternion):
+            # https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+            w, x, y, z = quaternion.w, quaternion.x, quaternion.y, quaternion.z
+            t0 = +2.0 * (w * x + y * z)
+            t1 = +1.0 - 2.0 * (x * x + y ** 2)
+            X = math.degrees(math.atan2(t0, t1))
+
+            t2 = +2.0 * (w * y - z * x)
+            t2 = +1.0 if t2 > +1.0 else t2
+            t2 = -1.0 if t2 < -1.0 else t2
+            Y = math.degrees(math.asin(t2))
+
+            t3 = +2.0 * (w * z + x * y)
+            t4 = +1.0 - 2.0 * (y ** 2 + z * z)
+            Z = math.atan2(t3, t4)
+            return X, Y, Z
+
         try:
             t = self.tf2_pos_buffer.lookup_transform("map", "robot", rospy.Time())
             tx, ty = t.transform.translation.x, t.transform.translation.y
-            rz = t.transform.rotation.z
+            rz = quaternion_to_euler_angle(t.transform.rotation)[2]
             Map.Robot.updatePosition(Position(tx, ty, angle = rz))
         except Exception as e:
             rospy.logwarn("Collisions could not get the robot's pos transform : {}".format(str(e)))
