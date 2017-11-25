@@ -5,7 +5,9 @@ from map import Map
 
 
 class Velocity(object):
-    pass # TODO
+    def __init__(self, linear, angular):
+        self.Linear = linear
+        self.Angular = angular
 
 
 class Point(object):
@@ -57,9 +59,6 @@ class RectObstacle(MapObstacle):
             for i in range(2):
                 phi = angle_phi  + ((-1) ** (i + 1)) * corner_phi
                 corners.append(Point(self.Position.X + l * math.cos(phi + self.Position.A), self.Position.Y + l * math.sin(phi + self.Position.A)))
-
-        for c in corners: # TODO Remove
-            Map.LidarObjects.append(MapObstacle(Circle(0.02), Position(c.X, c.Y)))
         return corners
 
     def segments(self):

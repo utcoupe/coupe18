@@ -2,13 +2,12 @@
 import math
 import rospy
 from map_classes import Position, RectObstacle, CircleObstacle, Rect, Circle
-from robot_path_collisions import PathChecker
+from collisions import Collision, CollisionLevel, CollisionsResolver
 
 
 class RobotPath(object):
     def __init__(self, waypoints = None):
         self.Waypoints = []
-        self.checker = PathChecker()
         self.updateWaypoints(waypoints)
 
     def hasPath(self):
@@ -50,4 +49,17 @@ class RobotPath(object):
 
     def checkCollisions(self, robot, obstacles):
         path_shapes = self.toShapes(robot)
-        return self.checker.checkCollisions(robot, path_shapes, obstacles)
+        i = CollisionsResolver()
+
+        collisions = []
+        distance_to_collision = 0.0
+        for path_segment in path_shapes:
+            for obstacle in obstacles:
+                if len([o for o in collisions if o.Obstacle == obstacle]) != 0:
+                    continue # Ignore already found collision obstacles
+
+                # Check if obstacle intersects with one of the path shapes
+                if i.intersect(path_segment, obstacle):
+                    collisions.append(Collision(CollisionLevel.LEVEL_DANGER, obstacle, distance_to_collision))
+            distance_to_collision += path_segment.Shape.Width if str(path_segment.Shape) == "rect" else 0
+        return collisions
