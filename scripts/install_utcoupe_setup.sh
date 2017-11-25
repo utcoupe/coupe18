@@ -17,7 +17,7 @@ ARCH=$(uname -m)
 ### Install the linux packages
 function install_apt() {
 	green_echo "Install missing packages..."
-	sudo apt-get install git build-essential python python-pip cmake libboost-dev libsdl1.2-dev gcc-avr avrdude avr-libc libsfml-dev
+	sudo apt-get install git build-essential python python-pip cmake libboost-dev libsdl1.2-dev gcc-avr avrdude avr-libc libsfml-dev libarmadillo-dev
 
 	# Check if it's a PC or a raspi
 	if [ "$ARCH" = "x86_64" ]; then
@@ -49,7 +49,11 @@ function install_ros() {
 		sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 		sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 		sudo apt-get update
-		sudo apt-get install ros-kinetic-desktop-full
+		if [ "$ARCH" = "x86_64" ]; then
+			sudo apt-get install ros-kinetic-desktop-full
+		elif [ "$ARCH" = "armv7l" ]; then
+			sudo apt-get install ros-kinetic-ros-base
+		fi
 		sudo rosdep init
 		rosdep update
 	else
