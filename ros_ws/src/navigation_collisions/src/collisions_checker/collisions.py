@@ -5,7 +5,7 @@ from map_classes import Position, RectObstacle, CircleObstacle, Rect, Circle
 
 
 class CollisionThresholds(object):
-    STOP_DISTANCE = 0.6#m
+    STOP_DISTANCE = 0.4#m
     DANGER_DISTANCE = 2.0#m
 
 
