@@ -17,7 +17,6 @@ add_message_files(
     ActPWMStates.msg
     ActServoStates.msg
 )
-
 ## Generate services in the 'srv' folder
 # add_service_files(
 #   FILES
@@ -48,3 +47,4 @@ catkin_package(
 include_directories(
     ${catkin_INCLUDE_DIRS}
 )
+
