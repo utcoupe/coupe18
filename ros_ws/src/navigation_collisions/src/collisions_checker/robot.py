@@ -8,10 +8,8 @@ from collisions import Collision, CollisionLevel, CollisionsResolver, CollisionT
 
 
 class RobotStatus(object): # Status given by navigation/nagivator.
-    NAV_IDLE     = 0 # No movement planned.
-    NAV_STOPPED  = 1 # Robot stopped, but still has movement plans pending.
-    NAV_STRAIGHT = 2 # Robot moving in a straight line.
-    NAV_TURNING  = 3 # Robot turning around itself.
+    NAV_IDLE       = 0 # No movement planned.
+    NAV_NAVIGATING = 1 # Pending path active.
 
 
 class MapRobot(MapObstacle):
@@ -37,10 +35,11 @@ class MapRobot(MapObstacle):
     def getStopRect(self):
         if not self.Path.hasPath():
             return []
-        r = Rect(self.Shape.Height + CollisionThresholds.STOP_DISTANCE, self.Shape.Width)
-        l = r.Width / 2.0 - self.Shape.Height / 2.0
-        return RectObstacle(r, Position(self.Position.X + l * math.cos(self.Position.A),
-                                        self.Position.Y + l * math.sin(self.Position.A),
+        r = Rect(self.Shape.Height + (CollisionThresholds.STOP_DISTANCE if self.Velocity.Linear != 0 else 0), self.Shape.Width)
+        l = r.Width / 2.0 - self.Shape.Height / 2.0 
+        side_a = math.pi if self.Velocity.Linear < 0 else 0
+        return RectObstacle(r, Position(self.Position.X + l * math.cos(self.Position.A + side_a),
+                                        self.Position.Y + l * math.sin(self.Position.A + side_a),
                                         self.Position.A)) # TODO support circles
 
     def checkCollisions(self, map_obstacles):

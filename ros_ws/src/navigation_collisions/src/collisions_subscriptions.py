@@ -1,7 +1,8 @@
 #!/usr/bin/python
 import rospy
+from collisions_checker import Point
 from processing_belt_interpreter.msg import BeltFiltered
-# from navigation_navigator.msg import NavStatus
+# from navigation_navigator.msg import Status
 # from drivers_asser.msg import RobotSpeed
 
 from collisions_checker import Map, MapObstacle, RobotStatus
@@ -16,16 +17,9 @@ class CollisionsSubscriptions(object):
         rospy.Subscriber("/drivers/ard_asserv/robot_speed", RobotSpeed, self.on_robot_speed)
 
     def on_nav_status(self, msg):
-        if msg.status == msg.NAV_STOPPED:
-            Map.Robot.NavStatus = RobotStatus.NAV_STOPPED
-        elif msg.status == msg.NAV_STRAIGHT:
-            Map.Robot.NavStatus = RobotStatus.NAV_STRAIGHT
-        elif msg.status == msg.NAV_TURNING:
-            Map.Robot.NavStatus = RobotStatus.NAV_TURNING
-        else:
-            rospy.logerr("ERROR : Unrecognized robot status type.")
-
-        Map.Robot.updatePath(msg.path) # TODO
+        Map.Robot.NavStatus = msg.status
+        for point in msg.currentPath:
+            Map.Robot.updatePath(Point(point.x, point.y))
 
     def on_belt(self, msg): # TODO
         points_frame = msg.frame_id
@@ -39,4 +33,4 @@ class CollisionsSubscriptions(object):
 
     def on_robot_speed(self, msg):
         Map.Robot.Velocity.Linear = msg.linear_speed
-        Map.Robot.Velocity.Angular = msg.wheel_speed_right - msg.wheel_speed_left # TODO
+        Map.Robot.Velocity.Angular = 0.0 # TODO Implement here if we use it one day ?
