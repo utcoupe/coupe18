@@ -4,8 +4,8 @@ uint8 LEVEL_DANGER    = 1  # Path needs to be modified (while driving is fine) o
 uint8 LEVEL_POTENTIAL = 2  # A dynamic object will probably pass through at some time, maybe not (replan optional).
 uint8 danger_level
 
-float32 distance_left  # Gives how far away the collision is (supposing the robot will follow the current path).
-float32 time_left      # Gives how much time's left before hitting the obstacle (predicted based on the current speed).
+# float32 distance_left  # Gives how far away the collision is (supposing the robot will follow the current path).
+# float32 time_left      # Gives how much time's left before hitting the obstacle (predicted based on the current speed).
 
 # Collision obstacle description
 uint8 TYPE_POINT  = 0

@@ -1,7 +1,6 @@
 #!/usr/bin/python
 import math
 import rospy
-from map_shapes import Rect, Circle
 from map_classes import Position, MapObstacle, RectObstacle, Velocity
 from robot_path import RobotPath
 from collisions import Collision, CollisionLevel, CollisionsResolver, CollisionThresholds
@@ -12,15 +11,15 @@ class RobotStatus(object): # Status given by navigation/nagivator.
     NAV_NAVIGATING = 1 # Pending path active.
 
 
-class MapRobot(MapObstacle):
-    def __init__(self, shape):
-        super(MapRobot, self).__init__(shape, None, Velocity(0, 0)) # TODO velocicty
+class MapRobot(RectObstacle):
+    def __init__(self, width, height):
+        super(MapRobot, self).__init__(None, width, height, Velocity(0, 0)) # TODO velocicty
         self.NavStatus = RobotStatus.NAV_IDLE
         self.Path = RobotPath()
         self._engine = CollisionsResolver()
 
     def isInitialized(self):
-        return self.Shape != None and self.Position != None and self.Velocity != None # TODO implement check if true data in there
+        return self.Position != None and self.Velocity != None # TODO implement check if true data in there
 
     def updatePosition(self, new_position):
         self.Position = new_position
@@ -35,12 +34,12 @@ class MapRobot(MapObstacle):
     def getStopRect(self):
         if not self.Path.hasPath():
             return []
-        r = Rect(self.Shape.Height + (CollisionThresholds.STOP_DISTANCE if self.Velocity.Linear != 0 else 0), self.Shape.Width)
-        l = r.Width / 2.0 - self.Shape.Height / 2.0 
+        w, h = self.Height + (CollisionThresholds.STOP_DISTANCE if self.Velocity.Linear != 0 else 0), self.Width
+        l = w / 2.0 - self.Height / 2.0
         side_a = math.pi if self.Velocity.Linear < 0 else 0
-        return RectObstacle(r, Position(self.Position.X + l * math.cos(self.Position.A + side_a),
-                                        self.Position.Y + l * math.sin(self.Position.A + side_a),
-                                        self.Position.A)) # TODO support circles
+        return RectObstacle(Position(self.Position.X + l * math.cos(self.Position.A + side_a),
+                                     self.Position.Y + l * math.sin(self.Position.A + side_a),
+                                     self.Position.A), w, h)
 
     def checkCollisions(self, map_obstacles):
         if map_obstacles is not None and self.Path.hasPath() and self.isInitialized():
