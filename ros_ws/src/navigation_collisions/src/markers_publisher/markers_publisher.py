@@ -6,7 +6,7 @@ from visualization_msgs.msg import Marker
 
 class MarkersPublisher(object):
     def __init__(self):
-        self.MARKERS_TOPIC = "navigation_markers"
+        self.MARKERS_TOPIC = "/visualization_markers/navigation"
         self.MarkersPUBL = rospy.Publisher(self.MARKERS_TOPIC, Marker, queue_size=10)
 
     def _is_connected(self):
