@@ -7,14 +7,9 @@ entities:
             a: 0.002
             type: dynamic
         shape:
-            type: polygon
-            points:
-                - [ 29, -140]
-                - [ 85, -84 ]
-                - [ 85,  140]
-                - [-85,  140]
-                - [-85, -84 ]
-                - [-29, -140]
+            type: rect
+            width: 0.3
+            height: 0.2
         marker:
             ns: robots
             id: 0
@@ -36,9 +31,9 @@ entities:
             a: 3.1415
             type: dynamic
         shape:
-            type: polygon
-            points:
-                - [ 29, -140] # TODO complete
+            type: rect
+            width: 0.2
+            height: 0.15
         marker:
             ns: robots
             id: 1
@@ -60,7 +55,7 @@ entities:
             type: dynamic
         shape:
             type: circle
-            radius: 0.02
+            radius: 0.3
         marker:
             ns: robots
             id: 2
@@ -81,9 +76,8 @@ entities:
             a: 3.1415
             type: dynamic
         shape:
-            type: polygon
-            points:
-                - [ 29, -140] # TODO complete
+            type: circle
+            radius: 0.2
         marker:
             ns: robots
             id: 3
