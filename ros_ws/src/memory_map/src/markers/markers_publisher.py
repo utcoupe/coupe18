@@ -7,29 +7,21 @@ from visualization_msgs.msg import Marker
 
 class MarkersPublisher():
     def __init__(self):
-        self.MARKERS_TOPIC = "/visualization_markers"
+        self.MARKERS_TOPIC = "/visualization_markers/world"
         self.MarkersPUBL = rospy.Publisher(self.MARKERS_TOPIC, Marker, queue_size=10)
 
-        count = 0  # TODO HARDCODED
-        self.RvizConnected = True
-        while not self.MarkersPUBL.get_num_connections():  # wait for RViz to connect, breaks after a few tries
-            rospy.sleep(0.2)
-            count += 1
-            if count > 3:
-                rospy.logwarn("WARNING RViz not detected. Map won't publish markers.")
-                self.RvizConnected = False
-                break # Cancel connection
-        if self.RvizConnected: rospy.loginfo("Map connected to RViz. Will publish markers.")
+    def _is_connected(self):
+        return bool(self.MarkersPUBL.get_num_connections())
 
     def publishTable(self, world):
-        if self.RvizConnected:
+        if self._is_connected():
             pos = map_attributes.Position2D({
                 "frame_id": "/map",
                 "x": -0.022,
                 "y": 0.022 + 2,
                 "type": "fixed"
             })
-            self.publishMarker(pos, world.get("/terrain/marker/^"))
+            self._publish_marker(pos, world.get("/terrain/marker/^"))
             rospy.logdebug("[memory/map] Published table to RViz.")
 
     def updateMarkers(self, world):
@@ -37,20 +29,20 @@ class MarkersPublisher():
         self.publishObjects(world)
 
     def updateZones(self, world):
-        if self.RvizConnected:
+        if self._is_connected():
             for z in world.get("/zones/^").toList():
-                self.publishMarker(z.get("position/^"), z.get("marker/^"))
+                self._publish_marker(z.get("position/^"), z.get("marker/^"))
 
     def publishObjects(self, world):
-        if self.RvizConnected:
+        if self._is_connected():
             for o in world.get("/objects/^").toList():
                 if o.get("type") == "object":
-                    self.publishMarker(o.get("position/^"), o.get("marker/^"))
+                    self._publish_marker(o.get("position/^"), o.get("marker/^"))
                 elif o.get("type") == "container":
                     for e in o.toList():
-                        self.publishMarker(e.get("position/^"), e.get("marker/^")) # TODO CAUTION can't show objects in a container in a container yet #23h
+                        self._publish_marker(e.get("position/^"), e.get("marker/^")) # TODO CAUTION can't show objects in a container in a container yet #23h
 
-    def publishMarker(self, position, visual):
+    def _publish_marker(self, position, visual):
         markertypes = {
             "cube": Marker.CUBE,
             "sphere": Marker.SPHERE,
@@ -73,7 +65,7 @@ class MarkersPublisher():
         marker.pose.position.x = position.get("x")
         marker.pose.position.y = position.get("y")
         marker.pose.position.z = visual.get("z")
-        orientation = self.eulerToQuaternion(visual.get("orientation"))
+        orientation = self._euler_to_quaternion(visual.get("orientation"))
         marker.pose.orientation.x = orientation[0]
         marker.pose.orientation.y = orientation[1]
         marker.pose.orientation.z = orientation[2]
@@ -83,7 +75,7 @@ class MarkersPublisher():
 
         self.MarkersPUBL.publish(marker)
 
-    def eulerToQuaternion(self, xyz):
+    def _euler_to_quaternion(self, xyz):
         cr, sr = math.cos(xyz[0] * 0.5), math.sin(xyz[0] * 0.5)
         cp, sp = math.cos(xyz[1] * 0.5), math.sin(xyz[1] * 0.5)
         cy, sy = math.cos(xyz[2] * 0.5), math.sin(xyz[2] * 0.5)
