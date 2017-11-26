@@ -5,6 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Grid1/Offset1
+        - /World Markers1
         - /World Markers1/Namespaces1
         - /Navigation Markers1
         - /Navigation Markers1/Namespaces1
@@ -80,17 +81,16 @@ Visualization Manager:
       Value: false
     - Class: rviz/Marker
       Enabled: true
-      Marker Topic: visualization_markers
+      Marker Topic: /visualization_markers/world
       Name: World Markers
       Namespaces:
         cubes: true
-        table: true
         zones: false
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
       Enabled: true
-      Marker Topic: navigation_markers
+      Marker Topic: /visualization_markers/navigation
       Name: Navigation Markers
       Namespaces:
         collisions_obstacles: true
