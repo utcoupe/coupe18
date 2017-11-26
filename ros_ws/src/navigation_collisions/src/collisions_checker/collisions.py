@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import math
 import rospy
-from map_classes import Position, RectObstacle, CircleObstacle, Rect, Circle
+from map_classes import Position, RectObstacle, CircleObstacle
 
 
 class CollisionThresholds(object):
@@ -24,7 +24,7 @@ class Collision(object):
 
 class CollisionsResolver(object):
     def intersect(self, obs1, obs2):
-        types = (str(obs1.Shape), str(obs2.Shape))
+        types = (str(obs1), str(obs2))
         if types[0] == 'rect' and types[1] == 'rect':
             return self._rects_intersect(obs1, obs2)
         elif types[0] == 'circle' and types[1] == 'circle':
@@ -66,16 +66,16 @@ class CollisionsResolver(object):
         a = rect.Position.A #if rect.Position.A > 0 else rect.Position.a + 2 * math.pi
         d = math.sqrt((point.X - rect.Position.X) ** 2 + (point.Y - rect.Position.Y) ** 2)
         local_point = (d * math.cos(phi - a), d * math.sin(phi - a))
-        return - rect.Shape.Width / 2.0 <= local_point[0] <= rect.Shape.Width / 2.0 and - rect.Shape.Height / 2.0 <= local_point[1] <= rect.Shape.Height / 2.0
+        return - rect.Width / 2.0 <= local_point[0] <= rect.Width / 2.0 and - rect.Height / 2.0 <= local_point[1] <= rect.Height / 2.0
 
     def _point_in_circle(self, point, circle):
         d = math.sqrt((point.X - circle.Position.X) ** 2 + (point.Y - circle.Position.Y) ** 2)
-        return d <= circle.Shape.Radius
+        return d <= circle.Radius
 
     def _rect_intersects_circle(self, rect, circle):
-        new_rect = RectObstacle(Rect(rect.Shape.Width + circle.Shape.Radius * 2, rect.Shape.Height + circle.Shape.Radius * 2), rect.Position)
+        new_rect = RectObstacle(rect.Position, rect.Width + circle.Radius * 2, rect.Height + circle.Radius * 2)
         return self._point_in_rect(circle.Position, new_rect)
 
     def _circles_intersect(self, circle1, circle2):
         d = math.sqrt((circle2.Position.X - circle1.Position.X) ** 2 + (circle2.Position.Y - circle1.Position.Y) ** 2)
-        return d <= circle1.Shape.Radius + circle2.Shape.Radius
+        return d <= circle1.Radius + circle2.Radius

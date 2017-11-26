@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import math
 import rospy
-from map_classes import Position, RectObstacle, CircleObstacle, Rect, Circle
+from map_classes import Position, RectObstacle, CircleObstacle
 from collisions import Collision, CollisionLevel, CollisionsResolver
 
 
@@ -29,20 +29,11 @@ class RobotPath(object):
                 angle = math.atan((w.Y - p_w.Y) / (w.X - p_w.X))
                 pos = Position((w.X + p_w.X) / 2.0, (w.Y + p_w.Y) / 2.0, angle = angle)
 
-                if isinstance(robot.Shape, Rect):
-                    width = robot.Shape.Width
-                    height = robot.Shape.Height
-                elif isinstance(robot.Shape, Circle):
-                    width = robot.Shape.Radius * 2.0
-                    height = robot.Shape.Radius * 2.0
-                else:
-                    raise ValueError("Robot shape type not supported.")
-                shapes.append(RectObstacle(Rect(d, width), pos))
-
+                shapes.append(RectObstacle(pos, d, robot.Width))
                 if i == len(self.Waypoints) - 1:
-                    shapes.append(RectObstacle(Rect(height, width), Position(w.X, w.Y, angle)))
+                    shapes.append(RectObstacle(Position(w.X, w.Y, angle), robot.Height, robot.Width))
                 else:
-                    shapes.append(CircleObstacle(Circle(width / 2.0), Position(w.X, w.Y)))
+                    shapes.append(CircleObstacle(Position(w.X, w.Y), robot.Width / 2.0))
             return shapes
         else:
             rospy.logerr("Path can't create shapes : less than two waypoints in path")
@@ -61,5 +52,5 @@ class RobotPath(object):
                 # Check if obstacle intersects with one of the path shapes
                 if i.intersect(path_segment, obstacle):
                     collisions.append(Collision(CollisionLevel.LEVEL_DANGER, obstacle, distance_to_collision))
-            distance_to_collision += path_segment.Shape.Width if str(path_segment.Shape) == "rect" else 0
+            distance_to_collision += path_segment.Width if str(path_segment) == "rect" else 0
         return collisions

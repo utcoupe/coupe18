@@ -9,32 +9,24 @@ class MarkersPublisher(object):
         self.MARKERS_TOPIC = "navigation_markers"
         self.MarkersPUBL = rospy.Publisher(self.MARKERS_TOPIC, Marker, queue_size=10)
 
-        count = 0  # TODO HARDCODED
-        self.RvizConnected = True
-        while not self.MarkersPUBL.get_num_connections():  # wait for RViz to connect, breaks after a few tries
-            rospy.sleep(0.2)
-            count += 1
-            if count > 3:
-                rospy.logwarn("WARNING RViz not detected. Map won't publish markers.")
-                self.RvizConnected = False
-                break # Cancel connection
-        if self.RvizConnected: rospy.loginfo("Map connected to RViz. Will publish markers.")
+    def _is_connected(self):
+        return bool(self.MarkersPUBL.get_num_connections())
 
     def publishCheckZones(self, robot):
-        if self.RvizConnected:
+        if self._is_connected():
             # Publish path collision shapes
             if robot.isInitialized():
                 for i, path_shape in enumerate(robot.Path.toShapes(robot)):
-                    self.publishMarker("collisions_path", i + 1, path_shape.Shape, path_shape.Position, 0.02, 0.01, (1.0, 0.5, 0.1, 0.8))
-                    stop_rect = robot.getStopRect()
-                self.publishMarker("collisions_path", 0, stop_rect.Shape, stop_rect.Position, 0.02, 0.01, (1.0, 0.0, 0.0, 0.8))
+                    self._publish_marker("collisions_path", i + 1, path_shape, 0.02, 0.01, (1.0, 0.5, 0.1, 0.8))
+                stop_rect = robot.getStopRect()
+                self._publish_marker("collisions_path", 0, stop_rect, 0.02, 0.01, (1.0, 0.0, 0.0, 0.8))
 
     def publishObstacles(self, obstacles): # Temporaire ?
-        if self.RvizConnected:
+        if self._is_connected():
             for i, obs in enumerate(obstacles):
-                self.publishMarker("collisions_obstacles", i, obs.Shape, obs.Position, 0.35, 0.35 / 2.0, (1.0, 0.8, 0.3, 0.8))
+                self._publish_marker("collisions_obstacles", i, obs, 0.35, 0.35 / 2.0, (1.0, 0.8, 0.3, 0.8))
 
-    def publishMarker(self, ns, index, shape, position, z_scale, z_height, color):
+    def _publish_marker(self, ns, index, obj, z_scale, z_height, color):
         markertypes = {
             "rect": Marker.CUBE,
             "circle": Marker.CYLINDER,
@@ -42,22 +34,22 @@ class MarkersPublisher(object):
         }
         marker = Marker()
         marker.header.frame_id = "/map"
-        marker.type = markertypes[str(shape)] # TODO
+        marker.type = markertypes[str(obj)] # TODO
         marker.ns = ns
         marker.id = index
 
         marker.action = Marker.ADD
-        marker.scale.x = shape.Width  if str(shape) == "rect" else shape.Radius * 2
-        marker.scale.y = shape.Height if str(shape) == "rect" else shape.Radius * 2
+        marker.scale.x = obj.Width  if str(obj) == "rect" else obj.Radius * 2
+        marker.scale.y = obj.Height if str(obj) == "rect" else obj.Radius * 2
         marker.scale.z = z_scale
         marker.color.r = color[0]
         marker.color.g = color[1]
         marker.color.b = color[2]
         marker.color.a = color[3]
-        marker.pose.position.x = position.X
-        marker.pose.position.y = position.Y
+        marker.pose.position.x = obj.Position.X
+        marker.pose.position.y = obj.Position.Y
         marker.pose.position.z = z_height
-        orientation = self.eulerToQuaternion([0, 0, position.A])
+        orientation = self._euler_to_quaternion([0, 0, obj.Position.A])
         marker.pose.orientation.x = orientation[0]
         marker.pose.orientation.y = orientation[1]
         marker.pose.orientation.z = orientation[2]
@@ -65,7 +57,7 @@ class MarkersPublisher(object):
 
         self.MarkersPUBL.publish(marker)
 
-    def eulerToQuaternion(self, xyz):
+    def _euler_to_quaternion(self, xyz):
         cr, sr = math.cos(xyz[0] * 0.5), math.sin(xyz[0] * 0.5)
         cp, sp = math.cos(xyz[1] * 0.5), math.sin(xyz[1] * 0.5)
         cy, sy = math.cos(xyz[2] * 0.5), math.sin(xyz[2] * 0.5)

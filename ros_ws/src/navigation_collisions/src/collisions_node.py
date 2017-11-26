@@ -28,7 +28,6 @@ class CollisionsNode(object):
 
         # Creating the publisher where the collisions will be notified in
         self.pub = rospy.Publisher("/navigation/collisions/warner", PredictedCollision, queue_size=10)
-
         self.markers = MarkersPublisher()
 
         # Getting the robot shape and creating the robot instance
@@ -36,26 +35,21 @@ class CollisionsNode(object):
             map_get_client = rospy.ServiceProxy("/memory/map/get", MapGet)
             map_get_client.wait_for_service(2.0)
             shape = json.loads(map_get_client("/entities/GR/shape/*").response) # TODO GR must not appear
-            if shape["type"] == "rect":
-                shape = Rect(shape["width"], shape["height"])
-            elif shape["type"] == "circle":
-                shape = Circle(shape["radius"])
-            else:
+            if not shape["type"] == "rect":
                 raise ValueError("Robot shape type not supported here.")
-            print "got map!"
         except Exception as e:
             rospy.logerr("ERROR Collisions couldn't get the robot's shape from map : " + str(e))
-            shape = Rect(0.3, 0.2)
+            shape = {"width": 0.3, "height": 0.2}
+        Map.Robot = MapRobot(shape["width"], shape["height"]) # Can create a rect or circle
 
         # TESTS While dependencies not available.
-        Map.Robot = MapRobot(shape) # Can create a rect or circle
         Map.Robot.updatePath(RobotPath([Point(2.0, 1.7), Point(0.6, 0.7), Point(2.2, 0.6), Point(2.7, 0.3)]))
         Map.Robot.NavStatus = RobotStatus.NAV_NAVIGATING
         Map.Robot.updateVelocity(3.0, 0.33)
 
-        Map.BeltPoints = [RectObstacle(Rect(0.1, 0.2),     Position(0.25, 1.3, 0.78539816339)),
-                          RectObstacle(Rect(0.24, 0.5),    Position(1.6, 0.9, 3.14 / 2)),
-                          CircleObstacle(Circle(0.25 / 2), Position(2.15, 0.7))]
+        Map.BeltPoints = [RectObstacle(Position(0.25, 1.3, 0.78539816339), 0.1,  0.2),
+                          RectObstacle(Position(1.6, 0.9, 3.14 / 2),       0.24, 0.5),
+                          CircleObstacle(Position(2.15, 0.7),              0.25 / 2)]
 
         self.run()
 
@@ -84,14 +78,12 @@ class CollisionsNode(object):
 
         obs = collision.Obstacle
         m.obstacle_pos = Pose2D(obs.Position.X, obs.Position.Y, obs.Position.A)
-        if isinstance(obs, Rect):
+        if isinstance(obs, RectObstacle):
             m.obstacle_type = m.TYPE_RECT
-            m.width, m.height = obs.Shape.Width, obs.Shape.Height
-        elif isinstance(obs, Circle):
+            m.obstacle_width, m.obstacle_height = obs.Width, obs.Height
+        elif isinstance(obs, CircleObstacle):
             m.obstacle_type = m.TYPE_CIRCLE
-            m.radius = obs.Shape.Radius
-        # elif isinstance(obs, Point):
-        #     m.obstacle_type = m.TYPE_POINT
+            m.obstacle_radius = obs.Radius
 
         self.pub.publish(m)
 
