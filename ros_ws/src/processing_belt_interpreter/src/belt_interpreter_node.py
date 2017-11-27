@@ -8,6 +8,8 @@ from marker_publisher import MarkersPublisher
 import tf
 import tf2_ros
 import json
+import math
+from numpy import linspace
 
 from memory_definitions.srv import GetDefinition
 from processing_belt_interpreter.msg import *
@@ -22,7 +24,7 @@ class BeltInterpreter(object):
         # template for the sensor frame id, with '{}' being the sensor id
         self.SENSOR_FRAME_ID = "belt_{}"
         self.DEF_FILE = "processing/belt.xml"
-        self.TOPIC = "/processing/belt_interpreter/objects"
+        self.TOPIC = "/processing/belt_interpreter/rects"
         self.SENSORS_TOPIC = "/sensors/belt"
         # resolution along the long and large side of the rectangle (meters)
         self.RESOLUTION_LONG = 0.01
@@ -60,20 +62,20 @@ class BeltInterpreter(object):
 
         for data in data_list.sensors:
             sensor_id = data.sensor_id
-            range = data.range
+            r = data.range
 
             sensor = self._belt_parser.Sensors[sensor_id]
 
-            prec = range * self._belt_parser.Params["precision"]
+            prec = r * self._belt_parser.Params["precision"]
             angle = self._belt_parser.Params["angle"]
 
             # define the rectangle in ref to the sensor frame_id
-            x_far = range + prec
-            x_close = math.cos(angle / 2) * (range - prec)
+            x_far = r + prec
+            x_close = math.cos(angle / 2) * (r - prec)
 
             # called width because along x axis, but it is the smaller side
             width = x_far - x_close
-            height = 2 * math.sin(angle / 2) * (range + prec)
+            height = 2 * math.sin(angle / 2) * (r + prec)
 
             rect = RectangleStamped()
             rect.header.frame_id = self.SENSOR_FRAME_ID.format(sensor_id)
@@ -86,21 +88,21 @@ class BeltInterpreter(object):
             static_points_nbr = 0
             total_points_nbr = 0
 
-            for (x, y) in zip(range(x_far, x_close,
-                                    self.RESOLUTION_LARGE),
-                              range(- height / 2, height / 2,
-                                    self.RESOLUTION_LONG)):
-                pointst = PointStamped()
-                pointst.point.x = x
-                pointst.point.y = y
-                pointst.header = rect.header
+            for x in linspace(x_close, x_far, width / self.RESOLUTION_LARGE):
+                for y in linspace(- height / 2, height / 2,
+                                  height / self.RESOLUTION_LONG):
 
-                pst_map = self._tl.transformPoint("/map", pointst)
+                    pointst = PointStamped()
+                    pointst.point.x = x
+                    pointst.point.y = y
+                    pointst.header = rect.header
 
-                total_points_nbr += 1
+                    pst_map = self._tl.transformPoint("map", pointst)
 
-                if self.is_static(pst_map):
-                    static_points_nbr += 1
+                    total_points_nbr += 1
+
+                    if self.is_static(pst_map):
+                        static_points_nbr += 1
 
             if float(static_points_nbr) / float(total_points_nbr) \
                > self.POINTS_PC_THRESHOLD:
@@ -108,7 +110,9 @@ class BeltInterpreter(object):
             else:
                 dynamic_rects.append(rect)
 
-        self._pub.publish("map", static_rects, dynamic_rects)
+        rospy.loginfo(static_rects)
+        rospy.loginfo(dynamic_rects)
+        self._pub.publish(static_rects, dynamic_rects)
 
     def pub_static_transforms(self):
         tr_list = []
