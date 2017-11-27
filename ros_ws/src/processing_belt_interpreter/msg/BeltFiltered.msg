@@ -1,3 +1,2 @@
-string frame_id
-geometry_msgs/PointStamped[] static_points
-geometry_msgs/PointStamped[] dynamic_points
+RectangleStamped[] map_rects
+RectangleStamped[] unknown_rects
