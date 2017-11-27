@@ -18,6 +18,7 @@ add_message_files(
     Range.msg
     RangeList.msg
     BeltFiltered.msg
+    RectangleStamped.msg
 )
 
 generate_messages(
