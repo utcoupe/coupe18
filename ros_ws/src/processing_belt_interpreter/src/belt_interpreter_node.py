@@ -16,85 +16,77 @@ from memory_map.srv import MapGet
 
 
 class BeltInterpreter(object):
-
     def __init__(self):
         super(BeltInterpreter, self).__init__()
 
-        self.SENSOR_FRAME_ID = "belt_{}" # {} will be replaced by the sensor name
+        self.SENSOR_FRAME_ID = "belt_{}"  # {} will be replaced by the sensor name
+        self.EXTRAPOLATION_MARGIN_MAX = 0.1  # if the difference of time beetween the last transform available and the sensor data reception is larger than this value (sec), a warning is raised
 
         rospy.init_node("belt_interpreter")
-        rospy.loginfo("[PROCESSING] belt_interpreter node started")
+        rospy.loginfo("Node started")
 
         # get definition file
-        rospy.wait_for_service('/memory/definitions/get')
         get_def = rospy.ServiceProxy('/memory/definitions/get', GetDefinition)
-
+        get_def.wait_for_service()
         try:
             res = get_def("processing/belt.xml")
             if not res.success:
-                rospy.logerr("[PROCESSING] Error when fetching belt definition file")
+                rospy.logerr("Error when fetching belt definition file")
 
             def_filename = res.path
         except rospy.ServiceException as exc:
-            rospy.logerr("[PROCESSING] Error when fetching belt definition file: {}"
+            rospy.logerr("Error when fetching belt definition file: {}"
                          .format(str(exc)))
             raise Exception()
 
-        rospy.loginfo("[PROCESSING] Belt definition file fetched")
+        rospy.loginfo("Belt definition file fetched")
 
         # parse definition file
         self._belt_parser = BeltParser(def_filename)
 
-
-        self._sensors_sub = rospy.Subscriber("/sensors/belt", RangeList, self.callback)
-        self._localizer_sub = rospy.Subscriber("/recognition/localizer", Pose2D, self.callbackPos)
         self._pub = rospy.Publisher("/processing/belt_interpreter/points", BeltFiltered, queue_size=10)
         self._tl = tf.TransformListener()
         self._broadcaster = tf2_ros.StaticTransformBroadcaster()
         self._markers_pub = MarkersPublisher()
 
-
         self.pub_static_transforms()
-
-        rospy.loginfo("[PROCESSING] belt_interpreter subscribed to sensors topics")
 
         self._static_shapes = []
 
+        rospy.wait_for_service('/memory/map/get')
         get_map = rospy.ServiceProxy('/memory/map/get', MapGet)
-        map_obj = json.loads(get_map("/terrain/*").response)
+        response = get_map("/terrain/*")
+        if not response.success:
+            rospy.logerr("Error when fetching objects from map")
+        else:
+            map_obj = json.loads(get_map("/terrain/*").response)
 
-        for v in map_obj["walls"]["layer_ground"].values():
-            x = float(v["position"]["x"])
-            y = float(v["position"]["y"])
-            type = v["shape"]["type"]
+            for v in map_obj["walls"]["layer_ground"].values():
+                x = float(v["position"]["x"])
+                y = float(v["position"]["y"])
+                type = v["shape"]["type"]
 
-            if type == "rect":
-                w = float(v["shape"]["width"])
-                h = float(v["shape"]["height"])
-                shape = Rectangle(x, y, w, h)
+                if type == "rect":
+                    w = float(v["shape"]["width"])
+                    h = float(v["shape"]["height"])
+                    shape = Rectangle(x, y, w, h)
 
-            elif type == "circle":
-                r = float(v["shape"]["radius"])
-                shape = Circle(x, y, r)
-            else: # TODO POLYGONS
-                pass
+                elif type == "circle":
+                    r = float(v["shape"]["radius"])
+                    shape = Circle(x, y, r)
+                else: # TODO POLYGONS
+                    pass
 
-            self._static_shapes.append(shape)
+                self._static_shapes.append(shape)
 
-        self._robot_pos = None
+        self._sensors_sub = rospy.Subscriber("/sensors/belt", RangeList, self.callback)
+        rospy.loginfo("Subscribed to sensors topics")
+
         rospy.spin()
 
-    def callbackPos(self, data):
-        self._robot_pos = data
-
     def callback(self, data_list):
-        if self._robot_pos is None:
-            rospy.logdebug("[PROCESSING] belt_interpreter : Sensor data received but no position received yet from localizer")
-            return
-
-        staticPoints = []
-        dynamicPoints = []
-
+        static_points = []
+        dynamic_points = []
         for data in data_list.sensors:
             sensor_id = data.sensor_id
 
@@ -102,11 +94,26 @@ class BeltInterpreter(object):
             sensor = self._belt_parser.Sensors[sensor_id]
 
             point = PointStamped()
-            point.header.stamp = rospy.Time.now()
             point.header.frame_id = self.SENSOR_FRAME_ID.format(sensor_id)
+
+            try:
+                diff = rospy.Time.now() - self._tl.getLatestCommonTime(point.header.frame_id, "map")
+            except tf2_rosLookupException as e:
+                rospy.logerr("Frame 'map' does not exist, cannot process points\n{}".format(e))
+                return
+
+            if(diff.to_sec() > self.EXTRAPOLATION_MARGIN_MAX):
+                rospy.logwarn("The difference between the last stored transform of {} and the current time is larger than {} ({}), this may cause errors".format(point.header.frame_id, self.EXTRAPOLATION_MARGIN_MAX, diff.to_sec()))
+
+            point.header.stamp = self._tl.getLatestCommonTime(point.header.frame_id, "map")
+
             point.point.x = range
 
-            point_in_map = self._tl.transformPoint("map", point)
+            try:
+                point_in_map = self._tl.transformPoint("map", point)
+            except tf2_ros.LookupException as e:
+                rospy.logerr("Frame 'map' does not exist, cannot process points\n{}".format(e))
+                return
 
             x = point_in_map.point.x
             y = point_in_map.point.y
@@ -118,14 +125,12 @@ class BeltInterpreter(object):
                     break
 
             if isStatic:
-                staticPoints.append(point_in_map)
+                static_points.append(point_in_map)
             else:
-                dynamicPoints.append(point_in_map)
+                dynamic_points.append(point_in_map)
 
-        self._pub.publish("map", staticPoints, dynamicPoints)
-        self._markers_pub.publish_markers(
-                [p.point for p in dynamicPoints],
-                [p.point for p in staticPoints])
+        self._pub.publish("map", static_points, dynamic_points)
+        self._markers_pub.publish_markers(static_points, dynamic_points)
 
     def pub_static_transforms(self):
         tr_list = []

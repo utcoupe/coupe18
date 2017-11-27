@@ -54,8 +54,8 @@ class DomainsService {
         nameArray.length > 1 &&
         nameArray[1] === domainName &&
         (entry.fetched || !entry.active) &&
-        nameArray[2] !== "get_loggers" && //TODO : filter nicely <3 (maybe put the rcc filter back)
-        nameArray[2] !== "set_logger_level"
+        !_.contains(nameArray, "get_loggers") && //TODO : filter nicely <3 (maybe put the rcc filter back)
+        !_.contains(nameArray, "set_logger_level")
       ) {
         entry.abbr = nameArray.slice(2).join('/');
         result.push(entry);
