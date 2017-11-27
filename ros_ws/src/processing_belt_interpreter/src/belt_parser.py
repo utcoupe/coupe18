@@ -17,7 +17,7 @@ class BeltParser(object):
 
         self.Params = {c.tag: float(c.text) for c in root.find("params")}
 
-        required = ["max_range", "angle"]
+        required = ["max_range", "angle", "precision"]
         for p in required:
             if p not in self.Params:
                 raise KeyError("A '{}' element is required in the parameters"
