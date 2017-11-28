@@ -7,3 +7,6 @@ class Rect:
         self.y = y
         self.w = w
         self.h = h
+    
+    def __repr__(self):
+        return 'Rect( x={}, y={}, w={}, h={} )'.format(self.x, self.y, self.w, self.h)
