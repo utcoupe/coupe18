@@ -12,14 +12,17 @@ find_package(catkin REQUIRED COMPONENTS
 ## Declare ROS messages, services and actions ##
 ################################################
 
-## Generate messages in the 'msg' folder
 add_message_files(
     FILES
     GameStatus.msg
     GameEnd.msg
 )
 
-# Generate added messages and services with any dependencies listed here
+add_service_files(
+    FILES
+    SetStatus.srv
+)
+
 generate_messages(
     DEPENDENCIES
     std_msgs

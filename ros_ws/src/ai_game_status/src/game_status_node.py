@@ -1,8 +1,13 @@
 #!/usr/bin/python
 import rospy
-from ai_game_status.msg import GameStatus
 
-class GameStatus():
+from timer import GameTimer
+
+from ai_game_status.msg import GameStatus
+from ai_game_status.srv import SetStatus, SetStatusResponse
+
+
+class Status():
     STATUS_INITIALIZING = 0
     STATUS_INITIALIZED  = 1
     STATUS_ARMING       = 2
@@ -14,49 +19,41 @@ class GameStatus():
 
 class GameStatusNode():
     def __init__(self):
-        rospy.init_node("game_status", log_level=rospy.LEVEL_DEBUG)
+        rospy.init_node("game_status", log_level=rospy.DEBUG)
+        self._srv = rospy.Service("/ai/game_status/set", SetStatus, self.on_set_status)
+        self._pub = rospy.Publisher("/ai/game_status/status", GameStatus, queue_size=10)
+        self._timer = GameTimer()
 
+        self.game_status = Status.STATUS_INITIALIZING
+        self.game_duration = -1
 
-class Timer():
-    def __init__(self):
-        self.PUBL = rospy.Publisher("/ai/timer/time", GameStatus, queue_size = 10)
-
-        self.Duration = None # Holds the match duration.
-        self.Started = False # Set to true when Timer is triggered.
-
-    def on_srv_request(self, req):
-        res_code, reason = 200, ""
-        if req.command == "timer_set_duration":
-            self.Duration = int(req.params)
-        elif req.command == "timer_start":
-            self.start()
-        else:
-            rospy.logerr("robot_ai_timer got non-recognized command '{}'.".format(req.command))
-            res_code, reason = 404, "command not recognized"
-        return AIGenericCommandResponse(res_code, reason)
+        self.run()
 
     def run(self):
-        rate = rospy.Rate(10) # 10hz
+        r = rospy.Rate(5)
         while not rospy.is_shutdown():
-            if self.Started:
-                msg = ai_timer()
-                msg.elapsed_time = self.elapsed_time()
-                msg.time_left = -1 if not self.Duration else self.time_left()
-                msg.is_finished = self.is_finished()
-                self.PUBL.publish(msg)
-                rate.sleep()
+            m = GameStatus()
+            m.game_status = self.game_status
+            m.is_gaming = self._is_gaming()
 
-    def start(self):
-        self.starttime = time.time() * 1000
-        self.Started = True
+            if m.is_gaming:
+                m.game_time_duration = self.game_duration
+                m.game_elapsed_time = self._timer.elapsed_time()
+                m.game_time_left = self._timer.time_left()
 
-    def elapsed_time(self):
-        return (time.time() * 1000 - self.starttime) / 1000.0 # return elapsed time in seconds
-    def time_left(self):
-        return self.Duration - self.elapsed_time()
-    def is_finished(self):
-        return True if self.time_left() < 0 else False
+            self._pub.publish(m)
+            r.sleep()
+
+    def on_set_status(self, req):
+        # TODO process status change (start/stop timer, error handling...)
+        if req.game_status == Status.STATUS_INGAME:
+            self._timer.start()
+        self.game_status = req.game_status
+        return SetStatusResponse()
+
+    def _is_gaming(self):
+        return Status.STATUS_INGAME <= self.game_status <= Status.STATUS_POSTGAME
 
 
 if __name__ == "__main__":
-    lsqdkfjghlsdkfjhg()
+    GameStatusNode()
