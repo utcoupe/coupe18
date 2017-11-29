@@ -52,9 +52,9 @@ void drawBigCentralMessageComponent(OLEDDisplay *display, OLEDDisplayUiState* st
     display->drawString(64 + x, 22 + y, text);
 }
 
-void drawMCQComponent(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y, String[] options, int num_options) {
-    int y_offset
-    for(i = 0; i < num_options; i++) {
+void drawMCQComponent(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y, String options[], int num_options) {
+    int y_offset = 0;
+    for(int i = 0; i < num_options; i++) {
 
     }
 }
@@ -83,12 +83,17 @@ void drawJackFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, i
 }
 
 void drawInGameFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
-    drawFrameTitleComponent(display, state, x, y, "In Game");
-    display->setTextAlignment(TEXT_ALIGN_LEFT);
-    display->setFont(ArialMT_Plain_10);
-    display->drawStringMaxWidth(0 + x, 15 + y, 128, "Lorem ipsum\n dolor sit amet, consetetur sadipscing elitr.");
+    ui.disableIndicator();
+    drawFrameTitleComponent(display, state, x, y, "In Game...");
+    //display->setTextAlignment(TEXT_ALIGN_LEFT);
+    //display->setFont(ArialMT_Plain_10);
+    //display->drawStringMaxWidth(0 + x, 15 + y, 128, "Lorem ipsum\n dolor sit amet, consetetur sadipscing elitr.");
 
-    display.drawProgressBar(0, 52, 120, 10, 67);
+    display->setTextAlignment(TEXT_ALIGN_CENTER);
+    display->setFont(ArialMT_Plain_24);
+    display->drawString(64 + x, 22 + y, "178pts");
+
+    display->drawProgressBar(x + 0, y + 54, 120, 8, 67); // shows time left
 }
 
 // frames are the single views that slide in
@@ -106,6 +111,7 @@ void setup() {
 
     ui.setTargetFPS(20);
 
+    ui.setActiveSymbol(activeSymbol);
     ui.setInactiveSymbol(inactiveSymbol);
     ui.setFrameAnimation(SLIDE_LEFT);
 
@@ -116,13 +122,13 @@ void setup() {
     ui.init();
 
     display.flipScreenVertically();
-    ui.nextFrame();
+    ui.switchToFrame(5); //tmp for tests
 }
 
 
 void loop() {
     int remainingTimeBudget = ui.update();
-    if(Serial.available() > 0) {
+    if(Serial.available() > 0) { //tmp
           char c = Serial.read();
           if(c == 'n') ui.nextFrame();
           if(c == 'p') ui.previousFrame();
