@@ -63,6 +63,8 @@ class BeltInterpreter(object):
         for data in data_list.sensors:
             sensor_id = data.sensor_id
             r = data.range
+            if r > self._belt_parser.Params["max_range"]:
+                continue
 
             sensor = self._belt_parser.Sensors[sensor_id]
 
@@ -110,9 +112,8 @@ class BeltInterpreter(object):
             else:
                 dynamic_rects.append(rect)
 
-        rospy.loginfo(static_rects)
-        rospy.loginfo(dynamic_rects)
         self._pub.publish(static_rects, dynamic_rects)
+        self._markers_pub.publish_markers(static_rects, dynamic_rects)
 
     def pub_static_transforms(self):
         tr_list = []

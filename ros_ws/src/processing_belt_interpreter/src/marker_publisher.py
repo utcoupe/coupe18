@@ -12,19 +12,12 @@ class MarkersPublisher(object):
         super(MarkersPublisher, self).__init__()
         self._pub = rospy.Publisher("/visualization_markers", Marker, queue_size=10)
 
-    def publish_markers(self, static_points, dynamic_points):
-        rospy.loginfo("Publishing markers")
-
-        print static_points
-        print dynamic_points
-
-        static_points = [p.point for p in static_points]
-        dynamic_points = [p.point for p in dynamic_points]
+    def publish_markers(self, static_rects, dynamic_rects):
 
         marker = Marker()
         marker.header.frame_id = "/map"
         marker.header.stamp = rospy.Time.now()
-        marker.type = Marker.POINTS
+        marker.type = Marker.CUBE
         marker.ns = MARKERS_NAMESPACE
         marker.action = Marker.ADD
         marker.pose.position.x = 0
