@@ -13,9 +13,9 @@ from drivers_ard_asserv.srv import *
 
 class AsservClient(object):
     def __init__ (self):
-        self.ASSERV_GOTO_SERVICE_NAME = "drivers/ard_asserv/goto"
-        self.ASSERV_POSE_TOPIC_NAME = "drivers/ard_asserv/pose2d"
-        self.ASSERV_GOTOACTION_NAME = "drivers/ard_asserv/goto_action"
+        self.ASSERV_GOTO_SERVICE_NAME = "/drivers/ard_asserv/goto"
+        self.ASSERV_POSE_TOPIC_NAME = "/drivers/ard_asserv/pose2d"
+        self.ASSERV_GOTOACTION_NAME = "/drivers/ard_asserv/goto_action"
         self._asservGotoService = ""
         self._asservGotoActionClient = ""
 
