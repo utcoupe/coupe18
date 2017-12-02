@@ -196,118 +196,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var ControlController = function () {
-  function ControlController($rootScope, $timeout, $interval, Settings, Domains, Ros, Console) {
-    var _this = this;
-
-    _classCallCheck(this, ControlController);
-
-    this.$timeout = $timeout;
-    this.Domains = Domains;
-    this.domains = $rootScope.domains;
-    this.logs = Console.logs;
-
-    this.ros = Ros;
-    this.setting = Settings.get();
-
-    if ($rootScope.isConnected) {
-      this.$timeout(function () {
-        _this.onConnected();
-      }, 100);
-    } else {
-      $rootScope.$watch('isConnected', function (newValue) {
-        var _this2 = this;
-
-        if (newValue) this.$timeout(function () {
-          _this2.onConnected();
-        }, 100);
-      }.bind(this));
-    }
-  }
-
-  // The active domain shows further information in the center view
-
-
-  _createClass(ControlController, [{
-    key: 'setActiveDomain',
-    value: function setActiveDomain(domain) {
-      this.activeDomain = domain;
-    }
-  }, {
-    key: 'onConnected',
-    value: function onConnected() {
-
-      if (!this.activeDomain) {
-        var _iteratorNormalCompletion = true;
-        var _didIteratorError = false;
-        var _iteratorError = undefined;
-
-        try {
-          for (var _iterator = this.domains[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var d = _step.value;
-
-            if (this.ros.getDomains().includes(d.name)) {
-              this.setActiveDomain(d.name);
-              return;
-            }
-          }
-        } catch (err) {
-          _didIteratorError = true;
-          _iteratorError = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion && _iterator.return) {
-              _iterator.return();
-            }
-          } finally {
-            if (_didIteratorError) {
-              throw _iteratorError;
-            }
-          }
-        }
-      }
-    }
-  }, {
-    key: 'refresh',
-    value: function refresh() {
-      this.ros.loadData();
-    }
-  }, {
-    key: 'isDomainActive',
-    value: function isDomainActive(domain) {
-      return _.some(this.ros.getServicesForDomain(domain), function (t) {
-        return t.active == true;
-      });
-    }
-  }, {
-    key: 'collapseAll',
-    value: function collapseAll(domain) {
-      this.ros.getServicesForDomain(domain).map(function (item) {
-        item.isOpen = false;
-      });
-    }
-  }, {
-    key: 'expandAll',
-    value: function expandAll(domain) {
-      this.ros.getServicesForDomain(domain).map(function (item) {
-        item.isOpen = true;
-      });
-    }
-  }]);
-
-  return ControlController;
-}();
-
-angular.module('roscc').component('ccControl', {
-  templateUrl: 'app/control/control.html',
-  controller: ControlController
-});
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 var DiagnosticController = function () {
   function DiagnosticController($rootScope, $timeout, $interval, Settings, Domains, Ros, Console) {
     var _this = this;
@@ -918,6 +806,118 @@ var RosService = function () {
 }();
 
 angular.module('roscc').service('Ros', RosService);
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ControlController = function () {
+  function ControlController($rootScope, $timeout, $interval, Settings, Domains, Ros, Console) {
+    var _this = this;
+
+    _classCallCheck(this, ControlController);
+
+    this.$timeout = $timeout;
+    this.Domains = Domains;
+    this.domains = $rootScope.domains;
+    this.logs = Console.logs;
+
+    this.ros = Ros;
+    this.setting = Settings.get();
+
+    if ($rootScope.isConnected) {
+      this.$timeout(function () {
+        _this.onConnected();
+      }, 100);
+    } else {
+      $rootScope.$watch('isConnected', function (newValue) {
+        var _this2 = this;
+
+        if (newValue) this.$timeout(function () {
+          _this2.onConnected();
+        }, 100);
+      }.bind(this));
+    }
+  }
+
+  // The active domain shows further information in the center view
+
+
+  _createClass(ControlController, [{
+    key: 'setActiveDomain',
+    value: function setActiveDomain(domain) {
+      this.activeDomain = domain;
+    }
+  }, {
+    key: 'onConnected',
+    value: function onConnected() {
+
+      if (!this.activeDomain) {
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = this.domains[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var d = _step.value;
+
+            if (this.ros.getDomains().includes(d.name)) {
+              this.setActiveDomain(d.name);
+              return;
+            }
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+      }
+    }
+  }, {
+    key: 'refresh',
+    value: function refresh() {
+      this.ros.loadData();
+    }
+  }, {
+    key: 'isDomainActive',
+    value: function isDomainActive(domain) {
+      return _.some(this.ros.getServicesForDomain(domain), function (t) {
+        return t.active == true;
+      });
+    }
+  }, {
+    key: 'collapseAll',
+    value: function collapseAll(domain) {
+      this.ros.getServicesForDomain(domain).map(function (item) {
+        item.isOpen = false;
+      });
+    }
+  }, {
+    key: 'expandAll',
+    value: function expandAll(domain) {
+      this.ros.getServicesForDomain(domain).map(function (item) {
+        item.isOpen = true;
+      });
+    }
+  }]);
+
+  return ControlController;
+}();
+
+angular.module('roscc').component('ccControl', {
+  templateUrl: 'app/control/control.html',
+  controller: ControlController
+});
 "use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1583,6 +1583,42 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var ParameterController = function () {
+  function ParameterController($timeout, Ros) {
+    _classCallCheck(this, ParameterController);
+
+    this.ros = Ros;
+    this.$timeout = $timeout;
+  }
+
+  _createClass(ParameterController, [{
+    key: '$onInit',
+    value: function $onInit() {
+      this.$timeout(function () {
+        this.param = new ROSLIB.Param({ ros: this.ros.ros, name: this.parameter.name });
+      }.bind(this), 500);
+    }
+  }, {
+    key: 'setValue',
+    value: function setValue(value) {
+      this.param.set(value);
+    }
+  }]);
+
+  return ParameterController;
+}();
+
+angular.module('roscc').component('ccParameter', {
+  bindings: { parameter: '=' },
+  templateUrl: 'app/parameters/parameters.html',
+  controller: ParameterController
+});
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var ServiceController = function () {
   function ServiceController($scope, $http, $timeout, Ros) {
     _classCallCheck(this, ServiceController);
@@ -1676,42 +1712,6 @@ angular.module('roscc').component('ccService', {
   bindings: { service: '=' },
   template: '<ng-include src="$ctrl.fileName"></ng-include>',
   controller: ServiceController
-});
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var ParameterController = function () {
-  function ParameterController($timeout, Ros) {
-    _classCallCheck(this, ParameterController);
-
-    this.ros = Ros;
-    this.$timeout = $timeout;
-  }
-
-  _createClass(ParameterController, [{
-    key: '$onInit',
-    value: function $onInit() {
-      this.$timeout(function () {
-        this.param = new ROSLIB.Param({ ros: this.ros.ros, name: this.parameter.name });
-      }.bind(this), 500);
-    }
-  }, {
-    key: 'setValue',
-    value: function setValue(value) {
-      this.param.set(value);
-    }
-  }]);
-
-  return ParameterController;
-}();
-
-angular.module('roscc').component('ccParameter', {
-  bindings: { parameter: '=' },
-  templateUrl: 'app/parameters/parameters.html',
-  controller: ParameterController
 });
 'use strict';
 
