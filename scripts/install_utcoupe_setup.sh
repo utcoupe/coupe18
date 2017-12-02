@@ -51,9 +51,9 @@ function install_ros() {
 		sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 		sudo apt-get update
 		if [ "$ARCH" = "x86_64" ]; then
-			sudo apt-get install ros-kinetic-desktop-full
+			sudo apt-get install ros-kinetic-desktop-full ros-kinetic-rosserial-arduino ros-kinetic-rosbridge-suite ros-kinetic-tf2-web-republisher
 		elif [ "$ARCH" = "armv7l" ]; then
-			sudo apt-get install ros-kinetic-ros-base ros-kinetic-tf2 ros-kinetic-tf2-ros ros-kinetic-rviz ros-kinetic-diagnostic-updater ros-kinetic-roslint ros-kinetic-camera-info-manager 
+			sudo apt-get install ros-kinetic-ros-base ros-kinetic-tf2 ros-kinetic-tf2-ros ros-kinetic-rviz ros-kinetic-diagnostic-updater ros-kinetic-roslint ros-kinetic-camera-info-manager ros-kinetic-rosserial-arduino ros-kinetic-rosbridge-suite ros-kinetic-tf2-web-republisher
 		fi
 		sudo rosdep init
 		rosdep update
