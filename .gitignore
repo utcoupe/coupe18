@@ -48,7 +48,7 @@ config.js
 *sync_time_stamp
 *liburg_c.a
 *.swp
-tmp.bmp
+.directory
 
 # SymLink to default ROS CMakeLists.txt
 ros_ws/src/CMakeLists.txt
