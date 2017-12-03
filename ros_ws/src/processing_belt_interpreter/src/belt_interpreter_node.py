@@ -108,11 +108,14 @@ class BeltInterpreter(object):
 
             if float(static_points_nbr) / float(total_points_nbr) \
                > self.POINTS_PC_THRESHOLD:
-                static_rects.append(rect)
+                static_rects.append((sensor_id, rect))
             else:
-                dynamic_rects.append(rect)
+                dynamic_rects.append((sensor_id, rect))
 
-        self._pub.publish(static_rects, dynamic_rects)
+
+        self._pub.publish([r.second for r in static_rects],
+                          [t.second for t in dynamic_rects])
+
         self._markers_pub.publish_markers(static_rects, dynamic_rects)
 
     def pub_static_transforms(self):
