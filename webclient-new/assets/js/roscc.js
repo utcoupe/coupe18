@@ -196,6 +196,118 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var ControlController = function () {
+  function ControlController($rootScope, $timeout, $interval, Settings, Domains, Ros, Console) {
+    var _this = this;
+
+    _classCallCheck(this, ControlController);
+
+    this.$timeout = $timeout;
+    this.Domains = Domains;
+    this.domains = $rootScope.domains;
+    this.logs = Console.logs;
+
+    this.ros = Ros;
+    this.setting = Settings.get();
+
+    if ($rootScope.isConnected) {
+      this.$timeout(function () {
+        _this.onConnected();
+      }, 100);
+    } else {
+      $rootScope.$watch('isConnected', function (newValue) {
+        var _this2 = this;
+
+        if (newValue) this.$timeout(function () {
+          _this2.onConnected();
+        }, 100);
+      }.bind(this));
+    }
+  }
+
+  // The active domain shows further information in the center view
+
+
+  _createClass(ControlController, [{
+    key: 'setActiveDomain',
+    value: function setActiveDomain(domain) {
+      this.activeDomain = domain;
+    }
+  }, {
+    key: 'onConnected',
+    value: function onConnected() {
+
+      if (!this.activeDomain) {
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = this.domains[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var d = _step.value;
+
+            if (this.ros.getDomains().includes(d.name)) {
+              this.setActiveDomain(d.name);
+              return;
+            }
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+      }
+    }
+  }, {
+    key: 'refresh',
+    value: function refresh() {
+      this.ros.loadData();
+    }
+  }, {
+    key: 'isDomainActive',
+    value: function isDomainActive(domain) {
+      return _.some(this.ros.getServicesForDomain(domain), function (t) {
+        return t.active == true;
+      });
+    }
+  }, {
+    key: 'collapseAll',
+    value: function collapseAll(domain) {
+      this.ros.getServicesForDomain(domain).map(function (item) {
+        item.isOpen = false;
+      });
+    }
+  }, {
+    key: 'expandAll',
+    value: function expandAll(domain) {
+      this.ros.getServicesForDomain(domain).map(function (item) {
+        item.isOpen = true;
+      });
+    }
+  }]);
+
+  return ControlController;
+}();
+
+angular.module('roscc').component('ccControl', {
+  templateUrl: 'app/control/control.html',
+  controller: ControlController
+});
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var DiagnosticController = function () {
   function DiagnosticController($rootScope, $timeout, $interval, Settings, Domains, Ros, Console) {
     var _this = this;
@@ -512,7 +624,7 @@ var RosService = function () {
     this.newRosConnection();
     $interval(function () {
       _this.newRosConnection();
-    }, 1000);
+    }, 1000 / this.setting.refresh_rate);
 
     $interval(function () {
       _this.loadData();
@@ -652,24 +764,27 @@ var RosService = function () {
       this.ros.getTopics(function (topics) {
         // TODO: check if type is already returned here
         angular.forEach(topics.topics, function (name) {
-          var foundTopic = _.findWhere(_this4.data.topics, { name: name });
+          var topic = _.findWhere(_this4.data.topics, { name: name });
 
-          if (foundTopic) {
+          if (topic) {
             //to update
-            foundTopic.active = true;
+            topic.active = true;
           } else {
             //to add
-            _this4.data.topics.push({
+            topic = {
               name: name,
               active: true,
               isOpen: true
-            });
+            };
+            _this4.data.topics.push(topic);
           }
 
-          _this4.ros.getTopicType(name, function (type) {
-            _.findWhere(_this4.data.topics, { name: name }).type = type;
-            _.findWhere(_this4.data.topics, { name: name }).fetched = true;
-          });
+          if (!topic.fetched) {
+            _this4.ros.getTopicType(name, function (type) {
+              topic.type = type;
+              topic.fetched = true;
+            });
+          }
         });
 
         for (var i = _this4.data.topics.length - 1; i >= 0; i--) {
@@ -691,24 +806,26 @@ var RosService = function () {
 
       this.ros.getServices(function (services) {
         angular.forEach(services, function (name) {
-          var foundService = _.findWhere(_this4.data.services, { name: name });
+          var service = _.findWhere(_this4.data.services, { name: name });
 
-          if (foundService) {
+          if (service) {
             //to update
-            foundService.active = true;
+            service.active = true;
           } else {
             //to add
-            _this4.data.services.push({
+            service = {
               name: name,
               active: true,
               isOpen: true
+            };
+            _this4.data.services.push(service);
+          }
+          if (!service.fetched) {
+            _this4.ros.getServiceType(name, function (type) {
+              service.type = type;
+              service.fetched = true;
             });
           }
-
-          _this4.ros.getServiceType(name, function (type) {
-            _.findWhere(_this4.data.services, { name: name }).type = type;
-            _.findWhere(_this4.data.services, { name: name }).fetched = true;
-          });
         });
 
         for (var i = _this4.data.services.length - 1; i >= 0; i--) {
@@ -806,118 +923,6 @@ var RosService = function () {
 }();
 
 angular.module('roscc').service('Ros', RosService);
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var ControlController = function () {
-  function ControlController($rootScope, $timeout, $interval, Settings, Domains, Ros, Console) {
-    var _this = this;
-
-    _classCallCheck(this, ControlController);
-
-    this.$timeout = $timeout;
-    this.Domains = Domains;
-    this.domains = $rootScope.domains;
-    this.logs = Console.logs;
-
-    this.ros = Ros;
-    this.setting = Settings.get();
-
-    if ($rootScope.isConnected) {
-      this.$timeout(function () {
-        _this.onConnected();
-      }, 100);
-    } else {
-      $rootScope.$watch('isConnected', function (newValue) {
-        var _this2 = this;
-
-        if (newValue) this.$timeout(function () {
-          _this2.onConnected();
-        }, 100);
-      }.bind(this));
-    }
-  }
-
-  // The active domain shows further information in the center view
-
-
-  _createClass(ControlController, [{
-    key: 'setActiveDomain',
-    value: function setActiveDomain(domain) {
-      this.activeDomain = domain;
-    }
-  }, {
-    key: 'onConnected',
-    value: function onConnected() {
-
-      if (!this.activeDomain) {
-        var _iteratorNormalCompletion = true;
-        var _didIteratorError = false;
-        var _iteratorError = undefined;
-
-        try {
-          for (var _iterator = this.domains[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var d = _step.value;
-
-            if (this.ros.getDomains().includes(d.name)) {
-              this.setActiveDomain(d.name);
-              return;
-            }
-          }
-        } catch (err) {
-          _didIteratorError = true;
-          _iteratorError = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion && _iterator.return) {
-              _iterator.return();
-            }
-          } finally {
-            if (_didIteratorError) {
-              throw _iteratorError;
-            }
-          }
-        }
-      }
-    }
-  }, {
-    key: 'refresh',
-    value: function refresh() {
-      this.ros.loadData();
-    }
-  }, {
-    key: 'isDomainActive',
-    value: function isDomainActive(domain) {
-      return _.some(this.ros.getServicesForDomain(domain), function (t) {
-        return t.active == true;
-      });
-    }
-  }, {
-    key: 'collapseAll',
-    value: function collapseAll(domain) {
-      this.ros.getServicesForDomain(domain).map(function (item) {
-        item.isOpen = false;
-      });
-    }
-  }, {
-    key: 'expandAll',
-    value: function expandAll(domain) {
-      this.ros.getServicesForDomain(domain).map(function (item) {
-        item.isOpen = true;
-      });
-    }
-  }]);
-
-  return ControlController;
-}();
-
-angular.module('roscc').component('ccControl', {
-  templateUrl: 'app/control/control.html',
-  controller: ControlController
-});
 "use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
