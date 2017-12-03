@@ -224,16 +224,19 @@ class RosService {
     this.ros.getParams((params) => { //TODO : update like topics
       angular.forEach(params, (name) => {
 
-        let foundParam = _.findWhere(this.data.parameters, { name });
-        if(!foundParam) {
-          this.data.parameters.push({ name });
+        let param = _.findWhere(this.data.parameters, { name });
+        if(!param) {
+          param = { name }
+          this.data.parameters.push(param);
         }
 
-        const param = new ROSLIB.Param({ ros: this.ros, name });
-        param.get((value) => {
-          _.findWhere(this.data.parameters, { name }).value = value;
-          _.findWhere(this.data.parameters, { name }).fetched = true;
-        });
+        if(!param.fetched) {
+          const rosparam = new ROSLIB.Param({ ros: this.ros, name });
+          rosparam.get((value) => {
+            param.value = value;
+            param.fetched = true;
+          });
+        }
       });
 
       for(let i = this.data.parameters.length - 1; i >= 0; i--) { //angular foreach not working for this

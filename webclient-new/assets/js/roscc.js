@@ -850,16 +850,19 @@ var RosService = function () {
         //TODO : update like topics
         angular.forEach(params, function (name) {
 
-          var foundParam = _.findWhere(_this4.data.parameters, { name: name });
-          if (!foundParam) {
-            _this4.data.parameters.push({ name: name });
+          var param = _.findWhere(_this4.data.parameters, { name: name });
+          if (!param) {
+            param = { name: name };
+            _this4.data.parameters.push(param);
           }
 
-          var param = new ROSLIB.Param({ ros: _this4.ros, name: name });
-          param.get(function (value) {
-            _.findWhere(_this4.data.parameters, { name: name }).value = value;
-            _.findWhere(_this4.data.parameters, { name: name }).fetched = true;
-          });
+          if (!param.fetched) {
+            var rosparam = new ROSLIB.Param({ ros: _this4.ros, name: name });
+            rosparam.get(function (value) {
+              param.value = value;
+              param.fetched = true;
+            });
+          }
         });
 
         for (var i = _this4.data.parameters.length - 1; i >= 0; i--) {
@@ -1840,14 +1843,15 @@ var SettingsService = function () {
     value: function getDefaultSetting() {
       return {
         name: 'Robot Name',
-        address: '127.0.0.1', // use localhost
+        address: window.location.hostname,
         port: 9090, // default port of rosbridge_server
         log: '/rosout',
         advanced: false,
         hokuyo_1: '/sensors/hokuyo_1_raw',
         hokuyo_2: '/sensors/hokuyo_2_raw',
-        maxConsoleEntries: 200,
-        refresh_rate: 1
+        maxConsoleEntries: 1000,
+        refresh_rate: 1,
+        log_level: 2
       };
     }
   }]);
@@ -2027,7 +2031,7 @@ var TopicController = function () {
     this.setting = Settings.get();
     this.Quaternions = Quaternions;
     this.ros = Ros;
-    this.isSubscribing = true;
+    this.isSubscribing = false;
     this.toggle = true;
   }
 

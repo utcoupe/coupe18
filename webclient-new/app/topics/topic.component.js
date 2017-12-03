@@ -5,7 +5,7 @@ class TopicController {
     this.setting = Settings.get();
     this.Quaternions = Quaternions;
     this.ros = Ros;
-    this.isSubscribing = true;
+    this.isSubscribing = false;
     this.toggle = true;
   }
 
