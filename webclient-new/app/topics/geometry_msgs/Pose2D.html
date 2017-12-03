@@ -19,7 +19,10 @@
               <span class="input-group-addon">m</span>
             </div>
           </div>
-
+        </form>
+      </div>
+      <div class="col-sm-6">
+        <form class="form-horizontal form-margin">
           <div class="form-group">
             <label>Y</label>
             <div class="input-group">
@@ -27,9 +30,11 @@
               <span class="input-group-addon">m</span>
             </div>
           </div>
-        </form>
-      </div>
+          </form>
+        </div>
+    </div>
 
+    <div class="row">
       <div class="col-sm-6">
         <form class="form-horizontal form-margin">
           <div class="form-group">
@@ -40,6 +45,10 @@
             </div>
           </div>
         </form>
+      </div>
+      <div class="col-sm-6">
+        <br/>
+        <button class="btn btn-default pull-right" type="button" ng-disabled="$ctrl.isSubscribing" style="margin-left: 10px;" ng-click="$ctrl.publishMessage($ctrl.message)">Publish</button>
       </div>
     </div>
   </div>

@@ -51,14 +51,15 @@ class SettingsService {
   getDefaultSetting() {
     return {
       name: 'Robot Name',
-      address: '127.0.0.1', // use localhost
+      address: window.location.hostname,
       port: 9090, // default port of rosbridge_server
       log: '/rosout',
       advanced: false,
       hokuyo_1: '/sensors/hokuyo_1_raw',
       hokuyo_2: '/sensors/hokuyo_2_raw',
-      maxConsoleEntries: 200,
-      refresh_rate: 1
+      maxConsoleEntries: 1000,
+      refresh_rate: 1,
+      log_level: 2
     };
   }
 }

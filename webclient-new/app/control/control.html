@@ -91,7 +91,7 @@
       <!-- Console Log -->
       <div class="console">
         <table class="table">
-          <tr ng-repeat="logEntry in $ctrl.logs">
+          <tr ng-repeat="logEntry in $ctrl.logs" ng-show="logEntry.level >= $ctrl.setting.log_level">
             <td>
               <strong ng-class="{
                         'text-danger bg-danger': logEntry.level > 8,
