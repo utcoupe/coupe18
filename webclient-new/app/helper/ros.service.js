@@ -15,7 +15,7 @@ class RosService {
     this.newRosConnection();
     $interval(() => {
       this.newRosConnection();
-    }, 1000);
+    }, 1000 / this.setting.refresh_rate);
 
     $interval(() => {
       this.loadData();
@@ -142,22 +142,25 @@ class RosService {
   loadData() {
     this.ros.getTopics((topics) => { // TODO: check if type is already returned here
       angular.forEach(topics.topics, (name) => {
-        let foundTopic = _.findWhere(this.data.topics, { name });
+        let topic = _.findWhere(this.data.topics, { name });
 
-        if(foundTopic) { //to update
-          foundTopic.active = true;
+        if(topic) { //to update
+          topic.active = true;
         } else { //to add
-          this.data.topics.push({
+          topic = {
             name: name,
             active: true,
             isOpen: true
-          });
+          };
+          this.data.topics.push(topic);
         }
 
-        this.ros.getTopicType(name, (type) => {
-          _.findWhere(this.data.topics, { name }).type = type;
-          _.findWhere(this.data.topics, { name }).fetched = true;
-        });
+        if(!topic.fetched) {
+          this.ros.getTopicType(name, (type) => {
+            topic.type = type;
+            topic.fetched = true;
+          });
+        }
       });
 
       for(let i = this.data.topics.length - 1; i >= 0; i--) {
@@ -180,22 +183,24 @@ class RosService {
 
     this.ros.getServices((services) => {
       angular.forEach(services, (name) => {
-        let foundService = _.findWhere(this.data.services, { name });
+        let service = _.findWhere(this.data.services, { name });
 
-        if(foundService) { //to update
-          foundService.active = true;
+        if(service) { //to update
+          service.active = true;
         } else { //to add
-          this.data.services.push({
+          service = {
             name: name,
             active: true,
             isOpen: true
+          };
+          this.data.services.push(service);
+        }
+        if(!service.fetched) {
+          this.ros.getServiceType(name, (type) => {
+            service.type = type;
+            service.fetched = true;
           });
         }
-
-        this.ros.getServiceType(name, (type) => {
-          _.findWhere(this.data.services, { name }).type = type;
-          _.findWhere(this.data.services, { name }).fetched = true;
-        });
       });
 
       for(let i = this.data.services.length - 1; i >= 0; i--) { //angular foreach not working for this
