@@ -1,8 +1,8 @@
 #!/usr/bin/python
 import rospy
 
-from ai_game_status.srv import ArmRequest, NodeReady
 from ai_game_status.msg import GameEnd
+from ai_game_status.srv import ArmRequest, NodeReady
 
 
 class StatusServices(object):

@@ -1,9 +1,7 @@
-uint8 STATUS_INITIALIZING = 0
-uint8 STATUS_INITIALIZED  = 1
-uint8 STATUS_ARMING       = 2
-uint8 STATUS_ARMED        = 3
-uint8 STATUS_INGAME       = 4
-uint8 STATUS_POSTGAME     = 5
-uint8 STATUS_HALT         = 6
-uint8 game_status
+# uint8 STATUS_INITIALIZING = 0 # Not allowed.
+# uint8 STATUS_INITIALIZED  = 1 # Not allowed.
+uint8 STATUS_INGAME         = 2
+uint8 STATUS_HALT           = 3
+uint8 new_game_status
 ---
+bool success

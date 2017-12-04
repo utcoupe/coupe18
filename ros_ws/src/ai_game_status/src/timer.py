@@ -3,14 +3,17 @@ import time
 
 
 class GameTimer():
-    def __init__(self):
-        self.game_duration = -1  # Holds the match duration.
-        self.started = False     # Set to true when Timer is triggered.
+    def __init__(self, duration):
+        self.game_duration = duration  # Holds the match duration.
+        self.started = False           # Set to true when Timer is active.
 
         self._start_time = -1
 
-    def start(self):
+    def reset(self):
         self._start_time = time.time() * 1000
+
+    def start(self):
+        self.reset()
         self.started = True
 
     def stop(self):
