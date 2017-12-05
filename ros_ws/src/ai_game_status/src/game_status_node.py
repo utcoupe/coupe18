@@ -4,7 +4,7 @@ import rospy
 from timer import GameTimer
 
 from ai_game_status.msg import GameStatus, GameTime
-from ai_game_status.srv import SetStatus, SetTimer, NodeReady
+from ai_game_status.srv import SetStatus, SetStatusResponse, SetTimer, SetTimerResponse, NodeReady, NodeReadyResponse
 
 
 class Status():
@@ -16,8 +16,8 @@ class Status():
 
     INIT_CHECKLIST = {  # Please comment the lines instead of deleting them.
         "/ai/scheduler": None,
-        "/ai/scripts": None,
-        #"/ai/game_status": None,
+        "/ai/scripts": None
+        "/ai/game_status": None,
 
         "/memory/map": None,
         "/memory/definitions": None,
@@ -50,45 +50,68 @@ class GameStatusNode():
         self._status_pub = rospy.Publisher("/ai/game_status/status", GameStatus, queue_size = 10)
         self._timer_pub  = rospy.Publisher("/ai/game_status/timer",  GameTime,   queue_size = 10)
 
-        duration = 100 # TODO get from def file
+        duration = 10 # TODO get from def file
         self._timer = GameTimer(duration)
 
         self.game_status = Status.STATUS_INITIALIZING
 
         r = rospy.Rate(5)
         while not rospy.is_shutdown():
+            # print Status.INIT_CHECKLIST
             if self.game_status == Status.STATUS_INITIALIZING:
                 self.check_init_checklist()
-            self._status_pub.publish(self.game_status) # publish game status at 5Hz.
-            self.publish_timer() # publish timer times at 5Hz.
+            self.check_timer()    # check when time is finished.
+            self.publish_status() # publish game status at 5Hz.
+            self.publish_timer()  # publish timer times at 5Hz.
 
             r.sleep()
 
+    def publish_status(self):
+        m = GameStatus()
+        m.game_status = self.game_status
+        for node in Status.INIT_CHECKLIST:
+            if Status.INIT_CHECKLIST[node] is None:
+                m.pending_nodes.append(node)
+            elif Status.INIT_CHECKLIST[node] is True:
+                m.ready_nodes.append(node)
+            elif Status.INIT_CHECKLIST[node] is False:
+                m.failed_nodes.append(node)
+        self._status_pub.publish(m)
+
     def publish_timer(self):
         m = GameTime()
-        m.game_duration     = self._timer.game_duration
-        m.game_elapsed_time = self._timer.elapsed_time()
-        m.game_time_left    = self._timer.time_left()
-        m.is_active         = self._timer.started
+        m.is_active          = self._timer.started
+        m.game_time_duration = self._timer.game_duration
+        m.game_elapsed_time  = self._timer.elapsed_time() if self._timer.started else -1
+        m.game_time_left     = self._timer.time_left()    if self._timer.started else -1
         self._timer_pub.publish(m)
 
     def check_init_checklist(self):
-        for node_status in Status.INIT_CHECKLIST:
-            if node_status in [None, False]:
+        for node in Status.INIT_CHECKLIST:
+            if Status.INIT_CHECKLIST[node] in [None, False]:
                 return
         if self.game_status == Status.STATUS_INITIALIZING:
             self.game_status = Status.STATUS_INITIALIZED
         else:
             rospy.logerr("Unexpected behaviour : game_status checklist got full but status is not INITIALIZING.")
 
+    def check_timer(self):
+        if self._timer.started:
+            if self._timer.time_left() <= 0:
+                self._timer.stop()
+                self.game_status = Status.STATUS_HALT
+
     def on_node_ready(self, msg):
         if msg.node_name in Status.INIT_CHECKLIST:
             Status.INIT_CHECKLIST[msg.node_name] = msg.success
+            return NodeReadyResponse()
         else:
             rospy.logwarn("Node name '{}' not in ai/game_status init checklist, passing.".format(msg.node_name))
+            return NodeReadyResponse()
 
     def on_set_status(self, req):
         self.game_status = req.new_game_status
+        return SetStatusResponse(True)
 
     def on_set_timer(self, req):
         if req.action == req.ACTION_START:
@@ -101,6 +124,7 @@ class GameStatusNode():
             self._timer.reset()
         elif req.action == req.ACTION_STOP:
             self._timer.stop()
+        return SetTimerResponse(True)
 
 
 if __name__ == "__main__":

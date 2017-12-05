@@ -15,7 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
     FILES
     GameStatus.msg
-    GameEnd.msg
+    GameTime.msg
 )
 
 add_service_files(
@@ -23,6 +23,7 @@ add_service_files(
     SetStatus.srv
     ArmRequest.srv
     NodeReady.srv
+    SetTimer.srv
 )
 
 generate_messages(
