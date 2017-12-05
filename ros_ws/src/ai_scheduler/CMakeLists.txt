@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 add_message_files(
     FILES
+    TaskResult.msg
 )
 
 add_service_files(

@@ -238,7 +238,6 @@ class ActionList(Task):
         if   self.executionOrder == ExecutionOrder.LINEAR:
             for task in self.TASKS:
                 if task.getStatus() in [TaskStatus.FREE, TaskStatus.PENDING]: return task
-                print "{} :::  {}".format(task, task.getStatus())
 
         elif self.executionOrder == ExecutionOrder.RANDOM:
             free_tasks = [task for task in self.TASKS if task.getStatus() == TaskStatus.FREE]
@@ -465,24 +464,21 @@ class Order(Task):
         self.setStatus(TaskStatus.WAITINGFORRESPONSE)
         rospy.loginfo("Executing task : {}...".format(self.__repr__()))
 
-        response, self.TimeTaken = self.Message.send(communicator, self.callback)
+        self.Message.send(communicator, self.callback)
 
 
-    def callback(self, response):
-        print "got response !! from Order class!!"
-        # After response
-        #TODO check is success properly
-        if not hasattr(response, "response_code"):
+    def callback(self, res, time_taken):
+        # if not hasattr(res, "response_code"): # TODO wtf? remove?
+        #     self.setStatus(TaskStatus.SUCCESS)
+        #     return
+        self.TimeTaken = time_taken
+        if res.result == res.RESULT_SUCCESS:
+            rospy.logdebug("    Order succeeded!")
             self.setStatus(TaskStatus.SUCCESS)
-            return
-
-        if response.response_code == 200:
-            self.setStatus(TaskStatus.SUCCESS)
-            rospy.logdebug("[AI] Order '{}' succeeded!".format(self.Name))
             #GameProperties.REWARD_POINTS += self.getReward() #TODO
-        else:
+        elif res.result in [res.RESULT_PAUSE, res.RESULT_FAIL]: # TODO implement pause
+            rospy.logerr("    Order failed: {}".format(res.verbose_reason))
             self.setStatus(TaskStatus.ERROR)
-            rospy.logerr("[AI] Order '{}' execution failed (code : {}, reason : '{}')".format(self.Name, response.response_code, response.reason))
 
     def __repr__(self):
         c = Console()
@@ -519,11 +515,8 @@ class Message():
             paramsNames.append(p.name)
 
     def send(self, communicator, callback):
-        self.startTime = time.time()
-        self.RosParameters = {p.name: p.getRos() for p in self.Parameters}
-        response = communicator.SendRequest(self.Destination,
-                                            self.RosParameters, callback)
-        return response, time.time() - self.startTime
+        ros_params = {p.name: p.getRos() for p in self.Parameters}
+        communicator.SendRequest(self.Destination, ros_params, callback)
 
     def setParameters(self, xml_list):  # populate values of params
         for child in xml_list:

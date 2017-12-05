@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+import time
 import rospy
+
 import ai_scheduler.srv
+from ai_scheduler.msg import TaskResult
 
 class RequestTypes():
     SERVICE = 0
@@ -18,11 +21,11 @@ class AICommunication():
         def getRequestClass(dest):
             return servers[dest][1]
 
+        start_time = time.time()
         if dest in servers:
             if getRequestType(dest) == RequestTypes.SERVICE:
                 response = self._send_service(dest, getRequestClass(dest), params)
-                callback(response)
-                return response
+                callback(response, time.time() - start_time)
             elif getRequestType(dest) == RequestTypes.ACTION:
                 pass
             else:
@@ -31,6 +34,12 @@ class AICommunication():
             raise ValueError, "Message destination '{}' was not recognized. Has it been added to ai_communication.py definition dict, or misspelled ?".format(dest)
 
     def _send_service(self, dest, srv_class, params):
-        rospy.wait_for_service(dest)
+        try: # Handle a timeout in case one node doesn't respond
+            rospy.wait_for_service(dest, timeout = 2)
+        except rospy.ROSException:
+            res = TaskResult()
+            res.result = res.RESULT_FAIL
+            res.verbose_reason = "wait_for_service request timeout exceeded."
+            return res
         service = rospy.ServiceProxy(dest, srv_class)
         return service(srv_class._request_class(**params))

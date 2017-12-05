@@ -4,8 +4,10 @@
 			<time>100</time>
 		</game>
 
-    <actions name="In-Game Actions">
+    <actions name="In-Game Actions" exec="+" order="random">
 			<actionref ref="goto_spawn_fast"/>
+      <actionref ref="goto_spawn_fast"/>
+      <actionref ref="goto_spawn_fast"/>
     </actions>
 
     <actions_onfinish name="Actions after game">
