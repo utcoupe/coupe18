@@ -147,6 +147,12 @@ function launch_script() {
 	fi
 }
 
+# Check that the folder has been cloned from git and not downloaded, because submodules won't work...
+if [ ! -d ".git" ]; then
+	red_echo "You have to clone this repository from git, not downloading it."
+	exit 1
+fi
+
 # Verify that the script is launched from the right place
 if [ ! "${PWD##*/}" = "coupe18" ]; then
 	red_echo "You have to launch this script from UTCoupe main directory : ./script/${0##*/} or to rename this folder in coupe18."
