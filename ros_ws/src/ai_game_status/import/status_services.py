@@ -24,3 +24,24 @@ class StatusServices(object):
     def _on_arm(self, req): # Handle Service response here.
         success = self.arm_cb()
         return ArmRequestResponse(success)
+
+'''
+EXAMPLE USAGE
+
+def on_arm():
+    # ... calibration ...
+    return True # True if arm successful, False otherwise.
+
+def on_status(req):
+    if req.game_status == req.STATUS_HALT:
+        pass # ... e.g. stop updating TFs ...
+
+def start():
+    rospy.init_node("nodename", log_level=rospy.INFO)
+    self.status_services = StatusServices("recognition", "localizer", on_arm, on_status)
+    # ... initialization ...
+    self.status_services.ready(True) # True if init successful, False otherwise.
+
+if __name__ == "__main__":
+    start()
+'''
