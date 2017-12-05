@@ -8,9 +8,8 @@ import time
 import copy
 '''
 GENERAL TOBEDONE
-    - Parameters
     - Conditions (chest, needsprevious..)
-    - Actions instead of Services
+    - Support actions too
 
 TESTS TOBEDONE
     - Fastest ExecutionOrder
@@ -26,15 +25,15 @@ WARNINGS
 #====================================*/
 
 class TaskStatus():
-    CRITICAL            = ('CRITICAL'            , '💔')                    # Fatal error, system will shutdown.
-    WAITINGFORRESPONSE  = ('WAITINGFORRESPONSE'    , '💬')                    # Order sent service or action message, waiting for response callback.
-    NEEDSPREVIOUS       = ('NEEDSPREVIOUS'      , '↳')                    # Task can't execute yet because it needs the previous task to be at SUCCESS still.
-    PENDING             = ('PENDING'            , '⋯')                    # For lists only. Active when one or not all child tasks are still active.
-    FREE                = ('FREE'                , '⬜')                    # Free task, not activated yet.
-    PAUSED              = ('PAUSED'                , '🔶')                    # TODO
-    ERROR               = ('ERROR'                , '⛔', "error_msg")        # Error. Order couldn't be done, AI will try to find an alternative path of orders in the tree.
-    BLOCKED             = ('BLOCKED'            , '◼')                    # Node can't execute because conditions aren't fully satisfied.
-    SUCCESS             = ('SUCCESS'            , '🆗', 0.0)                # Order and lists complete.
+    CRITICAL            = ('CRITICAL'           , '💔')                    # Fatal error, system will shutdown.
+    WAITINGFORRESPONSE  = ('WAITINGFORRESPONSE' , '💬')                    # Order sent service or action message, waiting for response callback.
+    NEEDSPREVIOUS       = ('NEEDSPREVIOUS'      , '↳')                     # Task can't execute yet because it needs the previous task to be at SUCCESS still.
+    PENDING             = ('PENDING'            , '⋯')                     # For lists only. Active when one or not all child tasks are still active.
+    FREE                = ('FREE'               , '⬜')                    # Free task, not activated yet.
+    PAUSED              = ('PAUSED'             , '🔶')                    # TODO
+    ERROR               = ('ERROR'              , '⛔', "error_msg")       # Error. Order couldn't be done, AI will try to find an alternative path of orders in the tree.
+    BLOCKED             = ('BLOCKED'            , '◼')                     # Node can't execute because conditions aren't fully satisfied.
+    SUCCESS             = ('SUCCESS'            , '🆗', 0.0)               # Order and lists complete.
     @staticmethod
     def toEmoji(status):
         return status[1]
@@ -42,7 +41,7 @@ class TaskStatus():
 class ExecutionMode():
     ALL                 = ('all'                , '⚫')    # Will execute all tasks (except the blocked ones).
     ONE                 = ('one'                , '1')    # Will execute tasks in the list until one is successful.
-    ATLEASTONE          = ('+'                    , '+')    # At least one task in the list must be executed, will try to execute all.
+    ATLEASTONE          = ('+'                  , '+')    # At least one task in the list must be executed, will try to execute all.
     @staticmethod
     def toEmoji(mode):
         return mode[1]
@@ -54,11 +53,11 @@ class ExecutionMode():
         else: raise ValueError, "ExecutionMode '{}' not recognized.".format(text)
 
 class ExecutionOrder():
-    LINEAR              = ('linear'                , '⬇')    # Will follow linearly the order given in the XML file.
-    RANDOM              = ('random'                , '🌀')    # Will pick a random free task.
-    SIMULTANEOUS        = ('simultaneous'        , '⇶')    # Will activate all tasks at once.
+    LINEAR              = ('linear'             , '⬇')    # Will follow linearly the order given in the XML file.
+    RANDOM              = ('random'             , '🌀')    # Will pick a random free task.
+    SIMULTANEOUS        = ('simultaneous'       , '⇶')    # Will activate all tasks at once.
     FASTEST             = ('fastest'            , '🕒')    # Will sort the tasks from least Duration to most.
-    MOSTREWARD          = ('mostreward'            , '⚡')    # Will sort the tasks from most Reward to least. Execute tasks with same reward amount linearly.
+    MOSTREWARD          = ('mostreward'         , '⚡')    # Will sort the tasks from most Reward to least. Execute tasks with same reward amount linearly.
     @staticmethod
     def toEmoji(order):
         return order[1]
@@ -102,8 +101,8 @@ class Task(object):
             self.Status = new_status
             if refresh_parent and self.Parent:
                 self.Parent.refreshStatus()
-    def getStatus(self, str = False):
-        return self.Status if not str else self.Status[0]
+    def getStatus(self, text_version = False):
+        return self.Status if not text_version else self.Status[0]
 
     def getStatusEmoji(self):
         return self.Status[1]
@@ -117,20 +116,14 @@ class GameProperties():
     REWARD_POINTS = 0
 
 
-
-
 #/*=====  End of Base classes  ======*/
 
 
-
-
-
-
-
 class Strategy(Task):
-    def __init__(self, xml, actions, orders):
+    def __init__(self, xml, actions, orders, communicator):
         super(Strategy, self).__init__(xml)
         self.Name = xml.attrib["name"]
+        self.communicator = communicator
         self.loadxml(xml, actions, orders)
 
     def loadxml(self, xml, actions, orders):
@@ -140,6 +133,17 @@ class Strategy(Task):
         # Fill actions
         self.TASKS = ActionList(xml.find("actions"), actions, orders)
         self.TASKS_ONFINISH = ActionList(xml.find("actions_onfinish"), actions, orders)
+
+    def execute(self):
+        self.PrettyPrint()
+        # Run the whole AI until there are no orders left to execute
+        while not rospy.is_shutdown():
+            if self.canContinue():
+                self.getNext().execute(self.communicator)
+            else:
+                rospy.loginfo("[AI] In-Game actions finished!")
+                break
+            self.PrettyPrint()
 
     def canContinue(self):
         '''TODO
@@ -333,6 +337,9 @@ class ActionList(Task):
         return c.getText()
 
 
+
+
+
 class Action(Task):
     def __init__(self, xml, actions, orders):
         super(Action, self).__init__(xml)
@@ -420,6 +427,9 @@ class Action(Task):
         return c.getText()
 
 
+
+
+
 class Order(Task):
     def __init__(self, xml):
         super(Order, self).__init__(xml)
@@ -485,6 +495,9 @@ class Order(Task):
         return c.getText()
 
 
+
+
+
 class Message():
     def __init__(self, xml):
         if "dest" not in xml.attrib:
@@ -517,7 +530,7 @@ class Message():
             name = child.tag
             params = [p for p in self.Parameters if p.name == name]
 
-            if(len(params) != 1):
+            if len(params) != 1:
                 raise KeyError("PARSE ERROR ! Param {} defined {} times"
                                .format(child.tag, len(params)))
 
@@ -529,6 +542,9 @@ class Message():
             param.parseValue(child)
 
         [p.checkValues() for p in self.Parameters if not p.bind]
+
+
+
 
 
 class Colors():

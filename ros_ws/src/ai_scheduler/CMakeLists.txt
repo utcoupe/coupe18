@@ -15,12 +15,11 @@ find_package(catkin REQUIRED COMPONENTS
 
 add_message_files(
     FILES
-    AICommand.msg
 )
 
 add_service_files(
     FILES
-    AIGenericCommand.srv
+    AICommand.srv
     test.srv
 )
 

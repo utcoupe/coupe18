@@ -1,43 +1,52 @@
 #!/usr/bin/python
-import rospy, time
+import rospy
 from scheduler_communication import AICommunication
 from scheduler_services import AIServices
-from ai import RobotAI, TaskStatus
+from ai import RobotAI
 
-from ai_scheduler.msg import AICommand
+from ai_scheduler.srv import AICommand, AICommandResponse
+
+# from drivers_hmi.srv import SetStrategies
 
 class AINode():
     def __init__(self):
         self.DepartmentName, self.PackageName = "ai", "scheduler"
 
         self.NODE = rospy.init_node(self.PackageName, log_level = rospy.DEBUG)
-        self.communication = AICommunication()
+        rospy.Service("/ai/scheduler/command", AICommand, self.on_command)
 
-        self.wait_for_departments()
-
-        self.AI = RobotAI("strategy_ftw") #TODO get strategy name from command line param
+        self.AI = RobotAI()
         self.services = AIServices(self.DepartmentName, self.PackageName)
 
-        self.runAI()
+        rospy.loginfo("[AI] Ready.")
+        # self.send_strategies()
+        rospy.spin()
 
-    def runAI(self):
-        #Debug: show task tree when starting the system
-        rospy.loginfo("[AI] Launching robot with strategy :")
-        self.AI.Strategy.PrettyPrint()
+    def send_strategies(self):
+        rospy.wait_for_service("/drivers/ard_hmi/set_strategies", timeout = 20) # TODO evaluate and put timeout
+        s = rospy.ServiceProxy("/drivers/ard_hmi/set_strategies", SetStrategies)
+        s(self.AI.get_strategies())
 
-        # Run the whole AI until there are no orders left to execute
-        while not rospy.is_shutdown():
-            if self.AI.Strategy.canContinue():
-                self.AI.Strategy.getNext().execute(self.communication)
-            else:
-                self.AI.Strategy.PrettyPrint()
-                rospy.loginfo("[AI] In-Game actions finished!")
-                break
-            self.AI.Strategy.PrettyPrint()
+    # def runAI(self):
+    #     #Debug: show task tree when starting the system
+    #     rospy.loginfo("[AI] Launching robot with strategy :")
+    #     self.AI.strategy.PrettyPrint()
 
+    #     # Run the whole AI until there are no orders left to execute
+    #     while not rospy.is_shutdown():
+    #         if self.AI.strategy.canContinue():
+    #             self.AI.strategy.getNext().execute(self.communication)
+    #         else:
+    #             rospy.loginfo("[AI] In-Game actions finished!")
+    #             break
+    #         self.AI.strategy.PrettyPrint()
 
-    def wait_for_departments(self):
-        pass # TODO wait for all services to be ready before launching the actions.
+    def on_command(self, req):
+        if req.command == req.COMMAND_START:
+            self.AI.start(req.strategy_name, AICommunication())
+        elif req.command == req.COMMAND_HALT:
+            self.AI.halt()
+        return AICommandResponse()
 
 '''
 PACKAGE STARTING POINT HERE

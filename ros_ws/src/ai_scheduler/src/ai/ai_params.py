@@ -18,8 +18,6 @@
 # - optional : <param type="int" optional="true"/>
 #      => the value doesn't have to be set in orderref, default value of ROS
 #                                                                will be set
-#
-#
 
 import std_msgs.msg
 import geometry_msgs.msg

@@ -20,7 +20,7 @@ class AICommunication():
 
         if dest in servers:
             if getRequestType(dest) == RequestTypes.SERVICE:
-                response = self.sendService(dest, getRequestClass(dest), params)
+                response = self._send_service(dest, getRequestClass(dest), params)
                 callback(response)
                 return response
             elif getRequestType(dest) == RequestTypes.ACTION:
@@ -30,7 +30,7 @@ class AICommunication():
         else:
             raise ValueError, "Message destination '{}' was not recognized. Has it been added to ai_communication.py definition dict, or misspelled ?".format(dest)
 
-    def sendService(self, dest, srv_class, params):
+    def _send_service(self, dest, srv_class, params):
         rospy.wait_for_service(dest)
         service = rospy.ServiceProxy(dest, srv_class)
         return service(srv_class._request_class(**params))

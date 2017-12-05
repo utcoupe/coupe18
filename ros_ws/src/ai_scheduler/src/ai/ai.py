@@ -1,42 +1,20 @@
 #!/bin/usr/python
-import os, time
-from ai_classes import Task, TaskStatus, Strategy, Action, Order
-import xml.etree.ElementTree as ET
 from timer import *
+from ai_loader import AILoader
 
 class RobotAI():
-    def __init__(self, strategyname):
-        self.xml_dirpath = os.path.dirname(__file__) + "/../../def/"
-        self.AvailableStrategies = None # loaded later (TODO Populate! used to be sent to the robot's onboard display)
+    def __init__(self):
+        self.strategy = None # Loaded when AI started with the right strategy.
+        self.timer = GameTimer() # Timer client.
+        self._loader = AILoader()
 
-        orders = self.loadOrders()
-        self.Strategy = self.loadStrategy(strategyname, self.loadActions(orders), orders)
-        self.Timer = GameTimer()
+    def get_strategies(self):
+        return self._loader.get_strategies()
 
-    def loadOrders(self):
-        self.XML_ORDERS = ET.parse(self.xml_dirpath + "orders_simple.xml").getroot()
+    def start(self, strategyname, communicator):
+        self.strategy = self._loader.load(strategyname, communicator)
+        rospy.loginfo("[AI] Loaded strategy '{}', starting actions...".format(strategyname))
+        self.strategy.execute()
 
-        orders = []
-        for order_xml in self.XML_ORDERS:
-            orders.append(Order(order_xml))
-        return orders
-
-    def loadActions(self, orders):
-        self.XML_ACTIONS = ET.parse(self.xml_dirpath + "actions_simple.xml").getroot()
-
-        actionnames = [action.attrib["ref"] for action in self.XML_ACTIONS]
-        actions = []
-        for action_xml in self.XML_ACTIONS:
-            actions.append(Action(action_xml, actions, orders))
-        return actions
-
-    def loadStrategy(self, strategyname, actions, orders):
-        self.XML_STRATEGIES = ET.parse(self.xml_dirpath + "strategies_simple.xml").getroot()
-        self.AvailableStrategies = [child.attrib["name"] for child in self.XML_STRATEGIES]
-
-        strategy_xml = self.XML_STRATEGIES.findall("strategy[@name='" + strategyname + "']")
-        if len(strategy_xml) == 1:
-            return Strategy(strategy_xml[0], actions, orders)
-        else:
-            print "FAIL Too many or no strategy to load with the given name. Aborting."
-            return None
+    def halt(self):
+        pass
