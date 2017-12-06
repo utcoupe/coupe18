@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 import time
 import rospy
+import actionlib
 
-import ai_scheduler.srv
 from ai_scheduler.msg import TaskResult
+import ai_scheduler.srv
+import navigation_navigator.msg
 
 class RequestTypes():
     SERVICE = 0
@@ -12,26 +14,26 @@ class RequestTypes():
 class AICommunication():
     def SendRequest(self, dest, params, callback):
         servers = {
-            "/ai/timer":          (RequestTypes.SERVICE, ai_scheduler.srv.AIGenericCommand),
-            "/ai/scheduler":      (RequestTypes.SERVICE, ai_scheduler.srv.AIGenericCommand),
-            "/movement/navigator/goto":         (RequestTypes.SERVICE, ai_scheduler.srv.test),
+            "/ai/timer":                        (RequestTypes.SERVICE, ai_scheduler.srv.AIGenericCommand),
+            "/ai/scheduler":                    (RequestTypes.SERVICE, ai_scheduler.srv.AIGenericCommand),
+            "/navigation/navigator/dogoto":     (RequestTypes.ACTION,  navigation_navigator.msg.DoGotoAction, navigation_navigator.msg.DoGotoGoal),
         }
         def getRequestType(dest):
             return servers[dest][0]
         def getRequestClass(dest):
             return servers[dest][1]
+        def getActionGoalClass(dest):
+            return servers[dest][2]
 
         start_time = time.time()
         if dest in servers:
             if getRequestType(dest) == RequestTypes.SERVICE:
                 response = self._send_service(dest, getRequestClass(dest), params)
-                callback(response, time.time() - start_time)
             elif getRequestType(dest) == RequestTypes.ACTION:
-                pass
-            else:
-                raise NotImplementedError, "Can't send a message of this type (yet ? NotImplemented ?)."
+                response = self._send_blocking_action(dest, getRequestClass(dest), getActionGoalClass(dest), params)
+            callback(response, time.time() - start_time)
         else:
-            raise ValueError, "Message destination '{}' was not recognized. Has it been added to ai_communication.py definition dict, or misspelled ?".format(dest)
+            raise ValueError, "Message destination '{}' was not recognized. Has it been added to ai_communication.py definition dict, or mispelled ?".format(dest)
 
     def _send_service(self, dest, srv_class, params):
         try: # Handle a timeout in case one node doesn't respond
@@ -43,3 +45,16 @@ class AICommunication():
             return res
         service = rospy.ServiceProxy(dest, srv_class)
         return service(srv_class._request_class(**params))
+
+    def _send_blocking_action(self, dest, action_class, goal_class, params):
+        client = actionlib.SimpleActionClient(dest, action_class)
+        try: # Handle a timeout in case one node doesn't respond
+            client.wait_for_server(timeout = rospy.Duration(2.0))
+            client.send_goal(goal_class(**params))
+            client.wait_for_result()
+            return client.get_result()
+        except:
+            res = TaskResult()
+            res.result = res.RESULT_FAIL
+            res.verbose_reason = "wait_for_service request timeout exceeded."
+            return res
