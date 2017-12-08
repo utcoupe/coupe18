@@ -3,6 +3,8 @@ import os
 import yaml
 import rospy
 
+from memory_definitions.srv import GetDefinition
+
 class LoadingHelpers():
     '''
     Helpers static class. Provides validation methods for easier and
@@ -40,23 +42,38 @@ class MapLoader():
         Gets the YML Map description file from the specified method
         Please change the method correspondingly to what is currently used in your package.
         '''
-        return MapLoader.loadYamlFromFile(filename)
+        return MapLoader.loafYamlFromDescriptionModule(filename)
 
     @staticmethod
-    def loadYamlFromFile(filename):
+    def loadYamlFromFile(filename): # DEPRECATED
         '''
         Loads the description file simply by getting the file in disk.
         The file MUST be in the package's directory to avoid any problems.
         '''
-        with open(os.path.dirname(__file__) + "/" + filename, 'r') as stream:
+        return MapLoader._json_from_file(os.path.dirname(__file__) + "/../../def" + filename)
+
+    @staticmethod
+    def loafYamlFromDescriptionModule(filename):
+        '''
+        Loads the description file by gettign it from the 'memory/definitions' ROS package.
+        '''
+        get_def = rospy.ServiceProxy('/memory/definitions/get', GetDefinition)
+        get_def.wait_for_service()
+
+        res = get_def('map/' + filename)
+        try:
+            if not res.success:
+                rospy.logerr("Error when fetching '{}' definition file".format(filename))
+                raise Exception()
+            return MapLoader._json_from_file(res.path)
+        except rospy.ServiceException as exc:
+            rospy.logerr("Unhandled error while getting def file: {}".format(str(exc)))
+            raise Exception()
+
+    @staticmethod
+    def _json_from_file(path):
+        with open(path, 'r') as stream:
             try:
                 return yaml.load(stream)
             except yaml.YAMLError as exc:
                 rospy.logerr("Could not load map YML file : " + str(exc))
-
-    @staticmethod
-    def loafYamlFromDescriptionModule(path):
-        '''
-        Loads the description file by gettign it from the 'memory/definitions' ROS package.
-        '''
-        raise NotImplementedError  # TODO use this when Definitions package is ready instead of loading from file.
