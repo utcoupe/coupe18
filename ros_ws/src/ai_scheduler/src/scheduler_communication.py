@@ -17,6 +17,7 @@ class AICommunication():
             "/ai/timer":                        (RequestTypes.SERVICE, ai_scheduler.srv.AIGenericCommand),
             "/ai/scheduler":                    (RequestTypes.SERVICE, ai_scheduler.srv.AIGenericCommand),
             "/navigation/navigator/dogoto":     (RequestTypes.ACTION,  navigation_navigator.msg.DoGotoAction, navigation_navigator.msg.DoGotoGoal),
+            "/test":                            (RequestTypes.SERVICE, ai_scheduler.srv.AIGenericCommand),
         }
         def getRequestType(dest):
             return servers[dest][0]
@@ -31,6 +32,8 @@ class AICommunication():
                 response = self._send_service(dest, getRequestClass(dest), params)
             elif getRequestType(dest) == RequestTypes.ACTION:
                 response = self._send_blocking_action(dest, getRequestClass(dest), getActionGoalClass(dest), params)
+            # response = TaskResult() # DEBUG Force success response
+            # response.result = response.RESULT_SUCCESS if bool(input("success ?")) else response.RESULT_FAIL
             callback(response, time.time() - start_time)
         else:
             raise ValueError, "Message destination '{}' was not recognized. Has it been added to ai_communication.py definition dict, or mispelled ?".format(dest)

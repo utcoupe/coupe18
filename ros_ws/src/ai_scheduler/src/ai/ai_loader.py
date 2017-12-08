@@ -2,13 +2,13 @@
 import os
 import rospy
 import xml.etree.ElementTree as ET
-from ai_classes import Order, Action, Strategy
+from tasks import Strategy, ActionList, Action, Order
 
 
 class AILoader():
-    STRATEGIES_PATH = "strategies_simple.xml"
-    ACTIONS_PATH    = "actions_simple.xml"
-    ORDERS_PATH     = "orders_simple.xml"
+    STRATEGIES_PATH = "1_strategies.xml"
+    ACTIONS_PATH    = "2_actions.xml"
+    ORDERS_PATH     = "3_orders.xml"
 
     def __init__(self):
         self.xml_dirpath = os.path.dirname(__file__) + "/../../def/"

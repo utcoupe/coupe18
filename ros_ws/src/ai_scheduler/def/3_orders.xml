@@ -1,74 +1,49 @@
 <orders>
 	<!-- Actuators -->
-	<order ref="wait_for_jack" duration="1">
-		<message dest="/feedback/display/reply_when_jack">
-			<param name="display_num" type="int" optional="true"/>
-			<param name="display_font" type="string" >Arial</param>
+	<order ref="wait_for_jack" duration="1" name="Wait for that motherf*cking Jack">
+		<message dest="/test">
 		</message>
 	</order>
 
 	<order ref="test" duration="1">
 		<message dest="/test">
-			<param name="position" type="pose2d">
-				<theta>99</theta> <!-- defaults -->
-				<x>88</x>
-			</param>
-			<param name="nombre" type="float" optional="true"/>
 		</message>
 	</order>
 
 	<order ref="funny_action" duration="1">
-		<message dest=" ccccccccccccvvddd">
-			<param name="command" type="string">actuator_set</param>
-			<param name="actuator_name" type="string">funny_action_servo</param>
+		<message dest="/test">
 		</message>
 	</order>
 
 	<order ref="actuator_startup_sequence">
-		<message dest="/movement/actuators/execute">
-			<param name="command" type="string">actuator_startup_sequence</param>
-			<param name="actuator_name" type="string"/>
+		<message dest="/test">
 		</message>
 	</order>
 
 	<order ref="actuator_toggle" duration="1.5" reward="3">
-		<message dest="/movement/actuators/execute">
-			<param name="command" type="string">actuator_toggle_pos</param>
-			<param name="actuator_name" type="string"/>
+		<message dest="/test">
 		</message>
 	</order>
 
 	<order ref="actuator_open" duration="1.5" reward="3">
-		<message dest="/movement/actuators/execute">
-			<param name="command" type="string">actuator_set_pos</param>
-			<param name="actuator_name" type="string"/>
-			<param name="pos_preset" type="string">OPEN</param>
+		<message dest="/test">
 		</message>
 	</order>
 
 	<order ref="actuator_close" duration="1.5" reward="3">
-		<message dest="/movement/actuators/execute">
-			<param name="command" type="string">actuator_set_pos</param>
-			<param name="actuator_name" type="string"/>
-			<param name="pos_preset" type="string">CLOSED</param>
+		<message dest="/test">
 		</message>
 	</order>
 
 	<order ref="actuator_set_pos" duration="1.5" reward="3">
-		<message dest="/movement/actuators/execute">
-			<param name="command" type="string">actuator_set_pos</param>
-			<param name="actuator_name" type="string"/>
-			<param name="pos_preset" type="string"/>
+		<message dest="/test">
 		</message>
 	</order>
 
 
 	<!-- Wheels -->
 	<order ref="wheels_goto" duration="1">
-		<message dest="/movement/navigator/goto">
-			<param name="position" type="pose2d"/>
-			<!--<param name="speed" type="movement_navigator/Speed" default="SPEED_FAST"/> TODO default is useful too..-->
-			<!--<param name="goal_type" type="string"/>  TODO precise, cercle d'approche, ...-->
+		<message dest="/test">
 		</message>
 	</order>
 
@@ -76,19 +51,17 @@
 
 	<!-- AI Specific -->
 	<order ref="ai_delay" duration="1">
-		<message dest="/ai/scheduler">
-			<param name="delay" type="float">0.75</param>
+		<message dest="/test">
 		</message>
 	</order>
 
 	<order ref="timer_start">
-		<message dest="/ai/timer">
+		<message dest="/test">
 		</message>
 	</order>
 
 	<order ref="timer_set_duration">
-		<message dest="/ai/timer">
-			<param name="delay" type="float">0.75</param>
+		<message dest="/test">
 		</message>
 	</order>
 

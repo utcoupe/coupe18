@@ -7,13 +7,7 @@
 		</game>
 		<actions name="In-Game Actions">
 			<!--<actionref ref="actuators_startup_sequence"/>-->
-			<orderref ref="test">
-				<position>
-					<x>50</x>
-					<y>55</y>
-					<theta>85</theta>
-				</position>
-			</orderref>
+			<orderref ref="test"/>
 			<actionref ref="wait_for_jack"/>
 			<nextneedsprevious/>
 			<orderref ref="ai_delay"/>
@@ -21,38 +15,23 @@
 			<actionlist name="Main actions" order="linear">
 				<conditions>
 				</conditions>
-				<orderref ref="wheels_goto">
-					<!--<position type="xy" x="3" y="2000"/>-->
-				</orderref>
-
+				<orderref ref="wheels_goto"/>
 				<actionlist name="Take Modules" exec="all" order="linear" reward="100">
 
 					<actionlist name="Load modules" exec="+" order="random">
-						<actionref ref = "load_module">
-							<position/>
-						</actionref>
-						<actionref ref = "load_module">
-							<position/>
-						</actionref>
-						<actionref ref = "load_module">
-							<position/>
-						</actionref>
+						<actionref ref="load_module"/>
+						<actionref ref="load_module"/>
+						<actionref ref="load_module"/>
 					</actionlist>
 
 					<nextneedsprevious/> <!-- This actionList needs the previous task to be OK in order to run-->
 					<actionlist name="Unload on left platform" exec="+" order="linear">
 						<conditions>
 						</conditions>
-						<actionref ref = "unload_module">
-							<position type="waypoint" ref = "left_unloadzone_p1"/>
-						</actionref>
+						<actionref ref = "unload_module"/>
 						<nextneedsprevious/>
-						<actionref ref = "unload_module">
-							<position type="waypoint" ref = "left_unloadzone_p2"/>
-						</actionref>
-						<actionref ref = "unload_module">
-							<position type="waypoint" ref = "left_unloadzone_p2"/>
-						</actionref>
+						<actionref ref = "unload_module"/>
+						<actionref ref = "unload_module"/>
 					</actionlist>
 
 

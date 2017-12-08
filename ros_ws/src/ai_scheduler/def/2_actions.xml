@@ -4,19 +4,15 @@
 	<action ref="takein_module">
 		<!-- The robot is already positioned, take it in -->
 		<params>
-			<param name="xx"/>
-			<param name="yy"/>
 		</params>
 		<conditions>
 			<chest ref = "robot_body_chest_modules" qty_left_min = "1" />
 		</conditions>
 		<actions exec="one">
 			<orderref ref="actuator_open">
-				<actuator_name bind="xx"/>
 			</orderref>
 			<orderref ref="ai_delay"/>
 			<orderref ref="actuator_close">
-				<actuator_name bind="yy"/>
 			</orderref>
 		</actions>
 	</action>
@@ -29,11 +25,9 @@
 		</conditions>
 		<actions exec="all" order="random">
 			<orderref ref="actuator_open">
-				<actuator_name>actu_1_tmtc</actuator_name>
 			</orderref>
 			<orderref ref="ai_delay"/>
 			<orderref ref="actuator_close">
-				<actuator_name>actu_1_tmtc</actuator_name>
 			</orderref>
 		</actions>
 	</action>
@@ -44,7 +38,6 @@
     		- position (position object) : position where the module is. Position origin must be 'robot_origin_modulegripper' -->
 	<action ref="load_module" name="Search and Load module" >
 		<params>
-			<param name="position"/>
 		</params>
 		<conditions>
 			<chest ref="robot_body_chest_module_gripper" qty="full"/>
@@ -52,7 +45,6 @@
 		</conditions>
 		<actions exec="all" order="linear">
 			<orderref ref = "wheels_goto">
-				<position bind="position"/>
 			</orderref>
 			<nextneedsprevious/>
 			<actionref ref="takein_module"/>
@@ -61,14 +53,12 @@
 
 	<action ref="unload_module" name = "Goto place and Unload module" reward="20">
 		<params>
-			<param name="position"/>
 		</params>
 		<conditions>
 			<chest ref = "robot_body_chest_modules" qty_in_min = "1" />
 		</conditions>
 		<actions exec="all" order="linear">
 			<orderref ref = "wheels_goto">
-				<position bind="position"/>
 			</orderref>
 			<nextneedsprevious/>
 			<actionref ref="takeout_module"/>
@@ -80,13 +70,11 @@
 		<params></params>
 		<conditions></conditions>
 		<actions name = "jack then start timer" exec="all" order="linear">
-      <orderref ref="timer_set_duration"/>
+      		<orderref ref="timer_set_duration"/>
 			<nextneedsprevious/>
-      <orderref ref="timer_start"/>
+      		<orderref ref="timer_start"/>
 			<nextneedsprevious/>
-			<orderref ref="wait_for_jack">
-				<display_num>5</display_num>
-			</orderref>
+			<orderref ref="wait_for_jack"/>
 		</actions>
 	</action>
 
@@ -94,9 +82,9 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="mostreward">
-			<orderref ref="actuator_startup_sequence"><actuator_name>a1</actuator_name></orderref>
-			<orderref ref="actuator_startup_sequence"><actuator_name>a6</actuator_name></orderref>
-			<orderref ref="actuator_startup_sequence"><actuator_name>a7</actuator_name></orderref>
+			<orderref ref="actuator_startup_sequence"/>
+			<orderref ref="actuator_startup_sequence"/>
+			<orderref ref="actuator_startup_sequence"/>
 			<actionref ref="unload_module"/>
 		</actions>
 	</action>

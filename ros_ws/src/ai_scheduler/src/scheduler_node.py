@@ -5,6 +5,7 @@ from scheduler_services import AIServices
 from ai import RobotAI
 
 from ai_scheduler.srv import AICommand, AICommandResponse
+# from drivers_ard_hmi.srv import SetStrategies
 
 # from drivers_hmi.srv import SetStrategies
 
@@ -16,14 +17,14 @@ class AINode():
         rospy.Service("/ai/scheduler/command", AICommand, self.on_command)
 
         self.AI = RobotAI()
-        self.services = AIServices(self.DepartmentName, self.PackageName)
+        # self.services = AIServices(self.DepartmentName, self.PackageName)
 
         rospy.loginfo("[AI] Ready.")
         # self.send_strategies()
         rospy.spin()
 
     def send_strategies(self):
-        rospy.wait_for_service("/drivers/ard_hmi/set_strategies", timeout = 20) # TODO evaluate and put timeout
+        rospy.wait_for_service("/drivers/ard_hmi/set_strategies", timeout = 20) # TODO evaluate and put good timeout
         s = rospy.ServiceProxy("/drivers/ard_hmi/set_strategies", SetStrategies)
         s(self.AI.get_strategies())
 
