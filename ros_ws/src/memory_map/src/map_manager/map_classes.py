@@ -1,6 +1,6 @@
 #!/usr/bin/python
 from map_loader import LoadingHelpers
-from map_bases import DictManager, ListManager
+from map_bases import DictManager
 from map_attributes import Position2D, Shape2D, MarkerRViz, Trajectory
 
 
