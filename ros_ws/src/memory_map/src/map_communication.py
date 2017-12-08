@@ -15,11 +15,12 @@ class Servers():
     OCCUPANCY_SERV = "/memory/map/get_occupancy"
 
 class MapServices():
-    def __init__(self):
+    def __init__(self, occupancy_generator):
         self.GetSERV       = rospy.Service(Servers.GET_SERV, memory_map.srv.MapGet,                self.on_get)
         self.SetSERV       = rospy.Service(Servers.SET_SERV, memory_map.srv.MapSet,                self.on_set)
         self.TransferSERV  = rospy.Service(Servers.TRANSFER_SERV, memory_map.srv.MapTransfer,      self.on_transfer)
         self.OccupancySERV = rospy.Service(Servers.OCCUPANCY_SERV, memory_map.srv.MapGetOccupancy, self.on_get_occupancy)
+        self.occupancy_generator = occupancy_generator
 
     def on_get(self, req):
         s = time.time() * 1000
@@ -73,7 +74,7 @@ class MapServices():
         rospy.loginfo("GET_OCCUPANCY:" + str(req.layer_name))
 
         try:
-            path = OccupancyGenerator.getImagePath(req.layer_name)
+            path = self.occupancy_generator.generateLayer(Map, req.layer_name, req.margin)
         except Exception as e:
             rospy.logerr("    Request failed : " + str(e))
 

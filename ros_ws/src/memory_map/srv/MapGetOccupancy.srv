@@ -1,3 +1,4 @@
+float32 margin    # margin in meters the shapes are going to be expanded at.
 string layer_name
 ---
 string img_path
