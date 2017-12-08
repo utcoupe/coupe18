@@ -34,7 +34,7 @@ class MapRobot(RectObstacle):
     def getStopRect(self):
         if not self.Path.hasPath():
             return []
-        w, h = self.Height + (CollisionThresholds.STOP_DISTANCE if self.Velocity.Linear != 0 else 0), self.Width
+        w, h = self.Height + CollisionThresholds.getStopDistance(self.Velocity.Linear), self.Width
         l = w / 2.0 - self.Height / 2.0
         side_a = math.pi if self.Velocity.Linear < 0 else 0
         return RectObstacle(Position(self.Position.X + l * math.cos(self.Position.A + side_a),
