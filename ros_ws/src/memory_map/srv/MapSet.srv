@@ -5,6 +5,7 @@ uint8 MODE_ADD     = 0  # Create a DictManager (only one at a time).
 uint8 MODE_REPLACE = 1  # Change a set of values in a dict.
 uint8 MODE_REMOVE  = 2  # Delete a value or a full dict (with its subdicts)
 uint8 mode
+# TODO ADD can only create a Dict, not a series of dicts (e.g. /objects/new_1/new_2:Object={} not supported)
 
 string request_path # Path examples :
                     # To create a full dict : /objects/cube_42:MapObject={"type": "object", "etc": True}

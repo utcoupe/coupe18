@@ -3,7 +3,7 @@ import time
 import rospy
 from map_loader import MapLoader, LoadingHelpers
 from map_bases import DictManager, RequestPath
-from map_classes import Terrain, Zone, Waypoint, Entity, Object
+from map_classes import Terrain, Zone, Waypoint, Entity, Container, Object
 
 class Map():
     MapDict = None
@@ -24,7 +24,10 @@ class Map():
         for entity in initdict_entities:
             initdict_entities[entity] = Entity(initdict_entities[entity])
         for obj in initdict_objects:
-            initdict_objects[obj] = Object(initdict_objects[obj])
+            if "container_" in obj: # Create container.
+                initdict_objects[obj] = Container(initdict_objects[obj])
+            else: # Create object.
+                initdict_objects[obj] = Object(initdict_objects[obj])
         rospy.loginfo("Loaded files in {0:.2f}ms.".format(time.time() * 1000 - starttime))
 
         # Create main Map dict
@@ -45,8 +48,8 @@ class Map():
         return Map.MapDict.get(requestpath)
 
     @staticmethod
-    def set(requestpath, mode):
+    def set(requestpath, mode, instance = None):
         if requestpath[0] != "/":
-            rospy.logerr("    GET Request failed : global search needs to start with '/'.")
+            rospy.logerr("    SET Request failed : global search needs to start with '/'.")
             return None
-        return Map.MapDict.set(requestpath, mode)
+        return Map.MapDict.set(requestpath, mode, instance)

@@ -89,9 +89,9 @@ class DictManager(MapElement):
                         d[item] = self.Dict[item]
                 return d
             else:
-                rospy.logerr("    GET Request failed : Couldn't recognize request path key '{}'.".format(keyname))
+                rospy.logerr("    GET Request failed : Couldn't recognize key or find element '{}'.".format(keyname))
 
-    def set(self, requestpath, mode):
+    def set(self, requestpath, mode, instance = None):
         if isinstance(requestpath, str):
             requestpath = RequestPath(requestpath)
             if not requestpath.Valid: return None
@@ -99,7 +99,7 @@ class DictManager(MapElement):
 
         if requestpath.isLast():
             if mode == SetMode.MODE_ADD:
-                return self._set_add(keyname)
+                return self._set_add(keyname, instance)
             elif mode == SetMode.MODE_REPLACE:
                 return self._set_replace(keyname)
             elif mode == SetMode.MODE_DELETE:
@@ -109,24 +109,30 @@ class DictManager(MapElement):
                 rospy.logerr("    Request failed : '=' assign operator must only be applied on the last path key.")
                 return False
             if keyname in self.Dict:
-                return self.Dict[keyname].set(requestpath, mode)
+                return self.Dict[keyname].set(requestpath, mode, instance)
 
-    def _set_add(self, lastkey):
+    def _set_add(self, lastkey, instance = None):
         # e.g. /objects/cube_42:MapObject={"type": "object", "etc": True}
-        request, new_dict = lastkey.split('=', 1) # split at first '='.
-        keyname, class_type = request.split(':')
-        new_dict = json.loads(new_dict)
-        if keyname in self.Dict:
-            rospy.logerr("    ADD Request failed : key '{}' already exists in dict.".format(keyname))
-            return False
+        if instance is None:
+            request, new_dict = lastkey.split('=', 1) # split at first '='.
+            keyname, class_type = request.split(':')
+            new_dict = json.loads(new_dict)
 
-        sc = DictManager.__subclasses__()
-        for c in sc:
-            if class_type == c.__name__:
-                self.Dict[keyname] = DictManager(new_dict)
-                return True
-        rospy.logerr("    ADD Request failed : class type '{}' not recognized.".format(class_type))
-        return False
+            if keyname in self.Dict:
+                rospy.logerr("    ADD Request failed : key '{}' already exists in dict.".format(keyname))
+                return False
+
+            sc = DictManager.__subclasses__()
+            for c in sc:
+                if class_type == c.__name__:
+                    self.Dict[keyname] = DictManager(new_dict)
+                    return True
+            rospy.logerr("    ADD Request failed : class type '{}' not recognized.".format(class_type))
+            return False
+        else: # add a DictManager (intern only, e.g. coming from MapTransfer).
+            self.Dict[lastkey] = instance
+            return True
+
 
     def _set_replace(self, lastkey):
         # e.g. /objects/cube_14/position/x=0.42,y=0.84,a=3.14

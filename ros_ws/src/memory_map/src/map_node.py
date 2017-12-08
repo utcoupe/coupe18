@@ -21,10 +21,8 @@ class MapNode():
         self.markers = MarkersPublisher()
         self.markers.publishTable(map_manager.Map)
 
-        # Starting the Get, Set and Conditions service handlers
-        map_communication.GetServiceHandler()
-        map_communication.SetServiceHandler()
-        map_communication.GetOccupancyServiceHandler()
+        # Starting service handlers (Get, Set, Transfer, GetOccupancy)
+        map_communication.MapServices()
         rospy.loginfo("[memory/map] Map request servers ready.")
 
         self.run()
