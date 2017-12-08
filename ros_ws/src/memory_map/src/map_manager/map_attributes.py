@@ -1,6 +1,6 @@
 #!/usr/bin/python
 from map_loader import LoadingHelpers
-from map_bases import ListManager, DictManager
+from map_bases import DictManager
 
 
 class Position2D(DictManager):

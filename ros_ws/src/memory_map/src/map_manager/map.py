@@ -2,7 +2,7 @@
 import time
 import rospy
 from map_loader import MapLoader, LoadingHelpers
-from map_bases import DictManager, ListManager, RequestPath
+from map_bases import DictManager, RequestPath
 from map_classes import Terrain, Zone, Waypoint, Entity, Object
 
 class Map():
@@ -45,8 +45,8 @@ class Map():
         return Map.MapDict.get(requestpath)
 
     @staticmethod
-    def set(requestpath):
+    def set(requestpath, mode):
         if requestpath[0] != "/":
             rospy.logerr("    GET Request failed : global search needs to start with '/'.")
             return None
-        return Map.MapDict.set(requestpath)
+        return Map.MapDict.set(requestpath, mode)

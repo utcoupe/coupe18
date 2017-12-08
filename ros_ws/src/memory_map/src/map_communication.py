@@ -4,7 +4,7 @@ import time
 
 import rospy
 import memory_map.srv
-from map_manager import Map, MapElement, DictManager
+from map_manager import SetMode, Map, DictManager
 from occupancy import OccupancyGenerator
 
 
@@ -46,8 +46,9 @@ class SetServiceHandler():
         rospy.loginfo("SET:" + str(req.request_path))
 
         success = False
+        success = Map.set(req.request_path, req.mode)
         try:
-            success = Map.set(req.request_path)
+            success = Map.set(req.request_path, req.mode)
         except Exception as e:
             rospy.logerr("    SET Request failed (python reason) : " + str(e))
 
