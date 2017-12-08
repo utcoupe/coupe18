@@ -2,9 +2,7 @@
 import time
 import rospy
 
-from timer import GameTimer
-
-from ai_game_status.msg import GameStatus, GameTime
+from ai_game_status.msg import GameStatus
 from ai_game_status.srv import SetStatus, SetStatusResponse, SetTimer, SetTimerResponse, NodeReady, NodeReadyResponse
 
 
@@ -49,19 +47,12 @@ class GameStatusNode():
         rospy.init_node("game_status", log_level=rospy.DEBUG)
         self._node_ready_notif = rospy.Service("/ai/game_status/node_ready", NodeReady, self.on_node_ready)
         self._set_status_srv   = rospy.Service("/ai/game_status/set_status", SetStatus, self.on_set_status)
-        self._set_timer_srv    = rospy.Service("/ai/game_status/set_timer",  SetTimer,  self.on_set_timer)
-
         self._status_pub = rospy.Publisher("/ai/game_status/status", GameStatus, queue_size = 10)
-        self._timer_pub  = rospy.Publisher("/ai/game_status/timer",  GameTime,   queue_size = 10)
-
-        duration = 10 # TODO get from def file
-        self._timer = GameTimer(duration)
 
         self.game_status = Status.STATUS_INIT
         self.init_status = Status.INIT_INITIALIZING
 
         self._init_start_time = time.time()
-
         r = rospy.Rate(5)
         while not rospy.is_shutdown():
             if self.init_status == Status.INIT_INITIALIZING:
@@ -70,10 +61,7 @@ class GameStatusNode():
                     if len([n for n in Status.INIT_CHECKLIST if Status.INIT_CHECKLIST[n] in [None, False]]) > 0:
                         self.init_status = Status.INIT_FAILED
                     else: self.init_status = Status.INIT_INITIALIZED
-
-            self.check_timer()    # check when time is finished.
             self.publish_status() # publish game status at 5Hz.
-            self.publish_timer()  # publish timer times at 5Hz.
 
             r.sleep()
 
@@ -90,14 +78,6 @@ class GameStatusNode():
                 m.failed_nodes.append(node)
         self._status_pub.publish(m)
 
-    def publish_timer(self):
-        m = GameTime()
-        m.is_active          = self._timer.started
-        m.game_time_duration = self._timer.game_duration
-        m.game_elapsed_time  = self._timer.elapsed_time() if self._timer.started else -1
-        m.game_time_left     = self._timer.time_left()    if self._timer.started else -1
-        self._timer_pub.publish(m)
-
     def check_init_checklist(self):
         for node in Status.INIT_CHECKLIST:
             if Status.INIT_CHECKLIST[node] in [None, False]:
@@ -106,12 +86,6 @@ class GameStatusNode():
             self.init_status = Status.INIT_INITIALIZED
         else:
             rospy.logerr("Unexpected behaviour : init_status checklist got full but status is not INITIALIZING.")
-
-    def check_timer(self):
-        if self._timer.started:
-            if self._timer.time_left() <= 0:
-                self._timer.stop()
-                self.game_status = Status.STATUS_HALT
 
     def on_node_ready(self, msg):
         if msg.node_name in Status.INIT_CHECKLIST:
@@ -124,20 +98,6 @@ class GameStatusNode():
     def on_set_status(self, req):
         self.game_status = req.new_game_status
         return SetStatusResponse(True)
-
-    def on_set_timer(self, req):
-        if req.action == req.ACTION_START:
-            self._timer.start()
-        # elif req.action == req.ACTION_PAUSE: # TODO Implement.
-        #     self._timer.pause()
-        # elif req.action == req.ACTION_RESUME:
-        #     self._timer.resume()
-        elif req.action == req.ACTION_RESET:
-            self._timer.reset()
-        elif req.action == req.ACTION_STOP:
-            self._timer.stop()
-        return SetTimerResponse(True)
-
 
 if __name__ == "__main__":
     GameStatusNode()
