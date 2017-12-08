@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import time
 import rospy
 
 from timer import GameTimer
@@ -8,16 +9,17 @@ from ai_game_status.srv import SetStatus, SetStatusResponse, SetTimer, SetTimerR
 
 
 class Status():
-    STATUS_INITIALIZING     = 0 # All nodes initializing, didn't respond yet.
-    STATUS_INITIALIZED      = 1 # All nodes initialized, ready to start.
-    # STATUS_NOT_INITIALIZED  = 1 # One node or more responded false init, go at your own risk.
-    STATUS_INGAME           = 2 # Scheduler started, doing its job.
-    STATUS_HALT             = 3 # Robot stopped (game end, critical HALT requested by a node...)
+    STATUS_INIT   = 0 # All nodes initializing, didn't respond yet.
+    STATUS_INGAME = 1 # Scheduler started, doing its job.
+    STATUS_HALT   = 2 # Robot stopped (game end, critical HALT requested by a node...)
+
+    INIT_INITIALIZING = 0 # All nodes didn't respond and we didn't reach the init timeout yet.
+    INIT_INITIALIZED  = 1 # All nodes responded successfully and are initialized.
+    INIT_FAILED       = 2 # Nodes responded false or didn't respond after before the init timeout.
 
     INIT_CHECKLIST = {  # Please comment the lines instead of deleting them.
         "/ai/scheduler": None,
-        "/ai/scripts": None
-        "/ai/game_status": None,
+        "/ai/scripts": None,
 
         "/memory/map": None,
         "/memory/definitions": None,
@@ -41,6 +43,8 @@ class Status():
 
 
 class GameStatusNode():
+    INIT_TIMEOUT = 20 # seconds to wait for the nodes to sned their init response before timeout.
+
     def __init__(self):
         rospy.init_node("game_status", log_level=rospy.DEBUG)
         self._node_ready_notif = rospy.Service("/ai/game_status/node_ready", NodeReady, self.on_node_ready)
@@ -53,13 +57,20 @@ class GameStatusNode():
         duration = 10 # TODO get from def file
         self._timer = GameTimer(duration)
 
-        self.game_status = Status.STATUS_INITIALIZING
+        self.game_status = Status.STATUS_INIT
+        self.init_status = Status.INIT_INITIALIZING
+
+        self._init_start_time = time.time()
 
         r = rospy.Rate(5)
         while not rospy.is_shutdown():
-            # print Status.INIT_CHECKLIST
-            if self.game_status == Status.STATUS_INITIALIZING:
+            if self.init_status == Status.INIT_INITIALIZING:
                 self.check_init_checklist()
+                if time.time() - self._init_start_time > GameStatusNode.INIT_TIMEOUT:
+                    if len([n for n in Status.INIT_CHECKLIST if Status.INIT_CHECKLIST[n] in [None, False]]) > 0:
+                        self.init_status = Status.INIT_FAILED
+                    else: self.init_status = Status.INIT_INITIALIZED
+
             self.check_timer()    # check when time is finished.
             self.publish_status() # publish game status at 5Hz.
             self.publish_timer()  # publish timer times at 5Hz.
@@ -69,6 +80,7 @@ class GameStatusNode():
     def publish_status(self):
         m = GameStatus()
         m.game_status = self.game_status
+        m.init_status = self.init_status
         for node in Status.INIT_CHECKLIST:
             if Status.INIT_CHECKLIST[node] is None:
                 m.pending_nodes.append(node)
@@ -90,10 +102,10 @@ class GameStatusNode():
         for node in Status.INIT_CHECKLIST:
             if Status.INIT_CHECKLIST[node] in [None, False]:
                 return
-        if self.game_status == Status.STATUS_INITIALIZING:
-            self.game_status = Status.STATUS_INITIALIZED
+        if self.init_status == Status.INIT_INITIALIZING:
+            self.init_status = Status.INIT_INITIALIZED
         else:
-            rospy.logerr("Unexpected behaviour : game_status checklist got full but status is not INITIALIZING.")
+            rospy.logerr("Unexpected behaviour : init_status checklist got full but status is not INITIALIZING.")
 
     def check_timer(self):
         if self._timer.started:
