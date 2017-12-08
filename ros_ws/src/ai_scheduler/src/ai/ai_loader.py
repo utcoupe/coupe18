@@ -4,17 +4,18 @@ import rospy
 import xml.etree.ElementTree as ET
 from tasks import Strategy, ActionList, Action, Order
 
+from memory_definitions.srv import GetDefinition
 
 class AILoader():
-    STRATEGIES_PATH = "1_strategies.xml"
-    ACTIONS_PATH    = "2_actions.xml"
-    ORDERS_PATH     = "3_orders.xml"
+    STRATEGIES_FILE = "1_strategies.xml"
+    ACTIONS_FILE    = "2_actions.xml"
+    ORDERS_FILE     = "3_orders.xml"
 
     def __init__(self):
-        self.xml_dirpath = os.path.dirname(__file__) + "/../../def/"
+        pass# self.xml_dirpath = os.path.dirname(__file__) + "/../../def/"
 
     def get_strategies(self):
-        xml_strategies = ET.parse(self.xml_dirpath + self.STRATEGIES_PATH).getroot()
+        xml_strategies = ET.parse(self.xml_dirpath + self.STRATEGIES_FILE).getroot()
         return [child.attrib["name"] for child in xml_strategies]
 
     def load(self, strategyname, communicator):
@@ -22,7 +23,7 @@ class AILoader():
         return self._load_strategy(strategyname, self._load_actions(orders), orders, communicator)
 
     def _load_orders(self):
-        xml_orders = ET.parse(self.xml_dirpath + self.ORDERS_PATH).getroot()
+        xml_orders = ET.parse(self._get_path(self.ORDERS_FILE)).getroot()
 
         orders = []
         for order_xml in xml_orders:
@@ -30,7 +31,7 @@ class AILoader():
         return orders
 
     def _load_actions(self, orders):
-        xml_actions = ET.parse(self.xml_dirpath + self.ACTIONS_PATH).getroot()
+        xml_actions = ET.parse(self._get_path(self.ACTIONS_FILE)).getroot()
 
         # actions_names = [action.attrib["ref"] for action in xml_actions]
         actions = []
@@ -39,7 +40,7 @@ class AILoader():
         return actions
 
     def _load_strategy(self, strategyname, actions, orders, communicator):
-        xml_strategies = ET.parse(self.xml_dirpath + self.STRATEGIES_PATH).getroot()
+        xml_strategies = ET.parse(self._get_path(self.STRATEGIES_FILE)).getroot()
 
         strategy_xml = xml_strategies.findall("strategy[@name='{}']".format(strategyname))
         if len(strategy_xml) == 1:
@@ -47,3 +48,17 @@ class AILoader():
         else:
             rospy.logerr("FAIL Too many or no strategy to load with the given name. Aborting.")
             return None
+
+    def _get_path(self, filename):
+        get_def = rospy.ServiceProxy('/memory/definitions/get', GetDefinition)
+        get_def.wait_for_service()
+
+        try:
+            res = get_def('ai/' + filename)
+            if not res.success:
+                rospy.logerr("Error when fetching '{}' definition file", filename)
+                raise Exception()
+            return res.path
+        except rospy.ServiceException as exc:
+            rospy.logerr("Unhandled error while getting def file: {}".format(str(exc)))
+            raise Exception()
