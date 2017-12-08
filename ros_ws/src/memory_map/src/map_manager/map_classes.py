@@ -62,6 +62,13 @@ class Entity(DictManager):
         })
 
 
+class Container(DictManager):
+    def __init__(self, initdict):
+        for obj in initdict:
+            initdict[obj] = Object(initdict[obj])
+        super(Container, self).__init__(initdict)
+
+
 class Object(DictManager):
     def __init__(self, initdict):
         LoadingHelpers.checkKeysExist(initdict, "type", "position", "shape", "marker", "properties")

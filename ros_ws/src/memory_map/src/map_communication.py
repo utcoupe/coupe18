@@ -9,15 +9,17 @@ from occupancy import OccupancyGenerator
 
 
 class Servers():
-    CONDITIONS_CONTAINERS_SERV = "/memory/map/conditions/containers"
     GET_SERV = "/memory/map/get"
     SET_SERV = "/memory/map/set"
+    TRANSFER_SERV = "/memory/map/transfer"
     OCCUPANCY_SERV = "/memory/map/get_occupancy"
 
-
-class GetServiceHandler():
+class MapServices():
     def __init__(self):
-        self.GetSERV = rospy.Service(Servers.GET_SERV, memory_map.srv.MapGet, self.on_get)
+        self.GetSERV       = rospy.Service(Servers.GET_SERV, memory_map.srv.MapGet,                self.on_get)
+        self.SetSERV       = rospy.Service(Servers.SET_SERV, memory_map.srv.MapSet,                self.on_set)
+        self.TransferSERV  = rospy.Service(Servers.TRANSFER_SERV, memory_map.srv.MapTransfer,      self.on_transfer)
+        self.OccupancySERV = rospy.Service(Servers.OCCUPANCY_SERV, memory_map.srv.MapGetOccupancy, self.on_get_occupancy)
 
     def on_get(self, req):
         s = time.time() * 1000
@@ -36,11 +38,6 @@ class GetServiceHandler():
         rospy.logdebug("    Process took {0:.2f}ms".format(time.time() * 1000 - s))
         return memory_map.srv.MapGetResponse(success, json.dumps(response))
 
-
-class SetServiceHandler():
-    def __init__(self):
-        self.SetSERV = rospy.Service(Servers.SET_SERV, memory_map.srv.MapSet, self.on_set)
-
     def on_set(self, req):
         s = time.time() * 1000
         rospy.loginfo("SET:" + str(req.request_path))
@@ -56,12 +53,22 @@ class SetServiceHandler():
         rospy.logdebug("    Process took {0:.2f}ms".format(time.time() * 1000 - s))
         return memory_map.srv.MapSetResponse(success)
 
+    def on_transfer(self, req):
+        s = time.time() * 1000
+        rospy.loginfo("TRANSFER:{} to {}".format(req.old_path, req.new_path))
+        elem, elem_name = Map.get(req.old_path + "/^"), req.old_path.split('/')[-1]
+        if elem:
+            success = Map.set(req.old_path, SetMode.MODE_DELETE) and \
+                      Map.set(req.new_path + "/{}".format(elem_name), SetMode.MODE_ADD, instance = elem)
+        else:
+            rospy.logerr("    TRANSFER Request failed : could not find the object at old_path '{}'.".format(req.old_path))
+            success = False
 
-class GetOccupancyServiceHandler():
-    def __init__(self):
-        self.SetSERV = rospy.Service(Servers.OCCUPANCY_SERV, memory_map.srv.MapGetOccupancy, self.on_get)
+        rospy.logdebug("    Responding: " + str(success))
+        rospy.logdebug("    Process took {0:.2f}ms".format(time.time() * 1000 - s))
+        return memory_map.srv.MapTransferResponse(success)
 
-    def on_get(self, req):
+    def on_get_occupancy(self, req):
         s = time.time() * 1000
         rospy.loginfo("GET_OCCUPANCY:" + str(req.layer_name))
 
@@ -73,14 +80,3 @@ class GetOccupancyServiceHandler():
         rospy.logdebug("    Responding: " + str(path))
         rospy.logdebug("    Process took {0:.2f}ms".format(time.time() * 1000 - s))
         return memory_map.srv.MapGetOccupancyResponse(path)
-
-
-class ConditionsHandler():
-    def __init__(self):
-        self.ContainersSERV = rospy.Service(Servers.CONDITIONS_CONTAINERS_SERV,
-                                            memory_map.srv.MapConditionContainer,
-                                            self.on_condition)
-
-    def on_condition(self, req):
-        raise NotImplementedError
-        return memory_map.srv.MapConditionContainerResponse(False)

@@ -774,7 +774,7 @@ objects:
             color: orange
 
 
-
+    container_balls:
         ball_1:
             type: object
             position:
