@@ -11,11 +11,11 @@ class Map():
     @staticmethod
     def load():
         starttime = time.time() * 1000
-        initdict_terrain   = MapLoader.loadFile("../../def/1_Terrain.yml")["terrain"]
-        initdict_zones     = MapLoader.loadFile("../../def/2_Zones.yml")["zones"]
-        initdict_waypoints = MapLoader.loadFile("../../def/3_Waypoints.yml")["waypoints"]
-        initdict_entities  = MapLoader.loadFile("../../def/4_Entities.yml")["entities"]
-        initdict_objects   = MapLoader.loadFile("../../def/5_Objects.yml")["objects"]
+        initdict_terrain   = MapLoader.loadFile("1_Terrain.yml")["terrain"]
+        initdict_zones     = MapLoader.loadFile("2_Zones.yml")["zones"]
+        initdict_waypoints = MapLoader.loadFile("3_Waypoints.yml")["waypoints"]
+        initdict_entities  = MapLoader.loadFile("4_Entities.yml")["entities"]
+        initdict_objects   = MapLoader.loadFile("5_Objects.yml")["objects"]
         # Instantiate objects before creating the map dict
         for zone in initdict_zones:
             initdict_zones[zone] = Zone(initdict_zones[zone])
