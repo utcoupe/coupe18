@@ -24,7 +24,7 @@ class BeltInterpreter(object):
         # template for the sensor frame id, with '{}' being the sensor id
         self.SENSOR_FRAME_ID = "belt_{}"
         self.DEF_FILE = "processing/belt.xml"
-        self.TOPIC = "/processing/belt_interpreter/rects"
+        self.TOPIC = "/processing/belt_interpreter/rects_filtered"
         self.SENSORS_TOPIC = "/sensors/belt"
         # resolution along the long and large side of the rectangle (meters)
         self.RESOLUTION_LONG = 0.01
@@ -97,7 +97,11 @@ class BeltInterpreter(object):
                     pointst.point.y = y
                     pointst.header = rect.header
 
-                    pst_map = self._tl.transformPoint("map", pointst)
+                    try:
+                        pst_map = self._tl.transformPoint("map", pointst)
+                    except:
+                        rospy.logwarn("Frame robot does not exist, cannot process sensor data")
+                        return
 
                     total_points_nbr += 1
 

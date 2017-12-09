@@ -15,7 +15,7 @@ class MarkersPublisher(object):
     def publishCheckZones(self, robot):
         if self._is_connected():
             # Publish path collision shapes
-            if robot.isInitialized():
+            if robot.isInitialized() and robot.NavStatus:
                 for i, path_shape in enumerate(robot.Path.toShapes(robot)):
                     self._publish_marker("collisions_path", i + 1, path_shape, 0.02, 0.01, (1.0, 0.5, 0.1, 0.8))
                 stop_rect = robot.getStopRect()
