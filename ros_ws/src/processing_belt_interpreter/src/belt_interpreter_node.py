@@ -24,7 +24,7 @@ class BeltInterpreter(object):
         # template for the sensor frame id, with '{}' being the sensor id
         self.SENSOR_FRAME_ID = "belt_{}"
         self.DEF_FILE = "processing/belt.xml"
-        self.TOPIC = "/processing/belt_interpreter/rects"
+        self.TOPIC = "/processing/belt_interpreter/rects_filtered"
         self.SENSORS_TOPIC = "/sensors/belt"
         # resolution along the long and large side of the rectangle (meters)
         self.RESOLUTION_LONG = 0.01
@@ -99,7 +99,11 @@ class BeltInterpreter(object):
                     pointst.point.y = y
                     pointst.header = rect.header
 
-                    pst_map = self._tl.transformPoint("map", pointst)
+                    try:
+                        pst_map = self._tl.transformPoint("map", pointst)
+                    except:
+                        rospy.logwarn("Frame robot does not exist, cannot process sensor data")
+                        return
 
                     total_points_nbr += 1
 
@@ -108,15 +112,13 @@ class BeltInterpreter(object):
 
             if float(static_points_nbr) / float(total_points_nbr) \
                > self.POINTS_PC_THRESHOLD:
-                static_rects.append((sensor_id, rect))
+                static_rects.append(rect)
             else:
-                dynamic_rects.append((sensor_id, rect))
+                dynamic_rects.append(rect)
 
-
-        self._pub.publish([r.second for r in static_rects],
-                          [t.second for t in dynamic_rects])
-
-        self._markers_pub.publish_markers(static_rects, dynamic_rects)
+        rospy.loginfo(static_rects)
+        rospy.loginfo(dynamic_rects)
+        self._pub.publish(static_rects, dynamic_rects)
 
     def pub_static_transforms(self):
         tr_list = []

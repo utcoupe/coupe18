@@ -3,7 +3,6 @@ import rospy
 from visualization_msgs.msg import Marker
 import hashlib
 
-
 MARKERS_NAMESPACE = "belt_data"
 POINT_SCALE = 0.05
 POINT_Z = 0.1

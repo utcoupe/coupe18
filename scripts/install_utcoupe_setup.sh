@@ -17,7 +17,7 @@ ARCH=$(uname -m)
 ### Install the linux packages
 function install_apt() {
 	green_echo "Install missing packages..."
-	sudo apt-get install git build-essential python python-pip cmake libboost-dev libsdl1.2-dev gcc-avr avrdude avr-libc libsfml-dev
+	sudo apt-get install git build-essential python python-pip cmake libboost-dev libsdl1.2-dev gcc-avr avrdude avr-libc libsfml-dev libarmadillo-dev libavcodec-dev libswscale-dev
 
 	# Check if it's a PC or a raspi
 	if [ "$ARCH" = "x86_64" ]; then
@@ -29,6 +29,7 @@ function install_apt() {
 		sudo apt-get remove npm nodejs nodejs-legacy
 		curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
 		sudo npm install npm@3.5.2 -g
+		#TODO be sure that all is correct for raspi
 	elif [ "$ARCH" = "armv6l" ]; then
 		sudo apt-get install raspberrypi-kernel-headers
 		sudo apt-get remove npm nodejs nodejs-legacy
@@ -49,7 +50,17 @@ function install_ros() {
 		sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 		sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 		sudo apt-get update
-		sudo apt-get install ros-kinetic-desktop-full
+		if [ "$ARCH" = "x86_64" ]; then
+			sudo apt-get install ros-kinetic-desktop-full ros-kinetic-rosserial-arduino ros-kinetic-rosbridge-suite ros-kinetic-tf2-web-republisher
+		elif [ "$ARCH" = "armv7l" ]; then
+			sudo apt-get install ros-kinetic-ros-base ros-kinetic-tf2 ros-kinetic-tf2-ros ros-kinetic-rviz ros-kinetic-diagnostic-updater ros-kinetic-roslint ros-kinetic-camera-info-manager ros-kinetic-rosserial-arduino ros-kinetic-rosbridge-suite ros-kinetic-tf2-web-republisher
+		fi
+		# "Install" Arduino libs needed by us
+		if [ -d "/usr/share/arduino" ] && [ -d "$PWD/libs/arduino-libraries" ]; then
+			sudo cp -ar $PWD/libs/arduino-libraries/* /usr/share/arduino/libraries/
+		else
+			red_echo "Unable to locate arduino folder or arduino-libraries extracted folder, please check your setup"
+		fi
 		sudo rosdep init
 		rosdep update
 	else
@@ -58,6 +69,7 @@ function install_ros() {
 }
 
 ### Setup the variable environment to taget the UTCoupe main folder
+### This function use $PWD instead of $UTCOUPE_WORKSPACE because if the env variable is not set before running the script, $UTCOUPE_WORKSPACE is unknown
 function env_setup() {
 	# Add the UTCOUPE_WORKSPACE env variable, default consider as bash shell
 	if [ -z "$UTCOUPE_WORKSPACE" ]; then
@@ -95,15 +107,11 @@ function env_setup() {
 		sudo chown $USER:$USER /var/log/utcoupe
 	fi
 	# Untar all libraries
-	for f in $UTCOUPE_WORKSPACE/libs/*; do
-		if [ ! -d $f ]; then	
-			tar -C $UTCOUPE_WORKSPACE/libs -xzf $f
+	for f in $PWD/libs/*; do
+		if [ ! -d $f ]; then
+			tar -C $PWD/libs -xzf $f
 		fi
 	done
-	# "Install" Arduino libs
-	if [ ! -L "/opt/arduino-1.0" ]; then
-		sudo ln -s $UTCOUPE_WORKSPACE/libs/arduino-1.0 /opt/
-	fi
 	# Add the Ethernet IP address of raspberry pi to have a shortcut
 	if ! grep "utcoupe" /etc/hosts > /dev/null; then
 	    sudo sh -c "echo '#UTCoupe raspberry pi Ethernet IP when connected on the UTC network\n172.18.159.254	utcoupe_rpi31\n172.18.161.161	utcoupe_rpi32\n172.18.161.162	utcoupe_rpi33' >> /etc/hosts"
@@ -124,7 +132,7 @@ function install_ros_workspace() {
 function launch_script() {
 
 	env_setup
-	
+
 	printf "Install apt missing packets ? [Y/n]?"
 	read answer
 	if [ "$answer" = "" ] || [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
@@ -141,6 +149,12 @@ function launch_script() {
 	fi
 }
 
+# Check that the folder has been cloned from git and not downloaded, because submodules won't work...
+if [ ! -d ".git" ]; then
+	red_echo "You have to clone this repository from git, not downloading it."
+	exit 1
+fi
+
 # Verify that the script is launched from the right place
 if [ ! "${PWD##*/}" = "coupe18" ]; then
 	red_echo "You have to launch this script from UTCoupe main directory : ./script/${0##*/} or to rename this folder in coupe18."
@@ -152,5 +166,5 @@ printf "Launch install script ? [Y/n]?"
 read answer
 if [ "$answer" = "" ] || [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
 	launch_script
+	echo "If you run the install script for the first time, please reboot your computer to apply all modifications."
 fi
-
