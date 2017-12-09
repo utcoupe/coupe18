@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
     std_msgs
     genmsg
     geometry_msgs
+    dynamic_reconfigure
 )
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH}) # Please note the use of CMAKE_CURRENT_SOURCE_DIR
@@ -34,6 +35,9 @@ generate_messages(
 ## Declare ROS dynamic reconfigure parameters ##
 ################################################
 
+generate_dynamic_reconfigure_options(
+    def/PathfinderNode.cfg
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -67,6 +71,7 @@ target_link_libraries(pathfinder_node
 
 add_dependencies(pathfinder_node
     ${${PROJECT_NAME}_EXPORTED_TARGETS}
+    ${PROJECT_NAME}_gencfg
     ${catkin_EXPORTED_TARGETS}
 )
 
