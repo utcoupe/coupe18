@@ -24,8 +24,8 @@ class MapRobot(RectObstacle):
     def updatePosition(self, new_position):
         self.Position = new_position
 
-    def updatePath(self, new_path):
-        self.Path = new_path
+    def updatePath(self, waypoints):
+        self.Path = RobotPath(waypoints)
 
     def updateVelocity(self, linear, angular):
         self.Velocity.Linear = linear
