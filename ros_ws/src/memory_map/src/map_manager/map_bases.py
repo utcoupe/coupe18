@@ -23,7 +23,8 @@ class MapElement(object):
 
 class DictManager(MapElement):
     def __init__(self, elemdict):
-        self.Dict = elemdict
+        self.Dict = elemdict if elemdict is not None else {}
+
         for k in self.Dict.keys():
             if isinstance(k, dict):
                 raise ValueError("Inner dicts as values NOT allowed. '{}' has a dict inside. Must be initialized beforehand.".format(k))

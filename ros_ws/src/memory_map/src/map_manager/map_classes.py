@@ -52,12 +52,16 @@ class Waypoint(DictManager):
 
 class Entity(DictManager):
     def __init__(self, initdict):
-        LoadingHelpers.checkKeysExist(initdict, "position", "shape", "marker", "chest", "trajectory")
+        LoadingHelpers.checkKeysExist(initdict, "position", "shape", "marker", "containers", "trajectory")
+
+        for container in initdict["containers"]:
+            initdict["containers"][container] = Container(initdict["containers"][container])
+
         super(Entity, self).__init__({
             "position": Position2D(initdict["position"]),
             "shape": Shape2D(initdict["shape"]),
             "marker": MarkerRViz(initdict["marker"]),
-            "chest": None, # TODO Implement
+            "chest": DictManager(initdict["containers"]),
             "trajectory": Trajectory(initdict["trajectory"])
         })
 
