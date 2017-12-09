@@ -17,13 +17,13 @@ public:
     /**
      * @brief Converts a coodinate from ROS system to pathfinding system using the scales.
      * @param rosPos The coodinate in ROS system
-     * @return The coordinate in pathfinding system
+     * @return The coordinate in pathfinder system
      */
     std::pair<double,double> fromRosToMapPos (const std::pair<double,double>& rosPos) const;
     
     /**
      * @brief Converts a coodinate from pathfinding system to ROS system using the scales.
-     * @param mapPos The coodinate in pathfinding system
+     * @param mapPos The coodinate in pathfinder system
      * @return The coordinate in ROS system
      */
     std::pair<double,double> fromMapToRosPos (const std::pair<double,double>& mapPos) const;

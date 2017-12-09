@@ -108,7 +108,7 @@ function env_setup() {
 	fi
 	# Untar all libraries
 	for f in $PWD/libs/*; do
-		if [ ! -d $f ]; then	
+		if [ ! -d $f ]; then
 			tar -C $PWD/libs -xzf $f
 		fi
 	done
@@ -132,7 +132,7 @@ function install_ros_workspace() {
 function launch_script() {
 
 	env_setup
-	
+
 	printf "Install apt missing packets ? [Y/n]?"
 	read answer
 	if [ "$answer" = "" ] || [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
@@ -168,4 +168,3 @@ if [ "$answer" = "" ] || [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
 	launch_script
 	echo "If you run the install script for the first time, please reboot your computer to apply all modifications."
 fi
-
