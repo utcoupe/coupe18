@@ -1,16 +1,23 @@
 /*
 Using the Arduino IDE, install the library "ESP8266 SSD1306 OLED" Display lib.
 This code was developed with a Wemos D1 Mini (ESP8266).
+Author: Pierre LACLAU, December 2017.
 */
+// Including rosserial
+#include <ros.h>
+#include <std_msgs/Empty.h>
+#include <drivers_ard_hmi/SetStrategies.h>
 
+//Creating OLED display instances
 #include <Wire.h>    // Only needed for Arduino 1.6.5 and earlier
 #include "SSD1306.h" // alias for `#include "SSD1306Wire.h"`
-
-// Create UI and Display.
 #include "OLEDDisplayUi.h"
 SSD1306  display(0x3c, D2, D1);
 OLEDDisplayUi ui(&display);
 
+//HMI variables
+String options[10] = ["Hii", "strategy_ftw"];
+uint8_t options_count = 2;
 
 const char activeSymbol[] PROGMEM = {
     B00000000,
@@ -35,9 +42,7 @@ const char inactiveSymbol[] PROGMEM = {
 };
 
 void msOverlay(OLEDDisplay *display, OLEDDisplayUiState* state) {
-    // display->setTextAlignment(TEXT_ALIGN_RIGHT);
-    // display->setFont(ArialMT_Plain_10);
-    // display->drawString(128, 0, String(millis()));
+
 }
 
 void drawFrameTitleComponent(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y, String text) {
@@ -53,9 +58,12 @@ void drawBigCentralMessageComponent(OLEDDisplay *display, OLEDDisplayUiState* st
 }
 
 void drawMCQComponent(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y, String options[], int num_options) {
-    int y_offset = 0;
-    for(int i = 0; i < num_options; i++) {
+    int y_offset = 22;
+    display->setFont(ArialMT_Plain_16);
+    display->setTextAlignment(TEXT_ALIGN_CENTER);
 
+    for(int i = 0; i < options_count; i++) {
+        display->drawString(14 + x, 22 + y, options[i]);
     }
 }
 
@@ -85,10 +93,7 @@ void drawJackFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, i
 void drawInGameFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
     ui.disableIndicator();
     drawFrameTitleComponent(display, state, x, y, "In Game...");
-    //display->setTextAlignment(TEXT_ALIGN_LEFT);
-    //display->setFont(ArialMT_Plain_10);
-    //display->drawStringMaxWidth(0 + x, 15 + y, 128, "Lorem ipsum\n dolor sit amet, consetetur sadipscing elitr.");
-
+    
     display->setTextAlignment(TEXT_ALIGN_CENTER);
     display->setFont(ArialMT_Plain_24);
     display->drawString(64 + x, 22 + y, "178pts");
@@ -101,13 +106,13 @@ FrameCallback frames[] = {drawHelloFrame, drawTeamFrame, drawStrategyFrame, draw
 int frameCount = 6;
 
 // Overlays are statically drawn on top of a frame
-OverlayCallback overlays[] = { msOverlay };
-int overlaysCount = 1;
+//OverlayCallback overlays[] = { msOverlay };
+//int overlaysCount = 1;
 
 void setup() {
     Serial.begin(115200);
     Serial.println();
-    Serial.println();
+    Serial.println("Hello");
 
     ui.setTargetFPS(20);
 
@@ -116,7 +121,7 @@ void setup() {
     ui.setFrameAnimation(SLIDE_LEFT);
 
     ui.setFrames(frames, frameCount);
-    ui.setOverlays(overlays, overlaysCount);
+    //ui.setOverlays(overlays, overlaysCount);
 
     ui.disableAutoTransition();
     ui.init();
@@ -137,4 +142,3 @@ void loop() {
         delay(remainingTimeBudget);
     }
 }
-
