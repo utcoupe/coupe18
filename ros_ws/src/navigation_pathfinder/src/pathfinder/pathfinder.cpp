@@ -187,9 +187,9 @@ Pathfinder::Path Pathfinder::smoothPath(const Path& rawPath)
 
 bool Pathfinder::isValid(const Point& pos)
 {
-    if (pos.getY() < 0 || pos.getY() > _allowedPositions.size())
+    if (pos.getY() < 0 || pos.getY() >= _allowedPositions.size())
         return false;
-    if (pos.getX() < 0 || pos.getX() > _allowedPositions.front().size())
+    if (pos.getX() < 0 || pos.getX() >= _allowedPositions.front().size())
         return false;
     if (!_allowedPositions[pos.getY()][pos.getX()] || _dynBarrierPositions[pos.getY()][pos.getX()])
         return false;
