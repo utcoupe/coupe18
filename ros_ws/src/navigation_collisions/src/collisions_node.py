@@ -37,13 +37,13 @@ class CollisionsNode(object):
         Map.Robot = MapRobot(shape["width"], shape["height"]) # Can create a rect or circle
 
         # TESTS While dependencies not available.
-        Map.Robot.updatePath(RobotPath([Point(2.0, 1.7), Point(0.6, 0.7), Point(2.2, 0.6), Point(2.7, 0.3)]))
-        Map.Robot.NavStatus = RobotStatus.NAV_NAVIGATING
-        Map.Robot.updateVelocity(0.2, 0.33)
+        # Map.Robot.updatePath(RobotPath([Point(2.0, 1.7), Point(0.6, 0.7), Point(2.2, 0.6), Point(2.7, 0.3)]))
+        # Map.Robot.NavStatus = RobotStatus.NAV_NAVIGATING
+        # Map.Robot.updateVelocity(0.2, 0.33)
 
-        Map.BeltPoints = [RectObstacle(Position(0.25, 1.3, 0.78539816339), 0.1,  0.2),
-                          RectObstacle(Position(1.6, 0.9, 3.14 / 2),       0.24, 0.5),
-                          CircleObstacle(Position(2.15, 0.7),              0.25 / 2)]
+        # Map.BeltPoints = [RectObstacle(Position(0.25, 1.3, 0.78539816339), 0.1,  0.2),
+        #                   RectObstacle(Position(1.6, 0.9, 3.14 / 2),       0.24, 0.5),
+        #                   CircleObstacle(Position(2.15, 0.7),              0.25 / 2)]
 
     def run(self):
         r = rospy.Rate(15)
