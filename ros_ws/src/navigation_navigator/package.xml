@@ -12,9 +12,9 @@
     <depend>std_msgs</depend>
     <depend>actionlib</depend>
     <depend>actionlib_msgs</depend>
+    <depend>navigation_pathfinder</depend>
+    <depend>drivers_ard_asserv</depend>
     <exec_depend>message_runtime</exec_depend>
-    <exec_depend>navigation_pathfinder</exec_depend>
-    <exec_depend>drivers_ard_asserv</exec_depend>
     <export>
     </export>
 </package>
