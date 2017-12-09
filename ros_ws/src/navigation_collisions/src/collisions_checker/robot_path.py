@@ -18,7 +18,7 @@ class RobotPath(object):
             self.Waypoints = waypoints_tuples
 
     def toShapes(self, robot):
-        if len(self.Waypoints) > 1:
+        if len(self.Waypoints) >= 1:
             shapes = []
             for i in range(1, len(self.Waypoints)):
                 # Creating a rectangle with the robot's width between each waypoint
