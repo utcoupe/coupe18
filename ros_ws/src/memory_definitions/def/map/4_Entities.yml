@@ -1,5 +1,5 @@
 entities:
-    GR:
+    gr:
         position:
             frame_id: /map
             x: 0.1
@@ -18,12 +18,11 @@ entities:
             z: 0.175
             orientation: [0, 0, 0]
             color: [1, 0.2, 0.2, 1.0]
-        chest:
-            notimplementedyet: True
+        containers:
         trajectory:
             history: null
             currentpath: null
-    PR:
+    pr:
         position:
             frame_id: /map
             x: 1.243
@@ -42,11 +41,11 @@ entities:
             z: 0.175
             orientation: [0, 0, 0]
             color: [1, 0.2, 0.2, 1.0]
-        chest: null
+        containers:
         trajectory:
             history: null
             currentpath: null
-    GE:
+    ge:
         position:
             frame_id: /map
             x: 0.33
@@ -64,7 +63,7 @@ entities:
             z: 0.175
             orientation: [0, 0, 0]
             color: [1, 0.2, 0.2, 1.0]
-        chest: null
+        containers:
         trajectory:
             history: null
             currentpath: null
@@ -86,7 +85,7 @@ entities:
             z: 0.175
             orientation: [0, 0, 0]
             color: [1, 0.2, 0.2, 1.0]
-        chest: null
+        containers:
         trajectory:
             history: null
             currentpath: null

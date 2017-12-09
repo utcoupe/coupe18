@@ -58,10 +58,14 @@ class MapLoader():
         Loads the description file by gettign it from the 'memory/definitions' ROS package.
         '''
         get_def = rospy.ServiceProxy('/memory/definitions/get', GetDefinition)
-        get_def.wait_for_service()
-
-        res = get_def('map/' + filename)
         try:
+            get_def.wait_for_service(timeout = 2)
+        except:
+            rospy.logerr("Could not contact definitions service, timeout reached. Quitting.")
+            raise Exception()
+
+        try:
+            res = get_def('map/' + filename)
             if not res.success:
                 rospy.logerr("Error when fetching '{}' definition file".format(filename))
                 raise Exception()
