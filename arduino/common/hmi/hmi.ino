@@ -7,6 +7,11 @@ Author: Pierre LACLAU, December 2017.
 #include <ros.h>
 #include <std_msgs/Empty.h>
 #include <drivers_ard_hmi/SetStrategies.h>
+#include <drivers_ard_hmi/SetTeams.h>
+#include <drivers_ard_hmi/SelectedConfig.h>
+#include <drivers_ard_hmi/HMIEvent.h>
+#include <drivers_ard_hmi/ArrowClick.h> //tmp
+ros::NodeHandle nh;
 
 //Creating OLED display instances
 #include <Wire.h>    // Only needed for Arduino 1.6.5 and earlier
@@ -15,10 +20,21 @@ Author: Pierre LACLAU, December 2017.
 SSD1306  display(0x3c, D2, D1);
 OLEDDisplayUi ui(&display);
 
-//HMI variables
-String options[10];
-uint8_t options_count = 8;
+//Component variables
 uint8_t cursor_pos;
+
+//HMI variables
+String strats[12];
+uint8_t strats_count = 8;
+
+String teams[12];
+uint8_t teams_count = 8;
+
+uint8_t chosen_strat = -1;
+uint8_t chosen_team = -1;
+
+uint8_t game_status;
+uint8_t init_status;
 
 const char activeSymbol[] PROGMEM = {
     B00000000,
@@ -42,8 +58,82 @@ const char inactiveSymbol[] PROGMEM = {
     B00000000
 };
 
-void msOverlay(OLEDDisplay *display, OLEDDisplayUiState* state) {
+//Input methods
+bool up_state    = false;
+bool down_state  = false;
+bool left_state  = false;
+bool right_state = false;
 
+bool upPressed() {
+    bool backup = up_state;
+    up_state = false;
+    if(backup) return true;
+    return false;
+}
+
+bool downPressed() {
+    bool backup = down_state;
+    down_state = false;
+    if(backup) return true;
+    return false;
+}
+
+bool leftPressed() {
+    bool backup = left_state;
+    left_state = false;
+    if(backup) return true;
+    return false;
+}
+
+bool rightPressed() {
+    bool backup = right_state;
+    right_state = false;
+    if(backup) return true;
+    return false;
+}
+
+
+//ROS methods
+void on_set_strategies(const drivers_ard_hmi::SetStrategies& msg){
+  strats_count = msg.strategies_names_length;
+  for(int i=0; i < msg.strategies_names_length; i++) {
+    strats[i] = msg.strategies_names[i];
+  }
+}
+
+void on_set_teams(const drivers_ard_hmi::SetTeams& msg){
+  teams_count = msg.teams_names_length;
+  for(int i=0; i < msg.teams_names_length; i++) {
+    teams[i] = msg.teams_names[i];
+  }
+}
+
+//void on_game_status(const ai_game_status::GameStatus& msg){
+//  game_status = msg.game_status;
+//  init_status = msg.init_status;
+//}
+
+void on_click(const drivers_ard_hmi::ArrowClick& msg){
+    if(msg.arrow == 0) up_state = true;
+    if(msg.arrow == 1) down_state = true;
+    if(msg.arrow == 2) left_state = true;
+    if(msg.arrow == 3) right_state = true;
+}
+
+ros::Subscriber<drivers_ard_hmi::SetStrategies> sub_strats("/feedback/ard_hmi/set_strategies", &on_set_strategies);
+ros::Subscriber<drivers_ard_hmi::SetTeams> sub_teams("/feedback/ard_hmi/set_teams", &on_set_teams);
+ros::Subscriber<drivers_ard_hmi::ArrowClick> sub_click("/feedback/ard_hmi/click", &on_click); //tmp
+//ros::Subscriber<ai_game_status::GameStatus> sub_game_status( "/ai/game_status/status", &on_game_status);
+
+drivers_ard_hmi::SelectedConfig config_msg;
+ros::Publisher config_pub("/feedback/ard_hmi/arm_config", &config_msg);
+
+
+
+
+//Components methods
+void msOverlay(OLEDDisplay *display, OLEDDisplayUiState* state) {
+    
 }
 
 void drawFrameTitleComponent(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y, String text) {
@@ -58,27 +148,27 @@ void drawBigCentralMessageComponent(OLEDDisplay *display, OLEDDisplayUiState* st
     display->drawString(64 + x, 22 + y, text);
 }
 
-void drawMCQComponent(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
+void drawMCQComponent(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y, String options[], uint8_t options_count) {
     if(options_count > 0) {
         int y_offset = 12;
         display->setFont(ArialMT_Plain_10);
         display->setTextAlignment(TEXT_ALIGN_LEFT);
-    
+        
         int start = cursor_pos - 1;
         if(cursor_pos == 0) start = 0;
         if(cursor_pos == options_count - 1) {
-          start = options_count - 3;
-          if(options_count == 2) start = options_count - 2;
-          if(options_count == 1) start = options_count - 1;
+            start = options_count - 3;
+            if(options_count == 2) start = options_count - 2;
+            if(options_count == 1) start = options_count - 1;
         }
-    
+        
         for(int i = 0; i < 3; i++) {
             display->drawString(11 + x, 16 + y + y_offset * i, options[start + i]);
             if(cursor_pos == start + i) {
                 display->drawString(4 + x, 16 + y + y_offset * i, ">");
             }
         }
-
+        
         char b[5];
         sprintf(b, "%d/%d",cursor_pos + 1,options_count);
         display->drawString(4 + x, 52 + y, b);
@@ -90,29 +180,77 @@ void drawMCQComponent(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x
     }
 }
 
+//Frames rendering methods
 void drawHelloFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
     drawFrameTitleComponent(display, state, x, y, "RPi init...");
     drawBigCentralMessageComponent(display, state, x, y, "WAIT");
+
+    if(rightPressed()) ui.nextFrame();
 }
 
 void drawTeamFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
     drawFrameTitleComponent(display, state, x, y, "Team select");
-    drawMCQComponent(display, state, x, y);
+    drawMCQComponent(display, state, x, y, teams, teams_count);
+
+    if(rightPressed()) {
+        chosen_team = cursor_pos;
+        cursor_pos = 0;
+        ui.nextFrame();
+    }
+    if(leftPressed()) {
+        cursor_pos = 0;
+        ui.previousFrame();
+    }
+    if(downPressed() && teams_count) {
+        cursor_pos += 1;
+        if(cursor_pos >= teams_count) cursor_pos = teams_count - 1;
+    }
+    if(upPressed() && teams_count) {
+        if(cursor_pos > 0) cursor_pos -= 1;
+    }
 }
 
 void drawStrategyFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
     drawFrameTitleComponent(display, state, x, y, "Strat select");
-    drawMCQComponent(display, state, x, y);
+    drawMCQComponent(display, state, x, y, strats, strats_count);
+
+    if(rightPressed()) {
+        chosen_strat = cursor_pos;
+        cursor_pos = 0;
+        ui.nextFrame();
+    }
+    if(leftPressed()) {
+        cursor_pos = 0;
+        ui.previousFrame();
+    }
+    if(downPressed() && strats_count) {
+        cursor_pos += 1;
+        if(cursor_pos >= strats_count) cursor_pos = strats_count - 1;
+    }
+    if(upPressed() && strats_count) {
+        if(cursor_pos > 0) cursor_pos -= 1;
+    }
 }
 
 void drawArmFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
     drawFrameTitleComponent(display, state, x, y, "Calibration");
     drawBigCentralMessageComponent(display, state, x, y, "ARM?");
+
+    if(leftPressed()) ui.previousFrame();
+    if(rightPressed()) {
+      config_msg.team_id = chosen_team;
+      config_msg.strategy_id = chosen_strat;
+      config_pub.publish(&config_msg); // send config
+      ui.nextFrame();
+    }
 }
 
 void drawJackFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
     drawFrameTitleComponent(display, state, x, y, "Jack");
     drawBigCentralMessageComponent(display, state, x, y, "JACK?");
+
+    if(leftPressed()) ui.previousFrame();
+    if(rightPressed()) ui.nextFrame();
 }
 
 void drawInGameFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
@@ -122,8 +260,11 @@ void drawInGameFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x,
     display->setTextAlignment(TEXT_ALIGN_CENTER);
     display->setFont(ArialMT_Plain_24);
     display->drawString(64 + x, 22 + y, "178pts");
-
+    
     display->drawProgressBar(x + 0, y + 54, 120, 8, 67); // shows time left
+
+    if(leftPressed()) ui.previousFrame();
+    if(rightPressed()) ui.nextFrame();
 }
 
 // frames are the single views that slide in
@@ -135,52 +276,31 @@ int frameCount = 6;
 //int overlaysCount = 1;
 
 void setup() {
-    Serial.begin(115200);
-    Serial.println();
-    Serial.println("Hello");
-
+    nh.initNode();
+    nh.subscribe(sub_strats);
+    nh.subscribe(sub_teams);
+    //nh.subscribe(sub_game_status);
+    nh.subscribe(sub_click);
+    nh.advertise(config_pub);
+    
     ui.setTargetFPS(20);
-
+    
     ui.setActiveSymbol(activeSymbol);
     ui.setInactiveSymbol(inactiveSymbol);
     ui.setFrameAnimation(SLIDE_LEFT);
-
+    
     ui.setFrames(frames, frameCount);
     //ui.setOverlays(overlays, overlaysCount);
-
+    
     ui.disableAutoTransition();
     ui.init();
-
+    
     display.flipScreenVertically();
-    ui.switchToFrame(5); //tmp for tests
-
-    options[0] = "strat1";
-    options[1] = "strategy_ftw";
-    options[2] = "rcva_going_to_death";
-    options[3] = "insa_is_trash";
-    options[4] = "hi";
-    options[5] = "MajusCules";
-    options[6] = "bonjour";
-    options[7] = "la derniere.";
+    ui.switchToFrame(1); //tmp for tests
 }
 
 
 void loop() {
     int remainingTimeBudget = ui.update();
-    if(Serial.available() > 0) { //tmp
-          char c = Serial.read();
-          if(c == 'l') ui.nextFrame();
-          if(c == 'j') ui.previousFrame();
-          if(c == 'k' && options_count) {
-            cursor_pos += 1;
-            if(cursor_pos >= options_count) cursor_pos = options_count - 1;
-          }
-          if(c == 'i' && options_count) {
-            if(cursor_pos > 0) cursor_pos -= 1;
-          }
-        }
-    Serial.println(cursor_pos);
-    if (remainingTimeBudget > 0) {
-        delay(remainingTimeBudget);
-    }
+    nh.spinOnce();
 }
