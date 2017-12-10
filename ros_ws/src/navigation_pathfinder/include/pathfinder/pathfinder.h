@@ -9,6 +9,7 @@
 #include <ros/console.h>
 
 #include "navigation_pathfinder/FindPath.h"
+#include "navigation_pathfinder/PathfinderNodeConfig.h"
 
 #include "pathfinder/map_storage.h"
 #include "pathfinder/point.h"
@@ -19,10 +20,12 @@ class Pathfinder
 public:
     typedef std::vector<Point> Path;
 
-    Pathfinder(const std::string& mapFileName, const std::pair< double, double >& tableSize, bool invertedY = true, bool render = false);
+    Pathfinder(const std::string& mapFileName, const std::pair< double, double >& tableSize, bool invertedY = true, bool render = false, const std::string& renderFile = "tmp.bmp");
     
     bool findPath(const Point& startPos, const Point& endPos, Path& path);
     bool findPathCallback(navigation_pathfinder::FindPath::Request &req, navigation_pathfinder::FindPath::Response &rep);
+    
+    void reconfigureCallback(navigation_pathfinder::PathfinderNodeConfig &config, uint32_t level);
 
 private:
     typedef std::vector<std::vector<short> > Vect2DShort;
@@ -36,6 +39,7 @@ private:
     Vect2DBool _dynBarrierPositions;
     
     bool _renderAfterComputing;
+    std::string _renderFile;
     
     bool exploreGraph(Vect2DShort& distMap, const Point& startPos, const Point& endPos);
     Path retrievePath(const Vect2DShort& distMap, const Point& startPos, const Point& endPos);
