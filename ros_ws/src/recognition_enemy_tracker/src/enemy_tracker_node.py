@@ -27,7 +27,7 @@ class EnemyTrackerNode():
         self.trackEnemies()
 
     def saveRect(self, rect):
-        while len(self.rect) >= self.maxRectHistory:
+        if len(self.rect) >= self.maxRectHistory:
             del self.rect[0]
         self.rect.append(rect)
 
@@ -44,5 +44,6 @@ class EnemyTrackerNode():
 if __name__ == '__main__':
     enemy_tracker_node = EnemyTrackerNode()
     rospy.loginfo('Enemy tracker node started')
+    #TODO Use rospy.get_param(name) instead
     enemy_tracker_node.configure(enemy_tracker_properties.EnemyTrackerProperties())
     rospy.spin()
