@@ -2,7 +2,7 @@
 # -*-coding:Utf-8 -*
 
 from processing_belt_interpreter.msg import BeltFiltered, RectangleStamped
-from libtools import Rect
+from libtools import Rect, EnemiesData
 import enemy_tracker_properties
 import rospy
 
@@ -16,13 +16,14 @@ class EnemyTrackerNode():
         self._belt_sub = rospy.Subscriber(
             '/processing/belt_interpreter/points', BeltFiltered, self.importPoint)
         self.configure(None)
-        self.rect=[]
+        self.rect = []
+        self.data = []
 
     def importPoint(self, beltData):
         rects = []
         for rect in beltData.unknown_rects:
             # TODO check referentiel
-            rects.append(Rect(rect.x, rect.y, rect.w, rect.h))
+            rects.append(Rect(rect.x, rect.y, rect.w, rect.h, rect.header.stamp))
         self.saveRect(rects)
         self.trackEnemies()
 
@@ -32,6 +33,9 @@ class EnemyTrackerNode():
         self.rect.append(rect)
 
     def trackEnemies(self):
+        pass
+    
+    def updateData(auto_detect_change = False):
         pass
     
     def configure(self, prop):
