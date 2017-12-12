@@ -1,16 +1,18 @@
 /*
 Using the Arduino IDE, install the library "ESP8266 SSD1306 OLED" Display lib.
-This code was developed with a Wemos D1 Mini (ESP8266).
-Author: Pierre LACLAU, December 2017.
+This code was developed with a Wemos D1 Mini (ESP8266) and a 128x64 i2c OLED.
+Author: Pierre LACLAU, December 2017, UTCoupe.
 */
+
 // Including rosserial
 #include <ros.h>
-#include <std_msgs/Empty.h>
-#include <drivers_ard_hmi/SetStrategies.h>
-#include <drivers_ard_hmi/SetTeams.h>
-#include <drivers_ard_hmi/SelectedConfig.h>
-#include <drivers_ard_hmi/HMIEvent.h>
-#include <drivers_ard_hmi/ArrowClick.h> //tmp
+#include <drivers_ard_hmi/SetStrategies.h>  // ROS sets strategy names for displaying on hmi.
+#include <drivers_ard_hmi/SetTeams.h>       // ROS sets teams names for displaying on hmi.
+#include <drivers_ard_hmi/SelectedConfig.h> // HMI sends selected team and strategy (id, not string).
+#include <drivers_ard_hmi/HMIEvent.h>       // HMI sends events : JACK, GAME_STOP
+#include <drivers_ard_hmi/ROSEvent.h>       // ROS sends events : ASK_JACK, GAME_STOP
+//#include <ai_game_status/ROSEvent.h>       // ROS sends game and init status (to  determine when RPi ready).
+#include <drivers_ard_hmi/ArrowClick.h> //tmp while no physical buttons
 ros::NodeHandle nh;
 
 //Creating OLED display instances
@@ -21,6 +23,7 @@ SSD1306  display(0x3c, D2, D1);
 OLEDDisplayUi ui(&display);
 
 //Component variables
+uint8_t current_frame;
 uint8_t cursor_pos;
 
 //HMI variables
@@ -35,6 +38,7 @@ uint8_t chosen_team = -1;
 
 uint8_t game_status;
 uint8_t init_status;
+bool is_arming = false;
 
 const char activeSymbol[] PROGMEM = {
     B00000000,
@@ -120,13 +124,19 @@ void on_click(const drivers_ard_hmi::ArrowClick& msg){
     if(msg.arrow == 3) right_state = true;
 }
 
+void on_ros_event(const drivers_ard_hmi::ROSEvent& msg){
+}
+
 ros::Subscriber<drivers_ard_hmi::SetStrategies> sub_strats("/feedback/ard_hmi/set_strategies", &on_set_strategies);
 ros::Subscriber<drivers_ard_hmi::SetTeams> sub_teams("/feedback/ard_hmi/set_teams", &on_set_teams);
 ros::Subscriber<drivers_ard_hmi::ArrowClick> sub_click("/feedback/ard_hmi/click", &on_click); //tmp
+ros::Subscriber<drivers_ard_hmi::ROSEvent> sub_ros_events("/feedback/ard_hmi/ros_event", &on_ros_event);
 //ros::Subscriber<ai_game_status::GameStatus> sub_game_status( "/ai/game_status/status", &on_game_status);
 
 drivers_ard_hmi::SelectedConfig config_msg;
 ros::Publisher config_pub("/feedback/ard_hmi/arm_config", &config_msg);
+drivers_ard_hmi::HMIEvent hmi_event_msg;
+ros::Publisher hmi_events_pub("/feedback/ard_hmi/hmi_event", &hmi_event_msg);
 
 
 
@@ -182,13 +192,16 @@ void drawMCQComponent(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x
 
 //Frames rendering methods
 void drawHelloFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
+    current_frame = 0;
     drawFrameTitleComponent(display, state, x, y, "RPi init...");
     drawBigCentralMessageComponent(display, state, x, y, "WAIT");
 
-    if(rightPressed()) ui.nextFrame();
+    if(game_status == 0 && init_status != 0 && strats_count && teams_count)
+        ui.nextFrame();
 }
 
 void drawTeamFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
+    current_frame = 1;
     drawFrameTitleComponent(display, state, x, y, "Team select");
     drawMCQComponent(display, state, x, y, teams, teams_count);
 
@@ -211,6 +224,7 @@ void drawTeamFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, i
 }
 
 void drawStrategyFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
+    current_frame = 2;
     drawFrameTitleComponent(display, state, x, y, "Strat select");
     drawMCQComponent(display, state, x, y, strats, strats_count);
 
@@ -233,20 +247,23 @@ void drawStrategyFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t 
 }
 
 void drawArmFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
+    current_frame = 3;
     drawFrameTitleComponent(display, state, x, y, "Calibration");
-    drawBigCentralMessageComponent(display, state, x, y, "ARM?");
+    if(is_arming)  drawBigCentralMessageComponent(display, state, x, y, "ARM?");
+    if(!is_arming) drawBigCentralMessageComponent(display, state, x, y, "ARMING...");
 
     if(leftPressed()) ui.previousFrame();
     if(rightPressed()) {
       config_msg.team_id = chosen_team;
       config_msg.strategy_id = chosen_strat;
       config_pub.publish(&config_msg); // send config
-      ui.nextFrame();
+      is_arming = true;
     }
 }
 
 void drawJackFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
-    drawFrameTitleComponent(display, state, x, y, "Jack");
+    current_frame = 4;
+    drawFrameTitleComponent(display, state, x, y, "Armed");
     drawBigCentralMessageComponent(display, state, x, y, "JACK?");
 
     if(leftPressed()) ui.previousFrame();
@@ -254,6 +271,7 @@ void drawJackFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, i
 }
 
 void drawInGameFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
+    current_frame = 5;
     ui.disableIndicator();
     drawFrameTitleComponent(display, state, x, y, "In Game...");
     
@@ -281,9 +299,11 @@ void setup() {
     nh.subscribe(sub_teams);
     //nh.subscribe(sub_game_status);
     nh.subscribe(sub_click);
+    nh.subscribe(sub_ros_events);
     nh.advertise(config_pub);
+    nh.advertise(hmi_events_pub);
     
-    ui.setTargetFPS(20);
+    ui.setTargetFPS(30);
     
     ui.setActiveSymbol(activeSymbol);
     ui.setInactiveSymbol(inactiveSymbol);
@@ -296,11 +316,14 @@ void setup() {
     ui.init();
     
     display.flipScreenVertically();
-    ui.switchToFrame(1); //tmp for tests
 }
 
 
 void loop() {
-    int remainingTimeBudget = ui.update();
+    ui.update();
+
+    if(current_frame != 5 && game_status == 1 /*INGAME*/)
+        ui.transitionToFrame(5); //if game starts, goto game screen no matter what.
+
     nh.spinOnce();
 }

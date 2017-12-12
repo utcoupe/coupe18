@@ -14,6 +14,7 @@ add_message_files(
   SetStrategies.msg
   SelectedConfig.msg
   HMIEvent.msg
+  ROSEvent.msg
   ArrowClick.msg
 )
 
