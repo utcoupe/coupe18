@@ -13,6 +13,7 @@ from navigation_navigator.msg import *
 from pathfinder import PathfinderClient
 from asserv import AsservClient
 from localizer import LocalizerClient
+from collisions import CollisionsClient
 
 __author__ = "Gaëtan Blond"
 __date__ = 17/10/2017
@@ -50,6 +51,7 @@ class NavigatorNode(object):
         self._pathfinderClient = ""
         self._asservClient = ""
         self._localizerClient = ""
+        self._collisionsClient = ""
         self._waitedResults = {}
 
         self._currentPath = {}
@@ -191,6 +193,7 @@ class NavigatorNode(object):
         self._pathfinderClient = PathfinderClient()
         self._asservClient = AsservClient()
         self._localizerClient = LocalizerClient()
+        self._collisionsClient = CollisionsClient()
 
         self._gotoSrv = rospy.Service ("/navigation/navigator/goto", Goto, self._handle_goto)
         self._actionSrv_Dogoto = actionlib.ActionServer("/navigation/navigator/goto_action", DoGotoAction, self._handleDoGotoRequest)
