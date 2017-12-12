@@ -2,7 +2,8 @@
 # -*-coding:Utf-8 -*
 
 from processing_belt_interpreter.msg import BeltFiltered, RectangleStamped
-from libtools import Rect, EnemiesData
+from libtools import Rect
+from enemy_tracker_tracker import EnemiesData
 import enemy_tracker_properties
 import rospy
 

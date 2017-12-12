@@ -2,6 +2,7 @@
 # -*-coding:Utf-8 -*
 from numpy import array
 from numpy.linalg import solve
+from math import sqrt
 
 class Rect:
     def __init__(self,x=0,y=0,w=0,h=0,t=0):
@@ -17,6 +18,9 @@ class Rect:
     def toYPoint(self):
         return Point(self.t, self.y + self.h/2)
 
+    def diagonal(self):
+        return sqrt(self.w**2+self.h**2)
+
     def __repr__(self):
         return 'Rect( x={}, y={}, w={}, h={}, t={} )'.format(self.x, self.y, self.w, self.h, self.t)
 class Point:
@@ -27,26 +31,6 @@ class Point:
     def __repr__(self):
         return '({}, {})'.format(self.x, self.y)
         
-class EnemiesData:
-
-    def __init__(self, pos):
-        self.pos = pos
-        self.pos_history = [[],[]]
-    
-    def __setattr__(self, name, value):
-        super.__setattr__(name, value)
-        if name == 'pos':
-            if len(self.pos_history[0]) >= self.maxPosHistory:
-                del self.pos_history[0][0]
-                del self.pos_history[1][0]
-            self.pos_history[0].append([value.toXPoint()])
-            self.pos_history[1].append([value.toYPoint()])
-    
-    def estimateSpeed(self):
-        return Point(
-            Polynome(self.pos_history[0]).derivative(),
-            Polynome(self.pos_history[1]).derivative()
-        )
 
 class Polynome:
     def __init__(self, point = []):
