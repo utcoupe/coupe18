@@ -8,15 +8,19 @@ __author__ = "Gaëtan Blond"
 __date__ = 11/12/2017
 
 class CollisionsClient(object):
-    def __init__ (self):
+    def __init__ (self, callbackStop):
         self.WARNER_TOPIC = "/navigation/collisions/warner"
+
+        self._callbackStop = callbackStop
 
         self._connectToServers()
 
 
     
     def _warnerCallback (self, message):
-        rospy.logdebug("Argggggg : " + str(message))
+        if message.danger_level == message.LEVEL_STOP:
+            rospy.logdebug("Argggggg : " + str(message))
+            self._callbackStop()
 
     def _connectToServers (self):
         rospy.loginfo("Waiting for \"" + self.WARNER_TOPIC + "\"")

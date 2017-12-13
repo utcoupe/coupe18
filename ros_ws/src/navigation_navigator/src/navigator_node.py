@@ -26,6 +26,7 @@ FAILURE             = 2
 # Constants used for the status topic
 NAV_IDLE        = 0
 NAV_NAVIGATING  = 1
+NAV_STOPPED     = 2
 
 def pointToStr(point):
     """
@@ -54,6 +55,7 @@ class NavigatorNode(object):
         self._collisionsClient = ""
         self._waitedResults = {}
 
+        self._currentStatus = NAV_IDLE
         self._currentPath = {}
     
     def _callbackForResults(self, idAct, result):
@@ -136,12 +138,14 @@ class NavigatorNode(object):
 
         if isFinalPos:
             result = DoGotoResult(True)
-            if not resultAsserv:
+            if (not resultAsserv) or (self._currentStatus == NAV_STOPPED):
                 result.success = False
+            self._currentStatus = NAV_IDLE
             handledGoal.set_succeeded(result)
     
     def _handleDoGotoRequest (self, handledGoal):
-        #posStart = self._asservClient.currentPose
+        self._currentStatus = NAV_NAVIGATING
+
         posStart = self._localizerClient.getLastKnownPos()
         posEnd = handledGoal.get_goal().targetPos
 
@@ -172,15 +176,19 @@ class NavigatorNode(object):
         except Exception, e:
             rospy.logdebug("Navigation failled: " + e.message)
             result = DoGotoResult(False)
+            self._currentStatus = NAV_IDLE
+            self._updateStatus()
             handledGoal.set_succeeded(result)
+    
+    def _callbackEmergencyStop (self):
+        self._currentStatus = NAV_STOPPED
+        # TODO stop asserv in a clean way to have action's result
     
     def _updateStatus (self):
         statusMsg = Status()
+        statusMsg.status = self._currentStatus
         if len(self._currentPath) > 0:
-            statusMsg.status = NAV_NAVIGATING
             statusMsg.currentPath = self._currentPath
-        else:
-            statusMsg.status = NAV_IDLE
         self._statusPublisher.publish(statusMsg)
         
 
@@ -193,7 +201,7 @@ class NavigatorNode(object):
         self._pathfinderClient = PathfinderClient()
         self._asservClient = AsservClient()
         self._localizerClient = LocalizerClient()
-        self._collisionsClient = CollisionsClient()
+        self._collisionsClient = CollisionsClient(self._callbackEmergencyStop)
 
         self._gotoSrv = rospy.Service ("/navigation/navigator/goto", Goto, self._handle_goto)
         self._actionSrv_Dogoto = actionlib.ActionServer("/navigation/navigator/goto_action", DoGotoAction, self._handleDoGotoRequest)
