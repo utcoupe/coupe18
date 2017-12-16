@@ -33,43 +33,56 @@ terrain:
                 shape:
                     type: circle
                     radius: 0.3
-            wall_top:
-                position:
-                    frame_id: /map
-                    x: -0.022
-                    y: 2.022
-                    type: fixed
-                shape:
-                    type: rect
-                    width: 3.044
-                    height: 0.022
+        
+        layer_belt:
             wall_bottom:
                 position:
                     frame_id: /map
-                    x: -0.022
-                    y: -0.022
+                    x: 1500
+                    y: -200
                     type: fixed
                 shape:
                     type: rect
-                    width: 3.044
-                    height: 0.022
+                    width: 3800
+                    height: 400
+                    
             wall_left:
                 position:
                     frame_id: /map
-                    x: -0.022
-                    y: 2.022
+                    x: -200
+                    y: 750
                     type: fixed
                 shape:
                     type: rect
-                    width: 0.022
-                    height: 3.044
+                    width: 400
+                    height: 2300
+            wall_top:
+                position:
+                    frame_id: /map
+                    x: 1500
+                    y: 1700
+                    type: fixed
+                shape:
+                    type: rect
+                    width: 3800
+                    height: 400
             wall_right:
                 position:
                     frame_id: /map
-                    x: 3
-                    y: 2.022
+                    x: 3200
+                    y: 750
                     type: fixed
                 shape:
                     type: rect
-                    width: 0.022
-                    height: 3.044
+                    width: 400
+                    height: 2300
+            station:
+                position:
+                    frame_id: /map
+                    x: 1500
+                    y: 125
+                    type: fixed
+                shape:
+                    type: rect
+                    width: 1224
+                    height: 250
