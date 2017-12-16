@@ -13,6 +13,11 @@ class MarkersPublisher():
     def _is_connected(self):
         return bool(self.MarkersPUBL.get_num_connections())
 
+    def updateMarkers(self, world):
+        self.publishTable(world)
+        self.updateZones(world)
+        self.publishObjects(world)
+
     def publishTable(self, world):
         if self._is_connected():
             pos = map_attributes.Position2D({
@@ -22,11 +27,6 @@ class MarkersPublisher():
                 "type": "fixed"
             })
             self._publish_marker(pos, world.get("/terrain/marker/^"))
-            rospy.logdebug("[memory/map] Published table to RViz.")
-
-    def updateMarkers(self, world):
-        self.updateZones(world)
-        self.publishObjects(world)
 
     def updateZones(self, world):
         if self._is_connected():
@@ -36,11 +36,11 @@ class MarkersPublisher():
     def publishObjects(self, world):
         if self._is_connected():
             for o in world.get("/objects/^").toList():
-                if o.get("type") == "object":
-                    self._publish_marker(o.get("position/^"), o.get("marker/^"))
-                elif o.get("type") == "container":
-                    for e in o.toList():
-                        self._publish_marker(e.get("position/^"), e.get("marker/^")) # TODO CAUTION can't show objects in a container in a container yet #23h
+                #if o.get("type") == "object":
+                self._publish_marker(o.get("position/^"), o.get("marker/^"))
+                #elif o.get("type") == "container":
+                #    for e in o.toList():
+                #        self._publish_marker(e.get("position/^"), e.get("marker/^")) # TODO CAUTION can't show objects in a container in a container yet #23h
 
     def _publish_marker(self, position, visual):
         markertypes = {
