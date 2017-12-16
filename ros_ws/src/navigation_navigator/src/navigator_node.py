@@ -182,7 +182,8 @@ class NavigatorNode(object):
     
     def _callbackEmergencyStop (self):
         self._currentStatus = NAV_STOPPED
-        # TODO stop asserv in a clean way to have action's result
+        self._asservClient.stopAsserv()
+        
     
     def _updateStatus (self):
         statusMsg = Status()
