@@ -26,7 +26,7 @@ class BeltInterpreter(object):
         self.SENSOR_FRAME_ID = "belt_{}"
         self.DEF_FILE = "processing/belt.xml"
         self.TOPIC = "/processing/belt_interpreter/rects_filtered"
-        self.SENSORS_TOPIC = "/sensors/belt"
+        self.SENSORS_TOPIC = "/drivers/ard_others/belt_ranges"
         # resolution along the long and large side of the rectangle (meters)
         self.RESOLUTION_LONG = 0.01
         self.RESOLUTION_LARGE = 0.005
@@ -72,7 +72,7 @@ class BeltInterpreter(object):
         for data in data_list.sensors:
             sensor_id = data.sensor_id
             r = data.range
-            if r > self._belt_parser.Params["max_range"]:
+            if r > self._belt_parser.Params["max_range"] or r <= 0:
                 continue
 
             sensor = self._belt_parser.Sensors[sensor_id]
@@ -179,7 +179,7 @@ class BeltInterpreter(object):
         get_map.wait_for_service()
 
         try:
-            response = get_map("/terrain/*")
+            response = get_map("/terrain/walls/layer_belt/*")
 
             if not response.success:
                 msg ="Can't fetch objects from map. Shutting down."
@@ -187,7 +187,7 @@ class BeltInterpreter(object):
                 raise rospy.ROSInitException(msg)
             else:
                 shapes = []
-                map_obj = json.loads(get_map("/terrain/walls/layer_ground/*").response)
+                map_obj = json.loads(response)
 
                 for v in map_obj.values():
                     x = float(v["position"]["x"])
