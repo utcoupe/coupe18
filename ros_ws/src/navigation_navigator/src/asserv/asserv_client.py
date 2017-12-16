@@ -4,6 +4,7 @@
 import rospy
 import actionlib
 from actionlib_msgs.msg import GoalStatus
+from actionlib.action_client import CommState
 
 from geometry_msgs.msg import Pose2D
 
@@ -98,12 +99,18 @@ class AsservClient(object):
     
     def _handleDoGotoResult (self, clientDoGotoHandle):
         idAct = self._getGoalId(clientDoGotoHandle)
-        if clientDoGotoHandle.get_goal_status() == GoalStatus.SUCCEEDED:
+        isDone = clientDoGotoHandle.get_comm_state() == CommState.DONE
+        if (clientDoGotoHandle.get_goal_status() == GoalStatus.SUCCEEDED) and isDone:
             if idAct in self._callbacksDoGoto:
                 callback = self._callbacksDoGoto[idAct]
                 del self._callbacksDoGoto[idAct]
                 del self._currentActions[idAct]
-                callback(idAct, clientDoGotoHandle.get_result().result)
+                raw_result = clientDoGotoHandle.get_result()
+                if hasattr(raw_result, "result"):
+                    callback(idAct, raw_result.result)
+                else:
+                    rospy.logwarn("No results found for " + idAct + ", node may be in undefined behavior")
+                    rospy.logwarn("Status was " + clientDoGotoHandle.get_goal_status_text())
         elif clientDoGotoHandle.get_goal_status() == GoalStatus.ABORTED:
              if idAct in self._callbacksDoGoto:
                 self._callbacksDoGoto[idAct](idAct, False)
