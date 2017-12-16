@@ -107,17 +107,20 @@ class AsservClient(object):
                 del self._currentActions[idAct]
                 raw_result = clientDoGotoHandle.get_result()
                 if hasattr(raw_result, "result"):
+                    rospy.logdebug("Finished: " + idAct)
                     callback(idAct, raw_result.result)
                 else:
                     rospy.logwarn("No results found for " + idAct + ", node may be in undefined behavior")
                     rospy.logwarn("Status was " + clientDoGotoHandle.get_goal_status_text())
-        elif clientDoGotoHandle.get_goal_status() == GoalStatus.ABORTED:
+        elif clientDoGotoHandle.get_goal_status() in [GoalStatus.ABORTED, GoalStatus.PREEMPTED]:
              if idAct in self._callbacksDoGoto:
+                rospy.logdebug("Cancelled: " + idAct)
                 self._callbacksDoGoto[idAct](idAct, False)
                 del self._callbacksDoGoto[idAct]
                 del self._currentActions[idAct]
     
     def stopAsserv (self):
+        rospy.logdebug("trying to stop asserv")
         self._asservEmergencyStopService.call(enable=True)
         self._asservManageService.call(mode=ManagementRequest.CLEANG)
         self._asservEmergencyStopService.call(enable=False)
