@@ -42,7 +42,7 @@ class DiagnosticController {
   refresh() {
     this.ros.loadData();
   }
-
+  
   isDomainActive(domain) {
     return _.some(this.ros.getTopicsForDomain(domain), (t) => t.active == true);
   }

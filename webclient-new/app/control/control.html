@@ -1,10 +1,10 @@
 <div class="container-fluid">
-  <center>
+  <!--<center>
     <button class="btn btn-info" ng-click="$ctrl.refresh()">
       Refresh
     </button>
 
-  </center><br />
+  </center><br />-->
 
   <!-- No connection alert -->
   <div class="alert alert-danger col-sm-6 col-sm-offset-3" role="alert" ng-if="!$ctrl.ros.isConnected">
@@ -20,7 +20,7 @@
           <!-- Domains -->
           <div class="panel panel-default panel-domain"
                ng-class="{ 'panel-active': ($ctrl.activeDomain == domain),
-                           'panel-danger': !$ctrl.isDomainActiveForServices(domain) }"
+                           'panel-danger': !$ctrl.isDomainActive(domain) }"
                ng-repeat="domain in $ctrl.ros.getExpectedDomains()"
                ng-click="$ctrl.setActiveDomain(domain)">
 
@@ -40,7 +40,6 @@
                         'glyphicon-chevron-up' : $ctrl.showUnexpected }"></span>
             </div>
           </div></center>
-            <br/>
           <hr ng-if="$ctrl.setting.showUnexpected"/>
 
           <div class="panel panel-default panel-domain"
@@ -54,9 +53,9 @@
                </div>
           </div>
 
-          <br /><br />
+          <hr/>
           <!-- Global parameters -->
-          <cc-parameter ng-repeat="parameter in $ctrl.getGlobalParameters()" ng-show="$ctrl.Domains.filterAdvanced(parameter.name, $ctrl.setting.advanced)" parameter="parameter"></cc-parameter>
+          <cc-parameter ng-repeat="parameter in $ctrl.Domains.getGlobalParameters($ctrl.ros.data.parameters)" ng-show="$ctrl.Domains.filterAdvanced(parameter.name, false)" parameter="parameter"></cc-parameter>
         </div>
 
         <div class="col-sm-9">
@@ -82,7 +81,7 @@
               </div>
             </uib-accordion>
             <!-- Parameters -->
-            <!-- <cc-parameter parameter="parameter" ng-repeat="parameter in $ctrl.Domains.getDataForDomain($ctrl.ros.data.parameters, domain, $ctrl.setting.advanced)"></cc-parameter> -->
+            <cc-parameter parameter="parameter" ng-repeat="parameter in $ctrl.Domains.getDataForDomain($ctrl.ros.data.parameters, domain, $ctrl.setting.advanced)"></cc-parameter>
           </div>
         </div>
       </div>
@@ -92,7 +91,7 @@
       <!-- Console Log -->
       <div class="console">
         <table class="table">
-          <tr ng-repeat="logEntry in $ctrl.logs">
+          <tr ng-repeat="logEntry in $ctrl.logs" ng-show="logEntry.level >= $ctrl.setting.log_level">
             <td>
               <strong ng-class="{
                         'text-danger bg-danger': logEntry.level > 8,

@@ -1,4 +1,4 @@
-#include "pathfinding/pos_convertor.hpp"
+#include "pathfinder/pos_convertor.h"
 
 using namespace std;
 

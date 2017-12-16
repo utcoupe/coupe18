@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*-coding:Utf-8 -*
 
+from functools import partial
+
 import rospy
 import actionlib
 
@@ -10,14 +12,19 @@ from navigation_navigator.msg import *
 
 from pathfinder import PathfinderClient
 from asserv import AsservClient
+from localizer import LocalizerClient
 
 __author__ = "Gaëtan Blond"
 __date__ = 17/10/2017
 
 # Constants used for the status of goto requests
-WAITING_FOR_RESULT = 0
-SUCCESS = 1
-FAILURE = 2
+WAITING_FOR_RESULT  = 0
+SUCCESS             = 1
+FAILURE             = 2
+
+# Constants used for the status topic
+NAV_IDLE        = 0
+NAV_NAVIGATING  = 1
 
 def pointToStr(point):
     """
@@ -37,11 +44,15 @@ class NavigatorNode(object):
         """
 
         self._actionSrv_Dogoto = ""
-        self._handledGoals = {}
+        self._gotoSrv = ""
+        self._statusPublisher = ""
 
         self._pathfinderClient = ""
         self._asservClient = ""
+        self._localizerClient = ""
         self._waitedResults = {}
+
+        self._currentPath = {}
     
     def _callbackForResults(self, idAct, result):
         """
@@ -79,7 +90,8 @@ class NavigatorNode(object):
         Else it will return success=True
         @param req:     Request containing the target position
         """
-        posStart = self._asservClient.currentPose
+        # posStart = self._asservClient.currentPose
+        posStart = self._localizerClient.getLastKnownPos()
 
         debugStr = "Asked to go from "
         debugStr += pointToStr(posStart)
@@ -115,24 +127,28 @@ class NavigatorNode(object):
         debugStr += "]"
         rospy.logdebug (debugStr)
     
-    def _callbackAsservForDoGotoAction (self, handledGoal, resultAsserv):
-        result = DoGotoResult(True)
-        if not resultAsserv:
-            result.success = False
-        
-        handledGoal.set_succeded(result)
+    def _callbackAsservForDoGotoAction (self, handledGoal, isFinalPos, idAct, resultAsserv):
+        if len(self._currentPath) > 0:
+            self._currentPath.pop(0)
+        self._updateStatus()
+
+        if isFinalPos:
+            result = DoGotoResult(True)
+            if not resultAsserv:
+                result.success = False
+            handledGoal.set_succeeded(result)
     
     def _handleDoGotoRequest (self, handledGoal):
-        posStart = self._asservClient.currentPose
+        #posStart = self._asservClient.currentPose
+        posStart = self._localizerClient.getLastKnownPos()
+        posEnd = handledGoal.get_goal().targetPos
 
         debugStr = "Asked to go from "
         debugStr += pointToStr(posStart)
-        debugStr += " to " + pointToStr(handledGoal.get_goal().targetPos)
+        debugStr += " to " + pointToStr(posEnd)
         rospy.logdebug(debugStr)
 
         handledGoal.set_accepted()
-        id = handledGoal.status.goal_id.id
-        self._handledGoals[id] = handledGoal
 
         try:
             # sends the request to the pathfinder
@@ -140,16 +156,31 @@ class NavigatorNode(object):
             self._printPath (path)
             # then sends the path point per point to the arduino_asserv
             path.pop()
+
+            self._currentPath = path[:]
+            self._currentPath.append(posEnd)
+
+            self._updateStatus()
+
             for point in path:
-                self._asservClient.doGoto(point, False)
-            
-            idAct = self._asservClient.doGoto(req.targetPos, True, self._callbackForResults)
-            self._waitResult(idAct)
+                self._asservClient.doGoto(point, False, partial(self._callbackAsservForDoGotoAction, handledGoal, False))
+
+            self._asservClient.doGoto(posEnd, True, partial(self._callbackAsservForDoGotoAction, handledGoal, True))
 
         except Exception, e:
             rospy.logdebug("Navigation failled: " + e.message)
             result = DoGotoResult(False)
-            self._handledGoals[id].set_succeeded(result)
+            handledGoal.set_succeeded(result)
+    
+    def _updateStatus (self):
+        statusMsg = Status()
+        if len(self._currentPath) > 0:
+            statusMsg.status = NAV_NAVIGATING
+            statusMsg.currentPath = self._currentPath
+        else:
+            statusMsg.status = NAV_IDLE
+        self._statusPublisher.publish(statusMsg)
+        
 
     def startNode(self):
         """
@@ -159,10 +190,15 @@ class NavigatorNode(object):
 
         self._pathfinderClient = PathfinderClient()
         self._asservClient = AsservClient()
+        self._localizerClient = LocalizerClient()
 
-        self._s = rospy.Service ("/navigation/navigator/goto", Goto, self._handle_goto)
-        self._actionSrv_Dogoto = actionlib.ActionServer("/navigation/navigator/dogoto", DoGotoAction, self._handleDoGotoRequest)
+        self._gotoSrv = rospy.Service ("/navigation/navigator/goto", Goto, self._handle_goto)
+        self._actionSrv_Dogoto = actionlib.ActionServer("/navigation/navigator/goto_action", DoGotoAction, self._handleDoGotoRequest)
+        self._statusPublisher = rospy.Publisher("/navigation/navigator/status", Status, queue_size=10)
+
+
         rospy.loginfo ("Ready to navigate!")
+        self._updateStatus()
         rospy.spin ()
 
 if __name__ == "__main__":

@@ -10,3 +10,9 @@
 [submodule "ros_ws/src/external_nodes/urg_c"]
 	path = ros_ws/src/external_nodes/urg_c
 	url = https://github.com/ros-drivers/urg_c.git
+[submodule "ros_ws/src/external_nodes/usb_cam"]
+	path = ros_ws/src/external_nodes/usb_cam
+	url = https://github.com/ros-drivers/usb_cam.git
+[submodule "ros_ws/src/external_nodes/obstacle_detector"]
+	path = ros_ws/src/external_nodes/obstacle_detector
+	url = https://github.com/tysik/obstacle_detector.git
