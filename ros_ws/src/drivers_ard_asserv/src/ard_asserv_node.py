@@ -192,7 +192,7 @@ class Asserv:
         elif request.mode == request.CLEANG:
             self.send_serial_data(self._orders_dictionary['CLEANG'], [])
             # Delete all internal goals
-            for goal in self._goals_dictionary:
+            for goal in self._goals_dictionary.values():
                 goal.set_canceled()
             self._goals_dictionary.clear()
         elif request.mode == request.PAUSE:
