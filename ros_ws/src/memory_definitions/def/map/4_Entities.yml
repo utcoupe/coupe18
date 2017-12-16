@@ -18,7 +18,7 @@ entities:
             z: 0.175
             orientation: [0, 0, 0]
             color: [1, 0.2, 0.2, 1.0]
-        containers:
+        containers: []
         trajectory:
             history: null
             currentpath: null
@@ -41,7 +41,7 @@ entities:
             z: 0.175
             orientation: [0, 0, 0]
             color: [1, 0.2, 0.2, 1.0]
-        containers:
+        containers: []
         trajectory:
             history: null
             currentpath: null
@@ -63,7 +63,7 @@ entities:
             z: 0.175
             orientation: [0, 0, 0]
             color: [1, 0.2, 0.2, 1.0]
-        containers:
+        containers: []
         trajectory:
             history: null
             currentpath: null
@@ -85,7 +85,8 @@ entities:
             z: 0.175
             orientation: [0, 0, 0]
             color: [1, 0.2, 0.2, 1.0]
-        containers:
+        containers: []
         trajectory:
             history: null
             currentpath: null
+
