@@ -187,7 +187,7 @@ class BeltInterpreter(object):
                 raise rospy.ROSInitException(msg)
             else:
                 shapes = []
-                map_obj = json.loads(response)
+                map_obj = json.loads(response.response)
 
                 for v in map_obj.values():
                     x = float(v["position"]["x"])
