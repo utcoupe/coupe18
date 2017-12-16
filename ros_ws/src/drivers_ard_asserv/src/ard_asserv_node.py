@@ -16,6 +16,7 @@ __author__ = "Thomas Fuhrmann"
 __date__ = 21/10/2017
 
 NODE_NAME = "ard_asserv"
+ASSERV_ERROR_POSITION = 0.005  # in meters
 
 class Asserv:
     """
@@ -36,8 +37,10 @@ class Asserv:
         self._goals_dictionary = {}
         # This dictionary stores the goals received by the Goto service and which are currently in processing
         self._goto_srv_dictionary = {}
+        # Store the current position of robot, this one is the raw value returned by the asserv
+        self._robot_raw_position = Pose2D(0, 0, 0)
         # Init ROS stuff
-        rospy.init_node(NODE_NAME, anonymous=False, log_level=rospy.DEBUG)
+        rospy.init_node(NODE_NAME, anonymous=False, log_level=rospy.INFO)
         self._pub_robot_pose = rospy.Publisher("/drivers/" + NODE_NAME + "/pose2d", Pose2D, queue_size=5)
         self._pub_robot_speed = rospy.Publisher("/drivers/" + NODE_NAME + "/speed", RobotSpeed, queue_size=5)
         # self._sub_arm = rospy.Subscriber("arm", 1, Asserv.callback_arm)
@@ -188,6 +191,10 @@ class Asserv:
             self.send_serial_data(self._orders_dictionary['KILLG'], [])
         elif request.mode == request.CLEANG:
             self.send_serial_data(self._orders_dictionary['CLEANG'], [])
+            # Delete all internal goals
+            for goal in self._goals_dictionary:
+                goal.set_canceled()
+            self._goals_dictionary.clear()
         elif request.mode == request.PAUSE:
             self.send_serial_data(self._orders_dictionary['PAUSE'], [])
         elif request.mode == request.RESUME:
@@ -262,7 +269,9 @@ class Asserv:
             rospy.logdebug("[ASSERV] Received status data.")
             receied_data_list = data.split(";")
             # rospy.loginfo("data sharp : " + receied_data_list[10])
-            self._pub_robot_pose.publish(Pose2D(float(receied_data_list[2]) / 1000, float(receied_data_list[3]) / 1000, float(receied_data_list[4]) / 1000))
+            robot_position = Pose2D(float(receied_data_list[2]) / 1000, float(receied_data_list[3]) / 1000, float(receied_data_list[4]) / 1000)
+            self._robot_raw_position = robot_position
+            self._pub_robot_pose.publish(robot_position)
             self._pub_robot_speed.publish(RobotSpeed(float(receied_data_list[5]), float(receied_data_list[6]), float(receied_data_list[7]), float(receied_data_list[8]), float(receied_data_list[9])))
         # Received order ack
         elif data.find(";") == 1:
@@ -281,7 +290,16 @@ class Asserv:
                 # TODO manage status
                 if ack_id in self._goals_dictionary:
                     rospy.logdebug("[ASSERV] Found key %d in goal dictionary !", ack_id)
-                    self._goals_dictionary[ack_id].set_succeeded(DoGotoResult(result=True))
+                    rospy.loginfo("robot x : %f, goal x : %f", self._robot_raw_position.x, self._goals_dictionary[ack_id].get_goal().position.x)
+                    result = DoGotoResult(True)
+                    # Check if the robot is arrived, otherwise this will tell that the robot is blocked (default behaviour of the asserv)
+                    if not ((self._robot_raw_position.x > self._goals_dictionary[ack_id].get_goal().position.x - ASSERV_ERROR_POSITION) and
+                            (self._robot_raw_position.x < self._goals_dictionary[ack_id].get_goal().position.x + ASSERV_ERROR_POSITION) and
+                            (self._robot_raw_position.y > self._goals_dictionary[ack_id].get_goal().position.y - ASSERV_ERROR_POSITION) and
+                            (self._robot_raw_position.y < self._goals_dictionary[ack_id].get_goal().position.y + ASSERV_ERROR_POSITION)):
+                        rospy.loginfo("Goal has not been reached !")
+                        result.result = False
+                    self._goals_dictionary[ack_id].set_succeeded(result)
                     del self._goals_dictionary[ack_id]
                 elif ack_id in self._goto_srv_dictionary:
                     rospy.logdebug("[ASSERV] Found key %d in goto dictionary !", ack_id)

@@ -1,0 +1,2 @@
+string strategy_name
+string team_name
