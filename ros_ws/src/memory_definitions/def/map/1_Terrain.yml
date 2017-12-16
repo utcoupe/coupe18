@@ -38,51 +38,51 @@ terrain:
             wall_bottom:
                 position:
                     frame_id: /map
-                    x: 1500
-                    y: -200
+                    x: 1.500
+                    y: -0.200
                     type: fixed
                 shape:
                     type: rect
-                    width: 3800
-                    height: 400
+                    width: 3.800
+                    height: 0.400
                     
             wall_left:
                 position:
                     frame_id: /map
-                    x: -200
-                    y: 750
+                    x: -0.200
+                    y: 0.750
                     type: fixed
                 shape:
                     type: rect
-                    width: 400
-                    height: 2300
+                    width: 0.400
+                    height: 2.300
             wall_top:
                 position:
                     frame_id: /map
-                    x: 1500
-                    y: 1700
+                    x: 1.500
+                    y: 1.700
                     type: fixed
                 shape:
                     type: rect
-                    width: 3800
-                    height: 400
+                    width: 3.800
+                    height: 0.400
             wall_right:
                 position:
                     frame_id: /map
-                    x: 3200
-                    y: 750
+                    x: 3.200
+                    y: 0.750
                     type: fixed
                 shape:
                     type: rect
-                    width: 400
-                    height: 2300
+                    width: 0.400
+                    height: 2.300
             station:
                 position:
                     frame_id: /map
-                    x: 1500
-                    y: 125
+                    x: 1.500
+                    y: 0.125
                     type: fixed
                 shape:
                     type: rect
-                    width: 1224
-                    height: 250
+                    width: 1.224
+                    height: 0.250
