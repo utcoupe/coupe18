@@ -12,11 +12,8 @@ class MarkersPublisher(object):
         super(MarkersPublisher, self).__init__()
         self._pub = rospy.Publisher("/visualization_markers", Marker, queue_size=10)
 
-    def publish_markers(self, static_rects, dynamic_rects): # lists of (id, rect)
-        rospy.loginfo("Publising markers")
+    def publish_markers(self, static_rects, dynamic_rects): # lists of rects
         marker = Marker()
-        marker.header.frame_id = "/map"
-        marker.header.stamp = rospy.Time.now()
         marker.type = Marker.CUBE
         marker.ns = MARKERS_NAMESPACE
         marker.action = Marker.ADD
@@ -28,10 +25,12 @@ class MarkersPublisher(object):
         marker.scale.z = POINT_SCALE
 
 
-        for id, rect in static_rects:
-            id_hash = int(hashlib.md5(id).hexdigest(), 16)
+        for rect in static_rects:
+            id_hash = int(hashlib.md5(rect.header.frame_id).hexdigest(), 16) % 2**10
+
 
             marker.id = id_hash
+            marker.header = rect.header
             marker.color.r = 0
             marker.color.g = 1
             marker.scale.x = rect.w
@@ -40,10 +39,11 @@ class MarkersPublisher(object):
             marker.pose.position.y = rect.y
             self._pub.publish(marker)
 
-        for id, rect in dynamic_rects:
-            id_hash = int(hashlib.md5(id).hexdigest(), 16)
+        for rect in dynamic_rects:
+            id_hash = int(hashlib.md5(rect.header.frame_id).hexdigest(), 16) % 2**10
 
             marker.id = id_hash
+            marker.header = rect.header
             marker.color.r = 1
             marker.color.g = 0
             marker.scale.x = rect.w

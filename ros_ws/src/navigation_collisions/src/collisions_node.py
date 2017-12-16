@@ -50,8 +50,6 @@ class CollisionsNode(object):
         while not rospy.is_shutdown():
             self.subscriptions.updateRobotPosition()
             
-            rospy.loginfo(Map.Robot.isInitialized())
-
             predicted_collisions = Map.Robot.checkCollisions(Map.toList())
             for pd in predicted_collisions:
                 self.publishCollision(pd)

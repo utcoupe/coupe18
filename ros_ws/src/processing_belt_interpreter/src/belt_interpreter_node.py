@@ -21,6 +21,7 @@ class BeltInterpreter(object):
     def __init__(self):
         super(BeltInterpreter, self).__init__()
 
+        rospy.loginfo("Belt interpreter is initializing...")
         # template for the sensor frame id, with '{}' being the sensor id
         self.SENSOR_FRAME_ID = "belt_{}"
         self.DEF_FILE = "processing/belt.xml"
@@ -47,8 +48,16 @@ class BeltInterpreter(object):
 
         self._static_shapes = self.fetch_map_objects()
 
+
+        # rospy.logerr("Static shapes received from map :")
+        # for f in self._static_shapes:
+        #     rospy.logerr(f)
+
+
         self._sensors_sub = rospy.Subscriber(self.SENSORS_TOPIC, RangeList,
                                              self.callback)
+
+        rospy.loginfo("Belt interpreter is ready. Listening for sensor data on '{}'.".format(self.SENSORS_TOPIC))
 
         rospy.spin()
 
@@ -76,8 +85,8 @@ class BeltInterpreter(object):
             x_close = math.cos(angle / 2) * (r - prec)
 
             # called width because along x axis, but it is the smaller side
-            width = x_far - x_close
-            height = 2 * math.sin(angle / 2) * (r + prec)
+            width = abs(x_far - x_close)
+            height = abs(2 * math.sin(angle / 2) * (r + prec))
 
             rect = RectangleStamped()
             rect.header.frame_id = self.SENSOR_FRAME_ID.format(sensor_id)
@@ -98,11 +107,12 @@ class BeltInterpreter(object):
                     pointst.point.x = x
                     pointst.point.y = y
                     pointst.header = rect.header
+                    pointst.header.stamp = self._tl.getLatestCommonTime(rect.header.frame_id, "/map")
 
                     try:
-                        pst_map = self._tl.transformPoint("map", pointst)
-                    except:
-                        rospy.logwarn("Frame robot does not exist, cannot process sensor data")
+                        pst_map = self._tl.transformPoint("/map", pointst)
+                    except Exception as e:
+                        rospy.logwarn("Frame robot or map does not exist, cannot process sensor data : {}".format(e))
                         return
 
                     total_points_nbr += 1
@@ -110,15 +120,16 @@ class BeltInterpreter(object):
                     if self.is_static(pst_map):
                         static_points_nbr += 1
 
+            #rospy.logerr("static points nbr : {}, total points : {}".format(static_points_nbr, total_points_nbr))
             if float(static_points_nbr) / float(total_points_nbr) \
                > self.POINTS_PC_THRESHOLD:
                 static_rects.append(rect)
             else:
                 dynamic_rects.append(rect)
 
-        rospy.loginfo(static_rects)
-        rospy.loginfo(dynamic_rects)
+
         self._pub.publish(static_rects, dynamic_rects)
+        self._markers_pub.publish_markers(static_rects, dynamic_rects)
 
     def pub_static_transforms(self):
         tr_list = []
@@ -151,49 +162,59 @@ class BeltInterpreter(object):
             res = get_def(self.DEF_FILE)
 
             if not res.success:
-                rospy.logerr("Error when fetching belt definition file")
-                raise Exception()
+                msg = "Can't fetch belt definition file. Shutting down."
+                rospy.logfatal(msg)
+                raise rospy.ROSInitException(msg)
             else:
-                rospy.logdebug("Belt definition file fetched")
+                rospy.logdebug("Belt definition file fetched.")
                 return res.path
 
         except rospy.ServiceException as exc:
-            rospy.logerr("Error when fetching belt definition file: {}"
-                         .format(str(exc)))
-            raise Exception()
+            msg = "Exception when fetching belt definition file. Shutting down.\n {}".format(str(exc))
+            rospy.logfatal(msg)
+            raise rospy.ROSInitException(msg)
 
     def fetch_map_objects(self):
         get_map = rospy.ServiceProxy('/memory/map/get', MapGet)
         get_map.wait_for_service()
 
-        response = get_map("/terrain/*")
+        try:
+            response = get_map("/terrain/*")
 
-        if not response.success:
-            rospy.logerr("Error when fetching objects from map")
-            raise Exception()
-        else:
-            shapes = []
-            map_obj = json.loads(get_map("/terrain/*").response)
+            if not response.success:
+                msg ="Can't fetch objects from map. Shutting down."
+                rospy.logerr(msg)
+                raise rospy.ROSInitException(msg)
+            else:
+                shapes = []
+                map_obj = json.loads(get_map("/terrain/walls/layer_ground/*").response)
 
-            for v in map_obj["walls"]["layer_ground"].values():
-                x = float(v["position"]["x"])
-                y = float(v["position"]["y"])
-                type = v["shape"]["type"]
+                for v in map_obj.values():
+                    x = float(v["position"]["x"])
+                    y = float(v["position"]["y"])
+                    type = v["shape"]["type"]
 
-                if type == "rect":
-                    w = float(v["shape"]["width"])
-                    h = float(v["shape"]["height"])
-                    shape = Rectangle(x, y, w, h)
+                    if type == "rect":
+                        w = float(v["shape"]["width"])
+                        h = float(v["shape"]["height"])
+                        shape = Rectangle(x, y, w, h)
 
-                elif type == "circle":
-                    r = float(v["shape"]["radius"])
-                    shape = Circle(x, y, r)
-                else:  # TODO POLYGONS
-                    pass
+                    elif type == "circle":
+                        r = float(v["shape"]["radius"])
+                        shape = Circle(x, y, r)
+                    else:  # TODO POLYGONS
+                        raise NotImplementedError()
 
-                shapes.append(shape)
+                    shapes.append(shape)
 
-            return shapes
+                if not shapes:
+                    rospy.logwarn("No static objects fetched from map, all sensor data will be treated as dynamic rects.")
+
+                return shapes
+        except rospy.ServiceException as exc:
+            msg = "Exception when fetching objects from map. Shutting down.\n {}".format(str(exc))
+            rospy.logfatal(msg)
+            raise rospy.ROSInitException(msg)
 
     def is_static(self, point_st):
         # need a point stamped in the /map frame

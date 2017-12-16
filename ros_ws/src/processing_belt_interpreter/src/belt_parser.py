@@ -8,35 +8,44 @@ class BeltParser(object):
     """Class used to parse the definition XML"""
     def __init__(self, file):
         super(BeltParser, self).__init__()
-        rospy.logdebug("[RECOGNITION] Parsing belt definition file ...")
+        rospy.logdebug("Parsing belt definition...")
+
         root = ET.parse(file).getroot()
 
+        required = ["max_range", "angle", "precision"]
+
         #  parse params
-        if root.find("params") is None:
-            raise KeyError("A 'params' element is required in the definition")
+        if required and root.find("params") is None:
+            msg = "Can't parse belt definition file: a 'params' element is required. Shutting down."
+            rospy.logfatal(msg)
+            raise rospy.ROSInitException(msg)
 
         self.Params = {c.tag: float(c.text) for c in root.find("params")}
 
-        required = ["max_range", "angle", "precision"]
         for p in required:
             if p not in self.Params:
-                raise KeyError("A '{}' element is required in the parameters"
-                               .format(p))
+                msg = "Can't parse belt definition: a '{}' element is required in the parameters. Shutting down."\
+                    .format(p)
+                rospy.logfatal(msg)
+                raise rospy.ROSInitException(msg)
 
         #  parse sensors
         if root.find("sensors") is None:
-            raise KeyError("A 'sensors' element is required in the definition")
+            msg = "Can't parse belt definition: a 'sensors' element is required. Shutting down."
+            rospy.logfatal(msg)
+            raise rospy.ROSInitException(msg)
 
         sensors = []
         for sensor in root.find("sensors"):
             if "id" not in sensor.attrib:
-                raise KeyError("A 'sensor' element need an 'id' atttribute")
+                rospy.logerr("Can't parse sensor definition: a 'id' attribute is required. Skipping this sensor.")
+                continue
 
             required = ["x", "y", "a"]
             for p in required:
                 if sensor.find(p) is None:
-                    raise KeyError("A '{}' element is required in the sensor"
-                                   .format(p))
+                    rospy.logerr("Can't parse sensor definition: a '{}' element is required. Skipping this sensor.".format(p))
+
 
             sensors.append({
                 "id": sensor.attrib["id"],
@@ -44,5 +53,11 @@ class BeltParser(object):
                 "y": float(sensor.find("y").text),
                 "a": float(sensor.find("a").text)
             })
+
+
+        if not sensors:
+            rospy.logwarn("No sensor found in belt definition.")
+
+        rospy.logdebug("{} sensors found in belt definition".format(len(sensors)))
 
         self.Sensors = {s["id"]: s for s in sensors}
