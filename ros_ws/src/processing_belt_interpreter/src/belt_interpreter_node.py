@@ -67,15 +67,12 @@ class BeltInterpreter(object):
         static_rects = []
         dynamic_rects = []
 
-        time_stamp = data_list.header.stamp
 
         for data in data_list.sensors:
             sensor_id = data.sensor_id
             r = data.range
             if r > self._belt_parser.Params["max_range"] or r <= 0:
                 continue
-
-            sensor = self._belt_parser.Sensors[sensor_id]
 
             prec = r * self._belt_parser.Params["precision"]
             angle = self._belt_parser.Params["angle"]
@@ -90,7 +87,12 @@ class BeltInterpreter(object):
 
             rect = RectangleStamped()
             rect.header.frame_id = self.SENSOR_FRAME_ID.format(sensor_id)
-            rect.header.stamp = time_stamp
+            ts = self._tl.getLatestCommonTime(rect.header.frame_id, "/map")
+
+            if rospy.Time.now() - ts > rospy.Duration(5):
+                rospy.logwarn("Difference between last tf update of /robot and current time is more than 5 seconds. Belt rects may be wrong.")
+
+            rect.header.stamp = ts
             rect.x = (x_far + x_close) / 2
             rect.y = 0
             rect.w = width
@@ -107,7 +109,7 @@ class BeltInterpreter(object):
                     pointst.point.x = x
                     pointst.point.y = y
                     pointst.header = rect.header
-                    pointst.header.stamp = self._tl.getLatestCommonTime(rect.header.frame_id, "/map")
+                    pointst.header.stamp = rect.header.stamp
 
                     try:
                         pst_map = self._tl.transformPoint("/map", pointst)

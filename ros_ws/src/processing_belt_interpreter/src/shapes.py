@@ -1,6 +1,5 @@
 from math import atan2, pi
 
-
 class Shape(object):
     """Class to test collisions with shapes returned by the map"""
 
@@ -70,7 +69,7 @@ class Rectangle(Shape):
         self.h = h
 
     def contains(self, x, y):
-        return x >= self.x - self.w / 2 and x <= self.x + self.w / 2 and y >= self.y + self.h / 2 \
+        return x >= self.x - self.w / 2 and x <= self.x + self.w / 2 and y >= self.y - self.h / 2 \
                            and y <= self.y + self.h / 2
 
     def __repr__(self):
