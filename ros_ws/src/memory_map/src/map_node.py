@@ -15,7 +15,6 @@ class MapNode():
 
         # Starting and publishing the table STL to RViz
         self.markers = MarkersPublisher()
-        self.markers.publishTable(map_manager.Map)
 
         # Generate static occupancy images for pathfinder, etc.
         occupancy = OccupancyGenerator(map_manager.Map)
