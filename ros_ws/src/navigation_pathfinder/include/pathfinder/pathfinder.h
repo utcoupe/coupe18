@@ -95,13 +95,13 @@ private:
      * @param endPos The end position.
      * @return The complete path between start and end positions.
      */
-    Path&& retrievePath(const Vect2DShort& distMap, const Point& startPos, const Point& endPos);
+    Path retrievePath(const Vect2DShort& distMap, const Point& startPos, const Point& endPos);
     /**
      * Removes unnecessary positions in the path by looking for a direct line between two points without meeting any barriers. It returns the cleaned path.
      * @param rawPath The path to clean.
      * @return The cleaned path.
      */
-    Path&& smoothPath(const Path& rawPath);
+    Path smoothPath(const Path& rawPath);
     
     /** 
      * Check if the given position is in the working referential, and if there is no barriers at the same place.

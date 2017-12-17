@@ -146,7 +146,7 @@ bool Pathfinder::exploreGraph(Vect2DShort& distMap, const Point& startPos, const
     return false; // if we reach this point, we haven't found start position
 }
 
-Pathfinder::Path&& Pathfinder::retrievePath(const Vect2DShort& distMap, const Point& startPos, const Point& endPos)
+Pathfinder::Path Pathfinder::retrievePath(const Vect2DShort& distMap, const Point& startPos, const Point& endPos)
 {
     Path path;
     path.push_back(startPos);
@@ -173,10 +173,10 @@ Pathfinder::Path&& Pathfinder::retrievePath(const Vect2DShort& distMap, const Po
         lastPos = bestNextPos;
         path.push_back(bestNextPos);
     }
-    return std::move(path);
+    return path;
 }
 
-Pathfinder::Path&& Pathfinder::smoothPath(const Path& rawPath)
+Pathfinder::Path Pathfinder::smoothPath(const Path& rawPath)
 {
     Path newPath;
     
@@ -192,7 +192,7 @@ Pathfinder::Path&& Pathfinder::smoothPath(const Path& rawPath)
         newPath.push_back(rawPath[posL]);
     }
     
-    return std::move(newPath);
+    return newPath;
 }
 
 
