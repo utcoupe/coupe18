@@ -14,33 +14,30 @@ class MarkersPublisher():
         return bool(self.MarkersPUBL.get_num_connections())
 
     def updateMarkers(self, world):
-        self.publishTable(world)
-        self.updateZones(world)
-        self.publishObjects(world)
-
-    def publishTable(self, world):
         if self._is_connected():
-            pos = map_attributes.Position2D({
-                "frame_id": "/map",
-                "x": -0.022,
-                "y": 0.022 + 2,
-                "type": "fixed"
-            })
-            self._publish_marker(pos, world.get("/terrain/marker/^"))
+            self._publish_table(world)
+            self._update_zones(world)
+            self._publish_objects(world.get("/objects/^"))
 
-    def updateZones(self, world):
-        if self._is_connected():
-            for z in world.get("/zones/^").toList():
-                self._publish_marker(z.get("position/^"), z.get("marker/^"))
+    def _publish_table(self, world):
+        pos = map_attributes.Position2D({
+            "frame_id": "/map",
+            "x": -0.022,
+            "y": 0.022 + 2,
+            "type": "fixed"
+        })
+        self._publish_marker(pos, world.get("/terrain/marker/^"))
 
-    def publishObjects(self, world):
-        if self._is_connected():
-            for o in world.get("/objects/^").toList():
-                #if o.get("type") == "object":
-                self._publish_marker(o.get("position/^"), o.get("marker/^"))
-                #elif o.get("type") == "container":
-                #    for e in o.toList():
-                #        self._publish_marker(e.get("position/^"), e.get("marker/^")) # TODO CAUTION can't show objects in a container in a container yet #23h
+    def _update_zones(self, world):
+        for z in world.get("/zones/^").toList():
+            self._publish_marker(z.get("position/^"), z.get("marker/^"))
+
+    def _publish_objects(self, objects_dictman):
+        for e in objects_dictman.Dict.keys():
+            if "container_" in e:
+                self._publish_objects(objects_dictman.get("{}/^".format(e)))
+            else:
+                self._publish_marker(objects_dictman.Dict[e].get("position/^"), objects_dictman.Dict[e].get("marker/^"))
 
     def _publish_marker(self, position, visual):
         markertypes = {
