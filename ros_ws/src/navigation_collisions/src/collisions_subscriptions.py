@@ -3,7 +3,6 @@ import math
 import rospy
 import tf2_ros
 import tf
-import tf2_geometry_msgs
 
 from navigation_navigator.msg import Status
 from drivers_ard_asserv.msg import RobotSpeed
@@ -21,7 +20,7 @@ class CollisionsSubscriptions(object):
         self.tf2_pos_listener = tf2_ros.TransformListener(self.tf2_pos_buffer)
         self.tranform_listener = tf.TransformListener()
 
-        # Subscribing to the dependencies
+        # Subscribing to dependencies
         rospy.Subscriber("/navigation/navigator/status", Status, self.on_nav_status)
         rospy.Subscriber("/processing/belt_interpreter/rects_filtered", BeltFiltered, self.on_belt)
         # rospy.Subscriber("/recognition/enemy_tracker/enemies", TrackedEnemy, self.on_enemy)
@@ -34,7 +33,8 @@ class CollisionsSubscriptions(object):
             rz = self._quaternion_to_euler_angle(t.transform.rotation)[2]
             Map.Robot.updatePosition(Position(tx, ty, angle = rz))
         except Exception as e:
-            rospy.logwarn("Collisions could not get the robot's pos transform : {}".format(str(e)))
+            pass
+            #rospy.logwarn("Collisions could not get the robot's pos transform : {}".format(str(e)))
 
     def on_nav_status(self, msg):
         Map.Robot.NavStatus = msg.status
