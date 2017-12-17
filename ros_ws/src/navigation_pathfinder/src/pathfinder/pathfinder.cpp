@@ -146,7 +146,7 @@ bool Pathfinder::exploreGraph(Vect2DShort& distMap, const Point& startPos, const
     return false; // if we reach this point, we haven't found start position
 }
 
-Pathfinder::Path Pathfinder::retrievePath(const Vect2DShort& distMap, const Point& startPos, const Point& endPos)
+Pathfinder::Path&& Pathfinder::retrievePath(const Vect2DShort& distMap, const Point& startPos, const Point& endPos)
 {
     Path path;
     path.push_back(startPos);
@@ -173,10 +173,10 @@ Pathfinder::Path Pathfinder::retrievePath(const Vect2DShort& distMap, const Poin
         lastPos = bestNextPos;
         path.push_back(bestNextPos);
     }
-    return path;
+    return std::move(path);
 }
 
-Pathfinder::Path Pathfinder::smoothPath(const Path& rawPath)
+Pathfinder::Path&& Pathfinder::smoothPath(const Path& rawPath)
 {
     Path newPath;
     
@@ -192,7 +192,7 @@ Pathfinder::Path Pathfinder::smoothPath(const Path& rawPath)
         newPath.push_back(rawPath[posL]);
     }
     
-    return newPath;
+    return std::move(newPath);
 }
 
 
@@ -256,7 +256,7 @@ bool Pathfinder::canConnectWithLine(const Point& pA, const Point& pB)
 }
 
 
-std::vector<Point> Pathfinder::directions() const
+std::vector< Point > Pathfinder::directions() const
 {
     const vector<Point> dirs {
         Point(0, 1),
