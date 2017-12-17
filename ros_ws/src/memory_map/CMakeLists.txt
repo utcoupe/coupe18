@@ -16,8 +16,9 @@ find_package(catkin REQUIRED COMPONENTS
 add_service_files(
   FILES
   MapGet.srv
-  MapGetOccupancy.srv
   MapSet.srv
+  MapTransfer.srv
+  MapGetOccupancy.srv
 )
 
 # Generate added messages and services with any dependencies listed here

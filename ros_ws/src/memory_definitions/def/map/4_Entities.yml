@@ -1,0 +1,47 @@
+entities:
+    GR:
+        position:
+            frame_id: /map
+            x: 0.1
+            y: 0.6
+            a: 0.002
+            type: dynamic
+        shape:
+            type: rect
+            width: 0.3
+            height: 0.2
+        marker:
+            ns: robots
+            id: 0
+            type: cube
+            scale: [0.4, 0.4, 0.35]
+            z: 0.175
+            orientation: [0, 0, 0]
+            color: [1, 0.2, 0.2, 1.0]
+        containers: []
+        trajectory:
+            history: null
+            currentpath: null
+    PR:
+        position:
+            frame_id: /map
+            x: 1.243
+            y: 0.42
+            a: 3.1415
+            type: dynamic
+        shape:
+            type: rect
+            width: 0.2
+            height: 0.15
+        marker:
+            ns: robots
+            id: 1
+            type: cube
+            scale: [0.4, 0.4, 0.35]
+            z: 0.175
+            orientation: [0, 0, 0]
+            color: [1, 0.2, 0.2, 1.0]
+        containers: []
+        trajectory:
+            history: null
+            currentpath: null

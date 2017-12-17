@@ -773,8 +773,7 @@ objects:
             ground_obstacle: true # is the object to be avoided in the pathfinder
             color: orange
 
-
-
+    container_balls:
         ball_1:
             type: object
             position:
