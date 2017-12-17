@@ -27,7 +27,7 @@ int main (int argc, char* argv[])
     ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
     ros::NodeHandle nodeHandle;
     
-    Pathfinder pathfinder(MAP_FILE_NAME, TABLE_SIZE, true, true);
+    Pathfinder pathfinder(MAP_FILE_NAME, TABLE_SIZE, true);
     ros::ServiceServer findPathServer = nodeHandle.advertiseService(FINDPATH_SERVICE_NAME, &Pathfinder::findPathCallback, &pathfinder);
     
     dynamic_reconfigure::Server<navigation_pathfinder::PathfinderNodeConfig> server;
