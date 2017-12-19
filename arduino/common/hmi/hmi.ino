@@ -11,8 +11,7 @@ Author: Pierre LACLAU, December 2017, UTCoupe.
 #include <drivers_ard_hmi/SelectedConfig.h> // HMI sends selected team and strategy (id, not string).
 #include <drivers_ard_hmi/HMIEvent.h>       // HMI sends events : JACK, GAME_STOP
 #include <drivers_ard_hmi/ROSEvent.h>       // ROS sends events : ASK_JACK, GAME_STOP
-//#include <ai_game_status/ROSEvent.h>       // ROS sends game and init status (to  determine when RPi ready).
-#include <drivers_ard_hmi/ArrowClick.h> //tmp while no physical buttons
+#include <ai_game_status/GameStatus.h>      // ROS sends game and init status (to  determine when RPi ready).
 ros::NodeHandle nh;
 
 //Creating OLED display instances
@@ -28,17 +27,18 @@ uint8_t cursor_pos;
 
 //HMI variables
 String strats[12];
-uint8_t strats_count = 8;
+uint8_t strats_count = 0;
 
 String teams[12];
-uint8_t teams_count = 8;
+uint8_t teams_count = 0;
 
-uint8_t chosen_strat = -1;
-uint8_t chosen_team = -1;
+int chosen_strat = -1;
+int chosen_team = -1;
 
-uint8_t game_status;
-uint8_t init_status;
-bool is_arming = false;
+int game_status = -1;
+int init_status = -1;
+bool _is_arming = false;
+bool _is_launching = false;
 
 const char activeSymbol[] PROGMEM = {
     B00000000,
@@ -62,38 +62,46 @@ const char inactiveSymbol[] PROGMEM = {
     B00000000
 };
 
-//Input methods
-bool up_state    = false;
-bool down_state  = false;
-bool left_state  = false;
-bool right_state = false;
+//Input
+#define PIN_BTN_VCC_1 D8 // to L2
+#define PIN_BTN_VCC_2 D7 // to L1
+#define PIN_BTN_IN_1  D6 // to R1 (with 1k resistor to GND)
+#define PIN_BTN_IN_2  D5 // to R1 (with 1k resistor to GND)
 
-bool upPressed() {
-    bool backup = up_state;
-    up_state = false;
-    if(backup) return true;
-    return false;
+bool _prev_up_state    = false;
+bool _prev_down_state  = false;
+bool _prev_left_state  = false;
+bool _prev_right_state = false;
+
+bool up_pressed    = false;
+bool down_pressed  = false;
+bool left_pressed  = false;
+bool right_pressed = false;
+
+void check_input() {
+    digitalWrite(PIN_BTN_VCC_1, HIGH);
+    digitalWrite(PIN_BTN_VCC_2, LOW);
+    delay(2);
+    up_pressed = digitalRead(PIN_BTN_IN_1) && !_prev_up_state;
+    _prev_up_state = digitalRead(PIN_BTN_IN_1);
+    down_pressed = digitalRead(PIN_BTN_IN_2) && !_prev_down_state;
+    _prev_down_state = digitalRead(PIN_BTN_IN_2);
+  
+    digitalWrite(PIN_BTN_VCC_1, LOW);
+    digitalWrite(PIN_BTN_VCC_2, HIGH);
+    delay(2);
+    left_pressed = digitalRead(PIN_BTN_IN_1) && !_prev_left_state;
+    _prev_left_state = digitalRead(PIN_BTN_IN_1);
+    right_pressed = digitalRead(PIN_BTN_IN_2) && !_prev_right_state;
+    _prev_right_state = digitalRead(PIN_BTN_IN_2);
 }
 
-bool downPressed() {
-    bool backup = down_state;
-    down_state = false;
-    if(backup) return true;
-    return false;
-}
+//LEDs
+#define PIN_LED_INIT D0
+#define PIN_LED_INGAME D0
 
-bool leftPressed() {
-    bool backup = left_state;
-    left_state = false;
-    if(backup) return true;
-    return false;
-}
-
-bool rightPressed() {
-    bool backup = right_state;
-    right_state = false;
-    if(backup) return true;
-    return false;
+void update_leds() {
+    digitalWrite(PIN_LED_INIT, game_status != -1);
 }
 
 
@@ -112,26 +120,23 @@ void on_set_teams(const drivers_ard_hmi::SetTeams& msg){
   }
 }
 
-//void on_game_status(const ai_game_status::GameStatus& msg){
-//  game_status = msg.game_status;
-//  init_status = msg.init_status;
-//}
+void on_game_status(const ai_game_status::GameStatus& msg){
+    game_status = msg.game_status;
+    init_status = msg.init_status;
 
-void on_click(const drivers_ard_hmi::ArrowClick& msg){
-    if(msg.arrow == 0) up_state = true;
-    if(msg.arrow == 1) down_state = true;
-    if(msg.arrow == 2) left_state = true;
-    if(msg.arrow == 3) right_state = true;
+    if(game_status == 1 /*INGAME*/)
+        ui.transitionToFrame(5);
 }
 
 void on_ros_event(const drivers_ard_hmi::ROSEvent& msg){
+    if(msg.event == 0) //asked to respond for JACK
+        ui.transitionToFrame(4);
 }
 
 ros::Subscriber<drivers_ard_hmi::SetStrategies> sub_strats("/feedback/ard_hmi/set_strategies", &on_set_strategies);
 ros::Subscriber<drivers_ard_hmi::SetTeams> sub_teams("/feedback/ard_hmi/set_teams", &on_set_teams);
-ros::Subscriber<drivers_ard_hmi::ArrowClick> sub_click("/feedback/ard_hmi/click", &on_click); //tmp
 ros::Subscriber<drivers_ard_hmi::ROSEvent> sub_ros_events("/feedback/ard_hmi/ros_event", &on_ros_event);
-//ros::Subscriber<ai_game_status::GameStatus> sub_game_status( "/ai/game_status/status", &on_game_status);
+ros::Subscriber<ai_game_status::GameStatus> sub_game_status( "/ai/game_status/status", &on_game_status);
 
 drivers_ard_hmi::SelectedConfig config_msg;
 ros::Publisher config_pub("/feedback/ard_hmi/arm_config", &config_msg);
@@ -139,12 +144,6 @@ drivers_ard_hmi::HMIEvent hmi_event_msg;
 ros::Publisher hmi_events_pub("/feedback/ard_hmi/hmi_event", &hmi_event_msg);
 
 
-
-
-//Components methods
-void msOverlay(OLEDDisplay *display, OLEDDisplayUiState* state) {
-    
-}
 
 void drawFrameTitleComponent(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y, String text) {
     display->setFont(ArialMT_Plain_16);
@@ -198,6 +197,8 @@ void drawHelloFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, 
 
     if(game_status == 0 && init_status != 0 && strats_count && teams_count)
         ui.nextFrame();
+    if(right_pressed && game_status != -1) // go to next screen if rpi is alive only. 
+        ui.nextFrame();
 }
 
 void drawTeamFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
@@ -205,20 +206,20 @@ void drawTeamFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, i
     drawFrameTitleComponent(display, state, x, y, "Team select");
     drawMCQComponent(display, state, x, y, teams, teams_count);
 
-    if(rightPressed()) {
+    if(right_pressed) {
         chosen_team = cursor_pos;
         cursor_pos = 0;
         ui.nextFrame();
     }
-    if(leftPressed()) {
+    if(left_pressed) {
         cursor_pos = 0;
         ui.previousFrame();
     }
-    if(downPressed() && teams_count) {
+    if(down_pressed && teams_count) {
         cursor_pos += 1;
         if(cursor_pos >= teams_count) cursor_pos = teams_count - 1;
     }
-    if(upPressed() && teams_count) {
+    if(up_pressed && teams_count) {
         if(cursor_pos > 0) cursor_pos -= 1;
     }
 }
@@ -228,20 +229,20 @@ void drawStrategyFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t 
     drawFrameTitleComponent(display, state, x, y, "Strat select");
     drawMCQComponent(display, state, x, y, strats, strats_count);
 
-    if(rightPressed()) {
+    if(right_pressed) {
         chosen_strat = cursor_pos;
         cursor_pos = 0;
         ui.nextFrame();
     }
-    if(leftPressed()) {
+    if(left_pressed) {
         cursor_pos = 0;
         ui.previousFrame();
     }
-    if(downPressed() && strats_count) {
+    if(down_pressed && strats_count) {
         cursor_pos += 1;
         if(cursor_pos >= strats_count) cursor_pos = strats_count - 1;
     }
-    if(upPressed() && strats_count) {
+    if(up_pressed && strats_count) {
         if(cursor_pos > 0) cursor_pos -= 1;
     }
 }
@@ -249,25 +250,40 @@ void drawStrategyFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t 
 void drawArmFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
     current_frame = 3;
     drawFrameTitleComponent(display, state, x, y, "Calibration");
-    if(is_arming)  drawBigCentralMessageComponent(display, state, x, y, "ARM?");
-    if(!is_arming) drawBigCentralMessageComponent(display, state, x, y, "ARMING...");
+    if(!_is_arming) drawBigCentralMessageComponent(display, state, x, y, "ARM?");
+    else drawBigCentralMessageComponent(display, state, x, y, "ARMING...");
 
-    if(leftPressed()) ui.previousFrame();
-    if(rightPressed()) {
-      config_msg.team_id = chosen_team;
-      config_msg.strategy_id = chosen_strat;
-      config_pub.publish(&config_msg); // send config
-      is_arming = true;
+    if(left_pressed) {
+        _is_arming = false; //todo good ?
+        ui.previousFrame();
+    }
+    if(right_pressed) {
+        if(!_is_arming) {
+            config_msg.team_id = chosen_team;
+            config_msg.strategy_id = chosen_strat;
+            config_pub.publish(&config_msg); // send config
+            _is_arming = true;
+        }
     }
 }
 
 void drawJackFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
     current_frame = 4;
     drawFrameTitleComponent(display, state, x, y, "Armed");
-    drawBigCentralMessageComponent(display, state, x, y, "JACK?");
+    if(!_is_launching) drawBigCentralMessageComponent(display, state, x, y, "JACK?");
+    else drawBigCentralMessageComponent(display, state, x, y, "WAIT...");
 
-    if(leftPressed()) ui.previousFrame();
-    if(rightPressed()) ui.nextFrame();
+    if(left_pressed) {
+        _is_launching = false; //todo good ?
+        ui.previousFrame();
+    }
+    if(right_pressed) { //TODO change to jack_pressed
+        if(!_is_launching) {
+            hmi_event_msg.event = 0; //JACKED
+            hmi_events_pub.publish(&hmi_event_msg); 
+            _is_launching = true;
+        }
+    }
 }
 
 void drawInGameFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
@@ -281,24 +297,26 @@ void drawInGameFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x,
     
     display->drawProgressBar(x + 0, y + 54, 120, 8, 67); // shows time left
 
-    if(leftPressed()) ui.previousFrame();
-    if(rightPressed()) ui.nextFrame();
+    if(left_pressed) ui.previousFrame();
+    if(right_pressed) ui.nextFrame();
 }
 
 // frames are the single views that slide in
 FrameCallback frames[] = {drawHelloFrame, drawTeamFrame, drawStrategyFrame, drawArmFrame, drawJackFrame, drawInGameFrame};
 int frameCount = 6;
 
-// Overlays are statically drawn on top of a frame
-//OverlayCallback overlays[] = { msOverlay };
-//int overlaysCount = 1;
-
 void setup() {
+    pinMode(PIN_BTN_VCC_1, OUTPUT); // init input buttons
+    pinMode(PIN_BTN_VCC_2, OUTPUT);
+    pinMode(PIN_BTN_IN_1, INPUT);
+    pinMode(PIN_BTN_IN_2, INPUT);
+
+    pinMode(PIN_LED_INIT, OUTPUT);
+
     nh.initNode();
     nh.subscribe(sub_strats);
     nh.subscribe(sub_teams);
-    //nh.subscribe(sub_game_status);
-    nh.subscribe(sub_click);
+    nh.subscribe(sub_game_status);
     nh.subscribe(sub_ros_events);
     nh.advertise(config_pub);
     nh.advertise(hmi_events_pub);
@@ -308,9 +326,7 @@ void setup() {
     ui.setActiveSymbol(activeSymbol);
     ui.setInactiveSymbol(inactiveSymbol);
     ui.setFrameAnimation(SLIDE_LEFT);
-    
     ui.setFrames(frames, frameCount);
-    //ui.setOverlays(overlays, overlaysCount);
     
     ui.disableAutoTransition();
     ui.init();
@@ -320,10 +336,13 @@ void setup() {
 
 
 void loop() {
+    check_input();
+    update_leds();
     ui.update();
 
     if(current_frame != 5 && game_status == 1 /*INGAME*/)
         ui.transitionToFrame(5); //if game starts, goto game screen no matter what.
 
     nh.spinOnce();
+    delay(30); // Needed for input to work properly, no idea why...
 }

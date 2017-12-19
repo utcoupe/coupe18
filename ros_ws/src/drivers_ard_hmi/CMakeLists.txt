@@ -15,7 +15,6 @@ add_message_files(
   SelectedConfig.msg
   HMIEvent.msg
   ROSEvent.msg
-  ArrowClick.msg
 )
 
 # add_service_files(
