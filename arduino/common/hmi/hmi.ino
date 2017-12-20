@@ -76,11 +76,13 @@ bool _prev_up_state    = false;
 bool _prev_down_state  = false;
 bool _prev_left_state  = false;
 bool _prev_right_state = false;
+bool _prev_jack_state = false;
 
 bool up_pressed    = false;
 bool down_pressed  = false;
 bool left_pressed  = false;
 bool right_pressed = false;
+bool jack_pulled   = false;
 
 void check_input() {
     digitalWrite(PIN_BTN_VCC_1, HIGH);
@@ -98,6 +100,9 @@ void check_input() {
     _prev_left_state = digitalRead(PIN_BTN_IN_1);
     right_pressed = digitalRead(PIN_BTN_IN_2) && !_prev_right_state;
     _prev_right_state = digitalRead(PIN_BTN_IN_2);
+
+    jack_pulled = !digitalRead(PIN_BTN_IN_2) && _prev_jack_state; // 1 when inserted
+    _prev_jack_state = digitalRead(PIN_BTN_IN_2);
 }
 
 //LEDs
@@ -109,11 +114,11 @@ void update_leds() {
 
     if(init_status != -1) {
         if(init_status == 0) // some nodes have not responded yet
-            analogWrite(PIN_LED_INIT, 127 * (2 - cos(millis() / 1000))); // wave
+            analogWrite(PIN_LED_INIT, 127 * (1 + cos(float(millis()) / 200.0))); // wave
         else if(init_status == 1) // init finished and all nodes are ready
-            digitalWrite(PIN_LED_INIT, HIGH); //solid ON
+            analogWrite(PIN_LED_INIT, 255); //solid ON
         else if(init_status == 2) // init finished but at least one node failed
-            digitalWrite(PIN_LED_INIT, millis() % 1000 > 500); // blink
+            analogWrite(PIN_LED_INIT, 255 * (millis() % 1000 < 700)); // blink
     }
     else digitalWrite(PIN_LED_INIT, LOW);
 }
@@ -179,6 +184,12 @@ void drawBigCentralMessageComponent(OLEDDisplay *display, OLEDDisplayUiState* st
     display->drawString(64 + x, 22 + y, text);
 }
 
+void drawSmallCentralMessageComponent(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y, String text) {
+    display->setFont(ArialMT_Plain_10);
+    display->setTextAlignment(TEXT_ALIGN_CENTER);
+    display->drawString(64 + x, 28 + y, text);
+}
+
 void drawMCQComponent(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y, String options[], uint8_t options_count) {
     if(options_count > 0) {
         int y_offset = 12;
@@ -205,9 +216,7 @@ void drawMCQComponent(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x
         display->drawString(4 + x, 52 + y, b);
     }
     else {
-        display->setFont(ArialMT_Plain_10);
-        display->setTextAlignment(TEXT_ALIGN_CENTER);
-        display->drawString(64 + x, 28 + y, "No options.");
+        drawSmallCentralMessageComponent(display, state, x, y, "No options.");
     }
 }
 
@@ -215,7 +224,8 @@ void drawMCQComponent(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x
 void drawHelloFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
     current_frame = 0;
     drawFrameTitleComponent(display, state, x, y, "RPi init...");
-    drawBigCentralMessageComponent(display, state, x, y, "WAIT");
+    if(init_status == -1) drawBigCentralMessageComponent(display, state, x, y, "WAIT");
+    else drawBigCentralMessageComponent(display, state, x, y, "READY");
 
     if(game_status == 0 && init_status != 0 && strats_count && teams_count)
         ui.nextFrame();
@@ -291,17 +301,20 @@ void drawArmFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, in
 
 void drawJackFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
     current_frame = 4;
-    drawFrameTitleComponent(display, state, x, y, "Armed");
-    if(!_is_launching) drawBigCentralMessageComponent(display, state, x, y, "JACK?");
+    drawFrameTitleComponent(display, state, x, y, "Jack");
+    if(!_is_launching) {
+        if(_prev_jack_state) drawBigCentralMessageComponent(display, state, x, y, "JACK?");
+        else drawSmallCentralMessageComponent(display, state, x, y, "Insert jack.");
+    }
     else drawBigCentralMessageComponent(display, state, x, y, "WAIT...");
 
     if(left_pressed) {
         _is_launching = false; //todo good ?
         ui.previousFrame();
     }
-    if(right_pressed) { //TODO change to jack_pressed
+    if(jack_pulled) {
         if(!_is_launching) {
-            hmi_event_msg.event = 0; //JACKED
+            hmi_event_msg.event = hmi_event_msg.EVENT_JACK_FIRED; //JACKED
             hmi_events_pub.publish(&hmi_event_msg); 
             _is_launching = true;
         }
@@ -368,6 +381,12 @@ void loop() {
 
     if(current_frame != 5 && game_status == 1 /*INGAME*/)
         ui.transitionToFrame(5); //if game starts, goto game screen no matter what.
+    if(current_frame == 5 && game_status != 1 /*INGAME*/)
+        ui.transitionToFrame(0); //if game ends, go back to init screen.
+    if(game_status == -1) {
+        hmi_event_msg.event = hmi_event_msg.EVENT_HMI_INITIALIZED; // tell ros that hmi is alive until it responds back
+        hmi_events_pub.publish(&hmi_event_msg);
+    }
 
     nh.spinOnce();
     delay(30); // Needed for input to work properly, no idea why...
