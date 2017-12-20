@@ -8,7 +8,7 @@ import actionlib
 
 from geometry_msgs.msg import Pose2D
 from navigation_navigator.srv import Goto
-from navigation_navigator.msg import Status, DoGotoResult
+from navigation_navigator.msg import Status, DoGotoResult, DoGotoAction
 
 from pathfinder import PathfinderClient
 from asserv import AsservClient
@@ -17,6 +17,9 @@ from collisions import CollisionsClient
 
 __author__ = "Gaëtan Blond"
 __date__ = 17/10/2017
+
+NODE_NAME = "navigator"
+FULL_NODE_NAME = "/navigation/" + NODE_NAME
 
 # Constants used for the status of goto requests
 class GotoStatuses(object):
@@ -83,7 +86,7 @@ class NavigatorNode(object):
         rate = rospy.Rate(10)
         while self._waitedResults[idAct] == GotoStatuses.WAITING_FOR_RESULT:
             rate.sleep()
-        
+
         if self._waitedResults[idAct] == GotoStatuses.FAILURE:
             raise Exception("Path found but asserv can't reach a point!")
 
@@ -205,16 +208,16 @@ class NavigatorNode(object):
         """
         Start the node and the clients.
         """
-        rospy.init_node ('navigator_node', anonymous=False, log_level=rospy.DEBUG)
+        rospy.init_node (NODE_NAME, anonymous=False, log_level=rospy.DEBUG)
         # Create the clients
         self._pathfinderClient = PathfinderClient()
         self._asservClient = AsservClient()
         self._localizerClient = LocalizerClient()
         self._collisionsClient = CollisionsClient(self._callbackEmergencyStop)
         # Create service server, action server and topic publisher
-        self._gotoSrv = rospy.Service ("/navigation/navigator/goto", Goto, self._handle_goto)
-        self._actionSrv_Dogoto = actionlib.ActionServer("/navigation/navigator/goto_action", DoGotoAction, self._handleDoGotoRequest, auto_start=False)
-        self._statusPublisher = rospy.Publisher("/navigation/navigator/status", Status, queue_size=10)
+        self._gotoSrv = rospy.Service (FULL_NODE_NAME + "/goto", Goto, self._handle_goto)
+        self._actionSrv_Dogoto = actionlib.ActionServer(FULL_NODE_NAME + "/goto_action", DoGotoAction, self._handleDoGotoRequest, auto_start=False)
+        self._statusPublisher = rospy.Publisher(FULL_NODE_NAME + "/status", Status, queue_size=10)
         # Launch the node
         self._actionSrv_Dogoto.start()
         rospy.loginfo ("Ready to navigate!")
