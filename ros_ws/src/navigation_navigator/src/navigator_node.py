@@ -205,10 +205,10 @@ class NavigatorNode(object):
         self._collisionsClient = CollisionsClient(self._callbackEmergencyStop)
 
         self._gotoSrv = rospy.Service ("/navigation/navigator/goto", Goto, self._handle_goto)
-        self._actionSrv_Dogoto = actionlib.ActionServer("/navigation/navigator/goto_action", DoGotoAction, self._handleDoGotoRequest)
+        self._actionSrv_Dogoto = actionlib.ActionServer("/navigation/navigator/goto_action", DoGotoAction, self._handleDoGotoRequest, auto_start=False)
         self._statusPublisher = rospy.Publisher("/navigation/navigator/status", Status, queue_size=10)
 
-
+        self._actionSrv_Dogoto.start()
         rospy.loginfo ("Ready to navigate!")
         self._updateStatus()
         rospy.spin ()
