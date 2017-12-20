@@ -12,6 +12,9 @@ add_message_files(
   FILES
   SetTeams.msg
   SetStrategies.msg
+  SelectedConfig.msg
+  HMIEvent.msg
+  ROSEvent.msg
 )
 
 # add_service_files(
