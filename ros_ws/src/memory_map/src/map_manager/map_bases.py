@@ -1,26 +1,33 @@
 #!/usr/bin/python
 import rospy
+import json
+
+class SetMode():
+    MODE_ADD     = 0
+    MODE_REPLACE = 1
+    MODE_DELETE  = 2
 
 class MapElement(object):
     def get(self, requestpath):
         raise NotImplementedError("This is the super class. Needs to be overwritten from the child class.")
-    def set(self, requestpath, new_value):
+    def set(self, requestpath, mode):
         raise NotImplementedError("This is the super class. Needs to be overwritten from the child class.")
 
 
-class ListManager(MapElement): # Not used for now
-    def __init__(self, classdef, initdict):
-        self.Elements = []
-        for k in initdict.keys():
-            self.Elements.append(classdef(initdict[k]))
+# class ListManager(MapElement): # Not used for now
+#     def __init__(self, classdef, initdict):
+#         self.Elements = []
+#         for k in initdict.keys():
+#             self.Elements.append(classdef(initdict[k]))
 
 
 class DictManager(MapElement):
     def __init__(self, elemdict):
-        self.Dict = elemdict
-        for k in self.Dict.keys():
-            if isinstance(k, dict):
-                raise ValueError("Inner dicts as values NOT allowed. '{}' has a dict inside. Must be initialized beforehand.".format(k))
+        self.Dict = elemdict if elemdict is not None else {}
+        if self.Dict:
+            for k in self.Dict.keys():
+                if isinstance(k, dict):
+                    raise ValueError("Inner dicts as values NOT allowed. '{}' has a dict inside. Must be initialized beforehand.".format(k))
 
     def toList(self):
         return self.Dict.values()
@@ -83,47 +90,86 @@ class DictManager(MapElement):
                         d[item] = self.Dict[item]
                 return d
             else:
-                rospy.logerr("    GET Request failed : Couldn't recognize request path key '{}'.".format(keyname))
+                rospy.logerr("    GET Request failed : Couldn't recognize key or find element '{}'.".format(keyname))
 
-    def set(self, requestpath):
+    def set(self, requestpath, mode, instance = None):
         if isinstance(requestpath, str):
             requestpath = RequestPath(requestpath)
             if not requestpath.Valid: return None
         keyname = requestpath.getNextKey()
 
         if requestpath.isLast():
-            assignments = []
-            for s in keyname.split(','):
-                if s.count("=") != 1:
-                    rospy.logerr("    SET Request failed : invalid key part '{}', must have one '=' operator.".format(s))
-                    return False
-                key, new_value = s.split("=")
-                if not key in self.Dict: # Remove this check if need to authorize to create keys
-                    rospy.logerr("    SET Request failed : key '{}' does not already exist in dict.".format(key))
-                    return False
-                if not isinstance(self.Dict[key], DictManager):
-                    try:
-                        new_value = type(self.Dict[key])(new_value)
-                        assignments.append((key, new_value))
-                    except (TypeError, ValueError):
-                        rospy.logerr("    SET Request failed : new value '{}' not castable to the old value '{}''s type.".format(new_value, self.Dict[keyname]))
-                        return False
-                    except KeyError:
-                        rospy.logerr("    SET Request failed : Couldn't find existing key '{}'.".format(key))
-                        return False
-                else:
-                    raise ValueError("    SET Request failed : Can't SET a whole DictManager to a new value.")
-
-            for assignment in assignments:
-                self.Dict[assignment[0]] = assignment[1]
-            return True
-
+            if mode == SetMode.MODE_ADD:
+                return self._set_add(keyname, instance)
+            elif mode == SetMode.MODE_REPLACE:
+                return self._set_replace(keyname)
+            elif mode == SetMode.MODE_DELETE:
+                return self._set_remove(keyname)
         else:
             if '=' in keyname:
-                rospy.logerr("    SET Request failed : '=' assign operator must only be applied on the last path key.")
+                rospy.logerr("    Request failed : '=' assign operator must only be applied on the last path key.")
                 return False
             if keyname in self.Dict:
-                return self.Dict[keyname].set(requestpath)
+                return self.Dict[keyname].set(requestpath, mode, instance)
+
+    def _set_add(self, lastkey, instance = None):
+        # e.g. /objects/cube_42:MapObject={"type": "object", "etc": True}
+        if instance is None:
+            request, new_dict = lastkey.split('=', 1) # split at first '='.
+            keyname, class_type = request.split(':')
+            new_dict = json.loads(new_dict)
+
+            if keyname in self.Dict:
+                rospy.logerr("    ADD Request failed : key '{}' already exists in dict.".format(keyname))
+                return False
+
+            sc = DictManager.__subclasses__()
+            for c in sc:
+                if class_type == c.__name__:
+                    self.Dict[keyname] = DictManager(new_dict)
+                    return True
+            rospy.logerr("    ADD Request failed : class type '{}' not recognized.".format(class_type))
+            return False
+        else: # add a DictManager (intern only, e.g. coming from MapTransfer).
+            self.Dict[lastkey] = instance
+            return True
+
+
+    def _set_replace(self, lastkey):
+        # e.g. /objects/cube_14/position/x=0.42,y=0.84,a=3.14
+        assignments = []
+        for s in lastkey.split(','):
+            if s.count("=") != 1:
+                rospy.logerr("    SET Request failed : invalid key part '{}', must have one '=' operator.".format(s))
+                return False
+            key, new_value = s.split("=")
+            if not key in self.Dict:
+                rospy.logerr("    SET Request failed : key '{}' does not already exist in dict.".format(key))
+                return False
+            if not isinstance(self.Dict[key], DictManager):
+                try:
+                    new_value = type(self.Dict[key])(new_value)
+                    assignments.append((key, new_value))
+                except (TypeError, ValueError):
+                    rospy.logerr("    SET Request failed : new value '{}' not castable to the old value '{}''s type.".format(new_value, self.Dict[key]))
+                    return False
+                except KeyError:
+                    rospy.logerr("    SET Request failed : Couldn't find existing key '{}'.".format(key))
+                    return False
+            else:
+                raise ValueError("    SET Request failed : Can't SET a whole DictManager to a new value.")
+
+        for assignment in assignments:
+            self.Dict[assignment[0]] = assignment[1]
+        return True
+
+    def _set_remove(self, lastkey):
+        # e.g. /objects/cube_12
+        if not lastkey in self.Dict:
+            rospy.logerr("    DEL Request failed : key '{}' does not already exist in dict.".format(lastkey))
+            return False
+        del self.Dict[lastkey]
+        return True
 
 
 

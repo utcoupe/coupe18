@@ -5,6 +5,8 @@ project(navigation_collisions)
 find_package(catkin REQUIRED COMPONENTS
     rospy
     std_msgs
+    geometry_msgs
+    memory_map
     message_generation
 )
 
@@ -22,6 +24,7 @@ add_message_files(
 generate_messages(
     DEPENDENCIES
     std_msgs
+    geometry_msgs
 )
 
 ################################################

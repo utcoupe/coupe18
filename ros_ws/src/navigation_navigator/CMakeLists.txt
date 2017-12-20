@@ -16,6 +16,11 @@ find_package(catkin REQUIRED COMPONENTS
 ## Declare ROS messages, services and actions ##
 ################################################
 
+add_message_files(
+    FILES
+    Status.msg
+)
+
 ## Generate services in the 'srv' folder
 add_service_files(
     FILES
