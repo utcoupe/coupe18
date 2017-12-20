@@ -12,6 +12,7 @@ Author: Pierre LACLAU, December 2017, UTCoupe.
 #include <drivers_ard_hmi/HMIEvent.h>       // HMI sends events : JACK, GAME_STOP
 #include <drivers_ard_hmi/ROSEvent.h>       // ROS sends events : ASK_JACK, GAME_STOP
 #include <ai_game_status/GameStatus.h>      // ROS sends game and init status (to  determine when RPi ready).
+#include <ai_game_status/GameTime.h>        // ROS sends the timer status (for the ingame progress bar).
 ros::NodeHandle nh;
 
 //Creating OLED display instances
@@ -24,21 +25,6 @@ OLEDDisplayUi ui(&display);
 //Component variables
 uint8_t current_frame;
 uint8_t cursor_pos;
-
-//HMI variables
-String strats[12];
-uint8_t strats_count = 0;
-
-String teams[12];
-uint8_t teams_count = 0;
-
-int chosen_strat = -1;
-int chosen_team = -1;
-
-int game_status = -1;
-int init_status = -1;
-bool _is_arming = false;
-bool _is_launching = false;
 
 const char activeSymbol[] PROGMEM = {
     B00000000,
@@ -61,6 +47,24 @@ const char inactiveSymbol[] PROGMEM = {
     B00000000,
     B00000000
 };
+
+//HMI variables
+String strats[12];
+uint8_t strats_count = 0;
+
+String teams[12];
+uint8_t teams_count = 0;
+
+int chosen_strat = -1;
+int chosen_team = -1;
+
+int game_status = -1;
+int init_status = -1;
+float game_duration = -1;
+float elapsed_time = -1;
+
+bool _is_arming = false;
+bool _is_launching = false;
 
 //Input
 #define PIN_BTN_VCC_1 D8 // to L2
@@ -97,11 +101,21 @@ void check_input() {
 }
 
 //LEDs
-#define PIN_LED_INIT D0
-#define PIN_LED_INGAME D0
+#define PIN_LED_ALIVE D0
+#define PIN_LED_INIT D3
 
 void update_leds() {
-    digitalWrite(PIN_LED_INIT, game_status != -1);
+    digitalWrite(PIN_LED_ALIVE, game_status != -1);
+
+    if(init_status != -1) {
+        if(init_status == 0) // some nodes have not responded yet
+            analogWrite(PIN_LED_INIT, 127 * (2 - cos(millis() / 1000))); // wave
+        else if(init_status == 1) // init finished and all nodes are ready
+            digitalWrite(PIN_LED_INIT, HIGH); //solid ON
+        else if(init_status == 2) // init finished but at least one node failed
+            digitalWrite(PIN_LED_INIT, millis() % 1000 > 500); // blink
+    }
+    else digitalWrite(PIN_LED_INIT, LOW);
 }
 
 
@@ -128,6 +142,13 @@ void on_game_status(const ai_game_status::GameStatus& msg){
         ui.transitionToFrame(5);
 }
 
+void on_game_timer(const ai_game_status::GameTime& msg){
+    if(msg.is_active) {
+        game_duration = msg.game_time_duration;
+        elapsed_time = msg.game_elapsed_time;
+    }
+}
+
 void on_ros_event(const drivers_ard_hmi::ROSEvent& msg){
     if(msg.event == 0) //asked to respond for JACK
         ui.transitionToFrame(4);
@@ -137,6 +158,7 @@ ros::Subscriber<drivers_ard_hmi::SetStrategies> sub_strats("/feedback/ard_hmi/se
 ros::Subscriber<drivers_ard_hmi::SetTeams> sub_teams("/feedback/ard_hmi/set_teams", &on_set_teams);
 ros::Subscriber<drivers_ard_hmi::ROSEvent> sub_ros_events("/feedback/ard_hmi/ros_event", &on_ros_event);
 ros::Subscriber<ai_game_status::GameStatus> sub_game_status( "/ai/game_status/status", &on_game_status);
+ros::Subscriber<ai_game_status::GameTime> sub_game_timer( "/ai/game_status/timer", &on_game_timer);
 
 drivers_ard_hmi::SelectedConfig config_msg;
 ros::Publisher config_pub("/feedback/ard_hmi/arm_config", &config_msg);
@@ -295,7 +317,9 @@ void drawInGameFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x,
     display->setFont(ArialMT_Plain_24);
     display->drawString(64 + x, 22 + y, "178pts");
     
-    display->drawProgressBar(x + 0, y + 54, 120, 8, 67); // shows time left
+    int percentage = 0;
+    if(elapsed_time != -1 && game_duration > 0) percentage = int(100 * elapsed_time / game_duration);
+    display->drawProgressBar(x + 0, y + 54, 120, 8, percentage); // shows time left
 
     if(left_pressed) ui.previousFrame();
     if(right_pressed) ui.nextFrame();
@@ -311,12 +335,14 @@ void setup() {
     pinMode(PIN_BTN_IN_1, INPUT);
     pinMode(PIN_BTN_IN_2, INPUT);
 
+    pinMode(PIN_LED_ALIVE, OUTPUT);
     pinMode(PIN_LED_INIT, OUTPUT);
 
     nh.initNode();
     nh.subscribe(sub_strats);
     nh.subscribe(sub_teams);
     nh.subscribe(sub_game_status);
+    nh.subscribe(sub_game_timer);
     nh.subscribe(sub_ros_events);
     nh.advertise(config_pub);
     nh.advertise(hmi_events_pub);
