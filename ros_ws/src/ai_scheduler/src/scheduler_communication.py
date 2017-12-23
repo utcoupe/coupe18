@@ -8,8 +8,10 @@ import ai_scheduler.srv
 import navigation_navigator.msg
 
 class RequestTypes():
-    SERVICE = 0
-    ACTION = 1
+    PUB_MSG = 0
+    SUB_MSH = 1
+    SERVICE = 2
+    ACTION  = 3
 
 class AICommunication():
     def SendRequest(self, dest, params, callback):
@@ -17,7 +19,7 @@ class AICommunication():
             "/ai/timer":                        (RequestTypes.SERVICE, ai_scheduler.srv.AIGenericCommand),
             "/ai/scheduler":                    (RequestTypes.SERVICE, ai_scheduler.srv.AIGenericCommand),
             "/navigation/navigator/dogoto":     (RequestTypes.ACTION,  navigation_navigator.msg.DoGotoAction, navigation_navigator.msg.DoGotoGoal),
-            "/test":                            (RequestTypes.SERVICE, ai_scheduler.srv.AIGenericCommand),
+            "/test":                            (RequestTypes.PUB_MSG, TaskResult),
         }
         def getRequestType(dest):
             return servers[dest][0]
@@ -28,7 +30,9 @@ class AICommunication():
 
         start_time = time.time()
         if dest in servers:
-            if getRequestType(dest) == RequestTypes.SERVICE:
+            if getRequestType(dest) == RequestTypes.PUB_MSG:
+                response = self._pub_msg(dest, getRequestClass(dest), params)
+            elif getRequestType(dest) == RequestTypes.SERVICE:
                 response = self._send_service(dest, getRequestClass(dest), params)
             elif getRequestType(dest) == RequestTypes.ACTION:
                 response = self._send_blocking_action(dest, getRequestClass(dest), getActionGoalClass(dest), params)
@@ -37,6 +41,14 @@ class AICommunication():
             callback(response, time.time() - start_time)
         else:
             raise ValueError, "Message destination '{}' was not recognized. Has it been added to ai_communication.py definition dict, or mispelled ?".format(dest)
+
+    def _pub_msg(self, dest, msg_class, params):
+        try:
+            pub = rospy.Publisher(dest, msg_class, queue_size=10)
+            pub.publish(**params)
+            return TaskResult(0, "")
+        except Exception as e:
+            return TaskResult(2, "ai_communication.py could not send message to topic '{}': {}".format(dest, e))
 
     def _send_service(self, dest, srv_class, params):
         try: # Handle a timeout in case one node doesn't respond

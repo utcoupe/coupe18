@@ -51,9 +51,9 @@ class AILoader():
 
     def _get_path(self, filename):
         get_def = rospy.ServiceProxy('/memory/definitions/get', GetDefinition)
-        get_def.wait_for_service()
 
         try:
+            get_def.wait_for_service(10)
             res = get_def('ai/' + filename)
             if not res.success:
                 rospy.logerr("Error when fetching '{}' definition file", filename)
