@@ -9,9 +9,9 @@ function ROSCCConfig($routeProvider, localStorageServiceProvider) {
 function run($rootScope) {
 
   $rootScope.domains = [{
-    name: 'asserv',
-    topics: [],
-    services: ['controls/emergency_stop', 'controls/goto', 'controls/set_pos', 'controls/speed', 'controls/pwm', 'management', 'parameters']
+    name: 'drivers',
+    topics: ['ard_asserv/pose2d', 'ard_asserv/speed'],
+    services: ['ard_asserv/emergency_stop', 'ard_asserv/goto', 'ard_asserv/set_pos', 'ard_asserv/speed', 'ard_asserv/pwm', 'ard_asserv/management', 'ard_asserv/parameters']
   }, {
     name: 'ai',
     topics: ['oui1', 'non1'],
@@ -60,13 +60,13 @@ var AsservController = function () {
 
     this.ros = Ros.ros;
 
-    Ros.listen('/robot/pose2d', function (e) {
+    Ros.listen('/drivers/ard_asserv/pose2d', function (e) {
       this.pushDataToChart(2, e.x);
       this.pushDataToChart(3, e.theta);
       this.pushDataToChart(4, e.y);
     }.bind(this));
 
-    Ros.listen('/robot/speed', function (e) {
+    Ros.listen('/drivers/ard_asserv/speed', function (e) {
       this.pushDataToChart(0, e.pwm_speed_left);
       this.pushDataToChart(1, e.pwm_speed_right);
       this.pushDataToChart(5, e.wheel_speed_right);
@@ -273,15 +273,8 @@ var ControlController = function () {
       this.ros.loadData();
     }
   }, {
-    key: 'isDomainActiveForTopics',
-    value: function isDomainActiveForTopics(domain) {
-      return _.some(this.ros.getTopicsForDomain(domain), function (t) {
-        return t.active == true;
-      });
-    }
-  }, {
-    key: 'isDomainActiveForServices',
-    value: function isDomainActiveForServices(domain) {
+    key: 'isDomainActive',
+    value: function isDomainActive(domain) {
       return _.some(this.ros.getServicesForDomain(domain), function (t) {
         return t.active == true;
       });
@@ -535,8 +528,8 @@ var DomainsService = function () {
       var result = [];
       angular.forEach(array, function (entry) {
         var nameArray = entry.name.split('/');
-        if (nameArray.length > 1 && nameArray[1] === domainName && (entry.fetched || !entry.active) && nameArray[2] !== "get_loggers" && //TODO : filter nicely <3 (maybe put the rcc filter back)
-        nameArray[2] !== "set_logger_level") {
+        if (nameArray.length > 1 && nameArray[1] === domainName && (entry.fetched || !entry.active) && !_.contains(nameArray, "get_loggers") && //TODO : filter nicely <3 (maybe put the rcc filter back)
+        !_.contains(nameArray, "set_logger_level")) {
           entry.abbr = nameArray.slice(2).join('/');
           result.push(entry);
         }
@@ -631,7 +624,7 @@ var RosService = function () {
     this.newRosConnection();
     $interval(function () {
       _this.newRosConnection();
-    }, 1000);
+    }, 1000 / this.setting.refresh_rate);
 
     $interval(function () {
       _this.loadData();
@@ -771,24 +764,27 @@ var RosService = function () {
       this.ros.getTopics(function (topics) {
         // TODO: check if type is already returned here
         angular.forEach(topics.topics, function (name) {
-          var foundTopic = _.findWhere(_this4.data.topics, { name: name });
+          var topic = _.findWhere(_this4.data.topics, { name: name });
 
-          if (foundTopic) {
+          if (topic) {
             //to update
-            foundTopic.active = true;
+            topic.active = true;
           } else {
             //to add
-            _this4.data.topics.push({
+            topic = {
               name: name,
               active: true,
               isOpen: true
-            });
+            };
+            _this4.data.topics.push(topic);
           }
 
-          _this4.ros.getTopicType(name, function (type) {
-            _.findWhere(_this4.data.topics, { name: name }).type = type;
-            _.findWhere(_this4.data.topics, { name: name }).fetched = true;
-          });
+          if (!topic.fetched) {
+            _this4.ros.getTopicType(name, function (type) {
+              topic.type = type;
+              topic.fetched = true;
+            });
+          }
         });
 
         for (var i = _this4.data.topics.length - 1; i >= 0; i--) {
@@ -810,24 +806,26 @@ var RosService = function () {
 
       this.ros.getServices(function (services) {
         angular.forEach(services, function (name) {
-          var foundService = _.findWhere(_this4.data.services, { name: name });
+          var service = _.findWhere(_this4.data.services, { name: name });
 
-          if (foundService) {
+          if (service) {
             //to update
-            foundService.active = true;
+            service.active = true;
           } else {
             //to add
-            _this4.data.services.push({
+            service = {
               name: name,
               active: true,
               isOpen: true
+            };
+            _this4.data.services.push(service);
+          }
+          if (!service.fetched) {
+            _this4.ros.getServiceType(name, function (type) {
+              service.type = type;
+              service.fetched = true;
             });
           }
-
-          _this4.ros.getServiceType(name, function (type) {
-            _.findWhere(_this4.data.services, { name: name }).type = type;
-            _.findWhere(_this4.data.services, { name: name }).fetched = true;
-          });
         });
 
         for (var i = _this4.data.services.length - 1; i >= 0; i--) {
@@ -850,15 +848,31 @@ var RosService = function () {
 
       this.ros.getParams(function (params) {
         //TODO : update like topics
-        _this4.data.parameters = [];
         angular.forEach(params, function (name) {
-          var param = new ROSLIB.Param({ ros: _this4.ros, name: name });
-          _this4.data.parameters.push({ name: name });
 
-          param.get(function (value) {
-            _.findWhere(_this4.data.parameters, { name: name }).value = value;
-          });
+          var param = _.findWhere(_this4.data.parameters, { name: name });
+          if (!param) {
+            param = { name: name };
+            _this4.data.parameters.push(param);
+          }
+
+          if (!param.fetched) {
+            var rosparam = new ROSLIB.Param({ ros: _this4.ros, name: name });
+            rosparam.get(function (value) {
+              param.value = value;
+              param.fetched = true;
+            });
+          }
         });
+
+        for (var i = _this4.data.parameters.length - 1; i >= 0; i--) {
+          //angular foreach not working for this
+          var p = _this4.data.parameters[i];
+
+          if (!_.contains(params, p.name)) {
+            _this4.data.parameters.splice(i, 1);
+          }
+        }
       });
 
       this.ros.getNodes(function (nodes) {
@@ -873,7 +887,7 @@ var RosService = function () {
     key: 'getDomains',
     value: function getDomains() {
       if (!this.data) return;
-      var allData = this.data.topics.concat(this.data.services, this.data.nodes);
+      var allData = this.data.topics.concat(this.data.services, this.data.nodes, this.data.parameters);
       var domains = this.Domains.getDomains(allData);
 
       var expectedD = _.pluck(this.$rootScope.domains, 'name');
@@ -1829,14 +1843,15 @@ var SettingsService = function () {
     value: function getDefaultSetting() {
       return {
         name: 'Robot Name',
-        address: '127.0.0.1', // use localhost
+        address: window.location.hostname,
         port: 9090, // default port of rosbridge_server
         log: '/rosout',
         advanced: false,
         hokuyo_1: '/sensors/hokuyo_1_raw',
         hokuyo_2: '/sensors/hokuyo_2_raw',
-        maxConsoleEntries: 200,
-        refresh_rate: 1
+        maxConsoleEntries: 1000,
+        refresh_rate: 1,
+        log_level: 2
       };
     }
   }]);
@@ -2016,7 +2031,7 @@ var TopicController = function () {
     this.setting = Settings.get();
     this.Quaternions = Quaternions;
     this.ros = Ros;
-    this.isSubscribing = true;
+    this.isSubscribing = false;
     this.toggle = true;
   }
 
@@ -2086,6 +2101,57 @@ angular.module('roscc').component('ccTopic', {
   bindings: { topic: '=' },
   template: '<ng-include src="$ctrl.fileName"></ng-include>',
   controller: TopicController
+});
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var TransformController = function () {
+  function TransformController(Ros) {
+    _classCallCheck(this, TransformController);
+
+    this.ros = Ros;
+  }
+
+  _createClass(TransformController, [{
+    key: '$onInit',
+    value: function $onInit() {
+      this.refresh();
+    }
+  }, {
+    key: 'refresh',
+    value: function refresh() {
+      // relative to fixed
+      console.log("Subscribed");
+      if (!this.transform.fixed || !this.transform.frame) return;
+
+      this.tfClient = new ROSLIB.TFClient({
+        ros: this.ros.ros,
+        fixedFrame: this.transform.fixed,
+        angularThres: 0.001,
+        transThres: 0.001
+      });
+
+      this.tfClient.subscribe(this.transform.frame, function (tf) {
+        var eulAngles = new THREE.Euler();
+
+        eulAngles.setFromQuaternion(new THREE.Quaternion(tf.rotation.x, tf.rotation.y, tf.rotation.z, tf.rotation.w));
+
+        this.transform.response = tf;
+        this.transform.response.rotation = eulAngles;
+      }.bind(this));
+    }
+  }]);
+
+  return TransformController;
+}();
+
+angular.module('roscc').component('ccTransform', {
+  bindings: { parameter: '=' },
+  templateUrl: 'app/transforms/transforms.html',
+  controller: TransformController
 });
 /**
  * @file Controlleur du simulateur

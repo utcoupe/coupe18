@@ -13,18 +13,14 @@ class MapNode():
 
         map_manager.Map.load()
 
-        # Generate static occupancy images for pathfinder, etc.
-        self.occupancy = OccupancyGenerator(map_manager.Map)
-        self.occupancy.generateTerrainImages(map_manager.Map)
-
         # Starting and publishing the table STL to RViz
         self.markers = MarkersPublisher()
-        self.markers.publishTable(map_manager.Map)
 
-        # Starting the Get, Set and Conditions service handlers
-        map_communication.GetServiceHandler()
-        map_communication.SetServiceHandler()
-        map_communication.GetOccupancyServiceHandler()
+        # Generate static occupancy images for pathfinder, etc.
+        occupancy = OccupancyGenerator(map_manager.Map)
+
+        # Starting service handlers (Get, Set, Transfer, GetOccupancy)
+        map_communication.MapServices(occupancy)
         rospy.loginfo("[memory/map] Map request servers ready.")
 
         self.run()

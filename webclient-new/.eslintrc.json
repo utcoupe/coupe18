@@ -11,7 +11,8 @@
       "_": false,
       "ROSLIB": false,
       "Raphael": false,
-      "$": false
+      "$": false,
+      "THREE": false
     },
     "rules": {
         "no-console": "off"

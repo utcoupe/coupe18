@@ -1,6 +1,6 @@
 #!/usr/bin/python
 from map_loader import LoadingHelpers
-from map_bases import DictManager, ListManager
+from map_bases import DictManager
 from map_attributes import Position2D, Shape2D, MarkerRViz, Trajectory
 
 
@@ -52,14 +52,25 @@ class Waypoint(DictManager):
 
 class Entity(DictManager):
     def __init__(self, initdict):
-        LoadingHelpers.checkKeysExist(initdict, "position", "shape", "marker", "chest", "trajectory")
+        LoadingHelpers.checkKeysExist(initdict, "position", "shape", "marker", "containers", "trajectory")
+
+        for container in initdict["containers"]:
+            initdict["containers"][container] = Container(initdict["containers"][container])
+
         super(Entity, self).__init__({
             "position": Position2D(initdict["position"]),
             "shape": Shape2D(initdict["shape"]),
             "marker": MarkerRViz(initdict["marker"]),
-            "chest": None, # TODO Implement
+            "chest": DictManager(initdict["containers"]),
             "trajectory": Trajectory(initdict["trajectory"])
         })
+
+
+class Container(DictManager):
+    def __init__(self, initdict):
+        for obj in initdict:
+            initdict[obj] = Object(initdict[obj])
+        super(Container, self).__init__(initdict)
 
 
 class Object(DictManager):

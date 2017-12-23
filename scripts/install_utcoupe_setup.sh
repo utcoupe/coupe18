@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ### The goal of this script is to install all UTCoupe specific packages to have a working setup.
-### This script is called automatically when you run a npm install.
+### When you just cloned the UTCoupe repository, you have to run this script first !
 
 function green_echo() {
 	echo -e "\033[32m$1\033[0m"
@@ -17,7 +17,7 @@ ARCH=$(uname -m)
 ### Install the linux packages
 function install_apt() {
 	green_echo "Install missing packages..."
-	sudo apt-get install git build-essential python cmake libboost-dev libsdl1.2-dev gcc-avr avrdude avr-libc
+	sudo apt-get install git build-essential python python-pip cmake libboost-dev libsdl1.2-dev gcc-avr avrdude avr-libc libsfml-dev libarmadillo-dev libavcodec-dev libswscale-dev
 
 	# Check if it's a PC or a raspi
 	if [ "$ARCH" = "x86_64" ]; then
@@ -29,6 +29,7 @@ function install_apt() {
 		sudo apt-get remove npm nodejs nodejs-legacy
 		curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
 		sudo npm install npm@3.5.2 -g
+		#TODO be sure that all is correct for raspi
 	elif [ "$ARCH" = "armv6l" ]; then
 		sudo apt-get install raspberrypi-kernel-headers
 		sudo apt-get remove npm nodejs nodejs-legacy
@@ -43,20 +44,45 @@ function install_apt() {
 	fi
 }
 
+### Install ros-desktop-full
+function install_ros() {
+	if [ "$(lsb_release -sc)" = "xenial" ] || [ "$(lsb_release -sc)" = "willy" ]; then
+		sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+		sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
+		sudo apt-get update
+		if [ "$ARCH" = "x86_64" ]; then
+			sudo apt-get install ros-kinetic-desktop-full ros-kinetic-rosserial-arduino ros-kinetic-rosbridge-suite ros-kinetic-tf2-web-republisher
+		elif [ "$ARCH" = "armv7l" ]; then
+			sudo apt-get install ros-kinetic-ros-base ros-kinetic-tf2 ros-kinetic-tf2-ros ros-kinetic-rviz ros-kinetic-diagnostic-updater ros-kinetic-roslint ros-kinetic-camera-info-manager ros-kinetic-rosserial-arduino ros-kinetic-rosbridge-suite ros-kinetic-tf2-web-republisher
+		fi
+		# "Install" Arduino libs needed by us
+		if [ -d "/usr/share/arduino" ] && [ -d "$PWD/libs/arduino-libraries" ]; then
+			sudo cp -ar $PWD/libs/arduino-libraries/* /usr/share/arduino/libraries/
+		else
+			red_echo "Unable to locate arduino folder or arduino-libraries extracted folder, please check your setup"
+		fi
+		sudo rosdep init
+		rosdep update
+	else
+		red_echo "Your OS is not Ubuntu Willy or Xenial, ROS will not been installed..."
+	fi
+}
 
 ### Setup the variable environment to taget the UTCoupe main folder
+### This function use $PWD instead of $UTCOUPE_WORKSPACE because if the env variable is not set before running the script, $UTCOUPE_WORKSPACE is unknown
 function env_setup() {
 	# Add the UTCOUPE_WORKSPACE env variable, default consider as bash shell
 	if [ -z "$UTCOUPE_WORKSPACE" ]; then
 		green_echo "Env variable is not set."
 		if [ "$SHELL" = "/bin/zsh" ]; then
 			echo "export UTCOUPE_WORKSPACE=$PWD" >> $HOME/.zshrc
-
-			printf "Warning :\n"
-			printf "Please \"source ~/.zshrc\" and run again this script if necessary\n"
+			echo "export ROS_LANG_DISABLE=genlisp:geneus" >> $HOME/.zshrc
+			red_echo "Warning :\n"
+			red_echo "Please \"source ~/.zshrc\" and run again this script if necessary\n"
 			exit 1
 		else
 			echo "export UTCOUPE_WORKSPACE=$PWD" >> $HOME/.bashrc
+			echo "export ROS_LANG_DISABLE=genlisp:geneus" >> $HOME/.bashrc
             		source $HOME/.bashrc
 		fi
 	fi
@@ -70,90 +96,68 @@ function env_setup() {
 	        sudo usermod -a -G dialout $USER
 	fi
 	# Setup GPIO + add the current user to the gpio group (to r/w in /dev files)
-	if ! id -Gn $USER | grep -qw "gpio"; then
-			sudo chgrp -R gpio /sys/class/gpio
-			sudo chmod -R g+rw /sys/class/gpio
+	if grep -q "gpio" /etc/group && ! id -Gn $USER | grep -qw "gpio"; then
+		sudo chgrp -R gpio /sys/class/gpio
+		sudo chmod -R g+rw /sys/class/gpio
 	        sudo usermod -a -G gpio $USER
 	fi
 	# Create the utcoupe folder where log files are stored
 	if [ ! -d "/var/log/utcoupe" ]; then
 		sudo mkdir /var/log/utcoupe
+		sudo chown $USER:$USER /var/log/utcoupe
 	fi
 	# Untar all libraries
-	for f in $UTCOUPE_WORKSPACE/libs/*.tar; do tar -C $UTCOUPE_WORKSPACE/libs xzf $f; done
-	# "Install" Arduino libs
-	sudo ln -s $UTCOUPE_WORKSPACE/libs/arduino-1.0 /opt/
-	# Change the ownership of the utcoupe log folder
-	sudo chown $USER:$USER /var/log/utcoupe
-	# Install the hokuyo automatic startup script (only for raspberry pi zero)
-	if [ ! -f "/etc/init.d/utcoupe_hokuyo.sh" ] && [ "$ARCH" = "armv6l" ]; then
-		sudo install $UTCOUPE_WORKSPACE/scripts/utcoupe_hokuyo.sh /etc/init.d/
-		sudo update-rc.d utcoupe_hokuyo.sh defaults 99
+	for f in $PWD/libs/*; do
+		if [ ! -d $f ]; then
+			tar -C $PWD/libs -xzf $f
+		fi
+	done
+	# Add the Ethernet IP address of raspberry pi to have a shortcut
+	if ! grep "utcoupe" /etc/hosts > /dev/null; then
+	    sudo sh -c "echo '#UTCoupe raspberry pi Ethernet IP when connected on the UTC network\n172.18.159.254	utcoupe_rpi31\n172.18.161.161	utcoupe_rpi32\n172.18.161.162	utcoupe_rpi33' >> /etc/hosts"
 	fi
+	#TODO add ssh to the raspi (must be connected...)
 }
 
-### Compile and install the UTCoupe libraries
-
-# URG library for the hokuyo
-function compile_urg() {
-	cd $UTCOUPE_WORKSPACE/libs/urg-0.8.18
-	./configure && make && sudo make install
+### Then install the UTCoupe ROS workspace
+function install_ros_workspace() {
+	# Download the submodules code
+	git submodule update --init --recursive
+	# Install the UTCoupe ROS specific packages
+	#TODO use the requirements system
+	pip install pyserial numpy scipy pymongo pyclipper pillow
 }
 
-# Archer driver for 5 GHz wifi
-function compile_archer() {
-	cd $UTCOUPE_WORKSPACE/libs/Archer_T1U_V1_150909/Driver
-	sudo make && sudo make install
-	#TODO add the ra0 interface in configuration files
-}
-
-### Then install the UTCoupe softwares
-
-# The pathfinding
-function compile_pathfinding() {
-	cd $UTCOUPE_WORKSPACE/pathfinding
-	./make.sh
-}
-
-# The hokuyo
-function compile_hokuyo() {
-	cd $UTCOUPE_WORKSPACE/hokuyo
-	./make.sh
-}
-
+### Main install_script function, ask the user to install each main components
 function launch_script() {
 
 	env_setup
-	
+
 	printf "Install apt missing packets ? [Y/n]?"
 	read answer
 	if [ "$answer" = "" ] || [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
 		install_apt
+		if [ ! -d "/opt/ros" ]; then
+			printf "ROS has not been detected in /opt/ros, launch the installation process..."
+			install_ros
+		fi
 	fi
-	
-	printf "Compile archer library (mandatory for 5 GHz usb wifi key) ? [Y/n]?"
+	printf "Install UTCoupe ROS workspace (ROS must to be installed) ? [Y/n]?"
 	read answer
 	if [ "$answer" = "" ] || [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
-		compile_archer
-	fi
-	
-	printf "Compile pathfinding ? [Y/n]?"
-	read answer
-	if [ "$answer" = "" ] || [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
-		compile_pathfinding
-	fi
-	
-	printf "Compiled hokuyo (+ urg mandatory library) ? [Y/n]?"
-	read answer
-	if [ "$answer" = "" ] || [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
-		compile_urg
-		compile_hokuyo
+		install_ros_workspace
 	fi
 }
 
+# Check that the folder has been cloned from git and not downloaded, because submodules won't work...
+if [ ! -d ".git" ]; then
+	red_echo "You have to clone this repository from git, not downloading it."
+	exit 1
+fi
+
 # Verify that the script is launched from the right place
-if [ ! "${PWD##*/}" = "coupe17" ]; then
-	red_echo "You have to launch this script from UTCoupe main directory : ./script/${0##*/}"
+if [ ! "${PWD##*/}" = "coupe18" ]; then
+	red_echo "You have to launch this script from UTCoupe main directory : ./script/${0##*/} or to rename this folder in coupe18."
 	exit 1
 fi
 
@@ -162,5 +166,5 @@ printf "Launch install script ? [Y/n]?"
 read answer
 if [ "$answer" = "" ] || [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
 	launch_script
+	echo "If you run the install script for the first time, please reboot your computer to apply all modifications."
 fi
-

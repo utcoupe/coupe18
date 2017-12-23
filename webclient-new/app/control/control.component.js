@@ -44,11 +44,7 @@ class ControlController {
     this.ros.loadData();
   }
 
-  isDomainActiveForTopics(domain) {
-    return _.some(this.ros.getTopicsForDomain(domain), (t) => t.active == true);
-  }
-
-  isDomainActiveForServices(domain) {
+  isDomainActive(domain) {
     return _.some(this.ros.getServicesForDomain(domain), (t) => t.active == true);
   }
 
