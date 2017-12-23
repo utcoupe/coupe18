@@ -5,7 +5,9 @@ import actionlib
 
 from ai_scheduler.msg import TaskResult
 import ai_scheduler.srv
+
 import navigation_navigator.msg
+import memory_map.srv
 
 class RequestTypes():
     PUB_MSG = 0
@@ -20,6 +22,7 @@ class AICommunication():
             "/ai/scheduler":                    (RequestTypes.SERVICE, ai_scheduler.srv.AIGenericCommand),
             "/navigation/navigator/dogoto":     (RequestTypes.ACTION,  navigation_navigator.msg.DoGotoAction, navigation_navigator.msg.DoGotoGoal),
             "/test":                            (RequestTypes.PUB_MSG, TaskResult),
+            "/memory/map/transfer":             (RequestTypes.SERVICE, memory_map.srv.MapTransfer)
         }
         def getRequestType(dest):
             return servers[dest][0]

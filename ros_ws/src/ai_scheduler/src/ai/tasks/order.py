@@ -47,13 +47,22 @@ class Order(Task):
         #     self.setStatus(TaskStatus.SUCCESS)
         #     return
         self.TimeTaken = time_taken
-        if res.result == res.RESULT_SUCCESS:
-            rospy.logdebug("    Order succeeded!")
-            self.setStatus(TaskStatus.SUCCESS)
-            #GameProperties.REWARD_POINTS += self.getReward() #TODO
-        elif res.result in [res.RESULT_PAUSE, res.RESULT_FAIL]: # TODO implement pause
-            rospy.logerr("    Order failed: {}".format(res.verbose_reason))
-            self.setStatus(TaskStatus.ERROR)
+        try: #TODO do a better way # For TaskRestul responses
+            if res.result == res.RESULT_SUCCESS:
+                rospy.logdebug("    Order succeeded!")
+                self.setStatus(TaskStatus.SUCCESS)
+                #GameProperties.REWARD_POINTS += self.getReward() #TODO
+            elif res.result in [res.RESULT_PAUSE, res.RESULT_FAIL]: # TODO implement pause
+                rospy.logerr("    Order failed: {}".format(res.verbose_reason))
+                self.setStatus(TaskStatus.ERROR)
+        except AttributeError: # Otherwise, look for a bool 'success'
+            if res.success is True:
+                rospy.logdebug("    Order succeeded!")
+                self.setStatus(TaskStatus.SUCCESS)
+            else:
+                rospy.logerr("    Order failed: {}".format(res.verbose_reason))
+                self.setStatus(TaskStatus.ERROR)
+
 
     def __repr__(self):
         c = Console()

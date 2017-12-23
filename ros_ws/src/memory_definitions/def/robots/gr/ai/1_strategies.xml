@@ -8,6 +8,7 @@
 		<actions name="In-Game Actions">
 			<!--<actionref ref="actuators_startup_sequence"/>-->
 			<orderref ref="test"/>
+			<orderref ref="map_transfer"/>
 			<actionref ref="wait_for_jack"/>
 			<nextneedsprevious/>
 			<orderref ref="ai_delay"/>
