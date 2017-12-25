@@ -16,8 +16,6 @@ find_package(catkin REQUIRED COMPONENTS
 
 add_message_files(
     FILES
-    Range.msg
-    RangeList.msg
     BeltFiltered.msg
     RectangleStamped.msg
 )
