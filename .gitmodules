@@ -16,3 +16,6 @@
 [submodule "ros_ws/src/external_nodes/obstacle_detector"]
 	path = ros_ws/src/external_nodes/obstacle_detector
 	url = https://github.com/tysik/obstacle_detector.git
+[submodule "ros_ws/src/external_nodes/teraranger"]
+	path = ros_ws/src/external_nodes/teraranger
+	url = https://github.com/Terabee/teraranger.git
