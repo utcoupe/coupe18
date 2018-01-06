@@ -199,6 +199,7 @@ class AsservReal(AsservAbstract):
                     result = True
                     # Check if the robot is arrived, otherwise this will tell that the robot is blocked (default behaviour of the asserv)
                     # TODO where and how to do this ?
+                    # TODO check angle
                     if not ((self._robot_raw_position.x > self._orders_id_dictionary[ack_id][1] - ASSERV_ERROR_POSITION) and
                             (self._robot_raw_position.x < self._orders_id_dictionary[ack_id][1] + ASSERV_ERROR_POSITION) and
                             (self._robot_raw_position.y > self._orders_id_dictionary[ack_id][2] - ASSERV_ERROR_POSITION) and
