@@ -24,7 +24,7 @@ class CollisionsSubscriptions(object):
         rospy.Subscriber("/navigation/navigator/status", Status, self.on_nav_status)
         rospy.Subscriber("/processing/belt_interpreter/rects_filtered", BeltFiltered, self.on_belt)
         # rospy.Subscriber("/recognition/enemy_tracker/enemies", TrackedEnemy, self.on_enemy)
-        rospy.Subscriber("/drivers/ard_asserv/robot_speed", RobotSpeed, self.on_robot_speed)
+        rospy.Subscriber("/drivers/ard_asserv/speed", RobotSpeed, self.on_robot_speed)
 
     def updateRobotPosition(self):
         try:
