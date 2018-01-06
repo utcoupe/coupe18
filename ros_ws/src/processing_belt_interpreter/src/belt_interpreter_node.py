@@ -75,7 +75,7 @@ class BeltInterpreter(object):
             rospy.logerr("Received data from belt sensor '{}' but no such sensor is defined".format(sensor_id))
             return
 
-        r = data.range / 1000.0
+        r = data.range
         rospy.loginfo("range value : %f", r)
 
         if r > self._belt_parser.Params["max_range"] or r <= 0:
@@ -139,7 +139,6 @@ class BeltInterpreter(object):
                 self._dynamic_rects.pop(sensor_id, None)
 
             self._static_rects.update({sensor_id: rect})
-            static_rects.append(rect)
         else: # dynamic
             if sensor_id in self._static_rects:
                 self._static_rects.pop(sensor_id, None)
