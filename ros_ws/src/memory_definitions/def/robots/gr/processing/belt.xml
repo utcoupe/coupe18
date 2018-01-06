@@ -6,7 +6,7 @@
   </params>
   <sensors>
     <sensor id="sensor1"> <!-- x, y in meters, a in rad -->
-      <x>0.15</x>
+      <x>0</x>
       <y>0</y>
       <a>0</a>
     </sensor>
