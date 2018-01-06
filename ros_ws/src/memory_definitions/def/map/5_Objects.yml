@@ -845,3 +845,4 @@ objects:
             properties:
                 ground_obstacle: false
                 color: green
+
