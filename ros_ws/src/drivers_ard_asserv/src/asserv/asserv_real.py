@@ -178,7 +178,7 @@ class AsservReal(AsservAbstract):
             robot_position = Pose2D(float(receied_data_list[2]) / 1000, float(receied_data_list[3]) / 1000, float(receied_data_list[4]) / 1000)
             self._robot_raw_position = robot_position
             self._node.send_robot_position(robot_position)
-            self._node.send_robot_speed(RobotSpeed(float(receied_data_list[5]), float(receied_data_list[6]), float(receied_data_list[7]), float(receied_data_list[8]), float(receied_data_list[9])))
+            self._node.send_robot_speed(RobotSpeed(float(receied_data_list[5]), float(receied_data_list[6]), float(receied_data_list[7]) / 1000, float(receied_data_list[8]), float(receied_data_list[9])))
         # Received order ack
         elif data.find(";") == 1:
             # Special order ack, the first one concern the Arduino activation
