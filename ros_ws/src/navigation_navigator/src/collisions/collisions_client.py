@@ -19,7 +19,7 @@ class CollisionsClient(object):
     
     def _warnerCallback (self, message):
         if message.danger_level == message.LEVEL_STOP:
-            rospy.logdebug("Argggggg : " + str(message))
+            rospy.logdebug("Obstacle detected, stopping the robot")
             self._callbackStop()
 
     def _connectToServers (self):
