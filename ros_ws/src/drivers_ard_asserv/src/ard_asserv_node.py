@@ -1,88 +1,77 @@
 #!/usr/bin/env python
 
-import serial
-import threading
-import Queue
-import os
 import rospy
 from geometry_msgs.msg import Pose2D
 import actionlib
 from drivers_ard_asserv.srv import *
 from drivers_ard_asserv.msg import *
-import protocol_parser
 import check_arduino
+import asserv
 
 __author__ = "Thomas Fuhrmann"
 __date__ = 21/10/2017
 
 NODE_NAME = "ard_asserv"
 
+
 class Asserv:
     """
-    The Asserv class manages the driver node for communication with the Arduino asserv.
+    The Asserv class manages the driver node for communication with asserv (real using the Arduino or in simulation).
     As this node is used as an interface, it gets orders to send on ROS services. The state of the robot is published on ROS topics.
     This node handles an action (see actionlib) for the Goto movement.
-    The communication with the Arduino is made using a serial communication line.
+    The selection of asserv type (real or simu) is made using serial port data. If the Arduino asserv is found, the real asserv is used.
+    If no Arduino asserv is found, the node will launch a simulated asserv.
     """
     def __init__(self):
         rospy.logdebug("[ASSERV] Starting asserv_node.")
-        # Queue to store the received information from the Arduino
-        self._reception_queue = Queue.Queue()
-        # A queue is used to send data to prevent to send data too fast, which will result to concatenate two sending and making the Arduino crash
-        self._sending_queue = Queue.Queue()
-        # Dictionary containing the list of orders which are interpreted by the Arduino (do not modify this dictionary !)
-        self._orders_dictionary = protocol_parser.protocol_parse(os.environ['UTCOUPE_WORKSPACE'] + "/arduino/common/asserv/protocol.h")
         # This dictionary stores the goals received by the DoGoto action and which are currently in processing
         self._goals_dictionary = {}
         # This dictionary stores the goals received by the Goto service and which are currently in processing
         self._goto_srv_dictionary = {}
+        # Unique ID given to the received goal to manage it
+        self._goal_id_counter = 0
+        # Instance of the asserv object (simu or real)
+        self._asserv_instance = None
         # Init ROS stuff
         rospy.init_node(NODE_NAME, anonymous=False, log_level=rospy.DEBUG)
         self._pub_robot_pose = rospy.Publisher("/drivers/" + NODE_NAME + "/pose2d", Pose2D, queue_size=5)
         self._pub_robot_speed = rospy.Publisher("/drivers/" + NODE_NAME + "/speed", RobotSpeed, queue_size=5)
-        # self._sub_arm = rospy.Subscriber("arm", 1, Asserv.callback_arm)
-        self._srv_goto = rospy.Service("/drivers/" + NODE_NAME + "/goto", Goto, self.callback_goto)
-        self._srv_pwm = rospy.Service("/drivers/" + NODE_NAME + "/pwm", Pwm, self.callback_pwm)
-        self._srv_speed = rospy.Service("/drivers/" + NODE_NAME + "/speed", Speed, self.callback_speed)
-        self._srv_set_pos = rospy.Service("/drivers/" + NODE_NAME + "/set_pos", SetPos, self.callback_set_pos)
-        self._srv_emergency_stop = rospy.Service("/drivers/" + NODE_NAME + "/emergency_stop", EmergencyStop, self.callback_emergency_stop)
-        self._srv_params = rospy.Service("/drivers/" + NODE_NAME + "/parameters", Parameters, self.callback_asserv_param)
-        self._srv_management = rospy.Service("/drivers/" + NODE_NAME + "/management", Management, self.callback_management)
-        self._tmr_serial_send = rospy.Timer(rospy.Duration(0.1), self.callback_timer_serial_send)
-        # Note : no cancel callback is used, the reason is that the asserv code does not manage cancelling a specific order
-        self._act_goto = actionlib.ActionServer("/drivers/" + NODE_NAME + "/goto_action", DoGotoAction, self.callback_action_goto, auto_start=False)
-        # Init the serial communication
-        # Flag to tell that the connected Arduino is started : we can send it orders
-        self._arduino_started_flag = False
-        # The order_id is sent to the asserv to identify the orders, it must be unique
-        self._order_id = 0
-        # Serial object
-        self._serial_com = None
-        # Thread dedicated to the reception from the serial line
-        self._serial_receiver_thread = None
+        self._srv_goto = rospy.Service("/drivers/" + NODE_NAME + "/goto", Goto, self._callback_goto)
+        self._srv_pwm = rospy.Service("/drivers/" + NODE_NAME + "/pwm", Pwm, self._callback_pwm)
+        self._srv_speed = rospy.Service("/drivers/" + NODE_NAME + "/speed", Speed, self._callback_speed)
+        self._srv_set_pos = rospy.Service("/drivers/" + NODE_NAME + "/set_pos", SetPos, self._callback_set_pos)
+        self._srv_emergency_stop = rospy.Service("/drivers/" + NODE_NAME + "/emergency_stop", EmergencyStop, self._callback_emergency_stop)
+        self._srv_params = rospy.Service("/drivers/" + NODE_NAME + "/parameters", Parameters, self._callback_asserv_param)
+        self._srv_management = rospy.Service("/drivers/" + NODE_NAME + "/management", Management, self._callback_management)
+        self._act_goto = actionlib.ActionServer("/drivers/" + NODE_NAME + "/goto_action", DoGotoAction, self._callback_action_goto, auto_start=False)
         self._act_goto.start()
-        self.start_serial_com_line(check_arduino.get_arduino_port("asserv"))
-        self.start()
+        arduino_port = check_arduino.get_arduino_port("asserv")
+        if arduino_port == "":
+            rospy.loginfo("[ASSERV] Creation of the simu asserv.")
+            self._asserv_instance = asserv.AsservSimu(self)
+        else:
+            rospy.loginfo("[ASSERV] Creation of the real asserv.")
+            self._asserv_instance = asserv.AsservReal(self, arduino_port)
+            self._asserv_instance.start()
 
-    def start_serial_com_line(self, port):
-        """
-        Initiate the serial communication line.
-        @param port:    The port where the Arduino is connected (ex : "/devttyUSB0")
-        @type port:     string
-        """
-        try:
-            self._serial_com = serial.Serial(port, 57600, timeout=0.5)
-            self._serial_receiver_thread = threading.Thread(target=self.data_receiver)
-            self._serial_receiver_thread.start()
-            rospy.logdebug("[ASSERV] Serial communication line has started.")
-        except serial.SerialException:
-            rospy.logerr("[ASSERV] Port : " + port + " is not available, make sure you have plugged the Arduino.")
+    # goal_id generated by node, reached to know if the gial as been reached
+    def goal_reached(self, goal_id, reached):
+        result = DoGotoResult(reached)
+        if goal_id in self._goals_dictionary:
+            self._goals_dictionary[goal_id].set_succeeded(result)
+            del self._goals_dictionary[goal_id]
+        elif goal_id in self._goto_srv_dictionary:
+            del self._goto_srv_dictionary[goal_id]
 
-    def callback_arm(self, data):
-        # TODO manage the arm state
-        rospy.loginfo("ARM callback")
+    # robot_pose is a Pose2d structure
+    def send_robot_position(self, robot_pose):
+        self._pub_robot_pose.publish(robot_pose)
 
-    def callback_goto(self, request):
+    # robot_speed is a RobotSpeed structure
+    def send_robot_speed(self, robot_speed):
+        self._pub_robot_speed.publish(robot_speed)
+
+    def _callback_goto(self, request):
         """
         Callback of the Goto service.
         @param request: Service request
@@ -92,16 +81,15 @@ class Asserv:
         """
         rospy.logdebug("[ASSERV] Received a request (goto service).")
         # TODO manage the direction
-        response = self.process_goto_order(request.mode, request.position.x, request.position.y, request.position.theta)
+        response = self._process_goto_order(self._goal_id_counter, request.mode, request.position.x, request.position.y, request.position.theta, 1)
         if response:
-            # TODO store something useful in dictionary ?
-            # TODO make it proper...
-            self._goto_srv_dictionary[self._order_id - 1] = ""
+            self._goto_srv_dictionary[self._goal_id_counter] = ""
+            self._goal_id_counter += 1
         else:
             rospy.logerr("[ASSERV] Service GOTO has failed... Mode probably does not exist.")
         return GotoResponse(response)
 
-    def callback_set_pos(self, request):
+    def _callback_set_pos(self, request):
         """
         Callback of the SetPos service.
         @param request: Service request
@@ -110,10 +98,10 @@ class Asserv:
         @rtype:         SetPosResponse
         """
         rospy.logdebug("[ASSERV] Received a request (set_pos service).")
-        self.send_serial_data(self._orders_dictionary['SET_POS'], [str(int(request.position.x * 1000)), str(int(request.position.y * 1000)), str(int(request.position.theta * 1000.0))])
-        return SetPosResponse(True)
+        ret_value = self._asserv_instance.set_pos(request.position.x, request.position.y, request.position.theta)
+        return SetPosResponse(ret_value)
 
-    def callback_pwm(self, request):
+    def _callback_pwm(self, request):
         """
         Callback of the Pwm service.
         @param request: Service request
@@ -122,10 +110,10 @@ class Asserv:
         @rtype:         PwmResponse
         """
         rospy.logdebug("[ASSERV] Received a request (pwm service).")
-        self.send_serial_data(self._orders_dictionary['PWM'], [str(request.left), str(request.right), str(request.duration)])
-        return PwmResponse(True)
+        ret_value = self._asserv_instance.pwm(request.left, request.right, request.duration)
+        return PwmResponse(ret_value)
 
-    def callback_speed(self, request):
+    def _callback_speed(self, request):
         """
         Callback of the Speed service.
         @param request: Service request
@@ -134,10 +122,10 @@ class Asserv:
         @rtype:         SpeedResponse
         """
         rospy.logdebug("[ASSERV] Received a request (speed service).")
-        self.send_serial_data(self._orders_dictionary['SPD'], [str(request.linear), str(request.angular), str(request.duration)])
-        return SpeedResponse(True)
+        ret_value = self._asserv_instance.speed(request.linear, request.angular, request.duration)
+        return SpeedResponse(ret_value)
 
-    def callback_emergency_stop(self, request):
+    def _callback_emergency_stop(self, request):
         """
         Callback of the EmergencyStop service.
         @param request: Service request
@@ -146,10 +134,10 @@ class Asserv:
         @rtype:         EmergencyStopResponse
         """
         rospy.logdebug("[ASSERV] Received a request (emergency_stop service).")
-        self.send_serial_data(self._orders_dictionary['SETEMERGENCYSTOP'], [str(request.enable)])
-        return EmergencyStopResponse(True)
+        ret_value = self._asserv_instance.set_emergency_stop(request.enable)
+        return EmergencyStopResponse(ret_value)
 
-    def callback_asserv_param(self, request):
+    def _callback_asserv_param(self, request):
         """
         Callback of the Parameters service.
         @param request: Service request
@@ -160,21 +148,23 @@ class Asserv:
         rospy.logdebug("[ASSERV] Received a request (parameters service).")
         response = True
         if request.mode == request.SPDMAX:
-            self.send_serial_data(self._orders_dictionary['SPDMAX'], [str(request.spd), str(request.spd_ratio)])
+            response = self._asserv_instance.set_max_speed(request.spd, request.spd_ratio)
         elif request.mode == request.ACCMAX:
-            self.send_serial_data(self._orders_dictionary['ACCMAX'], [str(request.acc)])
+            response = self._asserv_instance.set_max_accel(request.acc)
         elif request.mode == request.PIDRIGHT:
-            self.send_serial_data(self._orders_dictionary['PIDRIGHT'], [str(request.p), str(request.i), str(request.d)])
+            # TODO manage left and right
+            response = self._asserv_instance.set_pid(request.p, request.i, request.d)
         elif request.mode == request.PIDLEFT:
-            self.send_serial_data(self._orders_dictionary['PIDLEFT'], [str(request.p), str(request.i), str(request.d)])
+            # TODO manage left and right
+            response = self._asserv_instance.set_pid(request.p, request.i, request.d)
         elif request.mode == request.PIDALL:
-            self.send_serial_data(self._orders_dictionary['PIDALL'], [str(request.p), str(request.i), str(request.d)])
+            response = self._asserv_instance.set_pid(request.p, request.i, request.d)
         else:
             response = False
             rospy.logerr("[ASSERV] Parameter mode %d does not exists...", request.mode)
         return ParametersResponse(response)
 
-    def callback_management(self, request):
+    def _callback_management(self, request):
         """
         Callback of the Management service.
         @param request: Service request
@@ -185,131 +175,40 @@ class Asserv:
         rospy.logdebug("[ASSERV] Received a request (management service).")
         response = True
         if request.mode == request.KILLG:
-            self.send_serial_data(self._orders_dictionary['KILLG'], [])
+            response = self._asserv_instance.kill_goal()
         elif request.mode == request.CLEANG:
-            self.send_serial_data(self._orders_dictionary['CLEANG'], [])
+            response = self._asserv_instance.clean_goals()
+            # Delete all internal goals
+            for goal in self._goals_dictionary.values():
+                goal.set_canceled()
+            self._goals_dictionary.clear()
         elif request.mode == request.PAUSE:
-            self.send_serial_data(self._orders_dictionary['PAUSE'], [])
+            response = self._asserv_instance.pause(True)
         elif request.mode == request.RESUME:
-            self.send_serial_data(self._orders_dictionary['RESUME'], [])
+            response = self._asserv_instance.pause(False)
         elif request.mode == request.RESET_ID:
-            self.send_serial_data(self._orders_dictionary['RESET_ID'], [])
+            response = self._asserv_instance.reset_id()
         else:
             response = False
             rospy.logerr("[ASSERV] Management mode %d does not exists...", request.mode)
         return ManagementResponse(response)
 
-    def callback_action_goto(self, goal_handled):
+    def _callback_action_goto(self, goal_handled):
         """
         Callback of the DoGoto action.
         @param goal_handled:    Goal handler corresponding to the received action
         @type goal_handled:     ServerGoalHandle
         """
         rospy.logdebug("[ASSERV] Received a request (dogoto action).")
-        if self.process_goto_order(goal_handled.get_goal().mode, goal_handled.get_goal().position.x, goal_handled.get_goal().position.y, goal_handled.get_goal().position.theta):
+        #TODO manage direction
+        if self._process_goto_order(self._goal_id_counter, goal_handled.get_goal().mode, goal_handled.get_goal().position.x, goal_handled.get_goal().position.y, goal_handled.get_goal().position.theta, 1):
             goal_handled.set_accepted()
-            # TODO make it proper...
-            self._goals_dictionary[self._order_id - 1] = goal_handled
+            self._goals_dictionary[self._goal_id_counter] = goal_handled
+            self._goal_id_counter += 1
         else:
             rospy.logerr("[ASSERV] Action GOTO has failed... Mode probably does not exist.")
 
-    def data_receiver(self):
-        """
-        Receives data from serial communication line and put it in a queue.
-        This function has to be called within a thread.
-        """
-        while not rospy.is_shutdown():
-            try:
-                received_data = self._serial_com.readline()
-                if received_data != "":
-                    self._reception_queue.put(received_data.replace('\r\n', ''))
-            except KeyboardInterrupt:
-                break
-            rospy.sleep(0.01)
-
-    def start(self):
-        """
-        Starts the node, process the reception queue.
-        """
-        rospy.logdebug("[ASSERV] Node has correctly started.")
-        while not rospy.is_shutdown():
-            if not self._reception_queue.empty():
-                try:
-                    self.process_received_data(self._reception_queue.get())
-                    self._reception_queue.task_done()
-                except KeyboardInterrupt:
-                    break
-            rospy.sleep(0.01)
-
-    def process_received_data(self, data):
-        """
-        This function is in charge of processing all the received data from the Arduino.
-        The data received have different types :
-            * Identification of the Arduino (ex : "asserv_gr")
-            * Status data (robot position, speed...), starting with ~
-            * Orders ack, tells that an order has finished
-            * Debug string
-        @param data:    The data received from Arduino
-        @type data:     string
-        """
-        # At init, start the Arduino
-        # TODO split data by _ to check if pr or gr and of asserv or others
-        if (not self._arduino_started_flag) and data.find("asserv") != -1:
-            rospy.logdebug("[ASSERV] Asserv Arduino identified, start it.")
-            self._sending_queue.put(self._orders_dictionary['START'] + ";0;\n")
-        # Received status
-        elif data.find("~") != -1:
-            rospy.logdebug("[ASSERV] Received status data.")
-            receied_data_list = data.split(";")
-            # rospy.loginfo("data sharp : " + receied_data_list[10])
-            self._pub_robot_pose.publish(Pose2D(float(receied_data_list[2]) / 1000, float(receied_data_list[3]) / 1000, float(receied_data_list[4]) / 1000))
-            self._pub_robot_speed.publish(RobotSpeed(float(receied_data_list[5]), float(receied_data_list[6]), float(receied_data_list[7]), float(receied_data_list[8]), float(receied_data_list[9])))
-        # Received order ack
-        elif data.find(";") == 1:
-            # Special order ack, the first one concern the Arduino activation
-            if data.find("0;") == 0:
-                rospy.loginfo("[ASSERV] Arduino started")
-                self._arduino_started_flag = True
-                self._order_id += 1
-            else:
-                rospy.logdebug("[ASSERV] Received order ack : %s", data)
-                ack_data = data.split(";")
-                try:
-                    ack_id = int(ack_data[0])
-                except:
-                    ack_id = -1
-                # TODO manage status
-                if ack_id in self._goals_dictionary:
-                    rospy.logdebug("[ASSERV] Found key %d in goal dictionary !", ack_id)
-                    self._goals_dictionary[ack_id].set_succeeded(DoGotoResult(result=True))
-                    del self._goals_dictionary[ack_id]
-                elif ack_id in self._goto_srv_dictionary:
-                    rospy.logdebug("[ASSERV] Found key %d in goto dictionary !", ack_id)
-                    # TODO something else ?
-                    del self._goto_srv_dictionary[ack_id]
-                else:
-                    # Do nothing, some IDs are returned but do not correspond to a value in the dictionary.
-                    pass
-        else:
-            rospy.loginfo("%s", data)
-
-    def send_serial_data(self, order_type, args_list):
-        """
-        This function sends data to the Arduino, using the specific protocol.
-        @param order_type:  Type of the order to send (see protocol.h in arduino/common/asserv folder)
-        @type order_type:   string containing an int
-        @param args_list:   List of arguments, depending on the order
-        @type args_list:    List
-        """
-        if self._serial_com is not None:
-            args_list.insert(0, str(self._order_id))
-            # TODO check if \n is necessary  + '\n'
-            self._sending_queue.put(order_type + ";" + ";".join(args_list) + ";\n")
-            self._order_id += 1
-        else:
-            rospy.logerr("[ASSERV] Try to send data but serial line is not connected...")
-
-    def process_goto_order(self, mode, x, y, a):
+    def _process_goto_order(self, goal_id, mode, x, y, a, direction):
         """
         Processes the goto order, coming from service or action.
         @param mode:    Mode of the Goto order (see Goto.srv or DoGoto.action files)
@@ -325,24 +224,17 @@ class Asserv:
         """
         to_return = True
         if mode == GotoRequest.GOTO:
-            self.send_serial_data(self._orders_dictionary['GOTO'], [str(int(x * 1000)), str(int(y * 1000)), str(1)])
+            to_return = self._asserv_instance.goto(goal_id, x, y, direction)
         elif mode == GotoRequest.GOTOA:
-            self.send_serial_data(self._orders_dictionary['GOTOA'], [str(int(x * 1000)), str(int(y * 1000)), str(a * 1000), str(1)])
+            to_return = self._asserv_instance.gotoa(goal_id, x, y, a, direction)
         elif mode == GotoRequest.ROT:
-            self.send_serial_data(self._orders_dictionary['ROT'], [str(a * 1000)])
+            to_return = self._asserv_instance.rot(goal_id, a, False)
         elif mode == GotoRequest.ROTNOMODULO:
-            self.send_serial_data(self._orders_dictionary['ROTNOMODULO'], [str(a * 1000)])
+            to_return = self._asserv_instance.rot(goal_id, a, True)
         else:
             to_return = False
             rospy.logerr("[ASSERV] GOTO mode %d does not exists...", mode)
         return to_return
-
-    def callback_timer_serial_send(self, event):
-        if not self._sending_queue.empty():
-            data_to_send = self._sending_queue.get()
-            rospy.logdebug("Sending data : " + data_to_send)
-            self._serial_com.write(data_to_send)
-            self._sending_queue.task_done()
 
 
 if __name__ == "__main__":
