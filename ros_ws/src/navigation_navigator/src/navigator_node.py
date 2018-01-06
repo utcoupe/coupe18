@@ -180,7 +180,7 @@ class NavigatorNode(object):
         except Exception, e:
             rospy.logdebug("Navigation failled: " + e.message)
             result = DoGotoResult(False)
-            self._currentStatus = NAV_IDLE
+            self._currentStatus = NavigatorStatuses.NAV_IDLE
             self._updateStatus()
             handledGoal.set_succeeded(result)
 
