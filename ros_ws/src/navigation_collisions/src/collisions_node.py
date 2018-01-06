@@ -14,8 +14,7 @@ from geometry_msgs.msg import Pose2D
 
 class CollisionsNode(object):
     def __init__(self):
-        rospy.init_node("collisions", log_level=rospy.DEBUG)
-        rospy.loginfo("Started node 'navigation/collisions'.")
+        rospy.init_node("collisions", log_level=rospy.INFO)
 
         # Creating listeners
         self.subscriptions = CollisionsSubscriptions()
@@ -36,6 +35,8 @@ class CollisionsNode(object):
             shape = {"width": 0.3, "height": 0.2}
         Map.Robot = MapRobot(shape["width"], shape["height"]) # Can create a rect or circle
 
+        rospy.loginfo("'navigation/collisions' initialized.")
+
         # TESTS While dependencies not available.
         # Map.Robot.updatePath(RobotPath([Point(2.0, 1.7), Point(0.6, 0.7), Point(2.2, 0.6), Point(2.7, 0.3)]))
         # Map.Robot.NavStatus = RobotStatus.NAV_NAVIGATING
@@ -49,8 +50,6 @@ class CollisionsNode(object):
         r = rospy.Rate(15)
         while not rospy.is_shutdown():
             self.subscriptions.updateRobotPosition()
-            
-            rospy.loginfo(Map.Robot.isInitialized())
 
             predicted_collisions = Map.Robot.checkCollisions(Map.toList())
             for pd in predicted_collisions:
@@ -61,7 +60,7 @@ class CollisionsNode(object):
 
             r.sleep()
 
-    def publishCollision(self, collision): # TODO
+    def publishCollision(self, collision):
         m = PredictedCollision()
         m.danger_level = collision.Level
 
