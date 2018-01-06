@@ -31,8 +31,11 @@ void process_belt() {
 //    }
 
     //TODO use a loop and multiple sensors
-    belt_range_msg.sensor_id = "sensor_top";
-    belt_range_msg.range = sensor.readRangeSingleMillimeters();
+    belt_range_msg.sensor_id = "sensor1";
+    belt_range_msg.range = sensor.readRangeSingleMillimeters(); //in millimeters
+    if (belt_range_msg.range > 65534) {
+      belt_range_msg.range = -1;
+    }
     belt_ranges_pub.publish(&belt_range_msg);
 }
 
@@ -43,12 +46,13 @@ void setup() {
 
     Wire.begin();
     sensor.init();
-	sensor.setTimeout(500);
+	  sensor.setTimeout(500);
 
     // Configure the sensor in single shot long range
-    sensor.setSignalRateLimit(0.1);
-    sensor.setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18);
-    sensor.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
+    //sensor.setSignalRateLimit(0.1);
+    //sensor.setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18);
+    //sensor.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
+    sensor.setMeasurementTimingBudget(20000);
 
 //    lox.setAddress(0x34);
 //    if (!lox.begin()) {
@@ -59,5 +63,5 @@ void setup() {
 void loop() {
     process_belt();
     nh.spinOnce();
-    delay(100); //random delay for now
+    delay(50); //random delay for now
 }
