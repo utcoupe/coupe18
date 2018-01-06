@@ -52,7 +52,7 @@ class BeltInterpreter(object):
 
         self._static_shapes = self.fetch_map_objects()
         self._sensors_sub = rospy.Subscriber(self.SENSORS_TOPIC, BeltRange,
-                                             self.callback)
+                                             self.callback, queue_size=1)
 
         self._static_rects = {}
         self._dynamic_rects = {}
