@@ -33,7 +33,7 @@ class AsservSimu(AsservAbstract):
         self._current_goal_position = Pose2D(0, 0, 0)
         # Parameters
         # The acceleration is in m/s^2
-        self._max_acceleration = 0.05
+        self._max_acceleration = 0.1
         # The speed is in m/s
         self._max_linear_speed = 0.5
         # The angular speed is in rad/s
@@ -141,10 +141,9 @@ class AsservSimu(AsservAbstract):
 
     def _start_trajectory(self, x, y, a = 0, direction = "forward"):
         # TODO goal management
-        # TODO end_position management
+        # TODO use angle
+        # TODO use direction
         self._currently_moving = True
         self._goal_distance = ((x - self._current_pose.x) ** 2 + (y - self._current_pose.y) ** 2) ** 0.5
-        # TODO this is not good, wrong computation !!!
-        # self._goal_angle = math.acos((self._current_pose.x * x + self._current_pose.y * y) / self._goal_distance)
-        self._goal_angle = math.acos(x / self._goal_distance)
-        rospy.loginfo("distance : " + str(self._goal_distance) + " angle : " + str(self._goal_angle))
+        self._goal_angle = math.atan2(y, x)
+        rospy.loginfo("distance : " + str(self._goal_distance) + " cos angle : " + str(self._goal_angle))
