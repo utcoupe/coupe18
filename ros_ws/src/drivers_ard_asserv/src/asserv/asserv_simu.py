@@ -33,7 +33,7 @@ class AsservSimu(AsservAbstract):
         self._current_goal_position = Pose2D(0, 0, 0)
         # Parameters
         # The acceleration is in m/s^2
-        self._max_acceleration = 0.2
+        self._max_acceleration = 0.05
         # The speed is in m/s
         self._max_linear_speed = 0.5
         # The angular speed is in rad/s
@@ -121,8 +121,11 @@ class AsservSimu(AsservAbstract):
                 self._currently_moving = False
                 self._current_linear_speed = 0
             else:
-                # TODO deceleration
-                self._current_linear_speed += self._max_acceleration * ASSERV_RATE
+                current_goal_distance = ((self._current_goal_position.x - self._current_pose.x) ** 2 + (self._current_goal_position.y - self._current_pose.y) ** 2) ** 0.5
+                if current_goal_distance > self._goal_distance / 2:
+                    self._current_linear_speed += self._max_acceleration * ASSERV_RATE
+                else:
+                    self._current_linear_speed -= self._max_acceleration * ASSERV_RATE
                 if self._current_linear_speed > self._max_linear_speed:
                     self._current_linear_speed = self._max_linear_speed
                 current_x = self._current_pose.x + self._current_linear_speed * ASSERV_RATE * math.cos(self._goal_angle)
