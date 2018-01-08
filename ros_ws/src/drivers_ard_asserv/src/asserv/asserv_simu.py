@@ -9,9 +9,11 @@ from drivers_ard_asserv.msg import RobotSpeed
 __author__ = "Thomas Fuhrmann"
 __date__ = 16/12/2017
 
+# TODO adapt to have realistic behaviour of the robot
 SEND_POSE_RATE = 0.1  # in ms
 SEND_SPEED_RATE = 0.1  # in ms
 ASSERV_RATE = 0.05  # in ms
+ASSERV_ERROR_POSITION = 0.02  # in meters
 
 
 class AsservSimu(AsservAbstract):
@@ -28,6 +30,7 @@ class AsservSimu(AsservAbstract):
         self._goal_distance = 0
         # TODO rename
         self._goal_angle = 0
+        self._current_goal_position = Pose2D(0, 0, 0)
         # Parameters
         # The acceleration is in m/s^2
         self._max_acceleration = 0.2
@@ -47,6 +50,8 @@ class AsservSimu(AsservAbstract):
             rospy.sleep(0.01)
 
     def goto(self, goal_id, x, y, direction):
+        self._current_goal_position = Pose2D(x, y, 0)
+        rospy.loginfo("[ASSERV] Accepting goal (x = " + str(self._current_goal_position.x) + ", y = " + str(self._current_goal_position.y) + ").")
         self._start_trajectory(x, y)
         return True
 
@@ -106,15 +111,23 @@ class AsservSimu(AsservAbstract):
         return True
 
     def _callback_timer_asserv_computation(self, event):
-        # TODO + or - depending on the position on the trajectory (deceleration)
-        # TODO max speed
         if self._currently_moving:
-            self._current_linear_speed += self._max_acceleration * ASSERV_RATE
-            if self._current_linear_speed > self._max_linear_speed:
-                self._current_linear_speed = self._max_linear_speed
-            current_x = self._current_pose.x + self._current_linear_speed * ASSERV_RATE * math.cos(self._goal_angle)
-            current_y = self._current_pose.y + self._current_linear_speed * ASSERV_RATE * math.sin(self._goal_angle)
-            self._current_pose = Pose2D(current_x, current_y, self._current_pose.theta)
+            # Check if the robot is arrived
+            if ((self._current_pose.x > self._current_goal_position.x - ASSERV_ERROR_POSITION) and
+                    (self._current_pose.x < self._current_goal_position.x + ASSERV_ERROR_POSITION) and
+                    (self._current_pose.y > self._current_goal_position.y - ASSERV_ERROR_POSITION) and
+                    (self._current_pose.y < self._current_goal_position.y + ASSERV_ERROR_POSITION)):
+                rospy.loginfo("[ASSERV] Goal position has been reached !")
+                self._currently_moving = False
+                self._current_linear_speed = 0
+            else:
+                # TODO deceleration
+                self._current_linear_speed += self._max_acceleration * ASSERV_RATE
+                if self._current_linear_speed > self._max_linear_speed:
+                    self._current_linear_speed = self._max_linear_speed
+                current_x = self._current_pose.x + self._current_linear_speed * ASSERV_RATE * math.cos(self._goal_angle)
+                current_y = self._current_pose.y + self._current_linear_speed * ASSERV_RATE * math.sin(self._goal_angle)
+                self._current_pose = Pose2D(current_x, current_y, self._current_pose.theta)
 
     def _callback_timer_pose_send(self, event):
         self._node.send_robot_position(self._current_pose)
