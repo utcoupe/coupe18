@@ -33,7 +33,7 @@ class Asserv:
         # Instance of the asserv object (simu or real)
         self._asserv_instance = None
         # Init ROS stuff
-        rospy.init_node(NODE_NAME, anonymous=False, log_level=rospy.DEBUG)
+        rospy.init_node(NODE_NAME, anonymous=False, log_level=rospy.INFO)
         self._pub_robot_pose = rospy.Publisher("/drivers/" + NODE_NAME + "/pose2d", Pose2D, queue_size=5)
         self._pub_robot_speed = rospy.Publisher("/drivers/" + NODE_NAME + "/speed", RobotSpeed, queue_size=5)
         self._srv_goto = rospy.Service("/drivers/" + NODE_NAME + "/goto", Goto, self._callback_goto)
