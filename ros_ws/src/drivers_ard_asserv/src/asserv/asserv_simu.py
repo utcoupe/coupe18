@@ -15,6 +15,10 @@ SEND_SPEED_RATE = 0.1  # in ms
 ASSERV_RATE = 0.05  # in ms
 ASSERV_ERROR_POSITION = 0.02  # in meters
 
+# TODO FIFO management
+# TODO angle goal management
+# TODO emergency stop
+
 
 class AsservSimu(AsservAbstract):
     def __init__(self, asserv_node):
@@ -30,7 +34,11 @@ class AsservSimu(AsservAbstract):
         self._goal_distance = 0
         # TODO rename
         self._goal_angle = 0
-        self._current_goal_position = Pose2D(0, 0, 0)
+        self._current_goal = Pose2D(0, 0, 0)
+        self._current_goal_initial_distance = 0
+        self._current_goal_initial_angle = 0
+        # List of Pose2d corresponding to the goals
+        self._goals_list = []
         # Parameters
         # The acceleration is in m/s^2
         self._max_acceleration = 0.1
@@ -50,8 +58,7 @@ class AsservSimu(AsservAbstract):
             rospy.sleep(0.01)
 
     def goto(self, goal_id, x, y, direction):
-        self._current_goal_position = Pose2D(x, y, 0)
-        rospy.loginfo("[ASSERV] Accepting goal (x = " + str(self._current_goal_position.x) + ", y = " + str(self._current_goal_position.y) + ").")
+        rospy.loginfo("[ASSERV] Accepting goal (x = " + str(x) + ", y = " + str(y) + ").")
         self._start_trajectory(x, y)
         return True
 
@@ -72,8 +79,10 @@ class AsservSimu(AsservAbstract):
         return False
 
     def set_emergency_stop(self, stop):
-        rospy.logerr("AsservAbstract is abstract !")
-        return False
+        self._emergency_stop_flag = stop
+        if stop:
+            self._current_linear_speed = 0
+        return True
 
     def kill_goal(self):
         rospy.logerr("AsservAbstract is abstract !")
@@ -111,39 +120,43 @@ class AsservSimu(AsservAbstract):
         return True
 
     def _callback_timer_asserv_computation(self, event):
-        if self._currently_moving:
+        # First check if a goal has to be got from the list
+        if self._current_goal == Pose2D(0, 0, 0) and len(self._goals_list) > 0:
+            self._current_goal = self._goals_list.pop()
+            rospy.loginfo("[ASSERV] Starting a new goal : x = " + str(self._current_goal.x) + " y = " + str(self._current_goal.y) + " a = " + str(self._current_goal.theta))
+            self._current_goal_initial_distance = ((self._current_goal.x - self._current_pose.x) ** 2 + (self._current_goal.y - self._current_pose.y) ** 2) ** 0.5
+            self._current_goal_initial_angle = math.atan2(self._current_goal.y - self._current_pose.y, self._current_goal.x - self._current_pose.x)
+            self._currently_moving = True
+        if self._currently_moving and not self._emergency_stop_flag:
             # Check if the robot is arrived
-            if ((self._current_pose.x > self._current_goal_position.x - ASSERV_ERROR_POSITION) and
-                    (self._current_pose.x < self._current_goal_position.x + ASSERV_ERROR_POSITION) and
-                    (self._current_pose.y > self._current_goal_position.y - ASSERV_ERROR_POSITION) and
-                    (self._current_pose.y < self._current_goal_position.y + ASSERV_ERROR_POSITION)):
+            if ((self._current_pose.x > self._current_goal.x - ASSERV_ERROR_POSITION) and
+                    (self._current_pose.x < self._current_goal.x + ASSERV_ERROR_POSITION) and
+                    (self._current_pose.y > self._current_goal.y - ASSERV_ERROR_POSITION) and
+                    (self._current_pose.y < self._current_goal.y + ASSERV_ERROR_POSITION)):
                 rospy.loginfo("[ASSERV] Goal position has been reached !")
+                self._current_goal = Pose2D(0, 0, 0)
                 self._currently_moving = False
                 self._current_linear_speed = 0
             else:
-                current_goal_distance = ((self._current_goal_position.x - self._current_pose.x) ** 2 + (self._current_goal_position.y - self._current_pose.y) ** 2) ** 0.5
-                if current_goal_distance > self._goal_distance / 2:
+                current_goal_distance = ((self._current_goal.x - self._current_pose.x) ** 2 + (self._current_goal.y - self._current_pose.y) ** 2) ** 0.5
+                if current_goal_distance > self._current_goal_initial_distance / 2:
                     self._current_linear_speed += self._max_acceleration * ASSERV_RATE
                 else:
                     self._current_linear_speed -= self._max_acceleration * ASSERV_RATE
                 if self._current_linear_speed > self._max_linear_speed:
                     self._current_linear_speed = self._max_linear_speed
-                current_x = self._current_pose.x + self._current_linear_speed * ASSERV_RATE * math.cos(self._goal_angle)
-                current_y = self._current_pose.y + self._current_linear_speed * ASSERV_RATE * math.sin(self._goal_angle)
+                current_x = self._current_pose.x + self._current_linear_speed * ASSERV_RATE * math.cos(self._current_goal_initial_angle)
+                current_y = self._current_pose.y + self._current_linear_speed * ASSERV_RATE * math.sin(self._current_goal_initial_angle)
+                # TODO modify current angle
                 self._current_pose = Pose2D(current_x, current_y, self._current_pose.theta)
 
     def _callback_timer_pose_send(self, event):
         self._node.send_robot_position(self._current_pose)
 
     def _callback_timer_speed_send(self, event):
-        # TODO
         self._node.send_robot_speed(RobotSpeed(0, 0, self._current_linear_speed, 0, 0))
 
-    def _start_trajectory(self, x, y, a = 0, direction = "forward"):
-        # TODO goal management
+    def _start_trajectory(self, x, y, a=0, direction="forward"):
         # TODO use angle
         # TODO use direction
-        self._currently_moving = True
-        self._goal_distance = ((x - self._current_pose.x) ** 2 + (y - self._current_pose.y) ** 2) ** 0.5
-        self._goal_angle = math.atan2(y, x)
-        rospy.loginfo("distance : " + str(self._goal_distance) + " cos angle : " + str(self._goal_angle))
+        self._goals_list.append(Pose2D(x, y, a))
