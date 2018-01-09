@@ -56,7 +56,7 @@ class BeltInterpreter(object):
 
         self._static_rects = {}
         self._dynamic_rects = {}
-        self._data_to_process = {}
+        self._data_to_process = []
 
         rospy.loginfo("Belt interpreter is ready. Listening for sensor data on '{}'.".format(self.SENSORS_TOPIC))
 
@@ -80,6 +80,7 @@ class BeltInterpreter(object):
                 return
 
             r = data.range
+            rospy.loginfo("Range : " + str(r))
 
             if r > self._belt_parser.Params["max_range"] or r <= 0:
                 self._static_rects.pop(sensor_id, None)
