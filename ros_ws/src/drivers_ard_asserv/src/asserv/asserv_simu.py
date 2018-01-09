@@ -13,11 +13,11 @@ __date__ = 16/12/2017
 SEND_POSE_RATE = 0.1  # in ms
 SEND_SPEED_RATE = 0.1  # in ms
 ASSERV_RATE = 0.05  # in ms
+# To be more accurate on position error, the speed has to be lower otherwise the goal reached check will fail
 ASSERV_ERROR_POSITION = 0.02  # in meters
 
-# TODO FIFO management
 # TODO angle goal management
-# TODO emergency stop
+# TODO actionlib goals management (goal_id) --> put it in the abstract class ?
 
 
 class AsservSimu(AsservAbstract):
@@ -30,12 +30,11 @@ class AsservSimu(AsservAbstract):
         self._current_linear_speed = 0
         self._current_angular_speed = 0
         self._currently_moving = False
-        self._first_trajectory_update = True
-        self._goal_distance = 0
-        # TODO rename
-        self._goal_angle = 0
+        self._emergency_stop = False
         self._current_goal = Pose2D(0, 0, 0)
+        # Distance between the robot and the goal when the current goal is set
         self._current_goal_initial_distance = 0
+        # Angle between the robot and the goal when the current goal is set
         self._current_goal_initial_angle = 0
         # List of Pose2d corresponding to the goals
         self._goals_list = []
@@ -46,7 +45,6 @@ class AsservSimu(AsservAbstract):
         self._max_linear_speed = 0.5
         # The angular speed is in rad/s
         self._max_angular_speed = 0.01
-        self._emergency_stop_flag = False
         # ROS stuff
         self._tmr_pose_send = rospy.Timer(rospy.Duration(SEND_POSE_RATE), self._callback_timer_pose_send)
         self._tmr_speed_send = rospy.Timer(rospy.Duration(SEND_SPEED_RATE), self._callback_timer_speed_send)
@@ -63,11 +61,11 @@ class AsservSimu(AsservAbstract):
         return True
 
     def gotoa(self, goal_id, x, y, a, direction):
-        rospy.logerr("AsservAbstract is abstract !")
+        rospy.logerr("This function has not been implemented yet...")
         return False
 
     def rot(self, goal_id, a, no_modulo):
-        rospy.logerr("AsservAbstract is abstract !")
+        rospy.logerr("This function has not been implemented yet...")
         return False
 
     def pwm(self, left, right, duration):
@@ -75,25 +73,25 @@ class AsservSimu(AsservAbstract):
         return False
 
     def speed(self, linear, angular, duration):
-        rospy.logerr("AsservAbstract is abstract !")
+        rospy.logerr("This function has not been implemented yet...")
         return False
 
     def set_emergency_stop(self, stop):
-        self._emergency_stop_flag = stop
+        self._emergency_stop = stop
         if stop:
             self._current_linear_speed = 0
         return True
 
     def kill_goal(self):
-        rospy.logerr("AsservAbstract is abstract !")
+        rospy.logerr("This function has not been implemented yet...")
         return False
 
     def clean_goals(self):
-        rospy.logerr("AsservAbstract is abstract !")
-        return False
+        self._goals_list = []
+        return True
 
     def pause(self, pause):
-        rospy.logwarn("Pause is not implemented in simu yet...")
+        rospy.logerr("This function has not been implemented yet...")
         return False
 
     def reset_id(self):
@@ -112,12 +110,13 @@ class AsservSimu(AsservAbstract):
         return True
 
     def set_pos(self, x, y, a):
+        return_value = True
         if self._currently_moving:
-            # TODO set the pose or return false ?
             rospy.logwarn("Setting pose wile moving is not a good idea...")
+            return_value = False
         else:
             self._current_pose = Pose2D(x, y, a)
-        return True
+        return return_value
 
     def _callback_timer_asserv_computation(self, event):
         # First check if a goal has to be got from the list
@@ -127,7 +126,7 @@ class AsservSimu(AsservAbstract):
             self._current_goal_initial_distance = ((self._current_goal.x - self._current_pose.x) ** 2 + (self._current_goal.y - self._current_pose.y) ** 2) ** 0.5
             self._current_goal_initial_angle = math.atan2(self._current_goal.y - self._current_pose.y, self._current_goal.x - self._current_pose.x)
             self._currently_moving = True
-        if self._currently_moving and not self._emergency_stop_flag:
+        if self._currently_moving and not self._emergency_stop:
             # Check if the robot is arrived
             if ((self._current_pose.x > self._current_goal.x - ASSERV_ERROR_POSITION) and
                     (self._current_pose.x < self._current_goal.x + ASSERV_ERROR_POSITION) and
@@ -158,5 +157,5 @@ class AsservSimu(AsservAbstract):
 
     def _start_trajectory(self, x, y, a=0, direction="forward"):
         # TODO use angle
-        # TODO use direction
+        # TODO use direction ?
         self._goals_list.append(Pose2D(x, y, a))
