@@ -2,30 +2,37 @@ cmake_minimum_required(VERSION 2.8.3)
 project(memory_map)
 
 find_package(catkin REQUIRED COMPONENTS
-  rospy
-  std_msgs
-  geometry_msgs
-  message_generation
+    rospy
+    std_msgs
+    geometry_msgs
+    message_generation
 )
 
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
 
+# Generate messages in the 'msg' folder
+add_message_files(
+    FILES
+    Waypoint.msg
+)
+
 # Generate services in the 'srv' folder
 add_service_files(
-  FILES
-  MapGet.srv
-  MapSet.srv
-  MapTransfer.srv
-  MapGetOccupancy.srv
+    FILES
+    MapGet.srv
+    MapSet.srv
+    MapTransfer.srv
+    MapGetOccupancy.srv
+    FillWaypoint.srv
 )
 
 # Generate added messages and services with any dependencies listed here
 generate_messages(
-  DEPENDENCIES
-  std_msgs
-  geometry_msgs
+    DEPENDENCIES
+    std_msgs
+    geometry_msgs
 )
 
 ################################################
@@ -45,7 +52,7 @@ catkin_package(
 ###########
 
 include_directories(
-  ${catkin_INCLUDE_DIRS}
+    ${catkin_INCLUDE_DIRS}
 )
 
 #############
