@@ -61,8 +61,9 @@ class AsservSimu(AsservAbstract):
         return True
 
     def gotoa(self, goal_id, x, y, a, direction):
-        rospy.logerr("This function has not been implemented yet...")
-        return False
+        rospy.loginfo("[ASSERV] Accepting goal (x = " + str(x) + ", y = " + str(y) + "), angle has not been implemented yet...")
+        self._start_trajectory(x, y)
+        return True
 
     def rot(self, goal_id, a, no_modulo):
         rospy.logerr("This function has not been implemented yet...")
