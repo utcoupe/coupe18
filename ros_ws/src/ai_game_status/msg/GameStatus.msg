@@ -7,7 +7,3 @@ uint8 INIT_INITIALIZING = 0 # All nodes didn't respond and we didn't reach the i
 uint8 INIT_INITIALIZED  = 1 # All nodes responded successfully and are initialized.
 uint8 INIT_FAILED       = 2 # Nodes responded false or didn't respond after before the init timeout.
 uint8 init_status
-
-string[] pending_nodes # Node names that didn't notify they are init or not yet.
-string[] ready_nodes   # Node names that responded they initialized correctly.
-string[] failed_nodes  # Node names that responded they couldn't init.
