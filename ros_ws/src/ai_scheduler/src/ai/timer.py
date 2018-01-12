@@ -7,7 +7,7 @@ class GameTimer():
         self._finished = False
 
     def on_new_time(self, msg):
-        if msg.is_finished:
+        if msg.is_active:
             if not self._finished:
                 rospy.logwarn("[AI] GAME FINISHED EVENT FROM TIMER, STOPPING EXECUTION.")
                 self._finished = True

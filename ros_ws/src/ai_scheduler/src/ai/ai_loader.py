@@ -15,7 +15,8 @@ class AILoader():
         pass# self.xml_dirpath = os.path.dirname(__file__) + "/../../def/"
 
     def get_strategies(self):
-        xml_strategies = ET.parse(self.xml_dirpath + self.STRATEGIES_FILE).getroot()
+        strat_path = self._get_path(self.STRATEGIES_FILE)
+        xml_strategies = ET.parse(strat_path).getroot()
         return [child.attrib["name"] for child in xml_strategies]
 
     def load(self, strategyname, communicator):
@@ -56,8 +57,7 @@ class AILoader():
             get_def.wait_for_service(10)
             res = get_def('ai/' + filename)
             if not res.success:
-                rospy.logerr("Error when fetching '{}' definition file", filename)
-                raise Exception()
+                rospy.logerr("Error when fetching '{}' definition file".format(filename))
             return res.path
         except rospy.ServiceException as exc:
             rospy.logerr("Unhandled error while getting def file: {}".format(str(exc)))

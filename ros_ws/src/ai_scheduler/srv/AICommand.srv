@@ -1,3 +1,4 @@
+# DEPRECATED ? Ask Pierre Laclau.
 uint8 COMMAND_START = 0 # Start executing actions.
 uint8 COMMAND_HALT  = 1 # Stop all executions.
 uint8 command

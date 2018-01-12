@@ -1,32 +1,42 @@
 #!/usr/bin/python
+import time
 import rospy
 from scheduler_communication import AICommunication
 from scheduler_services import AIServices
 from ai import RobotAI
 
 from ai_scheduler.srv import AICommand, AICommandResponse
-# from drivers_ard_hmi.srv import SetStrategies
-
-# from drivers_hmi.srv import SetStrategies
+from drivers_ard_hmi.msg import SetStrategies, HMIEvent
+from ai_game_status.srv import SetStatus
+from ai_game_status_services import StatusServices
 
 class AINode():
     def __init__(self):
         self.DepartmentName, self.PackageName = "ai", "scheduler"
 
-        self.NODE = rospy.init_node(self.PackageName, log_level = rospy.DEBUG)
-        rospy.Service("/ai/scheduler/command", AICommand, self.on_command)
+        rospy.init_node(self.PackageName, log_level = rospy.DEBUG)
+        rospy.Subscriber("/drivers/driver_ard_hmi/hmi_event", HMIEvent, self.on_hmi_event)
 
         self.AI = RobotAI()
-        # self.services = AIServices(self.DepartmentName, self.PackageName)
 
-        rospy.loginfo("[AI] Ready.")
-        # self.send_strategies()
+        # Sending init status to ai/game_status, subscribing to game_status status pub.
+        status_services = StatusServices(self.DepartmentName, self.PackageName, None, self.on_game_status)
+        status_services.ready(True) # Tell ai/game_status the node is initialized.
+        rospy.loginfo("[AI] Ready. Waiting for activation.")
+        self.send_strategies()
         rospy.spin()
 
     def send_strategies(self):
-        rospy.wait_for_service("/drivers/ard_hmi/set_strategies", timeout = 20) # TODO evaluate and put good timeout
-        s = rospy.ServiceProxy("/drivers/ard_hmi/set_strategies", SetStrategies)
-        s(self.AI.get_strategies())
+        pub = rospy.Publisher("/drivers/driver_ard_hmi/set_strategies", SetStrategies, queue_size=10)
+        time.sleep(0.3)
+        pub.publish(SetStrategies(self.AI.get_strategies()))
+
+    def send_set_ingame(self): # TODO wrong place ?
+        pub = rospy.Publisher("/ai/game_status/set_status", SetStatus, queue_size=10)
+        time.sleep(0.3)
+        s = SetStatus()
+        s.new_game_status = 2 # STATUS_INGAME TODO do more "better" ?
+        pub.publish(s)
 
     # def runAI(self):
     #     #Debug: show task tree when starting the system
@@ -42,10 +52,16 @@ class AINode():
     #             break
     #         self.AI.strategy.PrettyPrint()
 
-    def on_command(self, req):
-        if req.command == req.COMMAND_START:
+    def on_game_status(self, msg):
+        if msg.game_status == msg.STATUS_HALT:
+            self.AI.halt()
+
+    def on_hmi_event(self, req):
+        if req.event == 0: #req.EVENT_START: TODO adapt on HMI branch and merge
+            rospy.loginfo("[AI] Starting actions ! Strategy '{}'.".format(req.strategy_name))
             self.AI.start(req.strategy_name, AICommunication())
-        elif req.command == req.COMMAND_HALT:
+        elif req.event == req.EVENT_GAME_CANCEL:
+            rospy.logwarn("[AI] HMI Asked to stop ! Stopping strategy execution.")
             self.AI.halt()
         return AICommandResponse()
 
