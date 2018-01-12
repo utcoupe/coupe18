@@ -19,7 +19,16 @@ class MapRobot(RectObstacle):
         self._engine = CollisionsResolver()
 
     def isInitialized(self):
-        return self.Position != None and self.Velocity != None # TODO implement check if true data in there
+        return self.Position != None and self.Velocity != None
+
+    def checkStatus(self, map_obstacles):
+        status = (map_obstacles is not None and len(map_obstacles) > 0) and self.Path.hasPath() and self.isInitialized() and self.NavStatus != RobotStatus.NAV_IDLE
+        rospy.logdebug("obstacles_exist:{}, hasPath:{}, initialized:{}, navigating:{} => INIT:{}".format(map_obstacles is not None and len(map_obstacles) > 0,
+                                                                                                         self.Path.hasPath(),
+                                                                                                         self.isInitialized(),
+                                                                                                         self.NavStatus != RobotStatus.NAV_IDLE,
+                                                                                                         status))
+        return status
 
     def updatePosition(self, new_position):
         self.Position = new_position
@@ -42,15 +51,14 @@ class MapRobot(RectObstacle):
                                      self.Position.A), w, h)
 
     def checkCollisions(self, map_obstacles):
-        if map_obstacles is not None and self.Path.hasPath() and self.isInitialized():
-            if self.NavStatus != RobotStatus.NAV_IDLE:
-                rospy.logdebug("Checking for collisions...")
-                imminent_collisions = self._check_imminent_collisions(map_obstacles)
-                path_collisions = self._check_path_collisions(map_obstacles)
-                for pc in path_collisions:
-                    if pc.Obstacle not in [ic.Obstacle for ic in imminent_collisions]:
-                        imminent_collisions.append(pc)
-                return imminent_collisions
+        if self.checkStatus(map_obstacles):
+            rospy.logdebug("Checking for collisions...")
+            imminent_collisions = self._check_imminent_collisions(map_obstacles)
+            path_collisions = self._check_path_collisions(map_obstacles)
+            for pc in path_collisions:
+                if pc.Obstacle not in [ic.Obstacle for ic in imminent_collisions]:
+                    imminent_collisions.append(pc)
+            return imminent_collisions
         else:
             return []
 
