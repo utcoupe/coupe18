@@ -10,8 +10,8 @@ class AIServices():
         rospy.Service(self.ServiceName, AIGenericCommand, self.onGenericCommand)
 
     def onGenericCommand(self, req):
-        if self.validate_request(req):     res_code, reason = self.executeService(req)
-        else:                             res_code, reason = 403, "Bad request. Wrong destination."
+        if self.validate_request(req): res_code, reason = self.executeService(req)
+        else:                          res_code, reason = 403, "Bad request. Wrong destination."
         return AIGenericCommandResponse(res_code, reason)
 
 #/*==========================================

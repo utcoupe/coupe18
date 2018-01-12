@@ -15,9 +15,11 @@ class AINode():
         self.DepartmentName, self.PackageName = "ai", "scheduler"
 
         rospy.init_node(self.PackageName, log_level = rospy.DEBUG)
-        rospy.Subscriber("/drivers/driver_ard_hmi/hmi_event", HMIEvent, self.on_hmi_event)
 
         self.AI = RobotAI()
+        self.available_strategies = self.AI.get_strategies()
+
+        rospy.Subscriber("/feedback/ard_hmi/hmi_event", HMIEvent, self.on_hmi_event)
 
         # Sending init status to ai/game_status, subscribing to game_status status pub.
         status_services = StatusServices(self.DepartmentName, self.PackageName, None, self.on_game_status)
@@ -27,9 +29,9 @@ class AINode():
         rospy.spin()
 
     def send_strategies(self):
-        pub = rospy.Publisher("/drivers/driver_ard_hmi/set_strategies", SetStrategies, queue_size=10)
+        pub = rospy.Publisher("/feedback/ard_hmi/set_strategies", SetStrategies, queue_size=10)
         time.sleep(0.3)
-        pub.publish(SetStrategies(self.AI.get_strategies()))
+        pub.publish(SetStrategies(self.available_strategies))
 
     def send_set_ingame(self): # TODO wrong place ?
         pub = rospy.Publisher("/ai/game_status/set_status", SetStatus, queue_size=10)
@@ -57,9 +59,11 @@ class AINode():
             self.AI.halt()
 
     def on_hmi_event(self, req):
-        if req.event == 0: #req.EVENT_START: TODO adapt on HMI branch and merge
-            rospy.loginfo("[AI] Starting actions ! Strategy '{}'.".format(req.strategy_name))
-            self.AI.start(req.strategy_name, AICommunication())
+        print "hi"
+        if req.event == 1: #req.EVENT_START: TODO adapt on HMI branch and merge
+            strat_name = self.available_strategies[req.chosen_strategy_id]
+            rospy.loginfo("[AI] Starting actions ! Strategy '{}'.".format(strat_name))
+            self.AI.start(strat_name, AICommunication())
         elif req.event == req.EVENT_GAME_CANCEL:
             rospy.logwarn("[AI] HMI Asked to stop ! Stopping strategy execution.")
             self.AI.halt()
