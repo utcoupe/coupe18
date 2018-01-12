@@ -1,2 +1,0 @@
-uint8 strategy_id
-uint8 team_id

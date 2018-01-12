@@ -8,7 +8,6 @@ Author: Pierre LACLAU, December 2017, UTCoupe.
 #include <ros.h>
 #include <drivers_ard_hmi/SetStrategies.h>  // ROS sets strategy names for displaying on hmi.
 #include <drivers_ard_hmi/SetTeams.h>       // ROS sets teams names for displaying on hmi.
-#include <drivers_ard_hmi/SelectedConfig.h> // HMI sends selected team and strategy (id, not string).
 #include <drivers_ard_hmi/HMIEvent.h>       // HMI sends events : JACK, GAME_STOP
 #include <drivers_ard_hmi/ROSEvent.h>       // ROS sends events : ASK_JACK, GAME_STOP
 #include <ai_game_status/GameStatus.h>      // ROS sends game and init status (to  determine when RPi ready).
@@ -160,15 +159,13 @@ void on_ros_event(const drivers_ard_hmi::ROSEvent& msg){
 }
 
 ros::Subscriber<drivers_ard_hmi::SetStrategies> sub_strats("/feedback/ard_hmi/set_strategies", &on_set_strategies);
-ros::Subscriber<drivers_ard_hmi::SetTeams> sub_teams("/feedback/ard_hmi/set_teams", &on_set_teams);
-ros::Subscriber<drivers_ard_hmi::ROSEvent> sub_ros_events("/feedback/ard_hmi/ros_event", &on_ros_event);
-ros::Subscriber<ai_game_status::GameStatus> sub_game_status( "/ai/game_status/status", &on_game_status);
-ros::Subscriber<ai_game_status::GameTime> sub_game_timer( "/ai/game_status/timer", &on_game_timer);
+ros::Subscriber<drivers_ard_hmi::SetTeams>      sub_teams      ("/feedback/ard_hmi/set_teams", &on_set_teams);
+ros::Subscriber<drivers_ard_hmi::ROSEvent>      sub_ros_events ("/feedback/ard_hmi/ros_event", &on_ros_event);
+ros::Subscriber<ai_game_status::GameStatus>     sub_game_status("/ai/game_status/status",      &on_game_status);
+ros::Subscriber<ai_game_status::GameTime>       sub_game_timer ("/ai/game_status/timer",       &on_game_timer);
 
-drivers_ard_hmi::SelectedConfig config_msg;
-ros::Publisher config_pub("/feedback/ard_hmi/arm_config", &config_msg);
 drivers_ard_hmi::HMIEvent hmi_event_msg;
-ros::Publisher hmi_events_pub("/feedback/ard_hmi/hmi_event", &hmi_event_msg);
+ros::Publisher hmi_event_pub("/feedback/ard_hmi/hmi_event", &hmi_event_msg);
 
 
 
@@ -291,9 +288,10 @@ void drawArmFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, in
     }
     if(right_pressed) {
         if(!_is_arming) {
-            config_msg.team_id = chosen_team;
-            config_msg.strategy_id = chosen_strat;
-            config_pub.publish(&config_msg); // send config
+            hmi_event_msg.event = hmi_event_msg.EVENT_START; // Will start ai/scheduler with selected config.
+            hmi_event_msg.chosen_team_id = chosen_team;
+            hmi_event_msg.chosen_strategy_id = chosen_strat;
+            hmi_event_pub.publish(&hmi_event_msg); // send config.
             _is_arming = true;
         }
     }
@@ -357,8 +355,7 @@ void setup() {
     nh.subscribe(sub_game_status);
     nh.subscribe(sub_game_timer);
     nh.subscribe(sub_ros_events);
-    nh.advertise(config_pub);
-    nh.advertise(hmi_events_pub);
+    nh.advertise(hmi_event_pub);
     
     ui.setTargetFPS(30);
     
