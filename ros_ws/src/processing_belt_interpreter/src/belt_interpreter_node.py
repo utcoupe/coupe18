@@ -114,9 +114,18 @@ class BeltInterpreter(object):
             static_points_nbr = 0
             total_points_nbr = 0
 
-            for x in linspace(x_close, x_far, width / self.RESOLUTION_LARGE):
+            # make sure at least 2 samples are taken (start and stop)
+            num_samples_width = width / self.RESOLUTION_LARGE
+            if num_samples_width < 2:
+                num_samples_width = 2
+                
+            num_samples_height = height / self.RESOLUTION_LONG
+            if num_samples_height < 2:
+                num_samples_height = 2
+                
+            for x in linspace(x_close, x_far, num_samples_width):
                 for y in linspace(- height / 2, height / 2,
-                                  height / self.RESOLUTION_LONG):
+                                  num_samples_height):
 
                     pointst = PointStamped()
                     pointst.point.x = x
