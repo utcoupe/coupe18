@@ -23,11 +23,11 @@ class MapRobot(RectObstacle):
 
     def checkStatus(self, map_obstacles):
         status = (map_obstacles is not None and len(map_obstacles) > 0) and self.Path.hasPath() and self.isInitialized() and self.NavStatus != RobotStatus.NAV_IDLE
-        rospy.logdebug("obstacles_exist:{}, hasPath:{}, initialized:{}, navigating:{} => INIT:{}".format(map_obstacles is not None and len(map_obstacles) > 0,
-                                                                                                         self.Path.hasPath(),
-                                                                                                         self.isInitialized(),
-                                                                                                         self.NavStatus != RobotStatus.NAV_IDLE,
-                                                                                                         status))
+        # rospy.logdebug("obstacles_exist:{}, hasPath:{}, initialized:{}, navigating:{} => INIT:{}".format(map_obstacles is not None and len(map_obstacles) > 0,
+        #                                                                                                  self.Path.hasPath(),
+        #                                                                                                  self.isInitialized(),
+        #                                                                                                  self.NavStatus != RobotStatus.NAV_IDLE,
+        #                                                                                                  status))
         return status
 
     def updatePosition(self, new_position):
