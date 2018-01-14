@@ -7,6 +7,8 @@ find_package(catkin REQUIRED COMPONENTS
     std_msgs
     geometry_msgs
     message_generation
+
+    drivers_ard_hmi
 )
 
 ################################################
@@ -15,12 +17,12 @@ find_package(catkin REQUIRED COMPONENTS
 
 add_message_files(
     FILES
-    AICommand.msg
+    TaskResult.msg
 )
 
 add_service_files(
     FILES
-    AIGenericCommand.srv
+    AICommand.srv
     test.srv
 )
 
