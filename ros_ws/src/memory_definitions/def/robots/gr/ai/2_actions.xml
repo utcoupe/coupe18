@@ -1,4 +1,14 @@
 <actions>
+	<action ref="jack">
+		<params/>
+		<conditions/>
+		<actions exec="all" order="linear">
+			<orderref ref="ask_for_jack"/>
+			<nextneedsprevious/>
+			<orderref ref="wait_for_jack"/>
+		</actions>
+	</action>
+
 	<!-- Action goup : sucks a module in and loads it in the robot's module chest
 			No params, this only plays the load routine without moving the robot.-->
 	<action ref="takein_module">
@@ -62,19 +72,6 @@
 			</orderref>
 			<nextneedsprevious/>
 			<actionref ref="takeout_module"/>
-		</actions>
-	</action>
-
-
-	<action ref="wait_for_jack" name="Wait for jack pullup...">
-		<params></params>
-		<conditions></conditions>
-		<actions name = "jack then start timer" exec="all" order="linear">
-      		<orderref ref="timer_set_duration"/>
-			<nextneedsprevious/>
-      		<orderref ref="timer_start"/>
-			<nextneedsprevious/>
-			<orderref ref="wait_for_jack"/>
 		</actions>
 	</action>
 

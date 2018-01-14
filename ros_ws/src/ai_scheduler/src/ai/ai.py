@@ -22,10 +22,9 @@ class RobotAI():
         strategy.PrettyPrint()
         # Run the whole AI until there are no orders left to execute
         while not rospy.is_shutdown():
-            if strategy.canContinue():
+            if strategy.canContinue() and not self.timer.finished:
                 strategy.getNext().execute(strategy.communicator)
             else:
                 rospy.loginfo("[AI] In-Game actions finished!")
                 break
             strategy.PrettyPrint()
-

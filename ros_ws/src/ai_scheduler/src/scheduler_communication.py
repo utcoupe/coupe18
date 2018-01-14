@@ -8,6 +8,8 @@ import ai_scheduler.srv
 
 import navigation_navigator.msg
 import memory_map.srv
+import ai_timer.srv
+import drivers_ard_hmi.msg
 
 class RequestTypes():
     PUB_MSG = 0
@@ -25,7 +27,10 @@ class AICommunication():
             "/navigation/navigator/dogoto":     (RequestTypes.ACTION,  navigation_navigator.msg.DoGotoAction, navigation_navigator.msg.DoGotoGoal),
             "/test":                            (RequestTypes.PUB_MSG, TaskResult),
             "/test2":                           (RequestTypes.SUB_MSG, TaskResult),
-            "/memory/map/transfer":             (RequestTypes.SERVICE, memory_map.srv.MapTransfer)
+            "/memory/map/transfer":             (RequestTypes.SERVICE, memory_map.srv.MapTransfer),
+            "/ai/timer/set_timer":              (RequestTypes.SERVICE, ai_timer.srv.SetTimer),
+            "/feedback/ard_hmi/ros_event":      (RequestTypes.PUB_MSG, drivers_ard_hmi.msg.ROSEvent),
+            "/feedback/ard_hmi/hmi_event":      (RequestTypes.SUB_MSG, drivers_ard_hmi.msg.HMIEvent)
         }
         def getRequestType(dest):
             return servers[dest][0]
@@ -60,14 +65,14 @@ class AICommunication():
             return TaskResult(2, "ai_communication.py could not send message to topic '{}': {}".format(dest, e))
 
     def _sub_msg(self, dest, msg_class):
+        rospy.logwarn("waiting for message on topic '{}'...".format(dest))
         self._sub_msg_success = False
         rospy.Subscriber(dest, msg_class, self._sub_msg_callback)
 
         s = time.time()
-        while not self._sub_msg_success and (time.time() - s < 15 * 60): #TODO customizable timeout
+        while not self._sub_msg_success and (time.time() - s < 30): #TODO customizable timeout
             time.sleep(0.02)
-        print "sub_msg result : " + str(self._sub_msg_success)
-        return TaskResult(0, "") if self._sub_msg_success else TaskResult(0, "Didn't receive any message in {} seconds.".format(15*60))
+        return TaskResult(0, "") if self._sub_msg_success else TaskResult(1, "Didn't receive any message in {} seconds.".format(15*60))
     def _sub_msg_callback(self, msg):
         self._sub_msg_success = True
 

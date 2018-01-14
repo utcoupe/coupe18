@@ -11,7 +11,7 @@ Author: Pierre LACLAU, December 2017, UTCoupe.
 #include <drivers_ard_hmi/HMIEvent.h>       // HMI sends events : JACK, GAME_STOP
 #include <drivers_ard_hmi/ROSEvent.h>       // ROS sends events : ASK_JACK, GAME_STOP
 #include <ai_game_status/GameStatus.h>      // ROS sends game and init status (to  determine when RPi ready).
-#include <ai_game_status/GameTime.h>        // ROS sends the timer status (for the ingame progress bar).
+#include <ai_timer/GameTime.h>        // ROS sends the timer status (for the ingame progress bar).
 ros::NodeHandle nh;
 
 //Creating OLED display instances
@@ -70,7 +70,7 @@ bool _is_launching = false;
 #define PIN_BTN_VCC_2 D7 // to L1
 #define PIN_BTN_IN_1  D6 // to R1 (with 1k resistor to GND)
 #define PIN_BTN_IN_2  D5 // to R1 (with 1k resistor to GND)
-#define PIN_JACK      D3 // to the Jack switch
+#define PIN_JACK      D5 // to the Jack switch
 
 bool _prev_up_state    = false;
 bool _prev_down_state  = false;
@@ -92,6 +92,9 @@ void check_input() {
     _prev_up_state = digitalRead(PIN_BTN_IN_1);
     down_pressed = digitalRead(PIN_BTN_IN_2) && !_prev_down_state;
     _prev_down_state = digitalRead(PIN_BTN_IN_2);
+
+    jack_pulled = !digitalRead(PIN_JACK) && _prev_jack_state; // 1 when inserted
+    _prev_jack_state = digitalRead(PIN_JACK);
   
     digitalWrite(PIN_BTN_VCC_1, LOW);
     digitalWrite(PIN_BTN_VCC_2, HIGH);
@@ -100,9 +103,6 @@ void check_input() {
     _prev_left_state = digitalRead(PIN_BTN_IN_1);
     right_pressed = digitalRead(PIN_BTN_IN_2) && !_prev_right_state;
     _prev_right_state = digitalRead(PIN_BTN_IN_2);
-
-    jack_pulled = !digitalRead(PIN_JACK) && _prev_jack_state; // 1 when inserted
-    _prev_jack_state = digitalRead(PIN_JACK);
 }
 
 //LEDs
@@ -147,7 +147,7 @@ void on_game_status(const ai_game_status::GameStatus& msg){
         ui.transitionToFrame(5);
 }
 
-void on_game_timer(const ai_game_status::GameTime& msg){
+void on_game_timer(const ai_timer::GameTime& msg){
     if(msg.is_active) {
         game_duration = msg.game_time_duration;
         elapsed_time = msg.game_elapsed_time;
@@ -163,7 +163,7 @@ ros::Subscriber<drivers_ard_hmi::SetStrategies> sub_strats("/feedback/ard_hmi/se
 ros::Subscriber<drivers_ard_hmi::SetTeams>      sub_teams      ("/feedback/ard_hmi/set_teams", &on_set_teams);
 ros::Subscriber<drivers_ard_hmi::ROSEvent>      sub_ros_events ("/feedback/ard_hmi/ros_event", &on_ros_event);
 ros::Subscriber<ai_game_status::GameStatus>     sub_game_status("/ai/game_status/status",      &on_game_status);
-ros::Subscriber<ai_game_status::GameTime>       sub_game_timer ("/ai/game_status/timer",       &on_game_timer);
+ros::Subscriber<ai_timer::GameTime>             sub_game_timer ("/ai/game_status/timer",       &on_game_timer);
 
 drivers_ard_hmi::HMIEvent hmi_event_msg;
 ros::Publisher hmi_event_pub("/feedback/ard_hmi/hmi_event", &hmi_event_msg);
@@ -305,7 +305,7 @@ void drawJackFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, i
         if(_prev_jack_state) drawBigCentralMessageComponent(display, state, x, y, "JACK?");
         else drawSmallCentralMessageComponent(display, state, x, y, "Insert jack.");
     }
-    else drawBigCentralMessageComponent(display, state, x, y, "STARTING...");
+    else drawBigCentralMessageComponent(display, state, x, y, "JACKED!");
 
     if(left_pressed) {
         _is_launching = false; //TODO good ?
@@ -316,7 +316,7 @@ void drawJackFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, i
             hmi_event_msg.event = hmi_event_msg.EVENT_JACK_FIRED; //JACKED
             hmi_event_msg.chosen_strategy_id = 0; // resetting values 
             hmi_event_msg.chosen_team_id     = 0; // from previous send.
-            hmi_events_pub.publish(&hmi_event_msg); 
+            hmi_event_pub.publish(&hmi_event_msg); 
             _is_launching = true;
         }
     }
@@ -386,7 +386,7 @@ void loop() {
         ui.transitionToFrame(0); //if game ends, go back to init screen.
     if(game_status == -1) {
         hmi_event_msg.event = hmi_event_msg.EVENT_HMI_INITIALIZED; // tell ros that hmi is alive until it responds back
-        hmi_events_pub.publish(&hmi_event_msg);
+        hmi_event_pub.publish(&hmi_event_msg);
     }
 
     nh.spinOnce();
