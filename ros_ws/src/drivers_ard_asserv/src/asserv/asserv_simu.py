@@ -14,7 +14,8 @@ SEND_POSE_RATE = 0.1  # in ms
 SEND_SPEED_RATE = 0.1  # in ms
 ASSERV_RATE = 0.05  # in ms
 # To be more accurate on position error, the speed has to be lower otherwise the goal reached check will fail
-ASSERV_ERROR_POSITION = 0.02  # in meters
+ASSERV_ERROR_POSITION = 0.005  # in meters
+ASSERV_MINIMAL_SPEED = 0.05 # in m/s
 
 # TODO angle goal management
 # TODO actionlib goals management (goal_id) --> put it in the abstract class ?
@@ -142,6 +143,8 @@ class AsservSimu(AsservAbstract):
                     self._current_linear_speed += self._max_acceleration * ASSERV_RATE
                 else:
                     self._current_linear_speed -= self._max_acceleration * ASSERV_RATE
+                    if self._current_linear_speed < ASSERV_MINIMAL_SPEED:
+                        self._current_linear_speed = ASSERV_MINIMAL_SPEED
                 if self._current_linear_speed > self._max_linear_speed:
                     self._current_linear_speed = self._max_linear_speed
                 current_x = self._current_pose.x + self._current_linear_speed * ASSERV_RATE * math.cos(self._current_goal_initial_angle)
