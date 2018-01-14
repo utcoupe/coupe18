@@ -1,6 +1,6 @@
 <belt>
   <params>
-    <max_range>9999</max_range> <!-- meters -->
+    <max_range>2</max_range> <!-- meters -->
     <angle>0.44</angle> <!-- rad -->
     <precision>0.05</precision> <!-- percents -->
   </params>
