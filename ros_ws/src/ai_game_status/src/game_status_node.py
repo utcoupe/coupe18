@@ -34,9 +34,7 @@ class Status():
         "/recognition/cp_recognizer": None,
 
         "/processing/belt_interpreter": None,
-        "/processing/lidar_objects": None,
-
-        "/feedback/webclient": None
+        "/processing/lidar_objects": None
     }
 
 
