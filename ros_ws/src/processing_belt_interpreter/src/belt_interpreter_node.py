@@ -45,14 +45,14 @@ class BeltInterpreter(object):
         # % the rectangle that need to overlap a map object
         # to be considered static
         self.POINTS_PC_THRESHOLD = 0.5
-        self.PUB_RATE = rospy.Rate(20)
+        self.PUB_RATE = rospy.Rate(10)
 
 
 
         filepath = self.fetch_definition()
 
         self._belt_parser = BeltParser(filepath)
-        self._pub = rospy.Publisher(self.TOPIC, BeltFiltered, queue_size=10)
+        self._pub = rospy.Publisher(self.TOPIC, BeltFiltered, queue_size=1)
         self._tl = tf.TransformListener()
         self._broadcaster = tf2_ros.StaticTransformBroadcaster()
         self._markers_pub = MarkersPublisher()
