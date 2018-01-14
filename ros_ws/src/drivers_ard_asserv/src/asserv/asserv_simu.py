@@ -79,6 +79,7 @@ class AsservSimu(AsservAbstract):
         return False
 
     def set_emergency_stop(self, stop):
+        rospy.loginfo("[ASSERV] Emergency stop called : " + str(stop))
         self._emergency_stop = stop
         if stop:
             self._current_linear_speed = 0
@@ -90,6 +91,9 @@ class AsservSimu(AsservAbstract):
 
     def clean_goals(self):
         self._goals_list = []
+        # TODO check to make it proper
+        self._current_goal = Pose2D(0, 0, 0)
+        self._currently_moving = False
         return True
 
     def pause(self, pause):
