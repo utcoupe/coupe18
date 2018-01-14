@@ -31,8 +31,8 @@ class BeltInterpreter(object):
         self.TOPIC = "/processing/belt_interpreter/rects_filtered"
         self.SENSORS_TOPIC = "/drivers/ard_others/belt_ranges"
         # resolution along the long and large side of the rectangle (meters)
-        self.RESOLUTION_LONG = 0.01
-        self.RESOLUTION_LARGE = 0.005
+        self.RESOLUTION_LONG = 0.05
+        self.RESOLUTION_LARGE = 0.05
         # % the rectangle that need to overlap a map object
         # to be considered static
         self.POINTS_PC_THRESHOLD = 0.5
@@ -56,7 +56,7 @@ class BeltInterpreter(object):
 
         self._static_rects = {}
         self._dynamic_rects = {}
-        self._data_to_process = {}
+        self._data_to_process = []
 
         rospy.loginfo("Belt interpreter is ready. Listening for sensor data on '{}'.".format(self.SENSORS_TOPIC))
 
@@ -132,6 +132,7 @@ class BeltInterpreter(object):
                     pointst.point.y = y
                     pointst.header = rect.header
                     pointst.header.stamp = rect.header.stamp
+
 
                     try:
                         pst_map = self._tl.transformPoint("/map", pointst)
