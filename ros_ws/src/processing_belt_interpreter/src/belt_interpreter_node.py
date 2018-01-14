@@ -37,6 +37,10 @@ class BeltInterpreter(object):
         # max range at which the number of rects samples does not scale anymore (m)
         self.PRECISION_RANGE_THRESH = 0.75
 
+        # if the difference in time between current time and last tf
+        # is greater than this, shows a warning (secs)
+        self.TF_TIME_THRESH = 5
+
         # % the rectangle that need to overlap a map object
         # to be considered static
         self.POINTS_PC_THRESHOLD = 0.5
@@ -83,36 +87,36 @@ class BeltInterpreter(object):
         for _ in range(len(self._data_to_process)):
             data = self._data_to_process.pop()
 
-            sensor_id = data.sensor_id
-            if sensor_id not in self._belt_parser.Sensors.keys():
-                rospy.logerr("Received data from belt sensor '{}' but no such sensor is defined".format(sensor_id))
-                return
+            if data.sensor_id not in self._belt_parser.Sensors.keys():
+                rospy.logerr("Received data from belt sensor '{}' but no such sensor is defined"
+                             .format(data.sensor_id))
+                continue
 
-            r = data.range
-
-            if r > self._belt_parser.Params["max_range"] or r <= 0:
-                self._static_rects.pop(sensor_id, None)
-                self._dynamic_rects.pop(sensor_id, None)
-                return
+            if data.range > self._belt_parser.Params["max_range"] or data.range <= 0:
+                self._static_rects.pop(data.sensor_id, None)
+                self._dynamic_rects.pop(data.sensor_id, None)
+                continue
 
 
-
-            width = self.get_rect_width(r)
-            height = self.get_rect_height(r)
+            width = self.get_rect_width(data.range)
+            height = self.get_rect_height(data.range)
 
             rect = RectangleStamped()
-            rect.header.frame_id = self.SENSOR_FRAME_ID.format(sensor_id)
+            rect.header.frame_id = self.SENSOR_FRAME_ID.format(data.sensor_id)
+
             try:
                 ts = self._tl.getLatestCommonTime(rect.header.frame_id, "/map")
             except:
+                rospy.logwarn("Couldn't get common tf time for sensor {}, skipping it...".format(data.sensor_id))
                 continue
 
-            if rospy.Time.now() - ts > rospy.Duration(5):
+            if rospy.Time.now() - ts > rospy.Duration(self.TF_TIME_THRESH):
                 rospy.logwarn(
-                    "Difference between last tf update of /robot and current time is more than 5 seconds. Belt rects may be wrong.")
+                    "Difference between last tf update of /robot and current time is more than {} seconds. Belt rects may be wrong."
+                    .format(self.TF_TIME_THRESH))
 
             rect.header.stamp = ts
-            rect.x = self.get_rect_x(r)
+            rect.x = self.get_rect_x(data.range)
             rect.y = 0
             rect.w = width
             rect.h = height
@@ -125,7 +129,7 @@ class BeltInterpreter(object):
             num_samples_height = int(height / self.RESOLUTION_LONG)
 
             # apply threshold filter
-            if r > self.PRECISION_RANGE_THRESH:
+            if data.range > self.PRECISION_RANGE_THRESH:
                 num_samples_width = int(self.get_rect_width(self.PRECISION_RANGE_THRESH)\
                                     / self.RESOLUTION_LARGE)
                 num_samples_height = int(self.get_rect_height(self.PRECISION_RANGE_THRESH)\
@@ -155,7 +159,7 @@ class BeltInterpreter(object):
                         pst_map = self._tl.transformPoint("/map", pointst)
                     except Exception as e:
                         rospy.logwarn("Frame robot or map does not exist, cannot process sensor data : {}".format(e))
-                        return
+                        break
 
                     total_points_nbr += 1
 
@@ -165,15 +169,15 @@ class BeltInterpreter(object):
             if float(static_points_nbr) / float(total_points_nbr) \
                     > self.POINTS_PC_THRESHOLD:  # static
 
-                if sensor_id in self._dynamic_rects:
-                    self._dynamic_rects.pop(sensor_id, None)
+                if data.sensor_id in self._dynamic_rects:
+                    self._dynamic_rects.pop(data.sensor_id, None)
 
-                self._static_rects.update({sensor_id: rect})
+                self._static_rects.update({data.sensor_id: rect})
             else:  # dynamic
-                if sensor_id in self._static_rects:
-                    self._static_rects.pop(sensor_id, None)
+                if data.sensor_id in self._static_rects:
+                    self._static_rects.pop(data.sensor_id, None)
 
-                self._dynamic_rects.update({sensor_id: rect})
+                self._dynamic_rects.update({data.sensor_id: rect})
 
         #rospy.loginfo("Took {:0.4f} ms to process {} rects".format((time.time() - before)*1000, nbr))
 
