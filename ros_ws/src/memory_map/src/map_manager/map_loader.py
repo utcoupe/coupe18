@@ -61,7 +61,7 @@ class MapLoader():
         try:
             get_def.wait_for_service(timeout = 2)
         except:
-            rospy.logerr("Could not contact definitions service, timeout reached. Quitting.")
+            rospy.logerr("FATAL Could not contact definitions service, timeout reached. Aborting.")
             raise Exception()
 
         try:
