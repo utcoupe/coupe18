@@ -122,5 +122,8 @@ class AsservClient(object):
     def stopAsserv (self):
         rospy.logdebug("trying to stop asserv")
         self._asservEmergencyStopService.call(enable=True)
-        self._asservManageService.call(mode=ManagementRequest.CLEANG)
+        # self._asservManageService.call(mode=ManagementRequest.CLEANG)
+        # self._asservEmergencyStopService.call(enable=False)
+
+    def resumeAsserv(self):
         self._asservEmergencyStopService.call(enable=False)

@@ -191,7 +191,11 @@ class NavigatorNode(object):
         self._currentStatus = NavigatorStatuses.NAV_STOPPED
         self._asservClient.stopAsserv()
         self._updateStatus()
-        
+
+    def _callbackAsservResume(self):
+        self._currentStatus = NavigatorStatuses.NAV_NAVIGATING
+        self._asservClient.resumeAsserv()
+        self._updateStatus()
     
     def _updateStatus (self):
         """
@@ -213,7 +217,7 @@ class NavigatorNode(object):
         self._pathfinderClient = PathfinderClient()
         self._asservClient = AsservClient()
         self._localizerClient = LocalizerClient()
-        self._collisionsClient = CollisionsClient(self._callbackEmergencyStop)
+        self._collisionsClient = CollisionsClient(self._callbackEmergencyStop, self._callbackAsservResume)
         # Create service server, action server and topic publisher
         self._gotoSrv = rospy.Service (FULL_NODE_NAME + "/goto", Goto, self._handle_goto)
         self._actionSrv_Dogoto = actionlib.ActionServer(FULL_NODE_NAME + "/goto_action", DoGotoAction, self._handleDoGotoRequest, auto_start=False)
@@ -230,3 +234,4 @@ if __name__ == "__main__":
         node.startNode ()
     except rospy.ROSInterruptException:
         pass
+
