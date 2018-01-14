@@ -11,6 +11,7 @@ import json
 import math
 from numpy import linspace
 import time
+import itertools
 
 from memory_definitions.srv import GetDefinition
 from processing_belt_interpreter.msg import *
@@ -144,9 +145,9 @@ class BeltInterpreter(object):
                 num_samples_height = 2
 
 
-            for x in linspace(rect.x - width / 2, rect.x + width / 2, num_samples_width):
-                for y in linspace(- height / 2, height / 2,
-                                  num_samples_height):
+            for x, y in itertools.product(
+                    linspace(rect.x - width / 2, rect.x + width / 2, num_samples_width),
+                    linspace(- height / 2, height / 2, num_samples_height)):
 
                     pointst = PointStamped()
                     pointst.point.x = x
