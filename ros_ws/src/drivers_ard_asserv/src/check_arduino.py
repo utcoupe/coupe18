@@ -10,6 +10,8 @@ import glob
 __date__ = 05/12/2016
 __author__ = "Thomas Fuhrmann"
 
+# Minimal data size to detect arduino
+READ_SIZE = 11
 
 # arduino is "asserv" or "others"
 def get_arduino_port(arduino):
@@ -36,17 +38,17 @@ def get_arduino_port(arduino):
     for port in available_port_list:
         # The timeout is necessary and must be greater than the sending time of the Arduino (currently it's set to 100ms)
         # With tests, it seems like it has to be greater than 0.6s, no mater the frequency of the sending Arduino ID...
-        com_line = serial.Serial(port, 57600, timeout=1.2)
+        com_line = serial.Serial(port, 57600, timeout=2)
+        read_data = ""
         try:
             # First line may be empty
-            com_line.readline()
-            arduino_id = com_line.readline()
+            read_data = com_line.read(READ_SIZE)
         except :
             pass
         com_line.close()
-        if arduino_id != "":
-            arduino_id = arduino_id.replace("\r\n", "")
-            arduino_port_dict[arduino_id] = port
+        if read_data.find("\r\n") > -1:
+            read_data = read_data.replace("\r\n", "")
+            arduino_port_dict[read_data] = port
 
     # Check if the asked arduino is in the dictionary
     for connected_arduino in arduino_port_dict:
