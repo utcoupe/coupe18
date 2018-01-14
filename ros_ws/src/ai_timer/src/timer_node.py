@@ -23,13 +23,13 @@ class TimerManager():
         self._start_time = time.time() * 1000
 
     def start(self, duration):
+        rospy.loginfo("Starting {} seconds timer.".format(duration))
         self.reset()
         self.game_duration = duration
         self.started = True
 
     def stop(self):
-        self._start_time = -1
-        self.started = False
+        self.__init__()
 
     def elapsed_time(self):
         return (time.time() * 1000 - self._start_time) / 1000.0 # return elapsed time in seconds
@@ -44,8 +44,8 @@ class TimerManager():
 class TimerNode():
     def __init__(self):
         rospy.init_node("timer", log_level=rospy.DEBUG)
-        self._set_timer_srv = rospy.Service("/ai/game_status/set_timer",  SetTimer,  self.on_set_timer)
-        self._timer_pub     = rospy.Publisher("/ai/game_status/timer",    GameTime,  queue_size = 10)
+        self._set_timer_srv = rospy.Service("/ai/timer/set_timer", SetTimer,  self.on_set_timer)
+        self._timer_pub     = rospy.Publisher("/ai/timer/time",   GameTime,  queue_size = 10)
 
         rospy.Subscriber("/ai/game_status/status", GameStatus, self.on_status)
         self._game_status = Status.STATUS_INIT
@@ -56,7 +56,9 @@ class TimerNode():
         while not rospy.is_shutdown():
             if self.timer.started:
                 if self.timer.time_left() <= 0:
+                    rospy.logwarn("Timer ended! setting HALT to ai/game_status, stopping timer.")
                     self.set_game_status(GameStatus.STATUS_HALT)
+                    self.timer.stop()
             self.publish_timer()
             r.sleep()
 
@@ -70,10 +72,10 @@ class TimerNode():
 
     def on_set_timer(self, req):
         if req.action == req.ACTION_START:
-            if self._game_status == Status.STATUS_INGAME:
+            if not self.timer.started:
                 self.timer.start(req.duration)
             else:
-                rospy.logerr("ERROR Not allowed to start a timer outside game_status STATUS_INGAME.")
+                rospy.logerr("ERROR Timer already started.")
                 return SetTimerResponse(False)
         elif req.action == req.ACTION_RESET:
             if self.timer.started:

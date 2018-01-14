@@ -1,10 +1,9 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(ai_game_status)
+project(ai_timer)
 
 find_package(catkin REQUIRED COMPONENTS
     rospy
     std_msgs
-    ai_scheduler
     message_generation
 )
 
@@ -14,15 +13,12 @@ find_package(catkin REQUIRED COMPONENTS
 
 add_message_files(
     FILES
-    GameStatus.msg
-    NodesStatus.msg
+    GameTime.msg
 )
 
 add_service_files(
     FILES
-    SetStatus.srv
-    ArmRequest.srv
-    NodeReady.srv
+    SetTimer.srv
 )
 
 generate_messages(
