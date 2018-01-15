@@ -16,8 +16,10 @@ class MarkersPublisher(object):
         if self._is_connected():
             # Publish path collision shapes
             if robot.isInitialized() and robot.NavStatus:
-                for i, path_shape in enumerate(robot.Path.toShapes(robot)):
-                    self._publish_marker("collisions_path", i + 1, path_shape, 0.02, 0.01, (1.0, 0.5, 0.1, 0.8))
+                path_shapes = robot.Path.toShapes(robot)
+                if len(path_shapes) > 0:
+                    for i, path_shape in enumerate(path_shapes):
+                        self._publish_marker("collisions_path", i + 1, path_shape, 0.02, 0.01, (1.0, 0.5, 0.1, 0.8))
                 stop_rect = robot.getStopRect()
                 self._publish_marker("collisions_path", 0, stop_rect, 0.02, 0.01, (1.0, 0.0, 0.0, 0.8))
 
