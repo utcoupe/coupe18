@@ -4,12 +4,12 @@
     <param name="robot"  value="$(arg robot)" />
 
 	<group ns="memory">
-		<node pkg="memory_definitions" name="definitions" type="definitions_node.py" output="screen" />
-		<node pkg="memory_map" name="map" type="map_node.py"/>
+		<node pkg="memory_definitions" name="definitions" type="definitions_node.py" />
+		<node pkg="memory_map" name="map" type="map_node.py" output="screen"/>
 	</group>
 
     <group ns="recognition">
-		<node pkg="recognition_localizer" name="localizer" type="localizer_node.py" output="screen" />
+		<node pkg="recognition_localizer" name="localizer" type="localizer_node.py" />
 	</group>
 
     <group ns="drivers">
@@ -25,8 +25,8 @@
 	</group>
 
 	<group ns="navigation">
-		<node pkg="navigation_collisions" name="collisions" type="collisions_node.py" output="screen"/>
-		<node pkg="navigation_navigator" name="navigator" type="navigator_node.py" output="screen" />
+		<node pkg="navigation_collisions" name="collisions" type="collisions_node.py"/>
+		<node pkg="navigation_navigator" name="navigator" type="navigator_node.py" />
 		<node pkg="navigation_pathfinder" name="pathfinder" type="pathfinder_node" args="-- " output="screen" />
 	</group>
 </launch>

@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import time
 import math
 from map import Map
 
@@ -27,6 +28,7 @@ class MapObstacle(object):
     def __init__(self, position, velocity = None):
         self.Position = position
         self.Velocity = velocity
+        self.SpawnTime = time.time()
 
 class CircleObstacle(MapObstacle):
     def __init__(self, position, radius, velocity = None):

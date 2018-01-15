@@ -42,7 +42,7 @@ class CollisionsSubscriptions(object):
         Map.Robot.updatePath([Point(point.x, point.y) for point in msg.currentPath])
 
     def on_belt(self, msg):
-        Map.BeltPoints = []
+        new_belt = []
         for rect in msg.map_rects + msg.unknown_rects:
             transform = self.tf2_pos_buffer.lookup_transform("map", rect.header.frame_id, # dest frame, source frame
                                                              rospy.Time.now(),     # get the tf at first available time
@@ -55,11 +55,13 @@ class CollisionsSubscriptions(object):
 
             try:
                 center_map = self.tranform_listener.transformPoint("map", center)
-                Map.BeltPoints.append(RectObstacle(Position(center_map.point.x, center_map.point.y,
-                                                            self._quaternion_to_euler_angle(transform.transform.rotation)[2]),
-                                                   rect.w, rect.h, velocity=Velocity(0, 0)))
+                new_belt.append(RectObstacle(Position(center_map.point.x, center_map.point.y,
+                                                      self._quaternion_to_euler_angle(transform.transform.rotation)[2]),
+                                                      rect.w, rect.h, velocity=Velocity(0, 0)))
             except:
                 rospy.logwarn("Frame /map does not exist, cannot fetch belt rects.")
+        if len(new_belt) > 0:
+            Map.updateBeltPoints(new_belt)
 
 
     def on_lidar_points(self, msg):
@@ -69,8 +71,9 @@ class CollisionsSubscriptions(object):
         pass
 
     def on_robot_speed(self, msg):
-        Map.Robot.Velocity.Linear = msg.linear_speed
-        Map.Robot.Velocity.Angular = 0.0 # TODO Implement here if we use it one day ?
+        if Map.Robot is not None:
+            Map.Robot.Velocity.Linear = msg.linear_speed
+            Map.Robot.Velocity.Angular = 0.0 # TODO Implement here if we use it one day ?
 
     def _quaternion_to_euler_angle(self, quaternion):
         # https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
