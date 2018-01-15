@@ -22,14 +22,18 @@ class ActuatorsProperties():
         for preset in positions.findall('preset'):
             self.preset[preset.get('name')] = preset.get('value')
 
-def getActuatorsList():
+
+def initActuatorsList():
     global _actuators_list, _xml_path
-    if _actuators_list == None:
-        xml_root = ET.parse(_xml_path).getroot()
-        _actuators_list = {}
-        for child in xml_root.iter('act'):
-            _actuators_list[child.get('name')] = ActuatorsProperties(child)
+    xml_root = ET.parse(_xml_path).getroot()
+    _actuators_list = {}
+    for child in xml_root.iter('act'):
+        _actuators_list[child.get('name')] = ActuatorsProperties(child)
+
+def getActuatorsList():
+    global _actuators_list
     return _actuators_list
 
 if __name__ == '__main__':
+    initActuatorsList()
     print getActuatorsList()

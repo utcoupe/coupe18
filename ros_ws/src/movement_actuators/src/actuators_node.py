@@ -78,8 +78,8 @@ class ActuatorsNode():
     def sendToAx12(self, id, order, param, timeout):
         return False
 
-
 if __name__ == '__main__':
+    actuators_properties.initActuatorsList()
     actuators_node = ActuatorsNode()
     rospy.loginfo('Actuators node started')
     rospy.spin()
