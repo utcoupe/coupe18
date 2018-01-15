@@ -1,0 +1,106 @@
+<strategies>
+	<!-- STRATEGY : <description here> -->
+	<!-- NOTE : The actions are in a rather random order. This strategy is set up for testing purposes only !-->
+	<strategy name="strategy_ftw">
+		<game>
+			<time>100</time>
+		</game>
+		<actions name="In-Game Actions">
+			<actionref ref="jack"/>
+			<nextneedsprevious/>
+      		<orderref ref="timer_start">
+			  	<duration>97</duration>
+			</orderref>
+			<nextneedsprevious/>
+			<actionlist name="Main actions" order="linear">
+				<conditions>
+				</conditions>
+				<orderref ref="wheels_goto"/>
+				<actionlist name="Take Modules" exec="all" order="linear" reward="100">
+
+					<actionlist name="Load modules" exec="+" order="random">
+						<actionref ref="load_module"/>
+						<actionref ref="load_module"/>
+						<actionref ref="load_module"/>
+					</actionlist>
+
+					<nextneedsprevious/> <!-- This actionList needs the previous task to be OK in order to run-->
+					<actionlist name="Unload on left platform" exec="+" order="linear">
+						<conditions>
+						</conditions>
+						<actionref ref = "unload_module"/>
+						<nextneedsprevious/>
+						<actionref ref = "unload_module"/>
+						<actionref ref = "unload_module"/>
+					</actionlist>
+
+
+				</actionlist>
+			</actionlist>
+		</actions>
+		<actions_onfinish name="Actions after game">
+			<orderref ref="funny_action"/>
+		</actions_onfinish>
+	</strategy>
+
+	<!-- Testing init workflow, SetPos, Navigation DoGoto -->
+	<strategy name="test_nav">
+		<game><time>100</time></game>
+		<actions name="In-Game Actions">
+			<actionref ref="jack"/>
+			<nextneedsprevious/>
+      		<orderref ref="timer_start">
+			  	<duration>97</duration>
+			</orderref>
+			<nextneedsprevious/>
+			<orderref ref="set_robot_pos">
+				<position>
+					<x>0.5</x>
+					<y>0.5</y>
+					<theta>0</theta>
+				</position>
+			</orderref>
+
+			<nextneedsprevious/>
+
+			<orderref ref="delay">
+				<duration>4</duration>
+			</orderref>
+
+			<nextneedsprevious/>
+			<orderref ref="asserv_goto" name="going to (1, 1)">
+				<target_pos>
+					<x>2.5</x>
+					<y>1.5</y>
+					<theta>0</theta>
+				</target_pos>
+			</orderref>
+
+			<orderref ref="asserv_goto" name="going to (1, 1)">
+				<target_pos>
+					<x>0.5</x>
+					<y>1.5</y>
+					<theta>0</theta>
+				</target_pos>
+			</orderref>
+
+			<orderref ref="asserv_goto" name="going to (1, 1)">
+				<target_pos>
+					<x>0.3</x>
+					<y>0.7</y>
+					<theta>0</theta>
+				</target_pos>
+			</orderref>
+
+			<orderref ref="asserv_goto" name="going to (1, 1)">
+				<target_pos>
+					<x>0.3</x>
+					<y>2.3</y>
+					<theta>0</theta>
+				</target_pos>
+			</orderref>
+		</actions>
+		<actions_onfinish name="Actions after game">
+		</actions_onfinish>
+	</strategy>
+</strategies>

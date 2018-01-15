@@ -2,7 +2,7 @@
 import time
 import rospy
 
-from ai_game_status.msg import GameStatus
+from ai_game_status.msg import GameStatus, NodesStatus
 from ai_game_status.srv import SetStatus, SetStatusResponse, SetTimer, SetTimerResponse, NodeReady, NodeReadyResponse
 
 
@@ -34,9 +34,7 @@ class Status():
         "/recognition/cp_recognizer": None,
 
         "/processing/belt_interpreter": None,
-        "/processing/lidar_objects": None,
-
-        "/feedback/webclient": None
+        "/processing/lidar_objects": None
     }
 
 
@@ -47,7 +45,8 @@ class GameStatusNode():
         rospy.init_node("game_status", log_level=rospy.DEBUG)
         self._node_ready_notif = rospy.Service("/ai/game_status/node_ready", NodeReady, self.on_node_ready)
         self._set_status_srv   = rospy.Service("/ai/game_status/set_status", SetStatus, self.on_set_status)
-        self._status_pub = rospy.Publisher("/ai/game_status/status", GameStatus, queue_size = 10)
+        self._game_status_pub  = rospy.Publisher("/ai/game_status/status", GameStatus,        queue_size = 10)
+        self._nodes_status_pub = rospy.Publisher("/ai/game_status/nodes_status", NodesStatus, queue_size = 10)
 
         self.game_status = Status.STATUS_INIT
         self.init_status = Status.INIT_INITIALIZING
@@ -61,14 +60,17 @@ class GameStatusNode():
                     if len([n for n in Status.INIT_CHECKLIST if Status.INIT_CHECKLIST[n] in [None, False]]) > 0:
                         self.init_status = Status.INIT_FAILED
                     else: self.init_status = Status.INIT_INITIALIZED
-            self.publish_status() # publish game status at 5Hz.
+            self.publish_statuses() # publish game status at 5Hz.
 
             r.sleep()
 
-    def publish_status(self):
+    def publish_statuses(self):
         m = GameStatus()
         m.game_status = self.game_status
         m.init_status = self.init_status
+        self._game_status_pub.publish(m)
+
+        m = NodesStatus()
         for node in Status.INIT_CHECKLIST:
             if Status.INIT_CHECKLIST[node] is None:
                 m.pending_nodes.append(node)
@@ -76,7 +78,7 @@ class GameStatusNode():
                 m.ready_nodes.append(node)
             elif Status.INIT_CHECKLIST[node] is False:
                 m.failed_nodes.append(node)
-        self._status_pub.publish(m)
+        self._nodes_status_pub.publish(m)
 
     def check_init_checklist(self):
         for node in Status.INIT_CHECKLIST:

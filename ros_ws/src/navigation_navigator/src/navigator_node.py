@@ -178,7 +178,7 @@ class NavigatorNode(object):
             cb = partial(self._callbackAsservForDoGotoAction, handledGoal, True)
             self._asservClient.doGoto(posEnd, True, cb)
         except Exception, e:
-            rospy.logdebug("Navigation failled: " + e.message)
+            rospy.logdebug("Navigation failed: " + e.message)
             result = DoGotoResult(False)
             self._currentStatus = NavigatorStatuses.NAV_IDLE
             self._updateStatus()

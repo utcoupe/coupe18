@@ -10,15 +10,15 @@ class AIServices():
         rospy.Service(self.ServiceName, AIGenericCommand, self.onGenericCommand)
 
     def onGenericCommand(self, req):
-        if self.validate_request(req):     res_code, reason = self.executeService(req)
-        else:                             res_code, reason = 403, "Bad request. Wrong destination."
+        if self.validate_request(req): res_code, reason = self.executeService(req)
+        else:                          res_code, reason = 403, "Bad request. Wrong destination."
         return AIGenericCommandResponse(res_code, reason)
 
 #/*==========================================
 #=            Service executions            =
 #==========================================*/
     def executeService(self, req):
-        if req.command == "ai_delay":
+        if req.command == "delay":
             res_code, reason = self.service_delay(req.params)
         else:
             res_code, reason = 404, "command not recognized"

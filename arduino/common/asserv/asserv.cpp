@@ -22,9 +22,11 @@
  * The loop is activate through a Timer (see arduino library).
  */
 void asservLoop();
+void asservStatus();
 
 // Run the loop for asserv at 100 Hz
 Timer asservLoopTimer = Timer(DT, &asservLoop);
+Timer asservStatusTimer = Timer(0.1, &asservStatus);
 
 //TODO make it proper with others
 // Flag to know if a computer is connected to the arduino
@@ -70,6 +72,7 @@ void setup() {
 	ControlInit();
 
     asservLoopTimer.Start();
+    asservStatusTimer.Start();
 }
 
 /**
@@ -83,6 +86,7 @@ void loop() {
         delay(1000);
     } else {
         asservLoopTimer.Update();
+        asservStatusTimer.Update();
     }
     SerialSender::SerialSendTask();
 }
@@ -101,5 +105,9 @@ void asservLoop(){
         lastReachedID = 0;
     }
 
+    //ProtocolAutoSendStatus();
+}
+
+void asservStatus() {
     ProtocolAutoSendStatus();
 }

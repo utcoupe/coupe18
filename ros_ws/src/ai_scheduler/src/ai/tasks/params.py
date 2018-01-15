@@ -18,12 +18,10 @@
 # - optional : <param type="int" optional="true"/>
 #      => the value doesn't have to be set in orderref, default value of ROS
 #                                                                will be set
-#
-#
 
+import copy
 import std_msgs.msg
 import geometry_msgs.msg
-import copy
 
 
 class Param(object):    # base class for parsing xml to param object
@@ -131,6 +129,24 @@ def ParamCreator(xml):  # factory : give parser given the type as string
 # Child classes - one for each type of param
 
 # base classes : getRos return a primitive type
+class BoolParser(Param):
+    TYPE_NAME = "bool"
+    TYPE_ROS = std_msgs.msg.Bool
+
+    def __init__(self, xml=None):
+        self.value = {
+            'data': None
+        }
+        super(BoolParser, self).__init__(xml)
+
+    def parseValue(self, xml):
+        self.parseBind(xml)
+        if xml.text:
+            self.value["data"] = bool(xml.text)
+
+    def getRos(self):
+        return self.value["data"]
+
 class StringParser(Param):
     TYPE_NAME = "string"
     TYPE_ROS = std_msgs.msg.String
