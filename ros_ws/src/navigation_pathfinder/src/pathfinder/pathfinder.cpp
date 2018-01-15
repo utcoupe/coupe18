@@ -2,8 +2,11 @@
 
 using namespace std;
 
-Pathfinder::Pathfinder(const std::string& mapFileName, const std::pair< double, double >& tableSize, bool invertedY, bool render)
+Pathfinder::Pathfinder(const string& mapFileName, const std::pair< double, double >& tableSize, bool invertedY, bool render, const string& renderFile)
 {
+    _renderAfterComputing = render;
+    _renderFile = renderFile;
+    
     _allowedPositions = _mapStorage.loadAllowedPositionsFromFile(mapFileName);
     if (_allowedPositions.size() == 0)
         ROS_FATAL("Allowed positions empty. Cannot define a scale.");
@@ -12,7 +15,6 @@ Pathfinder::Pathfinder(const std::string& mapFileName, const std::pair< double, 
         _convertor.setSizes(tableSize, make_pair<double,double>(_allowedPositions.front().size(), _allowedPositions.size()));
         _convertor.setInvertedY(invertedY);
     }
-    _renderAfterComputing = render;
     
     _dynBarrierPositions = Vect2DBool(
         _allowedPositions.size(), vector<bool>(_allowedPositions.front().size(), false)
@@ -61,7 +63,7 @@ bool Pathfinder::findPath(const Point& startPos, const Point& endPos, Path& path
     
     
     if (_renderAfterComputing)
-        _mapStorage.saveMapToFile("tmp.bmp", _allowedPositions, _dynBarrierPositions, rawPath, path);
+        _mapStorage.saveMapToFile(_renderFile, _allowedPositions, _dynBarrierPositions, rawPath, path);
     
     return true;
 }
@@ -94,6 +96,15 @@ bool Pathfinder::findPathCallback(navigation_pathfinder::FindPath::Request& req,
     
     return true;
 }
+
+void Pathfinder::reconfigureCallback(navigation_pathfinder::PathfinderNodeConfig& config, uint32_t level)
+{
+    ROS_INFO_STREAM ("Reconfigure request : " << config.render << " " << config.renderFile);
+    _renderAfterComputing = config.render;
+    _renderFile = config.renderFile;
+    // TODO detect env var and home
+}
+
 
 
 bool Pathfinder::exploreGraph(Vect2DShort& distMap, const Point& startPos, const Point& endPos)
@@ -245,7 +256,7 @@ bool Pathfinder::canConnectWithLine(const Point& pA, const Point& pB)
 }
 
 
-std::vector<Point> Pathfinder::directions() const
+std::vector< Point > Pathfinder::directions() const
 {
     const vector<Point> dirs {
         Point(0, 1),

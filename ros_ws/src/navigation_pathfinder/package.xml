@@ -11,6 +11,7 @@
   <depend>std_msgs</depend>
   <depend>message_generation</depend>
   <depend>geometry_msgs</depend>
+  <depend>dynamic_reconfigure</depend>
   <exec_depend>message_runtime</exec_depend>
   <export>
   </export>
