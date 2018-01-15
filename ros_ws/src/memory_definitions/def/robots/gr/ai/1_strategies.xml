@@ -42,4 +42,18 @@
 			<orderref ref="funny_action"/>
 		</actions_onfinish>
 	</strategy>
+
+	<strategy name="test_nav">
+		<actions name="In-Game Actions">
+			<actionref ref="jack"/>
+			<nextneedsprevious/>
+      		<orderref ref="timer_start">
+			  	<duration>3</duration>
+			</orderref>
+			<nextneedsprevious/>
+		</actions>
+		<actions_onfinish name="Actions after game">
+			<orderref ref="funny_action"/>
+		</actions_onfinish>
+	</strategy>
 </strategies>
