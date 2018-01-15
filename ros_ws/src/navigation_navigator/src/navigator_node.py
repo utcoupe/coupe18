@@ -103,17 +103,17 @@ class NavigatorNode(object):
         posStart = self._localizerClient.getLastKnownPos()
         debugStr = "Asked to go from "
         debugStr += pointToStr(posStart)
-        debugStr += " to " + pointToStr(req.targetPos)
+        debugStr += " to " + pointToStr(req.target_pos)
         rospy.logdebug(debugStr)
         try:
             # sends the request to the pathfinder
-            path = self._pathfinderClient.FindPath(posStart, req.targetPos)
+            path = self._pathfinderClient.FindPath(posStart, req.target_pos)
             self._printPath(path)
             # then sends the path point per point to the arduino_asserv
             path.pop()
             for point in path:
                 self._asservClient.doGoto(point, False)
-            idAct = self._asservClient.doGoto(req.targetPos, True, self._callbackForResults)
+            idAct = self._asservClient.doGoto(req.target_pos, True, self._callbackForResults)
             self._waitResult(idAct)
             # then return success
             rospy.logdebug("Success!")
@@ -156,7 +156,7 @@ class NavigatorNode(object):
         """
         self._currentStatus = NavigatorStatuses.NAV_NAVIGATING
         posStart = self._localizerClient.getLastKnownPos()
-        posEnd = handledGoal.get_goal().targetPos
+        posEnd = handledGoal.get_goal().target_pos
         debugStr = "Asked to go from "
         debugStr += pointToStr(posStart)
         debugStr += " to " + pointToStr(posEnd)
