@@ -38,6 +38,7 @@ class RobotPath(object):
             return shapes
         else:
             rospy.logerr("Path can't create shapes : less than two waypoints in path")
+            return []
 
     def checkCollisions(self, robot, obstacles):
         path_shapes = self.toShapes(robot)
