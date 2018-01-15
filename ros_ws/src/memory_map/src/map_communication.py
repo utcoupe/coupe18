@@ -3,16 +3,18 @@ import json
 import time
 
 import rospy
+import memory_map.msg
 import memory_map.srv
 from map_manager import SetMode, Map, DictManager
 from occupancy import OccupancyGenerator
 
 
 class Servers():
-    GET_SERV = "/memory/map/get"
-    SET_SERV = "/memory/map/set"
-    TRANSFER_SERV = "/memory/map/transfer"
-    OCCUPANCY_SERV = "/memory/map/get_occupancy"
+    GET_SERV        = "/memory/map/get"
+    SET_SERV        = "/memory/map/set"
+    TRANSFER_SERV   = "/memory/map/transfer"
+    OCCUPANCY_SERV  = "/memory/map/get_occupancy"
+    FILLWP_SERV     = "/memory/map/fill_waypoint"
 
 class MapServices():
     def __init__(self, occupancy_generator):
@@ -20,6 +22,7 @@ class MapServices():
         self.SetSERV       = rospy.Service(Servers.SET_SERV, memory_map.srv.MapSet,                self.on_set)
         self.TransferSERV  = rospy.Service(Servers.TRANSFER_SERV, memory_map.srv.MapTransfer,      self.on_transfer)
         self.OccupancySERV = rospy.Service(Servers.OCCUPANCY_SERV, memory_map.srv.MapGetOccupancy, self.on_get_occupancy)
+        self.FillWPSERV    = rospy.Service(Servers.FILLWP_SERV, memory_map.srv.FillWaypoint,       self.on_fill_waypoint)
         self.occupancy_generator = occupancy_generator
 
     def on_get(self, req):
@@ -81,3 +84,37 @@ class MapServices():
         rospy.logdebug("    Responding: " + str(path))
         rospy.logdebug("    Process took {0:.2f}ms".format(time.time() * 1000 - s))
         return memory_map.srv.MapGetOccupancyResponse(path)
+
+    def on_fill_waypoint(self, req):
+        s = time.time() * 1000
+        rospy.loginfo("FILL_WAYPOINT:{} ({}, {})".format(str(req.waypoint.name if req.waypoint.name else "<no name>"), req.waypoint.x, req.waypoint.y))
+
+        try:
+            filled_waypoint, filled_waypoint_name = None, None
+            if req.waypoint.name != "" and (req.waypoint.x == 0 and req.waypoint.y == 0):
+                filled_waypoint = Map.get("/waypoints/{}/^".format(req.waypoint.name))
+                filled_waypoint_name = req.waypoint.name
+            elif req.waypoint.x != 0 and req.waypoint.y != 0:
+                waypoints = Map.get("/waypoints/^").Dict
+                for w in waypoints:
+                    if waypoints[w].get("position/x") == round(req.waypoint.x, 3) and waypoints[w].get("position/y") == round(req.waypoint.y, 3):
+                        filled_waypoint = waypoints[w]
+                        filled_waypoint_name = w
+                if not filled_waypoint:
+                    rospy.logerr("    Request failed : could not find waypoint that corresponds to the given coordinates.")
+            else:
+                rospy.logerr("    Request failed : could not find what needs to be filled. EITHER name or X/Y needs to be filled.")
+        except Exception as e:
+            rospy.logerr("    Request failed : " + str(e))
+
+        success, w = False, None
+        if filled_waypoint_name and filled_waypoint:
+            success = True
+            w = memory_map.msg.Waypoint()
+            w.name = filled_waypoint_name
+            w.x, w.y = filled_waypoint.get("position/x"), filled_waypoint.get("position/y")
+            rospy.logdebug("    Responding:{} ({}, {})".format(filled_waypoint_name, filled_waypoint.get("position/x"), filled_waypoint.get("position/y")))
+
+        rospy.logdebug("    Responding:error")
+        rospy.logdebug("    Process took {0:.2f}ms".format(time.time() * 1000 - s))
+        return memory_map.srv.FillWaypointResponse(success, w)
