@@ -29,13 +29,13 @@ class Map(object):
     def garbageCollect():
         current_time = time.time()
         for obstacle in Map.BeltPoints:
-            if current_time - obstacle.SpawnTime < Map.OBSTACLES_LIFESPAN:
+            if current_time - obstacle.SpawnTime > Map.OBSTACLES_LIFESPAN:
                 Map.BeltPoints.remove(obstacle)
 
         for obstacle in Map.LidarObjects:
-            if current_time - obstacle.SpawnTime < Map.OBSTACLES_LIFESPAN:
+            if current_time - obstacle.SpawnTime > Map.OBSTACLES_LIFESPAN:
                 Map.BeltPoints.remove(obstacle)
 
         for obstacle in Map.Enemies:
-            if current_time - obstacle.SpawnTime < Map.OBSTACLES_LIFESPAN:
+            if current_time - obstacle.SpawnTime > Map.OBSTACLES_LIFESPAN:
                 Map.BeltPoints.remove(obstacle)
