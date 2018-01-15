@@ -3,7 +3,7 @@ import time
 import rospy
 
 from ai_game_status.msg import GameStatus, NodesStatus
-from ai_game_status.srv import SetStatus, SetStatusResponse, SetTimer, SetTimerResponse, NodeReady, NodeReadyResponse
+from ai_game_status.srv import SetStatus, SetStatusResponse, NodeReady, NodeReadyResponse
 
 
 class Status():

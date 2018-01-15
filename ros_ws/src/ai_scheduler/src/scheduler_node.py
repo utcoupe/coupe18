@@ -2,10 +2,8 @@
 import time
 import rospy
 from scheduler_communication import AICommunication
-from scheduler_services import AIServices
 from ai import RobotAI
 
-from ai_scheduler.srv import AICommand, AICommandResponse
 from drivers_ard_hmi.msg import SetStrategies, SetTeams, HMIEvent
 from ai_game_status.srv import SetStatus
 from ai_game_status_services import StatusServices
@@ -86,7 +84,6 @@ class AINode():
         elif req.event == req.EVENT_GAME_CANCEL:
             rospy.logwarn("[AI] HMI Asked to stop ! Stopping strategy execution.")
             self.AI.halt()
-        return AICommandResponse()
 
 '''
 PACKAGE STARTING POINT HERE

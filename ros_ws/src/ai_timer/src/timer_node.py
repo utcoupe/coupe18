@@ -2,10 +2,11 @@
 import time
 import rospy
 
-from ai_game_status.msg import GameTime, GameStatus
+from ai_game_status.msg import GameStatus
 from ai_game_status.srv import SetStatus
 
 from ai_timer.srv import SetTimer, SetTimerResponse, Delay, DelayResponse
+from ai_timer.msg import GameTime
 
 
 class Status():

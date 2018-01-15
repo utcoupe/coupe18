@@ -22,7 +22,6 @@ add_message_files(
 
 add_service_files(
     FILES
-    AICommand.srv
     test.srv
 )
 
