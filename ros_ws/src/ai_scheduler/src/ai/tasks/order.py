@@ -56,11 +56,20 @@ class Order(Task):
                 rospy.logerr("    Order failed: {}".format(res.verbose_reason))
                 self.setStatus(TaskStatus.ERROR)
         except AttributeError: # Otherwise, look for a bool 'success'
-            if res.success is True:
+            result = False
+            try: result = res.success
+            except: pass
+            try: result = res.response
+            except: pass
+
+            try: reason = res.verbose_reason
+            except: reason = ""
+
+            if result is True:
                 rospy.logdebug("    Order succeeded!")
                 self.setStatus(TaskStatus.SUCCESS)
             else:
-                rospy.logerr("    Order failed: {}".format(res.verbose_reason))
+                rospy.logerr("    Order failed: {}".format(reason))
                 self.setStatus(TaskStatus.ERROR)
 
 

@@ -23,16 +23,19 @@ class AICommunication():
 
     def SendRequest(self, dest, params, callback):
         servers = {
-            "/ai/timer":                        (RequestTypes.SERVICE, ai_scheduler.srv.AIGenericCommand),
-            "/ai/scheduler":                    (RequestTypes.SERVICE, ai_scheduler.srv.AIGenericCommand),
-            "/navigation/navigator/dogoto":     (RequestTypes.ACTION,  navigation_navigator.msg.DoGotoAction, navigation_navigator.msg.DoGotoGoal),
-            "/test":                            (RequestTypes.PUB_MSG, TaskResult),
-            "/test2":                           (RequestTypes.SUB_MSG, TaskResult),
-            "/memory/map/transfer":             (RequestTypes.SERVICE, memory_map.srv.MapTransfer),
-            "/ai/timer/set_timer":              (RequestTypes.SERVICE, ai_timer.srv.SetTimer),
-            "/feedback/ard_hmi/ros_event":      (RequestTypes.PUB_MSG, drivers_ard_hmi.msg.ROSEvent),
-            "/feedback/ard_hmi/hmi_event":      (RequestTypes.SUB_MSG, drivers_ard_hmi.msg.HMIEvent),
-            "/drivers/ard_asserv/set_pos":      (RequestTypes.SERVICE, drivers_ard_asserv.srv.SetPos)
+            "/ai/timer/set_timer":               (RequestTypes.SERVICE, ai_timer.srv.SetTimer),
+
+            "/memory/map/transfer":              (RequestTypes.SERVICE, memory_map.srv.MapTransfer),
+
+            "/navigation/navigator/goto_action": (RequestTypes.ACTION,  navigation_navigator.msg.DoGotoAction, navigation_navigator.msg.DoGotoGoal),
+
+            "/drivers/ard_asserv/set_pos":       (RequestTypes.SERVICE, drivers_ard_asserv.srv.SetPos),
+
+            "/feedback/ard_hmi/ros_event":       (RequestTypes.PUB_MSG, drivers_ard_hmi.msg.ROSEvent),
+            "/feedback/ard_hmi/hmi_event":       (RequestTypes.SUB_MSG, drivers_ard_hmi.msg.HMIEvent),
+
+            "/test":                             (RequestTypes.PUB_MSG, TaskResult),
+            "/test2":                            (RequestTypes.SUB_MSG, TaskResult)
         }
         def getRequestType(dest):
             return servers[dest][0]
