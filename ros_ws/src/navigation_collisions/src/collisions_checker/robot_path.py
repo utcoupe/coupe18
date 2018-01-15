@@ -25,15 +25,16 @@ class RobotPath(object):
                 p_w = robot.Position if i == 1 else self.Waypoints[i - 1]
                 w   = self.Waypoints[i]
 
-                d = math.sqrt( (w.X - p_w.X) ** 2 + (w.Y - p_w.Y) ** 2)
-                angle = math.atan((w.Y - p_w.Y) / (w.X - p_w.X))
-                pos = Position((w.X + p_w.X) / 2.0, (w.Y + p_w.Y) / 2.0, angle = angle)
+                if p_w.X != w.X and p_w.Y != w.Y: # TODO moche
+                    d = math.sqrt( (w.X - p_w.X) ** 2 + (w.Y - p_w.Y) ** 2)
+                    angle = math.atan((w.Y - p_w.Y) / (w.X - p_w.X))
+                    pos = Position((w.X + p_w.X) / 2.0, (w.Y + p_w.Y) / 2.0, angle = angle)
 
-                shapes.append(RectObstacle(pos, d, robot.Width))
-                if i == len(self.Waypoints) - 1:
-                    shapes.append(RectObstacle(Position(w.X, w.Y, angle), robot.Height, robot.Width))
-                else:
-                    shapes.append(CircleObstacle(Position(w.X, w.Y), robot.Width / 2.0))
+                    shapes.append(RectObstacle(pos, d, robot.Width))
+                    if i == len(self.Waypoints) - 1:
+                        shapes.append(RectObstacle(Position(w.X, w.Y, angle), robot.Height, robot.Width))
+                    else:
+                        shapes.append(CircleObstacle(Position(w.X, w.Y), robot.Width / 2.0))
             return shapes
         else:
             rospy.logerr("Path can't create shapes : less than two waypoints in path")
