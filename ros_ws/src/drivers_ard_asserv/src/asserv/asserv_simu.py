@@ -127,7 +127,7 @@ class AsservSimu(AsservAbstract):
     def _callback_timer_asserv_computation(self, event):
         # First check if a goal has to be got from the list
         if self._current_goal == Pose2D(0, 0, 0) and len(self._goals_list) > 0:
-            self._current_goal = self._goals_list.pop()
+            self._current_goal = self._goals_list.pop(0)
             rospy.loginfo("[ASSERV] Starting a new goal : x = " + str(self._current_goal.x) + " y = " + str(self._current_goal.y) + " a = " + str(self._current_goal.theta))
             self._current_goal_initial_distance = ((self._current_goal.x - self._current_pose.x) ** 2 + (self._current_goal.y - self._current_pose.y) ** 2) ** 0.5
             self._current_goal_initial_angle = math.atan2(self._current_goal.y - self._current_pose.y, self._current_goal.x - self._current_pose.x)
