@@ -66,7 +66,8 @@
 
 	<!-- AI Specific -->
 	<order ref="ai_delay" duration="1">
-		<message dest="/test">
+		<message dest="/ai/timer/delay">
+			<!-- <param name="time" type="float"/> -->
 		</message>
 	</order>
 
@@ -77,9 +78,18 @@
 		</message>
 	</order>
 
-	<order ref="timer_set_duration">
-		<message dest="/test">
+	<order ref="set_robot_pos">
+		<message dest="/drivers/ard_asserv/set_pos">
+			<param name="position" type="pose2d"/>
 		</message>
 	</order>
+
+	<order ref="asserv_goto">
+		<message dest="/navigation/navigator/goto_action">
+			<param name="position" type="pose2d"/>
+		</message>
+	</order>
+
+
 
 </orders>

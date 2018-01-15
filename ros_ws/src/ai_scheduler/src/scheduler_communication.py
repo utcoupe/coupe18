@@ -10,6 +10,7 @@ import navigation_navigator.msg
 import memory_map.srv
 import ai_timer.srv
 import drivers_ard_hmi.msg
+import drivers_ard_asserv.srv
 
 class RequestTypes():
     PUB_MSG = 0
@@ -30,7 +31,8 @@ class AICommunication():
             "/memory/map/transfer":             (RequestTypes.SERVICE, memory_map.srv.MapTransfer),
             "/ai/timer/set_timer":              (RequestTypes.SERVICE, ai_timer.srv.SetTimer),
             "/feedback/ard_hmi/ros_event":      (RequestTypes.PUB_MSG, drivers_ard_hmi.msg.ROSEvent),
-            "/feedback/ard_hmi/hmi_event":      (RequestTypes.SUB_MSG, drivers_ard_hmi.msg.HMIEvent)
+            "/feedback/ard_hmi/hmi_event":      (RequestTypes.SUB_MSG, drivers_ard_hmi.msg.HMIEvent),
+            "/drivers/ard_asserv/set_pos":      (RequestTypes.SERVICE, drivers_ard_asserv.srv.SetPos)
         }
         def getRequestType(dest):
             return servers[dest][0]

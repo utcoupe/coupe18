@@ -3,7 +3,7 @@
 	<!-- NOTE : The actions are in a rather random order. This strategy is set up for testing purposes only !-->
 	<strategy name="strategy_ftw">
 		<game>
-			<time>90</time>
+			<time>100</time>
 		</game>
 		<actions name="In-Game Actions">
 			<actionref ref="jack"/>
@@ -44,6 +44,7 @@
 	</strategy>
 
 	<strategy name="test_nav">
+		<game><time>100</time></game>
 		<actions name="In-Game Actions">
 			<actionref ref="jack"/>
 			<nextneedsprevious/>
@@ -51,6 +52,21 @@
 			  	<duration>3</duration>
 			</orderref>
 			<nextneedsprevious/>
+			<orderref ref="set_robot_pos">
+				<position>
+					<x>0.5</x>
+					<y>0.5</y>
+					<theta>0</theta>
+				</position>
+			</orderref>
+			<nextneedsprevious/>
+			<orderref ref="asserv_goto">
+				<position>
+					<x>2</x>
+					<y>1.2</y>
+					<theta>0</theta>
+				</position>
+			</orderref>
 		</actions>
 		<actions_onfinish name="Actions after game">
 			<orderref ref="funny_action"/>
