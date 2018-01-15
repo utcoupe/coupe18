@@ -276,7 +276,16 @@ class Asserv:
                 # TODO manage status
                 if ack_id in self._goals_dictionary:
                     rospy.logdebug("[ASSERV] Found key %d in goal dictionary !", ack_id)
-                    self._goals_dictionary[ack_id].set_succeeded(DoGotoResult(result=True))
+                    rospy.loginfo("robot x : %f, goal x : %f", self._robot_raw_position.x, self._goals_dictionary[ack_id].get_goal().position.x)
+                    result = DoGotoResult(True)
+                    # Check if the robot is arrived, otherwise this will tell that the robot is blocked (default behaviour of the asserv)
+                    if not ((self._robot_raw_position.x > self._goals_dictionary[ack_id].get_goal().position.x - ASSERV_ERROR_POSITION) and
+                            (self._robot_raw_position.x < self._goals_dictionary[ack_id].get_goal().position.x + ASSERV_ERROR_POSITION) and
+                            (self._robot_raw_position.y > self._goals_dictionary[ack_id].get_goal().position.y - ASSERV_ERROR_POSITION) and
+                            (self._robot_raw_position.y < self._goals_dictionary[ack_id].get_goal().position.y + ASSERV_ERROR_POSITION)):
+                        rospy.loginfo("Goal has not been reached !")
+                        result.result = False
+                    self._goals_dictionary[ack_id].set_succeeded(result)
                     del self._goals_dictionary[ack_id]
                 elif ack_id in self._goto_srv_dictionary:
                     rospy.logdebug("[ASSERV] Found key %d in goto dictionary !", ack_id)
