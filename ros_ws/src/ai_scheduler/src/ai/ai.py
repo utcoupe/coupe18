@@ -1,10 +1,13 @@
 #!/bin/usr/python
-from timer import *
+import rospy
+from timer_client import TimerClient
+from game_status_client import GameStatusClient
 from ai_loader import AILoader
 
 class RobotAI():
     def __init__(self):
-        self.timer = GameTimer() # Timer client.
+        self.timer = TimerClient() # Timer client.
+        self.game_status = GameStatusClient()
         self._loader = AILoader()
 
     def get_strategies(self):
@@ -22,7 +25,7 @@ class RobotAI():
         strategy.PrettyPrint()
         # Run the whole AI until there are no orders left to execute
         while not rospy.is_shutdown():
-            if strategy.canContinue() and not self.timer.finished:
+            if strategy.canContinue() and self.game_status.game_status != 2: # 2 = STATUS_HALT
                 strategy.getNext().execute(strategy.communicator)
             else:
                 rospy.loginfo("[AI] In-Game actions finished!")

@@ -21,7 +21,9 @@
 		<actions exec="one">
 			<orderref ref="actuator_open">
 			</orderref>
-			<orderref ref="ai_delay"/>
+			<orderref ref="delay">
+				<duration>2</duration>
+			</orderref>
 			<orderref ref="actuator_close">
 			</orderref>
 		</actions>
@@ -36,7 +38,9 @@
 		<actions exec="all" order="random">
 			<orderref ref="actuator_open">
 			</orderref>
-			<orderref ref="ai_delay"/>
+			<orderref ref="delay">
+				<duration>2</duration>
+			</orderref>
 			<orderref ref="actuator_close">
 			</orderref>
 		</actions>

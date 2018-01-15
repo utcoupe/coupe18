@@ -3,7 +3,9 @@ import time
 import rospy
 
 from ai_game_status.msg import GameTime, GameStatus
-from ai_game_status.srv import SetTimer, SetTimerResponse, SetStatus
+from ai_game_status.srv import SetStatus
+
+from ai_timer.srv import SetTimer, SetTimerResponse, Delay, DelayResponse
 
 
 class Status():
@@ -45,7 +47,8 @@ class TimerNode():
     def __init__(self):
         rospy.init_node("timer", log_level=rospy.DEBUG)
         self._set_timer_srv = rospy.Service("/ai/timer/set_timer", SetTimer,  self.on_set_timer)
-        self._timer_pub     = rospy.Publisher("/ai/timer/time",   GameTime,  queue_size = 10)
+        self._delay_srv     = rospy.Service("/ai/timer/delay",     Delay,  self.on_delay)
+        self._timer_pub     = rospy.Publisher("/ai/timer/time",    GameTime,  queue_size = 10)
 
         rospy.Subscriber("/ai/game_status/status", GameStatus, self.on_status)
         self._game_status = Status.STATUS_INIT
@@ -90,6 +93,11 @@ class TimerNode():
                 rospy.logerr("ERROR Tried to stop timer but it is not running.")
                 return SetTimerResponse(False)
         return SetTimerResponse(True)
+
+    def on_delay(self, req):
+        rospy.loginfo("[timer] Sleeping for {}s (service callback)...".format(req.duration))
+        time.sleep(req.duration)
+        return DelayResponse(True)
 
     def on_status(self, req):
         self._game_status = req.game_status

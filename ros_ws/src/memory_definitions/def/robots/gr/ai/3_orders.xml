@@ -65,9 +65,9 @@
 
 
 	<!-- AI Specific -->
-	<order ref="ai_delay" duration="1">
+	<order ref="delay" duration="1">
 		<message dest="/ai/timer/delay">
-			<!-- <param name="time" type="float"/> -->
+			<param name="duration" type="float"/>
 		</message>
 	</order>
 

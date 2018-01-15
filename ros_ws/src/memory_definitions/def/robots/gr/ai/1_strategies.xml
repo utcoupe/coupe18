@@ -62,6 +62,12 @@
 			</orderref>
 
 			<nextneedsprevious/>
+
+			<orderref ref="delay">
+				<duration>4</duration>
+			</orderref>
+
+			<nextneedsprevious/>
 			<orderref ref="asserv_goto" name="going to (1, 1)">
 				<target_pos>
 					<x>2.5</x>

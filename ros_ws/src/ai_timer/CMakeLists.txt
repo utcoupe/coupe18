@@ -19,6 +19,7 @@ add_message_files(
 add_service_files(
     FILES
     SetTimer.srv
+    Delay.srv
 )
 
 generate_messages(

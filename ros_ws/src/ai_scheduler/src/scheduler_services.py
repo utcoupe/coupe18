@@ -18,7 +18,7 @@ class AIServices():
 #=            Service executions            =
 #==========================================*/
     def executeService(self, req):
-        if req.command == "ai_delay":
+        if req.command == "delay":
             res_code, reason = self.service_delay(req.params)
         else:
             res_code, reason = 404, "command not recognized"

@@ -24,6 +24,7 @@ class AICommunication():
     def SendRequest(self, dest, params, callback):
         servers = {
             "/ai/timer/set_timer":               (RequestTypes.SERVICE, ai_timer.srv.SetTimer),
+            "/ai/timer/delay":                   (RequestTypes.SERVICE, ai_timer.srv.Delay),
 
             "/memory/map/transfer":              (RequestTypes.SERVICE, memory_map.srv.MapTransfer),
 
