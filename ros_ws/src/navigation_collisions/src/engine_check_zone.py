@@ -1,3 +1,6 @@
+from engine import CollisionsExplorer
+
+
 class CheckZone(object):
     def __init__(self, width, collision_level):
         self._width = width
@@ -15,21 +18,23 @@ class MainCheckZone(CheckZone):
         super(MainCheckZone, self).__init__(width, collision_level)
 
     def _get_shapes(self):
-        pass
+        return []
 
     def check_collisions(self, obstacles):
-        for main_shape in self._get_shapes():
-            pass
+        collisions = CollisionsExplorer.find_collisions(self._get_shapes(), obstacles)
+        return collisions
 
 
 class PathCheckZone(CheckZone):
-    def __init__(self, collision_level):
-        super(PathCheckZone, self).__init__(collision_level)
+    def __init__(self, width, collision_level):
+        super(PathCheckZone, self).__init__(width, collision_level)
         self._path = []
 
     def _get_shapes(self):
-        pass
+        return []
 
     def check_collisions(self, obstacles):
+        collisions = []
         for path_shape in self._get_shapes():
             pass
+        return collisions

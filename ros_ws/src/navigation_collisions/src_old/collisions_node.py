@@ -22,7 +22,7 @@ class CollisionsNode(object):
         # Creating the publisher where the collisions will be notified in
         self.pub = rospy.Publisher("/navigation/collisions/warner", PredictedCollision, queue_size=10)
         self.markers = MarkersPublisher()
-
+        print "old"
         # Getting the robot shape and creating the robot instance
         try:
             map_get_client = rospy.ServiceProxy("/memory/map/get", MapGet)

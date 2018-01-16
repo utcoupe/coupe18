@@ -1,7 +1,7 @@
 import math
 import time
 
-from collisions_shapes_attrib import Point
+from engine_shapes_attrib import Point, Position
 
 class MapObstacle(object):
     def __init__(self, position, velocity = None):

@@ -20,7 +20,7 @@
 
     <group ns="drivers">
 		<node pkg="drivers_ard_asserv"    name="ard_asserv"  type="ard_asserv_node.py"/>
-        <node pkg="rosserial_python"      name="ard_hmi"     type="serial_node.py"      args="/dev/ttyUSB0" respawn="true"/>
+        <node pkg="rosserial_python"      name="ard_hmi"     type="serial_node.py"      args="/dev/ttyUSB0"/>
 	</group>
 
     <group ns="processing">

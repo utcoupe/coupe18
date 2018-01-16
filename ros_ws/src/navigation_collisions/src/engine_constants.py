@@ -12,8 +12,6 @@ class CollisionThresholds(object):
     STOP_GAIN = 0.6  # distance in meters when the robot is at 1 m/sec (linear coefficient).
     STOP_MAX  = 1.0  # maximum distance when linear_speed != 0.
 
-    DANGER_MAX_DIST = 1.5 # Distance threshold between LEVEL_DANGER and LEVEL_POTENTIAL
-
     @staticmethod
     def getStopDistance(linear_speed):
         if not linear_speed:
