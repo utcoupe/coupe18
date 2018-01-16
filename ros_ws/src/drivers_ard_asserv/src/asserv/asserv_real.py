@@ -20,7 +20,6 @@ class AsservReal(AsservAbstract):
     def __init__(self, asserv_node, port):
         AsservAbstract.__init__(self, asserv_node)
         rospy.loginfo("AsservReal")
-        self.mutex = threading.Lock()
         # Dictionary containing the list of orders which are interpreted by the Arduino (do not modify this dictionary !)
         self._orders_dictionary = protocol_parser.protocol_parse(os.environ['UTCOUPE_WORKSPACE'] + "/arduino/common/asserv/protocol.h")
         # Queue to store the received information from the Arduino
@@ -224,10 +223,8 @@ class AsservReal(AsservAbstract):
         @type args_list:    List
         """
         if self._serial_com is not None:
-            self.mutex.acquire()
             args_list.insert(0, str(self._order_id))
             self._order_id += 1
-            self.mutex.release()
             # TODO check if \n is necessary  + '\n'
             self._sending_queue.put(order_type + ";" + ";".join(args_list) + ";\n")
         else:
