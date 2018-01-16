@@ -14,6 +14,7 @@ __author__ = "Thomas Fuhrmann"
 __date__ = 16/12/2017
 
 ASSERV_ERROR_POSITION = 0.005  # in meters
+ASSERV_ERROR_ANGLE = 0.015  # in radians
 
 
 class AsservReal(AsservAbstract):
@@ -66,7 +67,7 @@ class AsservReal(AsservAbstract):
     def gotoa(self, goal_id, x, y, a, direction):
         self._send_serial_data(self._orders_dictionary['GOTOA'], [str(int(round(x * 1000))), str(int(round(y * 1000))), str(int(round(a * 1000))), str(direction)])
         # TODO make it proper
-        self._orders_id_dictionary[self._order_id - 1] = [goal_id, x, y]
+        self._orders_id_dictionary[self._order_id - 1] = [goal_id, x, y, a]
         return True
 
     def rot(self, goal_id, a, no_modulo):
@@ -75,7 +76,7 @@ class AsservReal(AsservAbstract):
         else:
             self._send_serial_data(self._orders_dictionary['ROT'], [str(int(round(a * 1000)))])
         # TODO make it proper
-        self._orders_id_dictionary[self._order_id - 1] = goal_id
+        self._orders_id_dictionary[self._order_id - 1] = [goal_id, a]
         return True
 
     def pwm(self, left, right, duration):
@@ -200,10 +201,17 @@ class AsservReal(AsservAbstract):
                     # Check if the robot is arrived, otherwise this will tell that the robot is blocked (default behaviour of the asserv)
                     # TODO where and how to do this ?
                     # TODO check angle
-                    if not ((self._robot_raw_position.x > self._orders_id_dictionary[ack_id][1] - ASSERV_ERROR_POSITION) and
-                            (self._robot_raw_position.x < self._orders_id_dictionary[ack_id][1] + ASSERV_ERROR_POSITION) and
-                            (self._robot_raw_position.y > self._orders_id_dictionary[ack_id][2] - ASSERV_ERROR_POSITION) and
-                            (self._robot_raw_position.y < self._orders_id_dictionary[ack_id][2] + ASSERV_ERROR_POSITION)):
+                    reached = False
+                    if len(self._orders_id_dictionary[ack_id]) == 2:
+                        reached = self._check_reached_angle(self._orders_id_dictionary[ack_id][1])
+                    elif len(self._orders_id_dictionary[ack_id]) == 3:
+                        reached = self._check_reached_position(self._orders_id_dictionary[ack_id][1], self._orders_id_dictionary[ack_id][2])
+                    elif len(self._orders_id_dictionary[ack_id]) == 4:
+                        reached = self._check_reached_position(self._orders_id_dictionary[ack_id][1], self._orders_id_dictionary[ack_id][2])
+                        reached &= self._check_reached_angle(self._orders_id_dictionary[ack_id][3])
+                    else:
+                        rospy.logwarn("Goal id ack but not corresponding goal data...")
+                    if not reached:
                         rospy.logdebug("Goal has not been reached !")
                         result = False
                     self._node.goal_reached(self._orders_id_dictionary[ack_id][0], result)
@@ -236,3 +244,12 @@ class AsservReal(AsservAbstract):
             rospy.logdebug("Sending data : " + data_to_send)
             self._serial_com.write(data_to_send)
             self._sending_queue.task_done()
+
+    def _check_reached_angle(self, a):
+        return (self._robot_raw_position.theta > a - ASSERV_ERROR_ANGLE) and (self._robot_raw_position.theta < a + ASSERV_ERROR_ANGLE)
+
+    def _check_reached_position(self, x, y):
+        return ((self._robot_raw_position.x > x - ASSERV_ERROR_POSITION) and
+                (self._robot_raw_position.x < x + ASSERV_ERROR_POSITION) and
+                (self._robot_raw_position.y > y - ASSERV_ERROR_POSITION) and
+                (self._robot_raw_position.y < y + ASSERV_ERROR_POSITION))
