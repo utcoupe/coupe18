@@ -119,7 +119,7 @@ class RosService {
           abbr: t,
           active: false,
           expected: true,
-          isOpen: false
+          isOpen: true
         };
         this.data.topics.push(newT);
       });

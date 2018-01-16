@@ -7,6 +7,7 @@ class TopicController {
     this.ros = Ros;
     this.isSubscribing = false;
     this.toggle = true;
+    this.isOpen = true;
   }
 
   $onInit() {
@@ -20,16 +21,17 @@ class TopicController {
     this.fileName = `${path}default.html`;
 
     this.$scope.$watchGroup(['$ctrl.topic.type', '$ctrl.topic.active'], () => {
+      this.isSubscribing = false;
+      this.toggle = false;
+
       if(!this.topic.active) {
         this.fileName = `${path}disabled.html`;
-        this.isSubscribing = false;
-        this.toggle = false;
         return;
       }
 
       else if (!this.topic.type) {
         this.fileName = `${path}default.html`;
-        this.toggleSubscription(false);
+        //this.toggleSubscription(false);
         return;
       }
 
@@ -37,7 +39,7 @@ class TopicController {
       this.$http.get(fileName).then((result) => {
         if (result.data) {
           this.fileName = fileName;
-          this.toggleSubscription(false);
+          //this.toggleSubscription(false);
         }
       }, () => {});
     });
