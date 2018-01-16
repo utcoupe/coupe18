@@ -234,10 +234,10 @@ class Asserv:
             rospy.loginfo("[ASSERV] Accepting goal GOTOA (id = {}, x = {}, y = {}, a = {}).".format(goal_id, x, y, a))
             to_return = self._asserv_instance.gotoa(goal_id, x, y, a, direction)
         elif mode == GotoRequest.ROT:
-            rospy.loginfo("[ASSERV] Accepting goal ROT (id = {}, a = {}.".format(goal_id, a))
+            rospy.loginfo("[ASSERV] Accepting goal ROT (id = {}, a = {}).".format(goal_id, a))
             to_return = self._asserv_instance.rot(goal_id, a, False)
         elif mode == GotoRequest.ROTNOMODULO:
-            rospy.loginfo("[ASSERV] Accepting goal ROT NOMODULO(id = {}, a = {}.".format(goal_id, a))
+            rospy.loginfo("[ASSERV] Accepting goal ROT NOMODULO (id = {}, a = {}).".format(goal_id, a))
             to_return = self._asserv_instance.rot(goal_id, a, True)
         else:
             to_return = False
