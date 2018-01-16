@@ -180,7 +180,7 @@ class AsservReal(AsservAbstract):
             self._node.send_robot_position(robot_position)
             self._node.send_robot_speed(RobotSpeed(float(receied_data_list[5]), float(receied_data_list[6]), float(receied_data_list[7]) / 1000, float(receied_data_list[8]), float(receied_data_list[9])))
         # Received order ack
-        elif data.find(";") == 1:
+        elif data.find(";") >= 1 and data.find(";") <= 3:
             # Special order ack, the first one concern the Arduino activation
             if data.find("0;") == 0:
                 rospy.loginfo("[ASSERV] Arduino started")
