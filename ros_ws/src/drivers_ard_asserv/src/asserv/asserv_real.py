@@ -204,13 +204,13 @@ class AsservReal(AsservAbstract):
                             (self._robot_raw_position.x < self._orders_id_dictionary[ack_id][1] + ASSERV_ERROR_POSITION) and
                             (self._robot_raw_position.y > self._orders_id_dictionary[ack_id][2] - ASSERV_ERROR_POSITION) and
                             (self._robot_raw_position.y < self._orders_id_dictionary[ack_id][2] + ASSERV_ERROR_POSITION)):
-                        rospy.loginfo("Goal has not been reached !")
+                        rospy.logdebug("Goal has not been reached !")
                         result = False
                     self._node.goal_reached(self._orders_id_dictionary[ack_id][0], result)
                     del self._orders_id_dictionary[ack_id]
                 else:
                     # Do nothing, some IDs are returned but do not correspond to a value in the dictionary.
-                    pass
+                    rospy.logdebug("Received ack id ({}) but dropping it.".format(ack_id))
         else:
             rospy.loginfo("%s", data)
 
