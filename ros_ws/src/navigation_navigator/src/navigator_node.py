@@ -143,6 +143,7 @@ class NavigatorNode(object):
             if (not resultAsserv) or (self._currentStatus == NavigatorStatuses.NAV_STOPPED):
                 result.success = False
             self._currentStatus = NavigatorStatuses.NAV_IDLE
+            self._collisionsClient.setEnabled(False)
             handledGoal.set_succeeded(result)
 
     def _handleDoGotoRequest (self, handledGoal):
@@ -155,6 +156,7 @@ class NavigatorNode(object):
         @param handledGoal: the received goal
         """
         self._currentStatus = NavigatorStatuses.NAV_NAVIGATING
+        self._collisionsClient.setEnabled(True)
         posStart = self._localizerClient.getLastKnownPos()
         posEnd = handledGoal.get_goal().target_pos
         debugStr = "Asked to go from "
@@ -181,6 +183,7 @@ class NavigatorNode(object):
             rospy.logdebug("Navigation failed: " + e.message)
             result = DoGotoResult(False)
             self._currentStatus = NavigatorStatuses.NAV_IDLE
+            self._collisionsClient.setEnabled(False)
             self._updateStatus()
             handledGoal.set_succeeded(result)
 
@@ -194,6 +197,7 @@ class NavigatorNode(object):
 
     def _callbackAsservResume(self):
         self._currentStatus = NavigatorStatuses.NAV_NAVIGATING
+        self._collisionsClient.setEnabled(True)
         self._asservClient.resumeAsserv()
         self._updateStatus()
     
