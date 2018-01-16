@@ -1,17 +1,14 @@
-#!/usr/bin/python
 import math
 import rospy
-import tf2_ros
-import tf
+import tf2_ros, tf
+
+from obstacles_stack import ObstaclesStack
+from collisions_shapes import Point, Position, RectObstacle, CircleObstacle
+
+from geometry_msgs.msg import PointStamped
 
 from navigation_navigator.msg import Status
-from drivers_ard_asserv.msg import RobotSpeed
-from geometry_msgs.msg import PointStamped
-# from enemy_tracker import TrackedEnemy
-from processing_belt_interpreter.msg import BeltFiltered
-
-from collisions_checker import Map, RectObstacle, RobotStatus, Point, Position, Velocity
-
+from processing_belt_interpreter.msg import RectsFiltered
 
 class CollisionsSubscriptions(object):
     def __init__(self):
@@ -22,58 +19,31 @@ class CollisionsSubscriptions(object):
 
         # Subscribing to dependencies
         rospy.Subscriber("/navigation/navigator/status", Status, self.on_nav_status)
-        rospy.Subscriber("/processing/belt_interpreter/rects_filtered", BeltFiltered, self.on_belt)
-        # rospy.Subscriber("/recognition/enemy_tracker/enemies", TrackedEnemy, self.on_enemy)
-        rospy.Subscriber("/drivers/ard_asserv/speed", RobotSpeed, self.on_robot_speed)
-
-    def updateRobotPosition(self):
-        try:
-            t = self.tf2_pos_buffer.lookup_transform("map", "robot", rospy.Time())
-            tx, ty = t.transform.translation.x, t.transform.translation.y
-            rz = self._quaternion_to_euler_angle(t.transform.rotation)[2]
-            Map.Robot.updatePosition(Position(tx, ty, angle = rz))
-        except Exception as e:
-            pass
-            #rospy.logwarn("Collisions could not get the robot's pos transform : {}".format(str(e)))
+        rospy.Subscriber("/processing/belt_interpreter/rects_filtered", RectsFiltered, self.on_belt)
 
     def on_nav_status(self, msg):
-        Map.Robot.NavStatus = msg.status
-        print msg.status
-        Map.Robot.updatePath([Point(point.x, point.y) for point in msg.currentPath])
+        ObstaclesStack.Robot.NavStatus = msg.status
+        ObstaclesStack.Robot.updatePath([Point(point.x, point.y) for point in msg.currentPath])
 
     def on_belt(self, msg):
         new_belt = []
         for rect in msg.map_rects + msg.unknown_rects:
             transform = self.tf2_pos_buffer.lookup_transform("map", rect.header.frame_id, # dest frame, source frame
-                                                             rospy.Time.now(),     # get the tf at first available time
-                                                             rospy.Duration(1.0))  # timeout
-
+                                                             rospy.Time.now(),            # get the tf at first available time
+                                                             rospy.Duration(1.0))         # timeout
             center = PointStamped()
             center.point.x = rect.x
             center.point.y = rect.y
             center.header = rect.header
-
             try:
                 center_map = self.tranform_listener.transformPoint("map", center)
                 new_belt.append(RectObstacle(Position(center_map.point.x, center_map.point.y,
                                                       self._quaternion_to_euler_angle(transform.transform.rotation)[2]),
-                                                      rect.w, rect.h, velocity=Velocity(0, 0)))
+                                                      rect.w, rect.h))
             except:
-                rospy.logwarn("Frame /map does not exist, cannot fetch belt rects.")
+                rospy.logdebug("Frame /map does not exist, cannot fetch belt rects.")
         if len(new_belt) > 0:
-            Map.updateBeltPoints(new_belt)
-
-
-    def on_lidar_points(self, msg):
-        Map.LidarObjects = [] # TODO
-
-    def on_enemy(self, msg): # TODO
-        pass
-
-    def on_robot_speed(self, msg):
-        if Map.Robot is not None:
-            Map.Robot.Velocity.Linear = msg.linear_speed
-            Map.Robot.Velocity.Angular = 0.0 # TODO Implement here if we use it one day ?
+            ObstaclesStack.updateBeltPoints(new_belt)
 
     def _quaternion_to_euler_angle(self, quaternion):
         # https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles

@@ -1,0 +1,3 @@
+bool activate # True to start checking for collisions, False for standby mode.
+---
+bool success
