@@ -36,12 +36,13 @@ void autoSendStatus() {
 
 
 void ProtocolAutoSendStatus() {
-#if AUTO_STATUS_HZ
-    static int i=0;
-    if (++i % (HZ / AUTO_STATUS_HZ) == 0) {
-        autoSendStatus();
-    }
-#endif
+    autoSendStatus();
+// #if AUTO_STATUS_HZ
+//     static int i=0;
+//     if (++i % (HZ / AUTO_STATUS_HZ) == 0) {
+//         autoSendStatus();
+//     }
+// #endif
 }
 
 uint8_t getLog10(const uint16_t number) {

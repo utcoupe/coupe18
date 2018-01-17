@@ -8,24 +8,23 @@ find_package(catkin REQUIRED COMPONENTS
     std_msgs
     genmsg
     geometry_msgs
+    dynamic_reconfigure
 )
 
-find_package(Boost REQUIRED)
-
-SET(TCLAP_INCLUDE_DIR $ENV{UTCOUPE_WORKSPACE}/libs/tclap-1.2.1/include)
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH}) # Please note the use of CMAKE_CURRENT_SOURCE_DIR
+find_package(SFML 2 REQUIRED COMPONENTS
+    graphics
+)
 
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
 
-## Generate services in the 'srv' folder
 add_service_files(
     FILES
-    DoOrder.srv
     FindPath.srv
 )
 
-## Generate added messages and services with any dependencies listed here
 generate_messages(
     DEPENDENCIES
     std_msgs
@@ -35,6 +34,10 @@ generate_messages(
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
 ################################################
+
+generate_dynamic_reconfigure_options(
+    def/PathfinderNode.cfg
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -50,26 +53,34 @@ catkin_package(
 
 include_directories(
     include
-    ${TCLAP_INCLUDE_DIR}
     ${catkin_INCLUDE_DIRS}
 )
+
 
 file(
     GLOB_RECURSE
     source_files_pathfinder
     src/pathfinder/*
 )
+add_executable(pathfinder_node ${source_files_pathfinder} src/pathfinder_node.cpp)
 
-add_executable(pathfinder_node ${source_files_pathfinder} src/pathfinder.cpp)
+target_link_libraries(pathfinder_node
+    ${catkin_LIBRARIES}
+    ${SFML_LIBRARIES} ${SFML_DEPENDENCIES}
+)
 
-target_link_libraries(pathfinder_node ${catkin_LIBRARIES})
-
-add_dependencies(pathfinder_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(pathfinder_node
+    ${${PROJECT_NAME}_EXPORTED_TARGETS}
+    ${PROJECT_NAME}_gencfg
+    ${catkin_EXPORTED_TARGETS}
+)
 
 #############
 ## Install ##
 #############
 
+
 #############
 ## Testing ##
 #############
+

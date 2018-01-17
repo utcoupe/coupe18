@@ -1,42 +1,33 @@
 #!/bin/usr/python
-import os, time
-from ai_classes import Task, TaskStatus, Strategy, Action, Order
-import xml.etree.ElementTree as ET
-from timer import *
+import rospy
+from timer_client import TimerClient
+from game_status_client import GameStatusClient
+from ai_loader import AILoader
 
 class RobotAI():
-    def __init__(self, strategyname):
-        self.xml_dirpath = os.path.dirname(__file__) + "/../../def/"
-        self.AvailableStrategies = None # loaded later (TODO Populate! used to be sent to the robot's onboard display)
+    def __init__(self):
+        self.timer = TimerClient() # Timer client.
+        self.game_status = GameStatusClient()
+        self._loader = AILoader()
 
-        orders = self.loadOrders()
-        self.Strategy = self.loadStrategy(strategyname, self.loadActions(orders), orders)
-        self.Timer = GameTimer()
+    def get_strategies(self):
+        return self._loader.get_strategies()
 
-    def loadOrders(self):
-        self.XML_ORDERS = ET.parse(self.xml_dirpath + "orders_simple.xml").getroot()
+    def start(self, strategyname, communicator):
+        strategy = self._loader.load(strategyname, communicator)
+        rospy.loginfo("[AI] Loaded strategy '{}', starting actions...".format(strategyname))
+        self.execute(strategy)
 
-        orders = []
-        for order_xml in self.XML_ORDERS:
-            orders.append(Order(order_xml))
-        return orders
+    def halt(self):
+        pass
 
-    def loadActions(self, orders):
-        self.XML_ACTIONS = ET.parse(self.xml_dirpath + "actions_simple.xml").getroot()
-
-        actionnames = [action.attrib["ref"] for action in self.XML_ACTIONS]
-        actions = []
-        for action_xml in self.XML_ACTIONS:
-            actions.append(Action(action_xml, actions, orders))
-        return actions
-
-    def loadStrategy(self, strategyname, actions, orders):
-        self.XML_STRATEGIES = ET.parse(self.xml_dirpath + "strategies_simple.xml").getroot()
-        self.AvailableStrategies = [child.attrib["name"] for child in self.XML_STRATEGIES]
-
-        strategy_xml = self.XML_STRATEGIES.findall("strategy[@name='" + strategyname + "']")
-        if len(strategy_xml) == 1:
-            return Strategy(strategy_xml[0], actions, orders)
-        else:
-            print "FAIL Too many or no strategy to load with the given name. Aborting."
-            return None
+    def execute(self, strategy):
+        strategy.PrettyPrint()
+        # Run the whole AI until there are no orders left to execute
+        while not rospy.is_shutdown():
+            if strategy.canContinue() and self.game_status.game_status != 2: # 2 = STATUS_HALT
+                strategy.getNext().execute(strategy.communicator)
+            else:
+                rospy.loginfo("[AI] In-Game actions finished!")
+                break
+            strategy.PrettyPrint()

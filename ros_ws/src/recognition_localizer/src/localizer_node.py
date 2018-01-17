@@ -26,7 +26,7 @@ class Localizer(object):
 
     def run(self):
         rospy.loginfo("Localizer node started")
-        rate = rospy.Rate(10)
+        rate = rospy.Rate(100)
         while not rospy.is_shutdown():
             data = self.calculate()
             if data:

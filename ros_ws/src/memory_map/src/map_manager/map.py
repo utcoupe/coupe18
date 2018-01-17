@@ -2,8 +2,8 @@
 import time
 import rospy
 from map_loader import MapLoader, LoadingHelpers
-from map_bases import DictManager, ListManager, RequestPath
-from map_classes import Terrain, Zone, Waypoint, Entity, Object
+from map_bases import DictManager, RequestPath
+from map_classes import Terrain, Zone, Waypoint, Entity, Container, Object
 
 class Map():
     MapDict = None
@@ -11,11 +11,11 @@ class Map():
     @staticmethod
     def load():
         starttime = time.time() * 1000
-        initdict_terrain   = MapLoader.loadFile("../../def/1_Terrain.yml")["terrain"]
-        initdict_zones     = MapLoader.loadFile("../../def/2_Zones.yml")["zones"]
-        initdict_waypoints = MapLoader.loadFile("../../def/3_Waypoints.yml")["waypoints"]
-        initdict_entities  = MapLoader.loadFile("../../def/4_Entities.yml")["entities"]
-        initdict_objects   = MapLoader.loadFile("../../def/5_Objects.yml")["objects"]
+        initdict_terrain   = MapLoader.loadFile("1_Terrain.yml")["terrain"]
+        initdict_zones     = MapLoader.loadFile("2_Zones.yml")["zones"]
+        initdict_waypoints = MapLoader.loadFile("3_Waypoints.yml")["waypoints"]
+        initdict_entities  = MapLoader.loadFile("4_Entities.yml")["entities"]
+        initdict_objects   = MapLoader.loadFile("5_Objects.yml")["objects"]
         # Instantiate objects before creating the map dict
         for zone in initdict_zones:
             initdict_zones[zone] = Zone(initdict_zones[zone])
@@ -24,7 +24,10 @@ class Map():
         for entity in initdict_entities:
             initdict_entities[entity] = Entity(initdict_entities[entity])
         for obj in initdict_objects:
-            initdict_objects[obj] = Object(initdict_objects[obj])
+            if "container_" in obj: # Create container.
+                initdict_objects[obj] = Container(initdict_objects[obj])
+            else: # Create object.
+                initdict_objects[obj] = Object(initdict_objects[obj])
         rospy.loginfo("Loaded files in {0:.2f}ms.".format(time.time() * 1000 - starttime))
 
         # Create main Map dict
@@ -45,8 +48,8 @@ class Map():
         return Map.MapDict.get(requestpath)
 
     @staticmethod
-    def set(requestpath):
+    def set(requestpath, mode, instance = None):
         if requestpath[0] != "/":
-            rospy.logerr("    GET Request failed : global search needs to start with '/'.")
+            rospy.logerr("    SET Request failed : global search needs to start with '/'.")
             return None
-        return Map.MapDict.set(requestpath)
+        return Map.MapDict.set(requestpath, mode, instance)

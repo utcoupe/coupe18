@@ -6,7 +6,7 @@
     "type": "git",
     "url": "git+https://github.com/utcoupe/coupe18.git"
   },
-  "author": "Alexandre Milesi",
+  "author": "milesial",
   "license": "BSD-3-Clause",
   "dependencies": {
     "http-server": "^0.10.0"

@@ -1,6 +1,5 @@
 from math import atan2, pi
 
-
 class Shape(object):
     """Class to test collisions with shapes returned by the map"""
 
@@ -21,6 +20,8 @@ class Circle(Shape):
     def contains(self, x, y):
         return (x - self.x)**2 + (y - self.y)**2 <= self.r**2
 
+    def __repr__(self):
+        return "Circle Shape : x={s.x}, y={s.y}, r={s.r}".format(s=self)
 
 class Polygon(Shape):
     """Thanks to eboix (https://stackoverflow.com/users/1063041/eboix)
@@ -50,7 +51,12 @@ class Polygon(Shape):
             nextv = self.Vertices[(i+1) % len(self.Vertices)]
             angle += self.toAngle(v.x - x, v.y - y, nextv.x - x, nextv.y - y)
 
-        return abs(angle) >= PI
+        return abs(angle) >= pi
+
+    def __repr__(self):
+        return "Polygon Shape with {} vertices".format(len(self.Vertices))
+
+
 
 
 class Rectangle(Shape):
@@ -63,5 +69,8 @@ class Rectangle(Shape):
         self.h = h
 
     def contains(self, x, y):
-        return x >= self.x - self.w / 2 and x <= self.x + self.w / 2 and y >= self.y + self.h / 2 \
+        return x >= self.x - self.w / 2 and x <= self.x + self.w / 2 and y >= self.y - self.h / 2 \
                            and y <= self.y + self.h / 2
+
+    def __repr__(self):
+        return "Rectangle Shape : x={s.x}, y={s.y}, w={s.w}, h={s.h}".format(s=self)

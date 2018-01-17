@@ -1,99 +1,61 @@
 #!/usr/bin/python
-import json
 import rospy
-import tf2_ros
+from collisions_subscriptions import CollisionsSubscriptions
+from engine_constants import CollisionLevel
+from obstacles_stack import ObstaclesStack
 
-from collisions import MapObstacles, MapObstacle, MapRobot, RobotStatus
-
-# from memory_map.msg import MapGet
-
-# from processing_belt_interpreter.msg import BeltFiltered
-# from navigation_navigator.msg import NavStatus
-# from drivers_asser.msg import RobotSpeed
-
-# from geometry_msgs.msg import Pose2D
 from navigation_collisions.msg import PredictedCollision
+from navigation_collisions.srv import ActivateCollisions, ActivateCollisionsResponse
 
-
-class CollisionsNode(object):
+class CollisionsNode():
     def __init__(self):
         rospy.init_node("collisions", log_level=rospy.DEBUG)
-        rospy.loginfo("Started node 'navigation/collisions'.")
+        self.active = False # navigation/navigator activates this node through a service.
 
-        # Preparing to get the robot's position through tf2
-        self.tf2_pos_buffer = tf2_ros.Buffer(cache_time=rospy.Duration(5.0))
-        self.tf2_pos_listener = tf2_ros.TransformListener(self.tf2_pos_buffer)
+        self.subscriptions = CollisionsSubscriptions()
+        self.robot = self.subscriptions.create_robot()
+        rospy.Service("/navigation/collisions/set_active", ActivateCollisions, self.on_set_active)
 
-        # Subscribing to the dependencies
-        # rospy.Subscriber("/navigation/navigator/status", NavStatus, self.on_nav_status)
-        # rospy.Subscriber("/processing/belt_interpreter/points_filtered", BeltFiltered, self.on_belt)
-        # rospy.Subscriber("/recognition/enemy_tracker/enemies", Enemy, self.on_enemy)
-        # rospy.Subscriber("/drivers/ard_asserv/robot_speed", RobotSpeed, self.on_robot_speed)
+        self.subscriptions.send_init()
+        rospy.loginfo("navigation/collisions ready, waiting for activation.")
 
-        # Creating the publisher where the collisions will be notified in
-        self.pub = rospy.Publisher("/navigation/collisions/", PredictedCollision, queue_size=10)
-
-        # Getting the robot shape and creating the robot instance
-        # try:
-        #     map_get_client = rospy.ServiceProxy("/memory/map/get", MapGet)
-        #     map_get_client.wait_for_service()
-        #     shape = Shape(json.loads(map_get_client("/entities/{}/shape/*".format(rospy.get_param("/robotname")))))
-        # except:
-        #     shape = Shape({"type": "rect", "width": 0.3, "height": 0.3})
-        # self.Robot = MapRobot(shape)
-
-        # self.run()
-        rospy.spin()
+        self.run()
 
     def run(self):
-        r = rospy.Rate(50)
+        r = rospy.Rate(20)
         while not rospy.is_shutdown():
-            self.updateRobotPosition()
-
-            predicted_collisions = self.Robot.Path.checkCollisions(MapObstacles.toList())
-            for pd in predicted_collisions:
-                self.publishCollision(pd)
+            self.subscriptions.update_robot(self.robot)
+            if self.active:
+                collisions = self.robot.check_collisions(ObstaclesStack.toList())
+            ObstaclesStack.garbageCollect()
 
             r.sleep()
+            rospy.logerr(len(ObstaclesStack.toList()))
 
-    def publishCollision(self, collision): # TODO
+    def publish_collision(self, collision):
         m = PredictedCollision()
-        m.danger_level = collision.danger_level
+        m.danger_level = collision.Level
+
+        if collision.Level == CollisionLevel.LEVEL_STOP:
+            rospy.logwarn("[COLLISIONS] Found freaking close collision, please stop !!")
+        elif collision.Level == CollisionLevel.LEVEL_DANGER:
+            rospy.loginfo("[COLLISIONS] Found collision intersecting with the path.")
+
+        obs = collision.Obstacle
+        m.obstacle_pos = Pose2D(obs.Position.X, obs.Position.Y, obs.Position.A)
+        if isinstance(obs, RectObstacle):
+            m.obstacle_type = m.TYPE_RECT
+            m.obstacle_width, m.obstacle_height = obs.Width, obs.Height
+        elif isinstance(obs, CircleObstacle):
+            m.obstacle_type = m.TYPE_CIRCLE
+            m.obstacle_radius = obs.Radius
+
         self.pub.publish(m)
 
-    def updateRobotPosition(self):
-        try:
-            self.Robot.updatePosition(self.tf2_pos_buffer.lookup_transform("robot", "map", rospy.Time()))
-        except Exception as e:
-            rospy.logwarn("Collisions could not get the robot's pos transform : {}".format(str(e)))
-
-    def on_nav_status(self, msg):
-        if msg.status == msg.NAV_STOPPED:
-            self.Robot.NavStatus = RobotStatus.NAV_STOPPED
-        elif msg.status == msg.NAV_STRAIGHT:
-            self.Robot.NavStatus = RobotStatus.NAV_STRAIGHT
-        elif msg.status == msg.NAV_TURNING:
-            self.Robot.NavStatus = RobotStatus.NAV_TURNING
-        else:
-            rospy.logerr("ERROR : Unrecognized robot status type.")
-
-        self.Robot.updatePath(msg.path) # TODO
-
-    def on_belt(self, msg): # TODO
-        points_frame = msg.frame_id
-        MapObstacles.BeltPoints = [MapObstacle(p) for p in msg.static_points + msg.dynamic_points]
-
-    def on_lidar_points(self, msg):
-        MapObstacles.LidarObjects = [] # TODO
-
-    def on_enemy(self, msg): # TODO
-        pass
-
-    def on_robot_speed(self, msg):
-        self.Robot.Velocity.Linear = msg.linear_speed
-        self.Robot.Velocity.Angular = msg.wheel_speed_right - msg.wheel_speed_left # TODO
-
-
+    def on_set_active(self, msg):
+        self.active = msg.active
+        rospy.loginfo("{} collisions check.{}".format("Starting" if self.active else "Stopping", ".." if self.active else ""))
+        return ActivateCollisionsResponse(True)
 
 if __name__ == "__main__":
     CollisionsNode()

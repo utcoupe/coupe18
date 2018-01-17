@@ -4,7 +4,6 @@ project(ai_timer)
 find_package(catkin REQUIRED COMPONENTS
     rospy
     std_msgs
-    ai_scheduler
     message_generation
 )
 
@@ -12,13 +11,17 @@ find_package(catkin REQUIRED COMPONENTS
 ## Declare ROS messages, services and actions ##
 ################################################
 
-## Generate messages in the 'msg' folder
 add_message_files(
     FILES
-    ai_timer.msg
+    GameTime.msg
 )
 
-# Generate added messages and services with any dependencies listed here
+add_service_files(
+    FILES
+    SetTimer.srv
+    Delay.srv
+)
+
 generate_messages(
     DEPENDENCIES
     std_msgs

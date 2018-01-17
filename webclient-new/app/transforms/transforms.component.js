@@ -8,8 +8,7 @@ class TransformController {
   }
 
   refresh() { // relative to fixed
-    console.log("Subscribed");
-    if(!this.transform.fixed || !this.transform.frame)
+    if(!this.transform || !this.transform.fixed || !this.transform.frame)
       return;
 
     this.tfClient = new ROSLIB.TFClient({
@@ -34,7 +33,6 @@ class TransformController {
 }
 
 angular.module('roscc').component('ccTransform', {
-  bindings: { parameter: '=' },
   templateUrl: 'app/transforms/transforms.html',
   controller: TransformController,
 });

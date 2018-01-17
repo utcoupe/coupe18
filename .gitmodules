@@ -1,24 +1,3 @@
-[submodule "ros_ws/src/external_nodes/laser_proc"]
-	path = ros_ws/src/external_nodes/laser_proc
-	url = https://github.com/ros-perception/laser_proc.git
-[submodule "ros_ws/src/external_nodes/dynamixel_motor"]
-	path = ros_ws/src/external_nodes/dynamixel_motor
-	url = https://github.com/arebgun/dynamixel_motor.git
-[submodule "ros_ws/src/external_nodes/urg_node"]
-	path = ros_ws/src/external_nodes/urg_node
-	url = https://github.com/ros-drivers/urg_node.git
-[submodule "ros_ws/src/external_nodes/urg_c"]
-	path = ros_ws/src/external_nodes/urg_c
-	url = https://github.com/ros-drivers/urg_c.git
-[submodule "ros_ws/src/external_nodes/usb_cam"]
-	path = ros_ws/src/external_nodes/usb_cam
-	url = https://github.com/ros-drivers/usb_cam.git
-[submodule "ros_ws/src/external_nodes/obstacle_detector"]
-	path = ros_ws/src/external_nodes/obstacle_detector
-	url = https://github.com/tysik/obstacle_detector.git
-[submodule "ros_ws/src/external_nodes/rosbridge_suite"]
-	path = ros_ws/src/external_nodes/rosbridge_suite
-	url = https://github.com/RobotWebTools/rosbridge_suite.git
-[submodule "ros_ws/src/external_nodes/tf2_web_republisher"]
-	path = ros_ws/src/external_nodes/tf2_web_republisher
-	url = https://github.com/RobotWebTools/tf2_web_republisher
+[submodule "ros_ws/src/external_nodes/teraranger"]
+	path = ros_ws/src/external_nodes/teraranger
+	url = https://github.com/Terabee/teraranger.git

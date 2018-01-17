@@ -1,4 +1,4 @@
 # Takes 1 point and returns status
-geometry_msgs/Pose2D targetPos
+geometry_msgs/Pose2D target_pos
 ---
 bool success

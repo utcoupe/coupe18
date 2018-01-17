@@ -33,7 +33,7 @@ ou must then source the workspace with `source devel/setup.bash` or `source deve
 time you open a new terminal. Adding this line to your `~/.bashrc` or `~/.zshrc` (with the full
 path to the setup file) will simply automate this step.
 
-# Règles de bonne conduite
+# Règles et Guidelines
 
 Afin d'avoir un projet organisé et fonctionnel, voici quelques règles (par convention ou importantes pour le 
 fonctionnement du projet) à suivre pour la création de branches git, paquets, noeuds ros, etc :
@@ -49,6 +49,8 @@ ordre alphabétique : plus visuel)
 
 - Créer des serveurs de `topics`/`services`/`actions` nommés de la forme `/namespace/package/server_name` s'ils peuvent être accédés par des paquets 
 extérieurs (ATTENTION : avec un `/` au début pour créer un nom absolu), `server_name` s'ils sont internes.
+
+- Nommer les variables dans les fichiers de définition `.msg`/`.srv`/`.action` en format `var_name`.
 
 ### Python
 
