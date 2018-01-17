@@ -27,13 +27,13 @@ class ObstaclesStack():
     def garbageCollect():
         current_time = time.time()
         for obstacle in ObstaclesStack.BeltPoints:
-            if current_time - obstacle.SpawnTime > ObstaclesStack.OBSTACLES_LIFESPAN:
+            if current_time - obstacle.spawn_time > ObstaclesStack.OBSTACLES_LIFESPAN:
                 ObstaclesStack.BeltPoints.remove(obstacle)
 
         for obstacle in ObstaclesStack.LidarObjects:
-            if current_time - obstacle.SpawnTime > ObstaclesStack.OBSTACLES_LIFESPAN:
+            if current_time - obstacle.spawn_time > ObstaclesStack.OBSTACLES_LIFESPAN:
                 ObstaclesStack.BeltPoints.remove(obstacle)
 
         for obstacle in ObstaclesStack.Enemies:
-            if current_time - obstacle.SpawnTime > ObstaclesStack.OBSTACLES_LIFESPAN:
+            if current_time - obstacle.spawn_time > ObstaclesStack.OBSTACLES_LIFESPAN:
                 ObstaclesStack.BeltPoints.remove(obstacle)

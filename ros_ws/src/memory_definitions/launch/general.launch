@@ -28,7 +28,7 @@
 	</group>
 
   <group ns="navigation">
-		<node pkg="navigation_collisions"       name="collisions" type="collisions_node.py"         />
+		<node pkg="navigation_collisions"       name="collisions" type="collisions_node.py"         output="screen" />
 		<node pkg="navigation_navigator"        name="navigator"  type="navigator_node.py"          output="screen" />
 		<node pkg="navigation_pathfinder"       name="pathfinder" type="pathfinder_node" args="-- " output="screen" />
 	</group>

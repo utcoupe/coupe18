@@ -13,7 +13,7 @@ class CollisionThresholds(object):
     STOP_MAX  = 1.0  # maximum distance when linear_speed != 0.
 
     @staticmethod
-    def getStopDistance(linear_speed):
+    def get_stop_distance(linear_speed):
         if not linear_speed:
             return 0.0 # If robot stopped, don't create stop rect distance.
         return sorted((CollisionThresholds.STOP_MIN, CollisionThresholds.STOP_GAIN * linear_speed, CollisionThresholds.STOP_MAX))[1] # clamp value

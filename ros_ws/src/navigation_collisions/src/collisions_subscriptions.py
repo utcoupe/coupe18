@@ -4,13 +4,14 @@ import tf2_ros, tf
 
 from obstacles_stack import ObstaclesStack
 from collisions_robot import Robot
-from engine_shapes import Point, Position, RectObstacle, CircleObstacle
+from collisions_engine import Point, Position, RectObstacle, CircleObstacle
 from status_services import StatusServices
 
 from geometry_msgs.msg import PointStamped
 
 from memory_map.srv import MapGet
 from navigation_navigator.msg import Status
+from drivers_ard_asserv.msg import RobotSpeed
 from processing_belt_interpreter.msg import BeltFiltered
 
 class CollisionsSubscriptions(object):
@@ -21,12 +22,15 @@ class CollisionsSubscriptions(object):
         self._tranform_listener = tf.TransformListener()
 
         # Callback buffers
-        self._nav_status = None
-        self._robot_path_waypoints = None
+        self._nav_status = 0 #STATUS_IDLE
+        self._robot_path_waypoints = []
+        self._vel_linear  = 0.0
+        self._vel_angular = 0.0
 
         # Subscribing to dependencies
         rospy.Subscriber("/navigation/navigator/status", Status, self._on_nav_status)
         rospy.Subscriber("/processing/belt_interpreter/rects_filtered", BeltFiltered, self._on_belt)
+        rospy.Subscriber("/drivers/ard_asserv/speed", RobotSpeed, self.on_robot_speed)
 
         self.game_status = StatusServices("navigation", "collisions", None, self._on_game_status)
 
@@ -53,6 +57,8 @@ class CollisionsSubscriptions(object):
             robot.update_status(self._nav_status)
         if self._robot_path_waypoints is not None and len(self._robot_path_waypoints) > 0:
             robot.update_path(self._robot_path_waypoints)
+
+        robot.update_velocity(self._vel_linear, self._vel_angular)
 
     def _update_robot_pos(self):
         try:
@@ -89,6 +95,10 @@ class CollisionsSubscriptions(object):
                 rospy.logdebug("Frame /map does not exist, cannot fetch belt rects.")
         if len(new_belt) > 0:
             ObstaclesStack.updateBeltPoints(new_belt)
+
+    def on_robot_speed(self, msg):
+        self._vel_linear = msg.linear_speed
+        self._vel_angular = 0.0
 
     def _quaternion_to_euler_angle(self, quaternion):
         # https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles

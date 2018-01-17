@@ -37,7 +37,6 @@ class RobotPath(object):
                         shapes.append(CircleObstacle(Position(w.X, w.Y), robot.Width / 2.0))
             return shapes
         else:
-            rospy.logerr("Path can't create shapes : less than two waypoints in path")
             return []
 
     def checkCollisions(self, robot, obstacles):
