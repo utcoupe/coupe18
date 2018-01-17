@@ -17,6 +17,7 @@ class EnemyTrackerNode():
         self._belt_sub = rospy.Subscriber(
             '/processing/belt_interpreter/points', BeltFiltered, self.importPoint)
         self.configure(None)
+        self._publisher = rospy.Publisher('{}enemies'.format(self._namespace))
         self.rect = []
         self.data = []
 
