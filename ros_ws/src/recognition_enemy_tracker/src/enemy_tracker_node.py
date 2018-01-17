@@ -4,6 +4,7 @@
 from processing_belt_interpreter.msg import BeltFiltered, RectangleStamped
 from libtools import Rect
 from enemy_tracker_tracker import EnemiesData
+from tf import TransformListener
 import enemy_tracker_properties
 import rospy
 
@@ -20,14 +21,22 @@ class EnemyTrackerNode():
         self._publisher = rospy.Publisher('{}enemies'.format(self._namespace))
         self.rect = []
         self.data = []
+        self._tf = TransformListener()
 
     def importPoint(self, beltData):
         rects = []
         for rect in beltData.unknown_rects:
-            # TODO check referentiel
+            try:
+                rect = self._tl.transformPose("/map", rect)
+            except Exception as e:
+                rospy.logwarn("Frame map may not exist, cannot process sensor data : {}".format(e))
+                break
             rects.append(Rect(rect.x, rect.y, rect.w, rect.h, rect.header.stamp))
+        if(len(rects)==0)
+            return False
         self.saveRect(rects)
         self.trackEnemies()
+        return True
 
     def saveRect(self, rect):
         if len(self.rect) >= self.maxRectHistory:
