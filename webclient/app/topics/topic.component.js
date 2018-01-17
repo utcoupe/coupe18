@@ -25,7 +25,8 @@ class TopicController {
       this.toggle = false;
 
       if(!this.topic.active) {
-        this.fileName = `${path}disabled.html`;
+        this.fileName = '';
+        this.topic.isOpen = false;
         return;
       }
 
@@ -50,7 +51,10 @@ class TopicController {
       return;
     if (!data) {
       this.roslibTopic.subscribe((message) => {
-        this.message = message;
+        if(!this.fileName.includes('default.html'))
+          this.message = message;
+        else
+          this.message = JSON.stringify(message);
       });
     } else {
       this.roslibTopic.unsubscribe();
@@ -59,8 +63,8 @@ class TopicController {
 
   }
 
-  publishMessage(input, isJSON) {
-    const data = isJSON ? angular.fromJson(input) : input;
+  publishMessage(input) {
+    const data = !this.fileName.includes('default.html') ? angular.fromJson(input) : input;
     const message = new ROSLIB.Message(data);
     this.roslibTopic.publish(message);
   }
@@ -69,6 +73,6 @@ class TopicController {
 
 angular.module('roscc').component('ccTopic', {
   bindings: { topic: '=' },
-  template: '<ng-include src="$ctrl.fileName"></ng-include>',
-  controller: TopicController,
+  template: `<ng-include src="'./app/topics/meta.html'"></ng-include>`,
+  controller: TopicController
 });
