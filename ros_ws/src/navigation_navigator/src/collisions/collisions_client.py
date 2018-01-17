@@ -40,7 +40,7 @@ class CollisionsClient(object):
             self._activateCollisionsSrv = rospy.ServiceProxy(self.ACTIVATE_COLLISIONS_SERVICE_NAME, ActivateCollisions)
         except rospy.ServiceException, e:
             str_error = "Error when trying to connect to "
-            str_error += self.WARNER_TOPIC
+            str_error += self.ACTIVATE_COLLISIONS_SERVICE_NAME
             str_error += " : " + str(e)
             rospy.logerr(str_error)
 
@@ -52,4 +52,4 @@ class CollisionsClient(object):
             self._last_collision = False
     
     def setEnabled(self, isEnabled):
-        self._activateCollisionsSrv.call(ActivateCollisions(active=isEnabled))
+        self._activateCollisionsSrv.call(active=isEnabled)
