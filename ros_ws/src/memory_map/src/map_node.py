@@ -26,7 +26,7 @@ class MapNode():
         self.run()
 
     def run(self):
-        r = rospy.Rate(3)
+        r = rospy.Rate(10)
         while not rospy.is_shutdown():
             self.markers.updateMarkers(map_manager.Map)
             r.sleep()

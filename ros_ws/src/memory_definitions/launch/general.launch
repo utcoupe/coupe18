@@ -1,5 +1,5 @@
 <launch>
-	<arg name="robot" default="GR"/>
+	<arg name="robot" default="gr"/>
 
     <param name="robot"  value="$(arg robot)"/>
 
@@ -10,8 +10,8 @@
     </group>
 
 	<group ns="memory">
-		<node pkg="memory_definitions"    name="definitions" type="definitions_node.py" output="screen"/>
-		<node pkg="memory_map"            name="map"         type="map_node.py"         />
+		<node pkg="memory_definitions"    name="definitions" type="definitions_node.py" output="screen" />
+		<node pkg="memory_map"            name="map"         type="map_node.py"         output="screen" />
 	</group>
 
     <group ns="recognition">
@@ -20,7 +20,7 @@
 
     <group ns="drivers">
 		<node pkg="drivers_ard_asserv"    name="ard_asserv"  type="ard_asserv_node.py"/>
-        <node pkg="rosserial_python"      name="ard_hmi"     type="serial_node.py"      args="/dev/ttyUSB0" respawn="true"/>
+        <node pkg="rosserial_python"      name="ard_hmi"     type="serial_node.py"      args="/dev/ttyUSB0" />
 	</group>
 
     <group ns="processing">
