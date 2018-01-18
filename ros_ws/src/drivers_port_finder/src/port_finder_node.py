@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import os
+import re
+import subprocess
 import rospy
 import xml.etree.ElementTree as ET
 from drivers_port_finder.srv import *
@@ -21,6 +23,7 @@ class PortFinder:
         curr_dir = os.path.dirname(os.path.abspath(__file__))
         def_dir = os.path.join(curr_dir, "../def")
         self._parse_xml_file(def_dir + "/components_list.xml")
+        self._parse_dmesg()
 
     def _callback_get_port(self, request):
         return GetPortResponse(response)
@@ -57,6 +60,57 @@ class PortFinder:
             rospy.loginfo("{} components found in component_list definition".format(len(components)))
             rospy.loginfo(components)
             self._components_list = components
+
+    def _parse_dmesg(self):
+        dmesg_output = self._get_dmesg().split('\n')
+        id_list = []
+        tty_list = []
+        id_list_filtered = []
+        merged_filtedred_id_tty_list = []
+        line_number = 0
+        tty_regexp = re.compile('(ttyACM.|ttyUSB.)')
+        # Parse the whole file to extract a list of lines containing idVendor and an other list containing ttyX
+        for line in dmesg_output:
+            vendor_id_index = line.find("idVendor")
+            tty_usb_index = line.find("ttyUSB")
+            tty_acm_index = line.find("ttyACM")
+            if vendor_id_index != -1:
+                matched_line = line[vendor_id_index:len(line)]
+                matched_line_split = matched_line.split(', ')
+                id_list.append((line_number, matched_line_split[0].split('=')[1], matched_line_split[1].split('=')[1]))
+            if tty_usb_index != -1 or tty_acm_index != -1:
+                matched_tty = tty_regexp.search(line)
+                tty_list.append((line_number, matched_tty.group(0)))
+            line_number += 1
+        # Filter the idVendor list to keep only the idVendor we use
+        for element in id_list:
+            for component in self._components_list:
+                if element[1] == component["vendor_id"] and element[2] == component["product_id"]:
+                    id_list_filtered.append(element)
+        # Merge the information of vendor_id and tty port to have a single tuple in list
+        # for element in id_list_filtered:
+        #     for tty_element in tty_list:
+        #         pass
+        rospy.loginfo(id_list_filtered)
+        rospy.loginfo(tty_list)
+
+    def _get_dmesg(self):
+        """
+        From https://gist.github.com/saghul/542780
+        """
+        try:
+            sub = subprocess.Popen("dmesg", stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = sub.communicate()
+            returncode = sub.returncode
+        except OSError, e:
+            if e.errno == 2:
+                raise RuntimeError('"%s" is not present on this system' % cmdline[0])
+            else:
+                raise
+        if returncode != 0:
+            raise RuntimeError('Got return value %d while executing "%s", stderr output was:\n%s' % (
+            returncode, " ".join("dmesg"), stderr.rstrip("\n")))
+        return stdout
 
 
 if __name__ == "__main__":
