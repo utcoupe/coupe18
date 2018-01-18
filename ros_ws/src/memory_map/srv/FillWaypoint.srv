@@ -6,4 +6,4 @@
 memory_map/Waypoint waypoint
 ---
 bool success
-memory_map/Waypoint filled_waypoint
+memory_map/Waypoint filled_waypoint # WARNING frame_id is NOT FILLED for now, assuming it is /map.

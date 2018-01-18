@@ -1,79 +1,105 @@
-#!/usr/bin/python
-import math
+import math, json
 import rospy
-import tf2_ros
-import tf
+import tf2_ros, tf
 
+from obstacles_stack import Map, ObstaclesStack
+from collisions_robot import Robot
+from collisions_engine import Point, Position, RectObstacle, CircleObstacle
+from status_services import StatusServices
+
+from geometry_msgs.msg import PointStamped
+
+from memory_map.srv import MapGet
 from navigation_navigator.msg import Status
 from drivers_ard_asserv.msg import RobotSpeed
-from geometry_msgs.msg import PointStamped
-# from enemy_tracker import TrackedEnemy
 from processing_belt_interpreter.msg import BeltFiltered
-
-from collisions_checker import Map, RectObstacle, RobotStatus, Point, Position, Velocity
-
 
 class CollisionsSubscriptions(object):
     def __init__(self):
         # Preparing to get the robot's position, belt frame_id transform.
-        self.tf2_pos_buffer = tf2_ros.Buffer(cache_time=rospy.Duration(5.0))
-        self.tf2_pos_listener = tf2_ros.TransformListener(self.tf2_pos_buffer)
-        self.tranform_listener = tf.TransformListener()
+        self._tf2_pos_buffer = tf2_ros.Buffer(cache_time=rospy.Duration(5.0))
+        self._tf2_pos_listener = tf2_ros.TransformListener(self._tf2_pos_buffer)
+        self._tranform_listener = tf.TransformListener()
+
+        # Callback buffers
+        self._nav_status = 0 #STATUS_IDLE
+        self._robot_path_waypoints = []
+        self._vel_linear  = 0.0
+        self._vel_angular = 0.0
 
         # Subscribing to dependencies
-        rospy.Subscriber("/navigation/navigator/status", Status, self.on_nav_status)
-        rospy.Subscriber("/processing/belt_interpreter/rects_filtered", BeltFiltered, self.on_belt)
-        # rospy.Subscriber("/recognition/enemy_tracker/enemies", TrackedEnemy, self.on_enemy)
+        rospy.Subscriber("/navigation/navigator/status", Status, self._on_nav_status)
+        rospy.Subscriber("/processing/belt_interpreter/rects_filtered", BeltFiltered, self._on_belt)
         rospy.Subscriber("/drivers/ard_asserv/speed", RobotSpeed, self.on_robot_speed)
 
-    def updateRobotPosition(self):
+        self.game_status = StatusServices("navigation", "collisions", None, self._on_game_status)
+
+    def send_init(self, success = True):
+        self.game_status.ready(success)
+
+    def create_robot(self):
+        try: # Getting the robot shape and creating the robot instance
+            map_get_client = rospy.ServiceProxy("/memory/map/get", MapGet)
+            map_get_client.wait_for_service(2.0)
+            shape = json.loads(map_get_client("/entities/gr/shape/*").response)
+            if not shape["type"] == "rect":
+                raise ValueError("Robot shape type not supported here.")
+        except Exception as e:
+            rospy.logerr("ERROR Collisions couldn't get the robot's shape from map : " + str(e))
+            shape = {"width": 0.4, "height": 0.25}
+        return Robot(shape["width"], shape["height"]) # Can create a rect or circle
+
+    def update_robot(self):
+        new_pos = self._update_robot_pos()
+        if new_pos is not None:
+            Map.Robot.update_position(new_pos)
+
+        if self._nav_status is not None:
+            Map.Robot.update_status(self._nav_status)
+        if self._robot_path_waypoints is not None and len(self._robot_path_waypoints) > 0:
+            Map.Robot.update_waypoints(self._robot_path_waypoints)
+
+        Map.Robot.update_velocity(self._vel_linear, self._vel_angular)
+
+    def _update_robot_pos(self):
         try:
-            t = self.tf2_pos_buffer.lookup_transform("map", "robot", rospy.Time())
+            t = self._tf2_pos_buffer.lookup_transform("map", "robot", rospy.Time())
             tx, ty = t.transform.translation.x, t.transform.translation.y
             rz = self._quaternion_to_euler_angle(t.transform.rotation)[2]
-            Map.Robot.updatePosition(Position(tx, ty, angle = rz))
+            return (tx, ty, rz)
         except Exception as e:
-            pass
-            #rospy.logwarn("Collisions could not get the robot's pos transform : {}".format(str(e)))
+            return None
 
-    def on_nav_status(self, msg):
-        Map.Robot.NavStatus = msg.status
-        print msg.status
-        Map.Robot.updatePath([Point(point.x, point.y) for point in msg.currentPath])
+    def _on_game_status(self, msg):
+        pass
 
-    def on_belt(self, msg):
+    def _on_nav_status(self, msg):
+        self._nav_status = msg.status
+        self._robot_path_waypoints = [Point(point.x, point.y) for point in msg.currentPath]
+
+    def _on_belt(self, msg):
         new_belt = []
-        for rect in msg.map_rects + msg.unknown_rects:
-            transform = self.tf2_pos_buffer.lookup_transform("map", rect.header.frame_id, # dest frame, source frame
-                                                             rospy.Time.now(),     # get the tf at first available time
-                                                             rospy.Duration(1.0))  # timeout
-
+        for rect in msg.unknown_rects:
+            transform = self._tf2_pos_buffer.lookup_transform("map", rect.header.frame_id, # dest frame, source frame
+                                                              rospy.Time.now(),            # get the tf at first available time
+                                                              rospy.Duration(5.0))         # timeout
             center = PointStamped()
             center.point.x = rect.x
             center.point.y = rect.y
             center.header = rect.header
-
             try:
-                center_map = self.tranform_listener.transformPoint("map", center)
+                center_map = self._tranform_listener.transformPoint("map", center)
                 new_belt.append(RectObstacle(Position(center_map.point.x, center_map.point.y,
                                                       self._quaternion_to_euler_angle(transform.transform.rotation)[2]),
-                                                      rect.w, rect.h, velocity=Velocity(0, 0)))
+                                                      rect.w, rect.h))
             except:
-                rospy.logwarn("Frame /map does not exist, cannot fetch belt rects.")
+                rospy.logdebug("Frame /map does not exist, cannot fetch belt rects.")
         if len(new_belt) > 0:
-            Map.updateBeltPoints(new_belt)
-
-
-    def on_lidar_points(self, msg):
-        Map.LidarObjects = [] # TODO
-
-    def on_enemy(self, msg): # TODO
-        pass
+            ObstaclesStack.updateBeltPoints(new_belt)
 
     def on_robot_speed(self, msg):
-        if Map.Robot is not None:
-            Map.Robot.Velocity.Linear = msg.linear_speed
-            Map.Robot.Velocity.Angular = 0.0 # TODO Implement here if we use it one day ?
+        self._vel_linear = msg.linear_speed
+        self._vel_angular = 0.0
 
     def _quaternion_to_euler_angle(self, quaternion):
         # https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles

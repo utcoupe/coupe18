@@ -1,87 +1,73 @@
 #!/usr/bin/python
-import json
 import rospy
-
-from collisions_checker import *
 from collisions_subscriptions import CollisionsSubscriptions
+from collisions_engine import CollisionLevel, RectObstacle, CircleObstacle, Position
+from obstacles_stack import Map, ObstaclesStack
 from markers_publisher import MarkersPublisher
 
-from memory_map.srv import MapGet
-
-from navigation_collisions.msg import PredictedCollision
 from geometry_msgs.msg import Pose2D
+from navigation_collisions.msg import PredictedCollision
+from navigation_collisions.srv import ActivateCollisions, ActivateCollisionsResponse
 
-
-class CollisionsNode(object):
+class CollisionsNode():
     def __init__(self):
         rospy.init_node("collisions", log_level=rospy.DEBUG)
+        self.active = False # navigation/navigator activates this node through a service.
 
-        # Creating listeners
         self.subscriptions = CollisionsSubscriptions()
+        Map.Robot = self.subscriptions.create_robot()
 
-        # Creating the publisher where the collisions will be notified in
+        rospy.Service("/navigation/collisions/set_active", ActivateCollisions, self.on_set_active)
         self.pub = rospy.Publisher("/navigation/collisions/warner", PredictedCollision, queue_size=10)
+
         self.markers = MarkersPublisher()
+        self.subscriptions.send_init()
+        rospy.loginfo("navigation/collisions ready, waiting for activation.")
 
-        # Getting the robot shape and creating the robot instance
-        try:
-            map_get_client = rospy.ServiceProxy("/memory/map/get", MapGet)
-            map_get_client.wait_for_service(2.0)
-            shape = json.loads(map_get_client("/entities/GR/shape/*").response) # TODO GR must not appear
-            if not shape["type"] == "rect":
-                raise ValueError("Robot shape type not supported here.")
-        except Exception as e:
-            rospy.logerr("ERROR Collisions couldn't get the robot's shape from map : " + str(e))
-            shape = {"width": 0.3, "height": 0.2}
-        Map.Robot = MapRobot(shape["width"], shape["height"]) # Can create a rect or circle
-
-        rospy.loginfo("'navigation/collisions' initialized, standby until nagivating.")
-
-        # TESTS While dependencies not available.
-        # Map.Robot.updatePath(RobotPath([Point(2.0, 1.7), Point(0.6, 0.7), Point(2.2, 0.6), Point(2.7, 0.3)]))
-        # Map.Robot.NavStatus = RobotStatus.NAV_NAVIGATING
-        # Map.Robot.updateVelocity(0.2, 0.33)
-
-        # Map.BeltPoints = [RectObstacle(Position(0.25, 1.3, 0.78539816339), 0.1,  0.2),
-        #                   RectObstacle(Position(1.6, 0.9, 3.14 / 2),       0.24, 0.5),
-        #                   CircleObstacle(Position(2.15, 0.7),              0.25 / 2)]
+        self.run()
 
     def run(self):
-        r = rospy.Rate(15)
+        r = rospy.Rate(20)
         while not rospy.is_shutdown():
-            self.subscriptions.updateRobotPosition()
-
-            Map.garbageCollect() # removes old obstacles
-            predicted_collisions = Map.Robot.checkCollisions(Map.toList())
-            for pd in predicted_collisions:
-                self.publishCollision(pd)
+            ObstaclesStack.updateBeltPoints([RectObstacle(Position(1.5, 0.5, 0.2), 0.3, 0.15)])
+            self.subscriptions.update_robot()
+            if self.active:
+                for c in Map.Robot.check_collisions(ObstaclesStack.toList()):
+                    self.publish_collision(c)
 
             self.markers.publishCheckZones(Map.Robot)
-            self.markers.publishObstacles(Map.toList())
+            self.markers.publishObstacles(ObstaclesStack.toList())
+
+            ObstaclesStack.garbageCollect()
 
             r.sleep()
 
-    def publishCollision(self, collision):
+    def publish_collision(self, collision):
         m = PredictedCollision()
-        m.danger_level = collision.Level
+        m.danger_level = collision.level
 
-        if collision.Level == CollisionLevel.LEVEL_STOP:
-            rospy.logwarn("[COLLISIONS] Found freaking close collision, please stop !!")
-        elif collision.Level == CollisionLevel.LEVEL_DANGER:
-            rospy.loginfo("[COLLISIONS] Found collision intersecting with the path.")
+        if collision.level == CollisionLevel.LEVEL_STOP:
+            rospy.logwarn("[COLLISION] Found freaking close collision, please stop !!")
+        elif collision.level == CollisionLevel.LEVEL_DANGER:
+            rospy.logwarn("[COLLISION] Found close collision intersecting with the path.")
+        elif collision.level == CollisionLevel.LEVEL_POTENTIAL:
+            rospy.loginfo("[COLLISION] Found far-off collision intersecting with the path.")
 
-        obs = collision.Obstacle
-        m.obstacle_pos = Pose2D(obs.Position.X, obs.Position.Y, obs.Position.A)
+        obs = collision.obstacle
+        m.obstacle_pos = Pose2D(obs.position.x, obs.position.y, obs.position.a)
         if isinstance(obs, RectObstacle):
             m.obstacle_type = m.TYPE_RECT
-            m.obstacle_width, m.obstacle_height = obs.Width, obs.Height
+            m.obstacle_width, m.obstacle_height = obs.width, obs.height
         elif isinstance(obs, CircleObstacle):
             m.obstacle_type = m.TYPE_CIRCLE
-            m.obstacle_radius = obs.Radius
+            m.obstacle_radius = obs.radius
 
         self.pub.publish(m)
 
-# Entry point
+    def on_set_active(self, msg):
+        self.active = msg.active
+        rospy.loginfo("{} collisions check.{}".format("Starting" if self.active else "Stopping", ".." if self.active else ""))
+        return ActivateCollisionsResponse(True)
+
 if __name__ == "__main__":
-    c = CollisionsNode()
-    c.run()
+    CollisionsNode()

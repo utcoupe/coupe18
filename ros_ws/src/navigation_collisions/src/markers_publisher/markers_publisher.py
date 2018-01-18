@@ -14,14 +14,11 @@ class MarkersPublisher(object):
 
     def publishCheckZones(self, robot):
         if self._is_connected():
-            # Publish path collision shapes
-            if robot.isInitialized() and robot.NavStatus:
-                path_shapes = robot.Path.toShapes(robot)
-                if len(path_shapes) > 0:
-                    for i, path_shape in enumerate(path_shapes):
-                        self._publish_marker("collisions_path", i + 1, path_shape, 0.02, 0.01, (1.0, 0.5, 0.1, 0.8))
-                stop_rect = robot.getStopRect()
-                self._publish_marker("collisions_path", 0, stop_rect, 0.02, 0.01, (1.0, 0.0, 0.0, 0.8))
+            for i, main_shape in enumerate(robot.get_main_shapes()):
+                self._publish_marker("collisions_main", i, main_shape, 0.02, 0.01, (1.0, 0.0, 0.0, 0.8))
+
+            for i, path_shape in enumerate(robot.get_path_shapes()):
+                self._publish_marker("collisions_path", i, path_shape, 0.02, 0.01, (1.0, 0.5, 0.1, 0.8))
 
     def publishObstacles(self, obstacles): # Temporaire ?
         if self._is_connected():
@@ -41,21 +38,22 @@ class MarkersPublisher(object):
         marker.id = index
 
         marker.action = Marker.ADD
-        marker.scale.x = obj.Width  if str(obj) == "rect" else obj.Radius * 2
-        marker.scale.y = obj.Height if str(obj) == "rect" else obj.Radius * 2
+        marker.scale.x = obj.width  if str(obj) == "rect" else obj.radius * 2
+        marker.scale.y = obj.height if str(obj) == "rect" else obj.radius * 2
         marker.scale.z = z_scale
         marker.color.r = color[0]
         marker.color.g = color[1]
         marker.color.b = color[2]
         marker.color.a = color[3]
-        marker.pose.position.x = obj.Position.X
-        marker.pose.position.y = obj.Position.Y
+        marker.pose.position.x = obj.position.x
+        marker.pose.position.y = obj.position.y
         marker.pose.position.z = z_height
-        orientation = self._euler_to_quaternion([0, 0, obj.Position.A])
+        orientation = self._euler_to_quaternion([0, 0, obj.position.a])
         marker.pose.orientation.x = orientation[0]
         marker.pose.orientation.y = orientation[1]
         marker.pose.orientation.z = orientation[2]
         marker.pose.orientation.w = orientation[3]
+        marker.lifetime = rospy.Duration(1)
 
         self.MarkersPUBL.publish(marker)
 
