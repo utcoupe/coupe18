@@ -2,7 +2,7 @@ import math, json
 import rospy
 import tf2_ros, tf
 
-from obstacles_stack import ObstaclesStack
+from obstacles_stack import Map, ObstaclesStack
 from collisions_robot import Robot
 from collisions_engine import Point, Position, RectObstacle, CircleObstacle
 from status_services import StatusServices
@@ -46,19 +46,20 @@ class CollisionsSubscriptions(object):
                 raise ValueError("Robot shape type not supported here.")
         except Exception as e:
             rospy.logerr("ERROR Collisions couldn't get the robot's shape from map : " + str(e))
-            shape = {"width": 0.3, "height": 0.2}
+            shape = {"width": 0.4, "height": 0.25}
         return Robot(shape["width"], shape["height"]) # Can create a rect or circle
 
-    def update_robot(self, robot):
+    def update_robot(self):
         new_pos = self._update_robot_pos()
         if new_pos is not None:
-            robot.update_position(new_pos)
-        if self._nav_status is not None:
-            robot.update_status(self._nav_status)
-        if self._robot_path_waypoints is not None and len(self._robot_path_waypoints) > 0:
-            robot.update_path(self._robot_path_waypoints)
+            Map.Robot.update_position(new_pos)
 
-        robot.update_velocity(self._vel_linear, self._vel_angular)
+        if self._nav_status is not None:
+            Map.Robot.update_status(self._nav_status)
+        if self._robot_path_waypoints is not None and len(self._robot_path_waypoints) > 0:
+            Map.Robot.update_waypoints(self._robot_path_waypoints)
+
+        Map.Robot.update_velocity(self._vel_linear, self._vel_angular)
 
     def _update_robot_pos(self):
         try:

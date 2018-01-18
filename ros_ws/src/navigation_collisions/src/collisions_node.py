@@ -2,7 +2,7 @@
 import rospy
 from collisions_subscriptions import CollisionsSubscriptions
 from collisions_engine import CollisionLevel, RectObstacle, CircleObstacle, Position
-from obstacles_stack import ObstaclesStack
+from obstacles_stack import Map, ObstaclesStack
 from markers_publisher import MarkersPublisher
 
 from geometry_msgs.msg import Pose2D
@@ -15,7 +15,7 @@ class CollisionsNode():
         self.active = False # navigation/navigator activates this node through a service.
 
         self.subscriptions = CollisionsSubscriptions()
-        self.robot = self.subscriptions.create_robot()
+        Map.Robot = self.subscriptions.create_robot()
 
         rospy.Service("/navigation/collisions/set_active", ActivateCollisions, self.on_set_active)
         self.pub = rospy.Publisher("/navigation/collisions/warner", PredictedCollision, queue_size=10)
@@ -30,12 +30,12 @@ class CollisionsNode():
         r = rospy.Rate(20)
         while not rospy.is_shutdown():
             ObstaclesStack.updateBeltPoints([RectObstacle(Position(1.5, 0.5, 0.2), 0.3, 0.15)])
-            self.subscriptions.update_robot(self.robot)
+            self.subscriptions.update_robot()
             if self.active:
-                for c in self.robot.check_collisions(ObstaclesStack.toList()):
+                for c in Map.Robot.check_collisions(ObstaclesStack.toList()):
                     self.publish_collision(c)
 
-            self.markers.publishCheckZones(self.robot)
+            self.markers.publishCheckZones(Map.Robot)
             self.markers.publishObstacles(ObstaclesStack.toList())
 
             ObstaclesStack.garbageCollect()
@@ -47,9 +47,11 @@ class CollisionsNode():
         m.danger_level = collision.level
 
         if collision.level == CollisionLevel.LEVEL_STOP:
-            rospy.logwarn("[COLLISIONS] Found freaking close collision, please stop !!")
+            rospy.logwarn("[COLLISION] Found freaking close collision, please stop !!")
         elif collision.level == CollisionLevel.LEVEL_DANGER:
-            rospy.loginfo("[COLLISIONS] Found collision intersecting with the path.")
+            rospy.logwarn("[COLLISION] Found close collision intersecting with the path.")
+        elif collision.level == CollisionLevel.LEVEL_POTENTIAL:
+            rospy.loginfo("[COLLISION] Found far-off collision intersecting with the path.")
 
         obs = collision.obstacle
         m.obstacle_pos = Pose2D(obs.position.x, obs.position.y, obs.position.a)

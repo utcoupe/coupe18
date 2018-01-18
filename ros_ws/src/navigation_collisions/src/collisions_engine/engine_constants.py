@@ -8,9 +8,11 @@ class CollisionType(object):
     TYPE_DYNAMIC = 1
 
 class CollisionThresholds(object):
-    STOP_MIN  = 0.15 # minimum distance when linear_speed != 0.
-    STOP_GAIN = 0.6  # distance in meters when the robot is at 1 m/sec (linear coefficient).
-    STOP_MAX  = 1.0  # maximum distance when linear_speed != 0.
+    STOP_MIN  = 0.1 # minimum distance when linear_speed != 0.
+    STOP_GAIN = 0.6 # distance in meters when the robot is at 1 m/sec (linear coefficient).
+    STOP_MAX  = 1.0 # maximum distance when linear_speed != 0.
+
+    DANGER_RADIUS = 1.2 # radius around the robot where obstacles are considered at LEVEL_DANGER vs. LEVEL_POTENTIAL.
 
     @staticmethod
     def get_stop_distance(linear_speed):

@@ -18,9 +18,9 @@ class Robot(object):
         self._path_check_zone = PathCheckZone(self.width, self.height, CollisionLevel.LEVEL_DANGER)
 
     def update_position(self, tuple3):
-        self._position.X = tuple3[0]
-        self._position.Y = tuple3[1]
-        self._position.A = tuple3[2]
+        self._position.x = tuple3[0]
+        self._position.y = tuple3[1]
+        self._position.a = tuple3[2]
 
     def update_velocity(self, linear, angular):
         self._velocity.linear = linear
@@ -29,8 +29,8 @@ class Robot(object):
     def update_status(self, new_status):
         self._nav_status = new_status
 
-    def update_path(self, new_waypoints):
-        self._path_check_zone.update_path(new_waypoints)
+    def update_waypoints(self, new_waypoints):
+        self._path_check_zone.update_waypoints(new_waypoints)
 
     def get_main_shapes(self):
         return self._main_check_zone.get_shapes(self._position, self._velocity)

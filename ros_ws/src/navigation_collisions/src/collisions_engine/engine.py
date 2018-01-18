@@ -13,7 +13,6 @@ class Collision(object):
         self.approx_distance = approx_distance # Distance between the centers of the robot and obstacle (poor precision)
 
 
-
 class CollisionsResolver(object):
     @staticmethod
     def find_collisions(robot_shapes, obstacles_shapes):
@@ -21,9 +20,7 @@ class CollisionsResolver(object):
         for robot_shape in robot_shapes:
             for obstacle_shape in obstacles_shapes:
                 if CollisionsResolver.intersect(robot_shape, obstacle_shape):
-                    d = math.sqrt((robot_shape.position.x - obstacle_shape.position.x) ** 2 + \
-                                  (robot_shape.position.y - obstacle_shape.position.y) ** 2) # Very approximate distance
-                    collisions.append(Collision(CollisionLevel.LEVEL_STOP, obstacle_shape, d)) # TODO
+                    collisions.append(obstacle_shape)
         return collisions
 
     @staticmethod

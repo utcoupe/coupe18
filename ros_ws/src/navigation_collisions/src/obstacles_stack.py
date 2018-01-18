@@ -1,5 +1,9 @@
 import time
 
+class Map(object):
+    Robot = None
+
+
 class ObstaclesStack():
     OBSTACLES_LIFESPAN = 0.3 # max time in seconds before being considered too old
 
