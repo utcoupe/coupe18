@@ -31,7 +31,7 @@ class CollisionsClient(object):
             self._callbackStop()
 
     def _connectToServers (self):
-        rospy.loginfo("Waiting for \"" + self.WARNER_TOPIC + "\"")
+        rospy.loginfo("Waiting for \"" + self.ACTIVATE_COLLISIONS_SERVICE_NAME + "\"")
         rospy.wait_for_service(self.ACTIVATE_COLLISIONS_SERVICE_NAME)
         rospy.loginfo("Collisions found")
 
