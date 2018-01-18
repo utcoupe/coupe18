@@ -63,7 +63,7 @@ class PathCheckZone(CheckZone):
                 p_w = robot_pos if i == 0 else path[i - 1]
                 w   = path[i]
 
-                if not (p_w.x == w.x and p_w.y == w.y):
+                if p_w.x != w.x and p_w.y != w.y:
                     d = math.sqrt( (w.x - p_w.x) ** 2 + (w.y - p_w.y) ** 2)
                     angle = math.atan((w.y - p_w.y) / (w.x - p_w.x))
                     pos = Position((w.x + p_w.x) / 2.0, (w.y + p_w.y) / 2.0, angle = angle)

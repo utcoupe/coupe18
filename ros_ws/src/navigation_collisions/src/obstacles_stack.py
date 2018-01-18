@@ -1,11 +1,12 @@
 import time
+import rospy
 
 class Map(object):
     Robot = None
 
 
 class ObstaclesStack():
-    OBSTACLES_LIFESPAN = 0.3 # max time in seconds before being considered too old
+    OBSTACLES_LIFESPAN = 1.0 # max time in seconds before being considered too old
 
     BeltPoints = []
     LidarObjects = []
@@ -17,6 +18,7 @@ class ObstaclesStack():
 
     @staticmethod
     def updateBeltPoints(new_obstacles):
+        rospy.loginfo("setting belt")
         ObstaclesStack.BeltPoints = new_obstacles
 
     @staticmethod

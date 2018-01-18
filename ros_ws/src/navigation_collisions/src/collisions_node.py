@@ -29,12 +29,13 @@ class CollisionsNode():
     def run(self):
         r = rospy.Rate(20)
         while not rospy.is_shutdown():
-            ObstaclesStack.updateBeltPoints([RectObstacle(Position(1.5, 0.5, 0.2), 0.3, 0.15)])
+            #ObstaclesStack.updateBeltPoints([RectObstacle(Position(1.5, 0.5, 0.2), 0.3, 0.15)])
             self.subscriptions.update_robot()
             if self.active:
                 for c in Map.Robot.check_collisions(ObstaclesStack.toList()):
                     self.publish_collision(c)
 
+            rospy.logwarn(len(ObstaclesStack.toList()))
             self.markers.publishCheckZones(Map.Robot)
             self.markers.publishObstacles(ObstaclesStack.toList())
 

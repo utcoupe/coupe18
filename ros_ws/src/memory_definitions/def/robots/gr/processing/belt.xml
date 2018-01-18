@@ -15,5 +15,10 @@
       <y>-0.15</y>
       <a>-0.2</a>
     </sensor>
+    <sensor id="sensor_tera">
+      <x>0.1</x>
+      <y>0</y>
+      <a>0.0</a>
+    </sensor>
   </sensors>
 </belt>

@@ -18,7 +18,7 @@ class ArdOthersTeraranger:
         self._pub_belt_range = rospy.Publisher("/drivers/ard_others/belt_ranges", BeltRange, queue_size=1)
         self._sub_terarange = rospy.Subscriber("/teraranger_one", Range, self._callback_teranranger_range)
         while not rospy.is_shutdown():
-            self._pub_belt_range.publish(BeltRange("sensor1", self._range_value))
+            self._pub_belt_range.publish(BeltRange("sensor_tera", self._range_value))
             rospy.sleep(0.1)
 
     def _callback_teranranger_range(self, data):
