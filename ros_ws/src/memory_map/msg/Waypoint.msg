@@ -1,5 +1,5 @@
 string name # Waypoint name, referenced in the map definition dict.
 
-string frame_id
-float32 x # X and Y position corresponding to the waypoint 
-float32 y # referenced in the map.
+bool has_angle            # say whether the 'theta' attribute in pose is important
+string frame_id           # Position tf frame
+geometry_msgs/Pose2D pose # X, Y, THETA values corrsponding to the Waypoint name.

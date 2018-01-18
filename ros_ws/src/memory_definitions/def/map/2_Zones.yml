@@ -15,7 +15,7 @@ zones:
             type: cube
             scale: [0.55, 0.3, 0.001]
             z: 0.001
-            orientation: [1.57, 0, 0]
+            orientation: [0, 0, 0]
             color: [0.1, 0.7, 0.1, 1.0]
 
         properties:
