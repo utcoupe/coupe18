@@ -8,6 +8,7 @@ import ai_scheduler.srv
 
 import navigation_navigator.msg
 import memory_map.srv
+import ai_game_status.srv
 import ai_timer.srv
 import drivers_ard_hmi.msg
 import drivers_ard_asserv.srv
@@ -23,6 +24,7 @@ class AICommunication():
 
     def SendRequest(self, dest, params, callback):
         servers = {
+            "/ai/game_status/set_status":        (RequestTypes.SERVICE, ai_game_status.srv.SetStatus),
             "/ai/timer/set_timer":               (RequestTypes.SERVICE, ai_timer.srv.SetTimer),
             "/ai/timer/delay":                   (RequestTypes.SERVICE, ai_timer.srv.Delay),
 

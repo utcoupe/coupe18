@@ -71,6 +71,12 @@
 		</message>
 	</order>
 
+	<order ref="set_game_status_ingame" duration="0">
+		<message dest="/ai/game_status/set_status">
+			<param name="new_game_status" type="int" preset="true">1</param>
+		</message>
+	</order>
+
 	<order ref="timer_start">
 		<message dest="/ai/timer/set_timer">
 			<param name="action" type="int" preset="true">0</param> <!-- start command -->
