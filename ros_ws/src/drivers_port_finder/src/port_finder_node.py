@@ -13,6 +13,9 @@ __date__ = 18/01/2017
 
 NODE_NAME = "port_finder"
 ARDUINO_LIST = ("mega", "nano", "uno", "leo")
+#TODO put it in xml file
+ARDUINO_NODE_LIST = ("gr_asserv",)
+SERIAL_READ_SIZE = 50
 
 
 class PortFinder:
@@ -84,6 +87,12 @@ class PortFinder:
             if vendor_id_index != -1:
                 matched_line = line[vendor_id_index:len(line)]
                 matched_line_split = matched_line.split(', ')
+                id_index = -1
+                for counter, element in enumerate(id_list):
+                    if matched_line_split[0].split('=')[1] == element[1] and matched_line_split[1].split('=')[1] == element[2]:
+                        id_index = counter
+                if id_index != -1:
+                    id_list.pop(id_index)
                 # line_number, vendor_id, component_id
                 id_list.append((line_number, matched_line_split[0].split('=')[1], matched_line_split[1].split('=')[1]))
             if tty_usb_index != -1 or tty_acm_index != -1:
@@ -96,7 +105,6 @@ class PortFinder:
             for component in self._components_list:
                 if element[1] == component["vendor_id"] and element[2] == component["product_id"]:
                     id_list_filtered.append(element + (component["name"],))
-        # TODO filter the list to keep only the most recent vendor_id
         # Merge the information of vendor_id and tty port to have a single tuple in list
         for element in id_list_filtered:
             for tty_element in tty_list:
@@ -134,24 +142,36 @@ class PortFinder:
             self._associated_port_list.append((element[3], "/dev/" + element[2]))
         rospy.loginfo(self._associated_port_list)
 
-    # translate the arduino type in the real arduino connected
     def _identify_arduino(self):
+        rosserial_port_list = []
         for counter, element in enumerate(self._associated_port_list):
             if element[0].find("ard") != -1:
-                rospy.loginfo("Found an arduino to open !")
-                arduino_id = ""
+                read_string = ""
+                rosserial_flag = False
+                arduino_node_flag = False
                 try:
-                    com_line = serial.Serial(element[1], 57600, timeout=1.2)
-                    # First line may be empty...
-                    com_line.readline()
-                    arduino_id = com_line.readline()
+                    com_line = serial.Serial(element[1], 57600, timeout=3)
+                    # 10 try to check if the start header  for rosserial is received (40 is an experimental value)
+                    for try_number in range(0, SERIAL_READ_SIZE, 1):
+                        start_byte = com_line.read(1)
+                        read_string += start_byte
+                        if ord(start_byte) == 0xff:
+                            rospy.loginfo("Found an arduino to start with rosserial : " + element[1])
+                            rosserial_flag = True
+                            rosserial_port_list.append(element[1])
+                            break
                     com_line.close()
+                    # rospy.loginfo("Start byte : {:02x}".format(ord(start_byte)))
                 except:
                     rospy.logwarn("Try to open port {} but it fails...".format(element[1]))
-                if arduino_id.find("\r\n") > -1:
-                    arduino_id = arduino_id.replace("\r\n", "")
-                    self._associated_port_list[counter] = (arduino_id, element[1])
-                    rospy.loginfo("Found arduino : " + arduino_id)
+                for arduino_node in ARDUINO_NODE_LIST:
+                    if read_string.find(arduino_node) != -1:
+                        arduino_node_flag = True
+                        self._associated_port_list[counter] = (arduino_node, element[1])
+                        rospy.loginfo("Found a real arduino named " + arduino_node)
+                # Not an arduino node, seems not to be a rosserial component, it can't be an other thing, so maybe
+                if not rosserial_flag and not arduino_node_flag:
+                    rospy.logwarn("Serial port nor arduino node neither rosserial node, it might be a rosserial one...")
 
 
 if __name__ == "__main__":
