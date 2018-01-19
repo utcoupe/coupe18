@@ -11,6 +11,7 @@ __author__ = "Thomas Fuhrmann"
 __date__ = 18/01/2017
 
 NODE_NAME = "port_finder"
+ARDUINO_LIST = ("mega", "nano", "uno", "leo")
 
 
 class PortFinder:
@@ -28,6 +29,7 @@ class PortFinder:
         def_dir = os.path.join(curr_dir, "../def")
         self._parse_xml_file(def_dir + "/components_list.xml")
         self._parse_dmesg()
+        self._identify_arduino()
 
     def _callback_get_port(self, request):
         return GetPortResponse(response)
@@ -88,13 +90,13 @@ class PortFinder:
         for element in id_list:
             for component in self._components_list:
                 if element[1] == component["vendor_id"] and element[2] == component["product_id"]:
-                    id_list_filtered.append(element)
+                    id_list_filtered.append(element + (component["name"],))
         # TODO filter the list to keep only the most recent vendor_id ?
         # Merge the information of vendor_id and tty port to have a single tuple in list
         for element in id_list_filtered:
             for tty_element in tty_list:
                 if tty_element[0] > element[0]:
-                    merged_filtered_id_tty_list.append((element[1], element[2], tty_element[1]))
+                    merged_filtered_id_tty_list.append((element[1], element[2], tty_element[1], element[3]))
                     break
         rospy.loginfo("ID_LIST")
         rospy.loginfo(id_list_filtered)
@@ -102,6 +104,7 @@ class PortFinder:
         rospy.loginfo(tty_list)
         rospy.loginfo("MERGED_LIST")
         rospy.loginfo(merged_filtered_id_tty_list)
+        self._connected_component_list = merged_filtered_id_tty_list
 
     def _get_dmesg(self):
         """
@@ -122,6 +125,10 @@ class PortFinder:
             returncode, " ".join("dmesg"), stderr.rstrip("\n")))
         return stdout
 
+    def _identify_arduino(self):
+        for element in self._connected_component_list:
+            if (str(element[3]).split('_')[1]) in ARDUINO_LIST:
+                rospy.loginfo("Yolo !")
 
 if __name__ == "__main__":
     PortFinder()
