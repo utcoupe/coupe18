@@ -3,6 +3,7 @@
 import os
 import re
 import subprocess
+import serial
 import rospy
 import xml.etree.ElementTree as ET
 from drivers_port_finder.srv import *
@@ -18,10 +19,12 @@ class PortFinder:
     def __init__(self):
         rospy.logdebug("[drivers/port_finder] Starting the node.")
         # List containing the content of the xml definition file
-        self._components_list = ()
+        self._components_list = []
         # List containing the connected components and the corresponding port
         # TODO use a dictionary instead ?
-        self._connected_component_list = ()
+        self._connected_component_list = []
+        # List containing the final processing information, matching the serial port and the serial component
+        self._associated_port_list = []
         # Init ROS stuff
         rospy.init_node(NODE_NAME, anonymous=False, log_level=rospy.INFO)
         self._srv_goto = rospy.Service("/drivers/" + NODE_NAME + "/get_port", GetPort, self._callback_get_port)
@@ -29,7 +32,9 @@ class PortFinder:
         def_dir = os.path.join(curr_dir, "../def")
         self._parse_xml_file(def_dir + "/components_list.xml")
         self._parse_dmesg()
+        self._associate_port()
         self._identify_arduino()
+        rospy.loginfo(self._associated_port_list)
 
     def _callback_get_port(self, request):
         return GetPortResponse(response)
@@ -91,7 +96,7 @@ class PortFinder:
             for component in self._components_list:
                 if element[1] == component["vendor_id"] and element[2] == component["product_id"]:
                     id_list_filtered.append(element + (component["name"],))
-        # TODO filter the list to keep only the most recent vendor_id ?
+        # TODO filter the list to keep only the most recent vendor_id
         # Merge the information of vendor_id and tty port to have a single tuple in list
         for element in id_list_filtered:
             for tty_element in tty_list:
@@ -116,8 +121,7 @@ class PortFinder:
             returncode = sub.returncode
         except OSError, e:
             if e.errno == 2:
-                #TODO fix cmdLine error
-                raise RuntimeError('"%s" is not present on this system' % cmdline[0])
+                raise RuntimeError('"dmesg" is not present on this system')
             else:
                 raise
         if returncode != 0:
@@ -125,10 +129,30 @@ class PortFinder:
             returncode, " ".join("dmesg"), stderr.rstrip("\n")))
         return stdout
 
-    def _identify_arduino(self):
+    def _associate_port(self):
         for element in self._connected_component_list:
-            if (str(element[3]).split('_')[1]) in ARDUINO_LIST:
-                rospy.loginfo("Yolo !")
+            self._associated_port_list.append((element[3], "/dev/" + element[2]))
+        rospy.loginfo(self._associated_port_list)
+
+    # translate the arduino type in the real arduino connected
+    def _identify_arduino(self):
+        for counter, element in enumerate(self._associated_port_list):
+            if element[0].find("ard") != -1:
+                rospy.loginfo("Found an arduino to open !")
+                arduino_id = ""
+                try:
+                    com_line = serial.Serial(element[1], 57600, timeout=1.2)
+                    # First line may be empty...
+                    com_line.readline()
+                    arduino_id = com_line.readline()
+                    com_line.close()
+                except:
+                    rospy.logwarn("Try to open port {} but it fails...".format(element[1]))
+                if arduino_id.find("\r\n") > -1:
+                    arduino_id = arduino_id.replace("\r\n", "")
+                    self._associated_port_list[counter] = (arduino_id, element[1])
+                    rospy.loginfo("Found arduino : " + arduino_id)
+
 
 if __name__ == "__main__":
     PortFinder()
