@@ -15,10 +15,14 @@
       <y>-0.15</y>
       <a>-0.2</a>
     </sensor>
-    <sensor id="sensor_tera">
-      <x>0.1</x>
+    <sensor id="sensor_tera1"> <!-- x, y in meters, a in rad -->
+      <x>0</x>
       <y>0</y>
-      <a>0.0</a>
+      <a>0</a>
     </sensor>
-  </sensors>
+    <!-- <sensor id="non">
+      <x>-0.1</x>
+      <y>-0.1</y>
+      <a>-3.1415</a>
+    </sensor> -->
 </belt>

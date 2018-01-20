@@ -170,8 +170,7 @@ class PortFinder:
                     # Otherwise, in any case, start rosserial
                     if not arduino_node_flag:
                         rospy.loginfo("Found an arduino to start with rosserial : " + element[1] + ", start it.")
-                        self._rosserial_call_list.append(
-                        subprocess.Popen(["rosrun", "rosserial_python", "serial_node.py", element[1], "__name:=serial_node_" + str(counter)]))
+                        self._rosserial_call_list.append(subprocess.Popen(["rosrun", "rosserial_python", "serial_node.py", element[1], "__name:=serial_node_" + str(counter)]))
                         rosserial_port_list.append(element[1])
                         # Replace the tuple in list to keep a track that the port is used by rosserial
                         # Add an arbitrary id to rosserial to avoid having 2 components with the same name

@@ -20,8 +20,9 @@
 	</group>
 
     <group ns="drivers">
-		<node pkg="drivers_ard_asserv"    name="ard_asserv"  type="ard_asserv_node.py"/>
-        <node pkg="rosserial_python"      name="ard_hmi"     type="serial_node.py"      args="/dev/ttyUSB0" />
+		<node pkg="drivers_ard_asserv"    name="ard_asserv"  type="ard_asserv_node.py" output="screen"/>
+		<node pkg="drivers_port_finder"   name="port_finder"  type="port_finder_node.py" output="screen"/>
+		<node pkg="drivers_teraranger"    name="teraranger"  type="teraranger_node.py" output="screen"/>
 	</group>
 
     <group ns="processing">
