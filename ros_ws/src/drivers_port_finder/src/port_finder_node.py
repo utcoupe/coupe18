@@ -45,8 +45,11 @@ class PortFinder:
             rosserial_fd.terminate()
 
     def _callback_get_port(self, request):
+        response = ""
         if request.component == "all":
             response = str(self._associated_port_list)
+        elif request.component in dict(self._associated_port_list).keys():
+            response = dict(self._associated_port_list)[request.component]
         return GetPortResponse(response)
 
     def _parse_xml_file(self, file):
@@ -167,6 +170,9 @@ class PortFinder:
                             self._rosserial_call_list.append(subprocess.Popen(["rosrun", "rosserial_python", "serial_node.py", element[1]]))
                             rosserial_flag = True
                             rosserial_port_list.append(element[1])
+                            # Replace the tuple in list to keep a track that the port is used by rosserial
+                            # Add an arbitrary id to rosserial to avoid having 2 components with the same name
+                            self._associated_port_list[counter] = ("rosserial_node_" + str(counter), element[1])
                             break
                     com_line.close()
                     # rospy.loginfo("Start byte : {:02x}".format(ord(start_byte)))
