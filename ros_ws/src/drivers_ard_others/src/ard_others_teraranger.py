@@ -17,9 +17,19 @@ class ArdOthersTeraranger:
         self._range_value = 0.0
         self._pub_belt_range = rospy.Publisher("/drivers/ard_others/belt_ranges", BeltRange, queue_size=1)
         self._sub_terarange = rospy.Subscriber("/teraranger_one", Range, self._callback_teranranger_range)
+
+        status_services = self._get_status_services("drivers", "teraranger")
+        status_services.ready(True) # Tell ai/game_status the node initialized successfuly.
+
         while not rospy.is_shutdown():
             self._pub_belt_range.publish(BeltRange("sensor_tera", self._range_value))
             rospy.sleep(0.1)
+
+    def _get_status_services(self, ns, node_name, arm_cb=None, status_cb=None):
+        import sys, os
+        sys.path.append(os.environ['UTCOUPE_WORKSPACE'] + '/ros_ws/src/ai_game_status/')
+        from init_service import StatusServices
+        return StatusServices(ns, node_name, arm_cb, status_cb)
 
     def _callback_teranranger_range(self, data):
         if data.range == -inf:

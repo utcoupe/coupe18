@@ -1,6 +1,10 @@
 #!/usr/bin/python
 import rospy
 
+'''
+Imported from ai/game_status.
+'''
+
 from ai_game_status.msg import GameStatus
 from ai_game_status.srv import ArmRequest, ArmRequestResponse, NodeReady
 
@@ -17,9 +21,16 @@ class StatusServices(object):
         if status_cb: rospy.Subscriber(self.HALT_SRV, GameStatus, status_cb)
 
     def ready(self, success):
-        rospy.wait_for_service(self.READY_SRV, timeout = 4.0)
-        _ready_pub = rospy.ServiceProxy(self.READY_SRV, NodeReady)
-        _ready_pub(self.node_name, success)
+        try:
+            rospy.wait_for_service(self.READY_SRV, timeout = 4.0)
+            _ready_pub = rospy.ServiceProxy(self.READY_SRV, NodeReady)
+            _ready_pub(self.node_name, success)
+
+            if success: rospy.loginfo("Node '{}' initialized successfully.".format(self.node_name))
+            else:       rospy.logerr( "Node '{}' didn't initialize correctly.".format(self.node_name))
+        except:
+            rospy.logerr("status_services couldn't contact ai/game_status to send init notification.")
+
 
     def _on_arm(self, req): # Handle Service response here.
         success = self.arm_cb()

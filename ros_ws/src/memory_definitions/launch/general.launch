@@ -15,7 +15,8 @@
 	</group>
 
     <group ns="recognition">
-		<node pkg="recognition_localizer" name="localizer"   type="localizer_node.py"   output="screen"/>
+		<node pkg="recognition_localizer"     name="localizer"     type="localizer_node.py"     output="screen"/>
+		<node pkg="recognition_enemy_tracker" name="enemy_tracker" type="enemy_tracker_node.py" output="screen"/>
 	</group>
 
     <group ns="drivers">

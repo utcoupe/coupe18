@@ -67,9 +67,17 @@ class BeltInterpreter(object):
         self._dynamic_rects = {}
         self._data_to_process = []
 
-        rospy.loginfo("Belt interpreter is ready. Listening for sensor data on '{}'.".format(self.SENSORS_TOPIC))
+        rospy.loginfo("Belt interpreter is ready. Listening for sensor data on '{}'.".format(self.SENSORS_TOPIC)) # TODO duplicate log with status_services.ready()
+        status_services = self._get_status_services("processing", "belt_interpreter")
+        status_services.ready(True) # Tell ai/game_status the node initialized successfuly.
 
         self.run_publisher()
+
+    def _get_status_services(self, ns, node_name, arm_cb=None, status_cb=None):
+        import sys, os
+        sys.path.append(os.environ['UTCOUPE_WORKSPACE'] + '/ros_ws/src/ai_game_status/')
+        from init_service import StatusServices
+        return StatusServices(ns, node_name, arm_cb, status_cb)
 
     def run_publisher(self):
         while not rospy.is_shutdown():
@@ -309,4 +317,3 @@ class BeltInterpreter(object):
 
 if __name__ == '__main__':
     b = BeltInterpreter()
-

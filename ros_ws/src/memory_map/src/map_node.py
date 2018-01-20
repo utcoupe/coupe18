@@ -21,9 +21,18 @@ class MapNode():
 
         # Starting service handlers (Get, Set, Transfer, GetOccupancy)
         map_communication.MapServices(occupancy)
-        rospy.loginfo("[memory/map] Map request servers ready.")
+        rospy.logdebug("[memory/map] Map request servers ready.")
+
+        status_services = self._get_status_services("memory", "map")
+        status_services.ready(True) # Tell ai/game_status the node initialized successfuly.
 
         self.run()
+
+    def _get_status_services(self, ns, node_name, arm_cb=None, status_cb=None):
+        import sys, os
+        sys.path.append(os.environ['UTCOUPE_WORKSPACE'] + '/ros_ws/src/ai_game_status/')
+        from init_service import StatusServices
+        return StatusServices(ns, node_name, arm_cb, status_cb)
 
     def run(self):
         r = rospy.Rate(10)

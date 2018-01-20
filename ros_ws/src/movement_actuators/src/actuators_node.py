@@ -17,11 +17,20 @@ class ActuatorsNode():
         self._action_name = '{}dispatch'.format(self._namespace)
         self._action_server = actionlib.SimpleActionServer(
             self._action_name, movement_actuators.msg.dispatchAction, execute_cb=self.dispatch, auto_start=False)
-        
+
         # TODO: rename arduino
         self._arduino_client = actionlib.SimpleActionClient(
             '{}arduino'.format(self._namespace), movement_actuators.msg.arduinoAction)
         self._action_server.start()
+
+        status_services = self._get_status_services("movement", "actuators")
+        status_services.ready(True) # Tell ai/game_status the node initialized successfuly.
+
+    def _get_status_services(self, ns, node_name, arm_cb=None, status_cb=None):
+        import sys, os
+        sys.path.append(os.environ['UTCOUPE_WORKSPACE'] + '/ros_ws/src/ai_game_status/')
+        from init_service import StatusServices
+        return StatusServices(ns, node_name, arm_cb, status_cb)
 
     def dispatch(self, command):
         #-----Actuator check

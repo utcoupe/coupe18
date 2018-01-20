@@ -62,7 +62,16 @@ class NavigatorNode(object):
 
         self._currentStatus = NavigatorStatuses.NAV_IDLE
         self._currentPath = {}
-    
+
+        status_services = self._get_status_services("navigation", "navigator")
+        status_services.ready(True) # Tell ai/game_status the node initialized successfuly.
+
+    def _get_status_services(self, ns, node_name, arm_cb=None, status_cb=None):
+        import sys, os
+        sys.path.append(os.environ['UTCOUPE_WORKSPACE'] + '/ros_ws/src/ai_game_status/')
+        from init_service import StatusServices
+        return StatusServices(ns, node_name, arm_cb, status_cb)
+
     def _callbackForResults(self, idAct, result):
         """
         Callback called when a goto action to asserv ended.
@@ -75,7 +84,7 @@ class NavigatorNode(object):
             self._waitedResults[idAct] = GotoStatuses.SUCCESS
         else:
             self._waitedResults[idAct] = GotoStatuses.FAILURE
-    
+
     def _waitResult(self, idAct):
         """
         Wait for a goto (asserv) action to end.
@@ -200,7 +209,7 @@ class NavigatorNode(object):
         self._collisionsClient.setEnabled(True)
         self._asservClient.resumeAsserv()
         self._updateStatus()
-    
+
     def _updateStatus (self):
         """
         Send the current status and waypoint list in the navigator's status topic.
@@ -210,7 +219,7 @@ class NavigatorNode(object):
         if len(self._currentPath) > 0:
             statusMsg.currentPath = self._currentPath
         self._statusPublisher.publish(statusMsg)
-        
+
 
     def startNode(self):
         """
@@ -238,4 +247,3 @@ if __name__ == "__main__":
         node.startNode ()
     except rospy.ROSInterruptException:
         pass
-

@@ -56,6 +56,9 @@ class TimerNode():
 
         self.timer = TimerManager()
 
+        status_services = self._get_status_services("ai", "timer")
+        status_services.ready(True) # Tell ai/game_status the node initialized successfuly.
+
         r = rospy.Rate(5)
         while not rospy.is_shutdown():
             if self.timer.started:
@@ -65,6 +68,12 @@ class TimerNode():
                     self.timer.stop()
             self.publish_timer()
             r.sleep()
+
+    def _get_status_services(self, ns, node_name, arm_cb=None, status_cb=None):
+        import sys, os
+        sys.path.append(os.environ['UTCOUPE_WORKSPACE'] + '/ros_ws/src/ai_game_status/')
+        from init_service import StatusServices
+        return StatusServices(ns, node_name, arm_cb, status_cb)
 
     def publish_timer(self):
         m = GameTime()

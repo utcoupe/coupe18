@@ -19,7 +19,14 @@ class Localizer(object):
 
         self._data_asserv = None
 
-        rospy.loginfo("Localizer node initialized")
+        status_services = self._get_status_services("recognition", "localizer")
+        status_services.ready(True) # Tell ai/game_status the node initialized successfuly.
+
+    def _get_status_services(self, ns, node_name, arm_cb=None, status_cb=None):
+        import sys, os
+        sys.path.append(os.environ['UTCOUPE_WORKSPACE'] + '/ros_ws/src/ai_game_status/')
+        from init_service import StatusServices
+        return StatusServices(ns, node_name, arm_cb, status_cb)
 
     def callback_asserv(self, data):
         self._data_asserv = data

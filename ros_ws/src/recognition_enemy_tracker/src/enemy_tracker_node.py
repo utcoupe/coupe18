@@ -14,11 +14,19 @@ class EnemyTrackerNode():
     def __init__(self):
         self._node = rospy.init_node('enemy_tracker')
         self._namespace = '/recognition/enemy_tracker/'
-        self._belt_sub = rospy.Subscriber(
-            '/processing/belt_interpreter/points', BeltFiltered, self.importPoint)
+        self._belt_sub = rospy.Subscriber('/processing/belt_interpreter/points', BeltFiltered, self.importPoint)
         self.configure(None)
         self.rect = []
         self.data = []
+
+        status_services = self._get_status_services("recognition", "enemy_tracker")
+        status_services.ready(True) # Tell ai/game_status the node initialized successfuly.
+
+    def _get_status_services(self, ns, node_name, arm_cb=None, status_cb=None):
+        import sys, os
+        sys.path.append(os.environ['UTCOUPE_WORKSPACE'] + '/ros_ws/src/ai_game_status/')
+        from init_service import StatusServices
+        return StatusServices(ns, node_name, arm_cb, status_cb)
 
     def importPoint(self, beltData):
         rects = []
@@ -35,10 +43,10 @@ class EnemyTrackerNode():
 
     def trackEnemies(self):
         pass
-    
+
     def updateData(auto_detect_change = False):
         pass
-    
+
     def configure(self, prop):
         if prop is None:
             #Default values

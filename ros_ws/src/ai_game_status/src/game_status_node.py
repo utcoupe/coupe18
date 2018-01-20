@@ -17,24 +17,25 @@ class Status():
 
     INIT_CHECKLIST = {  # Please comment the lines instead of deleting them.
         "/ai/scheduler": None,
-        "/ai/scripts": None,
 
         "/memory/map": None,
         "/memory/definitions": None,
 
         "/navigation/navigator": None,
-        "/navigation/pathfinder": None,
+        # "/navigation/pathfinder": None,
         "/navigation/collisions": None,
 
         "/movement/actuators": None,
 
         "/recognition/localizer": None,
         "/recognition/enemy_tracker": None,
-        "/recognition/cube_finder": None,
-        "/recognition/cp_recognizer": None,
+        # "/recognition/cube_finder": None,
+        # "/recognition/cp_recognizer": None,
 
         "/processing/belt_interpreter": None,
-        "/processing/lidar_objects": None
+        # "/processing/lidar_objects": None,
+
+        "/drivers/ard_asserv": None
     }
 
 
