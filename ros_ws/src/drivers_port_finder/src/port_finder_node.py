@@ -149,40 +149,33 @@ class PortFinder:
         rosserial_port_list = []
         for counter, element in enumerate(self._associated_port_list):
             if self._check_rosseriable(element[0]):
-                read_string = ""
-                rosserial_flag = False
+                read_data = ""
+                serial_port_disconnected = False
                 arduino_node_flag = False
                 try:
                     com_line = serial.Serial(element[1], 57600, timeout=3)
-                    """
-                    The goal is to read the serial port byte by byte to identify the start byte of rosserial (0xff).
-                    If this start byte is found, launch rosserial in a dedicated process, otherwise check if it's an arduino
-                    with UTCoupe protocol.
-                    If it's none of them, the rosserial finding has probably failed...
-                    """
-                    for try_number in range(0, SERIAL_READ_SIZE, 1):
-                        start_byte = com_line.read(1)
-                        read_string += start_byte
-                        if ord(start_byte) == 0xff:
-                            rospy.loginfo("Found an arduino to start with rosserial : " + element[1] + ", start it.")
-                            self._rosserial_call_list.append(subprocess.Popen(["rosrun", "rosserial_python", "serial_node.py", element[1]]))
-                            rosserial_flag = True
-                            rosserial_port_list.append(element[1])
-                            # Replace the tuple in list to keep a track that the port is used by rosserial
-                            # Add an arbitrary id to rosserial to avoid having 2 components with the same name
-                            self._associated_port_list[counter] = ("rosserial_node_" + str(counter), element[1])
-                            break
+                    read_data = com_line.read(SERIAL_READ_SIZE)
                     com_line.close()
-                except:
+                except serial.SerialException:
                     rospy.logerr("Try to open port {} but it fails...".format(element[1]))
-                for arduino_node in ARDUINO_NODE_LIST:
-                    if read_string.find(arduino_node) != -1:
-                        arduino_node_flag = True
-                        self._associated_port_list[counter] = (arduino_node, element[1])
-                        rospy.loginfo("Found a real arduino named " + arduino_node)
-                # Not an arduino node, seems not to be a rosserial component, it can't be an other thing, so maybe
-                if not rosserial_flag and not arduino_node_flag:
-                    rospy.logwarn("Serial port nor arduino node neither rosserial node, it might be a rosserial one...")
+                    serial_port_disconnected = True
+                if not serial_port_disconnected:
+                    # Check if it's an arduino using UTCoupe protocol
+                    for arduino_node in ARDUINO_NODE_LIST:
+                        if read_data.find(arduino_node) != -1:
+                            arduino_node_flag = True
+                            self._associated_port_list[counter] = (arduino_node, element[1])
+                            rospy.loginfo("Found a real arduino named " + arduino_node)
+                            arduino_node_flag = True
+                    # Otherwise, in any case, start rosserial
+                    if not arduino_node_flag:
+                        rospy.loginfo("Found an arduino to start with rosserial : " + element[1] + ", start it.")
+                        self._rosserial_call_list.append(
+                        subprocess.Popen(["rosrun", "rosserial_python", "serial_node.py", element[1], "__name:=serial_node_" + str(counter)]))
+                        rosserial_port_list.append(element[1])
+                        # Replace the tuple in list to keep a track that the port is used by rosserial
+                        # Add an arbitrary id to rosserial to avoid having 2 components with the same name
+                        self._associated_port_list[counter] = ("rosserial_node_" + str(counter), element[1])
 
     def _check_rosseriable(self, component_name):
         returned_value = False
