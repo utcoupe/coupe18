@@ -1,6 +1,7 @@
 <component_list>
     <component name = "usb2ax"      vendor_id = "16d0" product_id = "06a7" port_type = "ttyACM" />
     <component name = "hokuyo"      vendor_id = "15d1" product_id = "0000" port_type = "ttyACM" />
+    <component name = "teraranger"  vendor_id = "0403" product_id = "6001" port_type = "ttyUSB" />
     <component name = "ard_mega"    vendor_id = "2341" product_id = "0042" port_type = "ttyACM" />
     <component name = "ard_uno"     vendor_id = "2341" product_id = "0001" port_type = "ttyACM" />
     <component name = "ard_leo"     vendor_id = "2341" product_id = "0036" port_type = "ttyACM" />

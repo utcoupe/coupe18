@@ -2,6 +2,7 @@
 
 import os
 import re
+import sys
 import subprocess
 import serial
 import rospy
@@ -28,6 +29,7 @@ class PortFinder:
         self._connected_component_list = []
         # List containing the final processing information, matching the serial port and the serial component
         self._associated_port_list = []
+        self._rosserial_call_list = []
         # Init ROS stuff
         rospy.init_node(NODE_NAME, anonymous=False, log_level=rospy.INFO)
         self._srv_goto = rospy.Service("/drivers/" + NODE_NAME + "/get_port", GetPort, self._callback_get_port)
@@ -38,8 +40,13 @@ class PortFinder:
         self._associate_port()
         self._identify_arduino()
         rospy.loginfo(self._associated_port_list)
+        rospy.spin()
+        for rosserial_fd in self._rosserial_call_list:
+            rosserial_fd.terminate()
 
     def _callback_get_port(self, request):
+        if request.component == "all":
+            response = str(self._associated_port_list)
         return GetPortResponse(response)
 
     def _parse_xml_file(self, file):
@@ -156,7 +163,8 @@ class PortFinder:
                         start_byte = com_line.read(1)
                         read_string += start_byte
                         if ord(start_byte) == 0xff:
-                            rospy.loginfo("Found an arduino to start with rosserial : " + element[1])
+                            rospy.loginfo("Found an arduino to start with rosserial : " + element[1] + ", start it.")
+                            self._rosserial_call_list.append(subprocess.Popen(["rosrun", "rosserial_python", "serial_node.py", element[1]]))
                             rosserial_flag = True
                             rosserial_port_list.append(element[1])
                             break
