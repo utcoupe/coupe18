@@ -5,13 +5,15 @@ from geometry_msgs.msg import Pose2D
 import actionlib
 from drivers_ard_asserv.srv import *
 from drivers_ard_asserv.msg import *
-import check_arduino
+from drivers_port_finder.srv import *
 import asserv
 
 __author__ = "Thomas Fuhrmann"
 __date__ = 21/10/2017
 
 NODE_NAME = "ard_asserv"
+GET_PORT_SERVICE_NAME = "/drivers/port_finder/get_port"
+GET_PORT_SERVICE_TIMEOUT = 10  # in seconds
 
 
 class Asserv:
@@ -45,7 +47,10 @@ class Asserv:
         self._srv_management = rospy.Service("/drivers/" + NODE_NAME + "/management", Management, self._callback_management)
         self._act_goto = actionlib.ActionServer("/drivers/" + NODE_NAME + "/goto_action", DoGotoAction, self._callback_action_goto, auto_start=False)
         self._act_goto.start()
-        arduino_port = check_arduino.get_arduino_port("asserv")
+        rospy.wait_for_service(GET_PORT_SERVICE_NAME, GET_PORT_SERVICE_TIMEOUT)
+        self._src_client_get_port = rospy.ServiceProxy(GET_PORT_SERVICE_NAME, GetPort)
+        arduino_port = self._src_client_get_port("gr_asserv").port
+        rospy.loginfo("Service return value : " + arduino_port)
         if arduino_port == "":
             rospy.loginfo("[ASSERV] Creation of the simu asserv.")
             self._asserv_instance = asserv.AsservSimu(self)
