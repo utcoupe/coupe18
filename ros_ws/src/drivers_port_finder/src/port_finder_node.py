@@ -2,7 +2,6 @@
 
 import os
 import re
-import sys
 import subprocess
 import serial
 import rospy
@@ -21,25 +20,25 @@ SERIAL_READ_SIZE = 50
 
 class PortFinder:
     def __init__(self):
-        rospy.logdebug("[drivers/port_finder] Starting the node.")
+        rospy.logdebug("Starting the node.")
         # List containing the content of the xml definition file
         self._components_list = []
         # List containing the connected components and the corresponding port
-        # TODO use a dictionary instead ?
         self._connected_component_list = []
         # List containing the final processing information, matching the serial port and the serial component
         self._associated_port_list = []
+        # List of file descriptor for calls to rosserial
         self._rosserial_call_list = []
         # Init ROS stuff
         rospy.init_node(NODE_NAME, anonymous=False, log_level=rospy.INFO)
-        self._srv_goto = rospy.Service("/drivers/" + NODE_NAME + "/get_port", GetPort, self._callback_get_port)
         curr_dir = os.path.dirname(os.path.abspath(__file__))
         def_dir = os.path.join(curr_dir, "../def")
         self._parse_xml_file(def_dir + "/components_list.xml")
         self._parse_dmesg()
         self._associate_port()
         self._identify_arduino()
-        rospy.loginfo(self._associated_port_list)
+        rospy.logdebug("Node ready, found : " + str(self._associated_port_list))
+        self._srv_goto = rospy.Service("/drivers/" + NODE_NAME + "/get_port", GetPort, self._callback_get_port)
         rospy.spin()
         for rosserial_fd in self._rosserial_call_list:
             rosserial_fd.terminate()
@@ -78,7 +77,6 @@ class PortFinder:
             if not components:
                 rospy.logwarn("No component found in component_list definition.")
             rospy.logdebug("{} components found in component_list definition".format(len(components)))
-            # rospy.loginfo(components)
             self._components_list = components
 
     def _parse_dmesg(self):
@@ -121,12 +119,6 @@ class PortFinder:
                 if tty_element[0] > element[0]:
                     merged_filtered_id_tty_list.append((element[1], element[2], tty_element[1], element[3]))
                     break
-        rospy.loginfo("ID_LIST")
-        rospy.loginfo(id_list_filtered)
-        rospy.loginfo("TTY_LIST")
-        rospy.loginfo(tty_list)
-        rospy.loginfo("MERGED_LIST")
-        rospy.loginfo(merged_filtered_id_tty_list)
         self._connected_component_list = merged_filtered_id_tty_list
 
     def _get_dmesg(self):
@@ -161,7 +153,12 @@ class PortFinder:
                 arduino_node_flag = False
                 try:
                     com_line = serial.Serial(element[1], 57600, timeout=3)
-                    # 10 try to check if the start header  for rosserial is received (40 is an experimental value)
+                    """
+                    The goal is to read the serial port byte by byte to identify the start byte of rosserial (0xff).
+                    If this start byte is found, launch rosserial in a dedicated process, otherwise check if it's an arduino
+                    with UTCoupe protocol.
+                    If it's none of them, the rosserial finding has probably failed...
+                    """
                     for try_number in range(0, SERIAL_READ_SIZE, 1):
                         start_byte = com_line.read(1)
                         read_string += start_byte
@@ -175,7 +172,6 @@ class PortFinder:
                             self._associated_port_list[counter] = ("rosserial_node_" + str(counter), element[1])
                             break
                     com_line.close()
-                    # rospy.loginfo("Start byte : {:02x}".format(ord(start_byte)))
                 except:
                     rospy.logwarn("Try to open port {} but it fails...".format(element[1]))
                 for arduino_node in ARDUINO_NODE_LIST:
