@@ -44,7 +44,6 @@ class CollisionsNode():
                 for c in Map.Robot.check_collisions(ObstaclesStack.toList()):
                     self.publish_collision(c)
 
-            rospy.logwarn(len(ObstaclesStack.toList()))
             self.markers.publishCheckZones(Map.Robot)
             self.markers.publishObstacles(ObstaclesStack.toList())
 
