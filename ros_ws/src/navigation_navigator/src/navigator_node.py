@@ -165,7 +165,7 @@ class NavigatorNode(object):
         @param handledGoal: the received goal
         """
         self._currentStatus = NavigatorStatuses.NAV_NAVIGATING
-        self._collisionsClient.setEnabled(True)
+        self._collisionsClient.setEnabled(not handledGoal.get_goal().disable_collisions)
         posStart = self._localizerClient.getLastKnownPos()
         posEnd = handledGoal.get_goal().target_pos
         debugStr = "Asked to go from "
