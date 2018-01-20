@@ -15,7 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
     genmsg
     actionlib_msgs
     actionlib
-    port_finder
+    drivers_port_finder
 )
 
 ## Generate messages
