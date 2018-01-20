@@ -64,7 +64,7 @@ class PortFinder:
                 if "name" not in component.attrib:
                     rospy.logerr("Can't parse component: a 'name' attribute is required. Skipping this component.")
                     continue
-                required = ["name", "vendor_id", "product_id", "port_type"]
+                required = ["name", "vendor_id", "product_id", "port_type", "rosserialable"]
                 for param in required:
                     if component.attrib[param] is None:
                         rospy.logerr("Can't parse component definition: a '{}' element is required. Skipping this component.".format(p))
@@ -72,7 +72,8 @@ class PortFinder:
                     "name": component.attrib["name"],
                     "vendor_id": component.attrib["vendor_id"],
                     "product_id": component.attrib["product_id"],
-                    "port_type": component.attrib["port_type"]
+                    "port_type": component.attrib["port_type"],
+                    "rosserialable": component.attrib["rosserialable"]
                 })
             if not components:
                 rospy.logwarn("No component found in component_list definition.")
@@ -147,7 +148,7 @@ class PortFinder:
     def _identify_arduino(self):
         rosserial_port_list = []
         for counter, element in enumerate(self._associated_port_list):
-            if element[0].find("ard") != -1:
+            if self._check_rosseriable(element[0]):
                 read_string = ""
                 rosserial_flag = False
                 arduino_node_flag = False
@@ -173,7 +174,7 @@ class PortFinder:
                             break
                     com_line.close()
                 except:
-                    rospy.logwarn("Try to open port {} but it fails...".format(element[1]))
+                    rospy.logerr("Try to open port {} but it fails...".format(element[1]))
                 for arduino_node in ARDUINO_NODE_LIST:
                     if read_string.find(arduino_node) != -1:
                         arduino_node_flag = True
@@ -182,6 +183,15 @@ class PortFinder:
                 # Not an arduino node, seems not to be a rosserial component, it can't be an other thing, so maybe
                 if not rosserial_flag and not arduino_node_flag:
                     rospy.logwarn("Serial port nor arduino node neither rosserial node, it might be a rosserial one...")
+
+    def _check_rosseriable(self, component_name):
+        returned_value = False
+        if component_name != "":
+            for element in self._components_list:
+                if element["name"] == component_name:
+                    if element["rosserialable"] == "true":
+                        returned_value = True
+        return returned_value
 
 
 if __name__ == "__main__":
