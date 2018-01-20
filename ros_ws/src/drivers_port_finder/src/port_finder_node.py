@@ -153,7 +153,7 @@ class PortFinder:
                 serial_port_disconnected = False
                 arduino_node_flag = False
                 try:
-                    com_line = serial.Serial(element[1], 57600, timeout=3)
+                    com_line = serial.Serial(element[1], 57600, timeout=5)
                     read_data = com_line.read(SERIAL_READ_SIZE)
                     com_line.close()
                 except serial.SerialException:
