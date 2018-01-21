@@ -6,6 +6,8 @@ from ai import RobotAI
 
 from drivers_ard_hmi.msg import SetStrategies, SetTeams, HMIEvent
 from ai_game_status.srv import SetStatus
+from ai_game_status import StatusServices
+
 
 class AINode():
     def __init__(self):
@@ -22,7 +24,7 @@ class AINode():
         rospy.Subscriber("/feedback/ard_hmi/hmi_event", HMIEvent, self.on_hmi_event)
 
         # Sending init status to ai/game_status, subscribing to game_status status pub.
-        status_services = self._get_status_services(self.DepartmentName, self.PackageName, None, self.on_game_status)
+        status_services = StatusServices(self.DepartmentName, self.PackageName, None, self.on_game_status)
         status_services.ready(True) # Tell ai/game_status the node initialized successfuly.
 
         r = rospy.Rate(10)
@@ -34,12 +36,6 @@ class AINode():
                 self.AI.start(self._chosen_strat, AICommunication())
                 self._ai_start_request = False
             r.sleep()
-
-    def _get_status_services(self, ns, node_name, arm_cb=None, status_cb=None):
-        import sys, os
-        sys.path.append(os.environ['UTCOUPE_WORKSPACE'] + '/ros_ws/src/ai_game_status/')
-        from init_service import StatusServices
-        return StatusServices(ns, node_name, arm_cb, status_cb)
 
     def send_strategies(self):
         pub = rospy.Publisher("/feedback/ard_hmi/set_strategies", SetStrategies, queue_size=10)

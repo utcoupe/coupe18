@@ -9,6 +9,9 @@ from geometry_msgs.msg import Pose2D
 from navigation_collisions.msg import PredictedCollision
 from navigation_collisions.srv import ActivateCollisions, ActivateCollisionsResponse
 
+from ai_game_status import StatusServices
+
+
 class CollisionsNode():
     def __init__(self):
         rospy.init_node("collisions", log_level=rospy.DEBUG)
@@ -24,16 +27,10 @@ class CollisionsNode():
         self.subscriptions.send_init()
         rospy.loginfo("navigation/collisions ready, waiting for activation.")
 
-        status_services = self._get_status_services("navigation", "collisions")
-        status_services.ready(True) # Tell ai/game_status the node initialized successfuly.
+        # Tell ai/game_status the node initialized successfuly.
+        StatusServices("navigation", "collisions").ready(True)
 
         self.run()
-
-    def _get_status_services(self, ns, node_name, arm_cb=None, status_cb=None):
-        import sys, os
-        sys.path.append(os.environ['UTCOUPE_WORKSPACE'] + '/ros_ws/src/ai_game_status/')
-        from init_service import StatusServices
-        return StatusServices(ns, node_name, arm_cb, status_cb)
 
     def run(self):
         r = rospy.Rate(20)

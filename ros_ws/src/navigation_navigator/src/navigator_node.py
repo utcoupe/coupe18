@@ -15,6 +15,9 @@ from asserv import AsservClient
 from localizer import LocalizerClient
 from collisions import CollisionsClient
 
+from ai_game_status import StatusServices
+
+
 __author__ = "Gaëtan Blond"
 __date__ = 17/10/2017
 
@@ -63,14 +66,8 @@ class NavigatorNode(object):
         self._currentStatus = NavigatorStatuses.NAV_IDLE
         self._currentPath = {}
 
-        status_services = self._get_status_services("navigation", "navigator")
-        status_services.ready(True) # Tell ai/game_status the node initialized successfuly.
-
-    def _get_status_services(self, ns, node_name, arm_cb=None, status_cb=None):
-        import sys, os
-        sys.path.append(os.environ['UTCOUPE_WORKSPACE'] + '/ros_ws/src/ai_game_status/')
-        from init_service import StatusServices
-        return StatusServices(ns, node_name, arm_cb, status_cb)
+        # Tell ai/game_status the node initialized successfuly.
+        StatusServices("navigation", "navigator").ready(True)
 
     def _callbackForResults(self, idAct, result):
         """

@@ -6,6 +6,7 @@ from libtools import Rect
 from enemy_tracker_tracker import EnemiesData
 import enemy_tracker_properties
 import rospy
+from ai_game_status import StatusServices
 
 
 class EnemyTrackerNode():
@@ -19,14 +20,8 @@ class EnemyTrackerNode():
         self.rect = []
         self.data = []
 
-        status_services = self._get_status_services("recognition", "enemy_tracker")
-        status_services.ready(True) # Tell ai/game_status the node initialized successfuly.
-
-    def _get_status_services(self, ns, node_name, arm_cb=None, status_cb=None):
-        import sys, os
-        sys.path.append(os.environ['UTCOUPE_WORKSPACE'] + '/ros_ws/src/ai_game_status/')
-        from init_service import StatusServices
-        return StatusServices(ns, node_name, arm_cb, status_cb)
+        # Tell ai/game_status the node initialized successfuly.
+        StatusServices("recognition", "enemy_tracker").ready(True)
 
     def importPoint(self, beltData):
         rects = []

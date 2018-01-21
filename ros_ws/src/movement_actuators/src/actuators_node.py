@@ -5,6 +5,8 @@ import rospy
 import actionlib
 import movement_actuators.msg
 import actuators_properties
+from ai_game_status import StatusServices
+
 
 class ActuatorsNode():
     """Dispatch commands from AI to the correct node"""
@@ -23,14 +25,8 @@ class ActuatorsNode():
             '{}arduino'.format(self._namespace), movement_actuators.msg.arduinoAction)
         self._action_server.start()
 
-        status_services = self._get_status_services("movement", "actuators")
-        status_services.ready(True) # Tell ai/game_status the node initialized successfuly.
-
-    def _get_status_services(self, ns, node_name, arm_cb=None, status_cb=None):
-        import sys, os
-        sys.path.append(os.environ['UTCOUPE_WORKSPACE'] + '/ros_ws/src/ai_game_status/')
-        from init_service import StatusServices
-        return StatusServices(ns, node_name, arm_cb, status_cb)
+        # Tell ai/game_status the node initialized successfuly.
+        StatusServices("movement", "actuators").ready(True)
 
     def dispatch(self, command):
         #-----Actuator check
@@ -73,7 +69,7 @@ class ActuatorsNode():
         elif actuator.family == 'ax12':
             self._action_server.set_succeeded(sendToAx12(
                 actuator.id, command.order, param, timeout))
-            return 
+            return
 
         self._action_server.set_succeeded(False)
 
