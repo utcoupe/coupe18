@@ -1,11 +1,6 @@
 #ifndef PATHFINDER_H
 #define PATHFINDER_H
 
-#include <chrono>
-#include <sstream>
-#include <utility>
-#include <vector>
-
 #include <ros/console.h>
 
 #include "navigation_pathfinder/FindPath.h"
@@ -14,6 +9,10 @@
 #include "pathfinder/map_storage.h"
 #include "pathfinder/point.h"
 #include "pathfinder/pos_convertor.h"
+#include "pathfinder/dynamic_barriers_manager.h"
+
+#include <vector>
+#include <memory>
 
 
 /**
@@ -73,7 +72,7 @@ private:
     /** Contains the positions of static barriers. **/
     Vect2DBool _allowedPositions;
     /** Contains the positions of dynamic barriers. **/
-    Vect2DBool _dynBarrierPositions;
+    std::shared_ptr<DynamicBarriersManager> _dynBarriersMng;
     
     /** Tells if the map and the path must be saved after computing. **/
     bool _renderAfterComputing;
