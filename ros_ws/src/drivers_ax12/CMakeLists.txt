@@ -20,7 +20,7 @@ generate_messages(
 catkin_package(
     CATKIN_DEPENDS
     message_runtime
-    dynamixel_controllers
+    dynamixel_workbench_controllers
 )
 
 include_directories(
