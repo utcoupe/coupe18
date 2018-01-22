@@ -86,29 +86,16 @@ class PortFinder:
         tty_list = []
         id_list_filtered = []
         merged_filtered_id_tty_list = []
-        line_number = 0
-        tty_regexp = re.compile('(ttyACM.|ttyUSB.)')
+        vendor_id_regex = re.compile('usb (.*):.*idVendor=([a-z0-9]+).*idProduct=([a-z0-9]+)')
+        tty_regexp = re.compile(' ([0-9\-.]+):.*(ttyACM.|ttyUSB.)')
         # Parse the whole file to extract a list of lines containing idVendor and an other list containing ttyX
         for line in dmesg_output:
-            vendor_id_index = line.find("idVendor")
-            tty_usb_index = line.find("ttyUSB")
-            tty_acm_index = line.find("ttyACM")
-            if vendor_id_index != -1:
-                matched_line = line[vendor_id_index:len(line)]
-                matched_line_split = matched_line.split(', ')
-                id_index = -1
-                for counter, element in enumerate(id_list):
-                    if matched_line_split[0].split('=')[1] == element[1] and matched_line_split[1].split('=')[1] == element[2]:
-                        id_index = counter
-                if id_index != -1:
-                    id_list.pop(id_index)
-                # line_number, vendor_id, component_id
-                id_list.append((line_number, matched_line_split[0].split('=')[1], matched_line_split[1].split('=')[1]))
-            if tty_usb_index != -1 or tty_acm_index != -1:
-                matched_tty = tty_regexp.search(line)
-                # line_number, ttyX
-                tty_list.append((line_number, matched_tty.group(0)))
-            line_number += 1
+            vendor_id_matched = vendor_id_regex.search(line)
+            tty_matched = tty_regexp.search(line)
+            if vendor_id_matched is not None:
+                id_list.append((vendor_id_matched.group(1), vendor_id_matched.group(2), vendor_id_matched.group(3)))
+            if tty_matched is not None:
+                tty_list.append((tty_matched.group(1), tty_matched.group(2)))
         # Filter the idVendor list to keep only the idVendor we use
         for element in id_list:
             for component in self._components_list:
@@ -117,7 +104,7 @@ class PortFinder:
         # Merge the information of vendor_id and tty port to have a single tuple in list
         for element in id_list_filtered:
             for tty_element in tty_list:
-                if tty_element[0] > element[0]:
+                if tty_element[0] == element[0]:
                     merged_filtered_id_tty_list.append((element[1], element[2], tty_element[1], element[3]))
                     break
         self._connected_component_list = merged_filtered_id_tty_list
