@@ -12,6 +12,9 @@ add_message_files(
     FILES
     BeltRange.msg
     Move.msg
+    ActDigitalStates.msg
+    ActPWMStates.msg
+    ActServoStates.msg
 )
 
 ## Generate services in the 'srv' folder

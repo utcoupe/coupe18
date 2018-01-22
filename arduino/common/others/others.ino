@@ -1,15 +1,18 @@
+//ROS includes
+#include <ros.h>
+ros::NodeHandle nh;
+
 //Sensors includes
 #include <Wire.h>
 #include "VL53L0X.h"
+#include <drivers_ard_others/BeltRange.h>
 
 //Actuators includes
 #include "Servo.h"
-
-//ROS includes
-#include <ros.h>
-#include <drivers_ard_others/BeltRange.h>
 #include <drivers_ard_others/Move.h>
-ros::NodeHandle nh;
+#include <drivers_ard_others/ActDigitalStates.h>
+#include <drivers_ard_others/ActPWMStates.h>
+#include <drivers_ard_others/ActServoStates.h>
 
 
 // ---- SENSORS DEPARTMENT ----
@@ -69,60 +72,16 @@ bool digital_actuators_states[NUM_DIGITAL_ACTUATORS]        = {true};
 
 #define NUM_PWM_ACTUATORS 2
 const int pins_pwm_actuators_pwm[NUM_PWM_ACTUATORS]         = {6, 7};
-uint8_t pwm_actuators_values[NUM_PWM_ACTUATORS]             = {0, 255};
+uint8_t pwm_actuators_states[NUM_PWM_ACTUATORS]             = {0, 255};
 // Names : motor_canon1, motor_canon2
 
 #define NUM_SERVO_ACTUATORS 1
 const int pins_servo_actuators_pwm[NUM_SERVO_ACTUATORS]     = {9};
-int servo_actuators_angles[NUM_SERVO_ACTUATORS]             = {90};
+int16_t servo_actuators_states[NUM_SERVO_ACTUATORS]         = {90};
 Servo servo_actuators_objects[NUM_SERVO_ACTUATORS];
 // Names : servo_main_door
 
-// Digital actuators
-void init_digital_actuators() {
-    for(int i = 0; i < NUM_DIGITAL_ACTUATORS; i++)
-        pinMode(pins_digital_actuators[i], OUTPUT);
-}
-
-void loop_digital_actuators() {
-    for(int i = 0; i < NUM_DIGITAL_ACTUATORS; i++) {
-        nh.loginfo(digital_actuators_states[i]);
-        digitalWrite(pins_digital_actuators[i], digital_actuators_states[i]);
-    }
-}
-
-// PWM actuators
-void init_pwm_actuators() {
-    for(int i = 0; i < NUM_PWM_ACTUATORS; i++)
-        pinMode(pins_digital_actuators[i], OUTPUT);
-}
-
-void loop_pwm_actuators() {
-    for(int i = 0; i < NUM_PWM_ACTUATORS; i++)
-        analogWrite(pins_digital_actuators[i], pwm_actuators_values[i]);
-}
-
-// Servo actuators
-void init_servo_actuators() {
-    for(int i = 0; i < NUM_SERVO_ACTUATORS; i++) {
-        pinMode(pins_digital_actuators[i], OUTPUT);
-        servo_actuators_objects[i].attach(pins_servo_actuators_pwm[i]);
-    }
-}
-
-void loop_servo_actuators() {
-    for(int i = 0; i < NUM_SERVO_ACTUATORS; i++) {
-        servo_actuators_objects[i].write(servo_actuators_angles[i]);
-    }
-}
-
-void init_actuators() {
-    init_digital_actuators();
-    init_pwm_actuators();
-    init_servo_actuators();
-}
-
-// Actuators callbacks
+// Actuators ROS callbacks
 void on_move(const drivers_ard_others::Move& msg){
     switch(msg.type) {
         case msg.TYPE_DIGITAL:
@@ -135,15 +94,76 @@ void on_move(const drivers_ard_others::Move& msg){
             break;
         case msg.TYPE_PWM:
             if(msg.id >= 0 && msg.id <= NUM_PWM_ACTUATORS)
-                pwm_actuators_values[msg.id] = msg.dest_value;
+                pwm_actuators_states[msg.id] = msg.dest_value;
             break;
         case msg.TYPE_SERVO:
             if(msg.id >= 0 && msg.id <= NUM_SERVO_ACTUATORS)
-                servo_actuators_angles[msg.id] = msg.dest_value;
+                servo_actuators_states[msg.id] = msg.dest_value;
             break;
     }
 }
+
 ros::Subscriber<drivers_ard_others::Move> sub_move("/drivers/ard_others/move", &on_move);
+
+drivers_ard_others::ActDigitalStates digital_states_msg;
+ros::Publisher digital_states_pub("/drivers/ard_others/digital_act_states", &digital_states_msg);
+drivers_ard_others::ActPWMStates pwm_states_msg;
+ros::Publisher pwm_states_pub("/drivers/ard_others/pwm_act_states", &pwm_states_msg);
+drivers_ard_others::ActServoStates servo_states_msg;
+ros::Publisher servo_states_pub("/drivers/ard_others/servo_act_states", &servo_states_msg);
+
+// Digital actuators
+void init_digital_actuators() {
+    for(int i = 0; i < NUM_DIGITAL_ACTUATORS; i++)
+        pinMode(pins_digital_actuators[i], OUTPUT);
+}
+
+void loop_digital_actuators() {
+    for(int i = 0; i < NUM_DIGITAL_ACTUATORS; i++)
+        digitalWrite(pins_digital_actuators[i], digital_actuators_states[i]);
+    
+    digital_states_msg.states_length = NUM_DIGITAL_ACTUATORS;
+    digital_states_msg.states = digital_actuators_states;
+    digital_states_pub.publish(&digital_states_msg);
+}
+
+// PWM actuators
+void init_pwm_actuators() {
+    for(int i = 0; i < NUM_PWM_ACTUATORS; i++)
+        pinMode(pins_digital_actuators[i], OUTPUT);
+}
+
+void loop_pwm_actuators() {
+    for(int i = 0; i < NUM_PWM_ACTUATORS; i++)
+        analogWrite(pins_digital_actuators[i], pwm_actuators_states[i]);
+
+    pwm_states_msg.states_length = NUM_PWM_ACTUATORS;
+    pwm_states_msg.states = pwm_actuators_states;
+    pwm_states_pub.publish(&pwm_states_msg);
+}
+
+// Servo actuators
+void init_servo_actuators() {
+    for(int i = 0; i < NUM_SERVO_ACTUATORS; i++) {
+        pinMode(pins_digital_actuators[i], OUTPUT);
+        servo_actuators_objects[i].attach(pins_servo_actuators_pwm[i]);
+    }
+}
+
+void loop_servo_actuators() {
+    for(int i = 0; i < NUM_SERVO_ACTUATORS; i++)
+        servo_actuators_objects[i].write(servo_actuators_states[i]);
+
+    servo_states_msg.states_length = NUM_SERVO_ACTUATORS;
+    servo_states_msg.states = servo_actuators_states;
+    servo_states_pub.publish(&servo_states_msg);
+}
+
+void init_actuators() {
+    init_digital_actuators();
+    init_pwm_actuators();
+    init_servo_actuators();
+}
 
 void loop_actuators() {
     loop_digital_actuators();
@@ -157,7 +177,11 @@ void setup() {
     // ROS init
     nh.initNode();
     nh.advertise(belt_ranges_pub);
-    nh.subscribe(sub_move);    
+
+    nh.subscribe(sub_move);
+    nh.advertise(digital_states_pub);
+    nh.advertise(pwm_states_pub);
+    nh.advertise(servo_states_pub);
 
     // Libs init
     Wire.begin();
@@ -176,5 +200,5 @@ void loop() {
 
     // ROS loop
     nh.spinOnce();
-    delay(50); //random delay for now
+    delay(20); //random delay for now
 }
