@@ -2,7 +2,7 @@
 uint8 ABSOLUTE = 0
 uint8 RELATIVE = 1
 
-string id
+uint8 motor_id
 float64 angle
 uint8 mode
 ---
