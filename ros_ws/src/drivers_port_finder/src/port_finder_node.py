@@ -7,6 +7,8 @@ import serial
 import rospy
 import xml.etree.ElementTree as ET
 from drivers_port_finder.srv import *
+from ai_game_status import StatusServices
+
 
 __author__ = "Thomas Fuhrmann"
 __date__ = 18/01/2017
@@ -39,6 +41,10 @@ class PortFinder:
         self._identify_arduino()
         rospy.logdebug("Node ready, found : " + str(self._associated_port_list))
         self._srv_goto = rospy.Service("/drivers/" + NODE_NAME + "/get_port", GetPort, self._callback_get_port)
+
+        # Tell ai/game_status the node initialized successfuly.
+        StatusServices("drivers", "port_finder").ready(True)
+
         rospy.spin()
         for rosserial_fd in self._rosserial_call_list:
             rosserial_fd.terminate()
@@ -140,7 +146,7 @@ class PortFinder:
                 serial_port_disconnected = False
                 arduino_node_flag = False
                 try:
-                    com_line = serial.Serial(element[1], 57600, timeout=3)
+                    com_line = serial.Serial(element[1], 57600, timeout=5)
                     read_data = com_line.read(SERIAL_READ_SIZE)
                     com_line.close()
                 except serial.SerialException:
@@ -157,8 +163,7 @@ class PortFinder:
                     # Otherwise, in any case, start rosserial
                     if not arduino_node_flag:
                         rospy.loginfo("Found an arduino to start with rosserial : " + element[1] + ", start it.")
-                        self._rosserial_call_list.append(
-                        subprocess.Popen(["rosrun", "rosserial_python", "serial_node.py", element[1], "__name:=serial_node_" + str(counter)]))
+                        self._rosserial_call_list.append(subprocess.Popen(["rosrun", "rosserial_python", "serial_node.py", element[1], "__name:=serial_node_" + str(counter)]))
                         rosserial_port_list.append(element[1])
                         # Replace the tuple in list to keep a track that the port is used by rosserial
                         # Add an arbitrary id to rosserial to avoid having 2 components with the same name

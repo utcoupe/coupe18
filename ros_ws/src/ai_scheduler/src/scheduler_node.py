@@ -6,7 +6,8 @@ from ai import RobotAI
 
 from drivers_ard_hmi.msg import SetStrategies, SetTeams, HMIEvent
 from ai_game_status.srv import SetStatus
-from ai_game_status_services import StatusServices
+from ai_game_status import StatusServices
+
 
 class AINode():
     def __init__(self):
@@ -24,8 +25,7 @@ class AINode():
 
         # Sending init status to ai/game_status, subscribing to game_status status pub.
         status_services = StatusServices(self.DepartmentName, self.PackageName, None, self.on_game_status)
-        status_services.ready(True) # Tell ai/game_status the node is initialized.
-        rospy.loginfo("[AI] Ready. Waiting for activation.")
+        status_services.ready(True) # Tell ai/game_status the node initialized successfuly.
 
         r = rospy.Rate(10)
         while not rospy.is_shutdown():

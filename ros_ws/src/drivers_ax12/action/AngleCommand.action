@@ -1,0 +1,14 @@
+# goal
+uint8 ABSOLUTE = 0
+uint8 RELATIVE = 1
+
+string id
+float64 angle
+uint8 mode
+---
+# result
+bool success
+float64 angle
+---
+#feedback
+float64 angle
