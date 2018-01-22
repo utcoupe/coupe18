@@ -12,6 +12,7 @@ add_message_files(
     FILES
     BeltRange.msg
     Move.msg
+    MoveResponse.msg
     ActDigitalStates.msg
     ActPWMStates.msg
     ActServoStates.msg

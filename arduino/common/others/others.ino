@@ -10,6 +10,7 @@ ros::NodeHandle nh;
 //Actuators includes
 #include "Servo.h"
 #include <drivers_ard_others/Move.h>
+#include <drivers_ard_others/MoveResponse.h>
 #include <drivers_ard_others/ActDigitalStates.h>
 #include <drivers_ard_others/ActPWMStates.h>
 #include <drivers_ard_others/ActServoStates.h>
@@ -82,25 +83,60 @@ Servo servo_actuators_objects[NUM_SERVO_ACTUATORS];
 // Names : servo_main_door
 
 // Actuators ROS callbacks
+
+drivers_ard_others::MoveResponse move_response_msg;
+ros::Publisher move_responses_pub("/drivers/ard_others/move_responses", &move_response_msg);
+
+void send_move_response(int order_nb, bool success) {
+    move_response_msg.order_nb = order_nb;
+    move_response_msg.success = success;
+    move_responses_pub.publish(&move_response_msg);
+}
+
 void on_move(const drivers_ard_others::Move& msg){
+    bool success = true;
     switch(msg.type) {
         case msg.TYPE_DIGITAL:
             if(msg.id >= 0 && msg.id <= NUM_DIGITAL_ACTUATORS) {
-                if(msg.dest_value == 0 || msg.dest_value == 1) {
-                    nh.loginfo("digitaaaal");
+                if(msg.dest_value == 0 || msg.dest_value == 1)
                     digital_actuators_states[msg.id] = bool(msg.dest_value);
+                else {
+                    nh.logerror("MOVE failed : dest_value invalid (0 or 1).");
+                    success = false;
                 }
+            } else {
+                nh.logerror("MOVE failed : invalid id.");
+                success = false;
             }
             break;
         case msg.TYPE_PWM:
-            if(msg.id >= 0 && msg.id <= NUM_PWM_ACTUATORS)
-                pwm_actuators_states[msg.id] = msg.dest_value;
-            break;
+            if(msg.id >= 0 && msg.id <= NUM_PWM_ACTUATORS) {
+                if(msg.dest_value >= 0 && msg.dest_value <= 255)
+                    pwm_actuators_states[msg.id] = bool(msg.dest_value);
+                else {
+                    nh.logerror("MOVE failed : dest_value invalid (0 to 255).");
+                    success = false;
+                }
+            } else {
+                nh.logerror("MOVE failed : invalid id.");
+                success = false;
+            }
         case msg.TYPE_SERVO:
-            if(msg.id >= 0 && msg.id <= NUM_SERVO_ACTUATORS)
-                servo_actuators_states[msg.id] = msg.dest_value;
+            if(msg.id >= 0 && msg.id <= NUM_SERVO_ACTUATORS) {
+                if(msg.dest_value >= 0 && msg.dest_value <= 180)
+                    digital_actuators_states[msg.id] = bool(msg.dest_value);
+                else {
+                    nh.logerror("MOVE failed : dest_value invalid (0 to 180).");
+                    success = false;
+                }
+            } else {
+                nh.logerror("MOVE failed : invalid id.");
+                success = false;
+            }
             break;
     }
+
+    if(msg.order_nb != 0) send_move_response(msg.order_nb, success); // send response if order_nb provided.
 }
 
 ros::Subscriber<drivers_ard_others::Move> sub_move("/drivers/ard_others/move", &on_move);
@@ -179,6 +215,8 @@ void setup() {
     nh.advertise(belt_ranges_pub);
 
     nh.subscribe(sub_move);
+    nh.advertise(move_responses_pub);
+
     nh.advertise(digital_states_pub);
     nh.advertise(pwm_states_pub);
     nh.advertise(servo_states_pub);
