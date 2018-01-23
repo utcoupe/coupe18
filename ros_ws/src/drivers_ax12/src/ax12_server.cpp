@@ -1,5 +1,22 @@
 #include "drivers_ax12/ax12_server.h"
 
+
+void Ax12Server::init_workbench(const std::string& port)
+{
+    if(!dxl_wb_.begin(port.c_str(), BAUD_RATE)) {
+        ROS_FATAL("Error initializing dynamixel workbench (port: %s, baudrate: %d), shutting down...", port.c_str(), BAUD_RATE);
+        ros::shutdown();
+    }
+
+
+    dxl_wb_.scan(dxl_id_, &dxl_cnt_, SCAN_RANGE);
+    ROS_INFO("Found %d ax12 connected ! (scan range: %d)", dxl_cnt_, SCAN_RANGE);
+
+
+    for (uint8_t index = 0; index < dxl_cnt_; index++)
+        dxl_wb_.jointMode(dxl_id_[index], DEFAULT_VEL, 0); // no acceleration for ax12a
+
+}
 void Ax12Server::execute_goal_cb(GoalHandle goal_handle)
 {
     if(!goal_handle.isValid())
@@ -17,10 +34,8 @@ void Ax12Server::execute_goal_cb(GoalHandle goal_handle)
     ROS_INFO("%s", goal_handle.getGoalID().id.c_str());
 }
 
-std::string Ax12Server::fetch_port()
+std::string Ax12Server::fetch_port(const std::string& service_name)
 {
-    std::string service_name = "/drivers/port_finder/get_port";
-
     std::string port;
 
     if(!ros::service::waitForService(service_name, 10000))
@@ -52,9 +67,8 @@ std::string Ax12Server::fetch_port()
     return port;
 }
 
-std::string Ax12Server::fetch_def_file_path()
+std::string Ax12Server::fetch_def_file_path(const std::string& service_name)
 {
-    std::string service_name = "/memory/definitions/get";
 
     std::string path;
 
@@ -88,20 +102,56 @@ std::string Ax12Server::fetch_def_file_path()
 
 }
 
-void Ax12Server::set_ros_params()
+void Ax12Server::set_ros_params(const std::string& def_file_path)
 {
-    std::string ns = ros::names::append(nh_.getNamespace().c_str(), "motors");
+    std::string ns = ros::names::append(nh_.getNamespace(), "motors");
 
-    size_t needed = snprintf(NULL, 0, "rosparam load %s %s",  def_file_path_.c_str(), ns.c_str()) + 1;
+    int needed = snprintf(nullptr, 0, "rosparam load %s %s",  def_file_path.c_str(), ns.c_str()) + 1;
+    if(needed < 0)
+    {
+        ROS_FATAL("Cannot load parameters from definition file, shutting down...");
+        ros::shutdown();
+    }
+
     char command[needed];
 
-    snprintf(command, needed, "rosparam load %s %s", def_file_path_.c_str(), ns.c_str());
-    ROS_ERROR(command);
+    snprintf(command, (size_t)needed, "rosparam load %s %s", def_file_path.c_str(), ns.c_str());
 
     int code = system(command);
 
     if(code)
     {
-        ROS_ERROR("Couln't set the ROS params from the definition file");
+        ROS_ERROR("Couldn't set the ROS params from the definition file");
     }
+}
+
+Ax12Server::Ax12Server(std::string name) :
+        as_(nh_, name, boost::bind(&Ax12Server::execute_goal_cb, this, _1), false)
+{
+    std::string def_file_path, port;
+
+
+    as_.start();
+
+    def_file_path = fetch_def_file_path(DEFINITIONS_SERVICE);
+    set_ros_params(def_file_path);
+
+
+    // port = fetch_port(PORT_FINDER_SERVICE);
+
+
+    port = "/dev/ttyACM0";
+    init_workbench(port);
+
+
+
+    ROS_INFO("drivers_ax12 action server initialized (port %s), waiting for goals...", port.c_str());
+}
+
+Ax12Server::~Ax12Server()
+{
+    for (int index = 0; index < dxl_cnt_; index++)
+        dxl_wb_.itemWrite(dxl_id_[index], "Torque_Enable", 0);
+
+    ros::shutdown();
 }
