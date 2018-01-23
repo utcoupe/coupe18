@@ -15,8 +15,30 @@ void Ax12Server::init_workbench(const std::string& port)
 
     for (uint8_t index = 0; index < dxl_cnt_; index++)
         dxl_wb_.jointMode(dxl_id_[index], DEFAULT_VEL, 0); // no acceleration for ax12a
+}
+
+void Ax12Server::intersect_id_lists() //drops ids in scanned ids that are not in ros params
+{
+
+    std::string key;
+
+    for(uint8_t i = dxl_cnt_; i >= 0; i--)
+    {
+
+        key = ros::names::append("motors", std::to_string(i));
+        key = ros::names::append(key, "init");
+
+        if(!ros::param::has(key))
+        {
+            //todo: delete from list
+            ROS_WARN("Detected ax12 with id %d, no such id in definition file, ax12 will be ignored", i);
+        }
+    }
+
+
 
 }
+
 void Ax12Server::execute_goal_cb(GoalHandle goal_handle)
 {
     if(!goal_handle.isValid())
@@ -60,8 +82,8 @@ std::string Ax12Server::fetch_port(const std::string& service_name)
 
     if(port.length() == 0)
     {
-        ROS_FATAL("The port is not set, shutting down...");
-        ros::shutdown();
+        ROS_ERROR("The port is not set, falling back to default %s", DEFAULT_PORT.c_str());
+        port = DEFAULT_PORT;
     }
 
     return port;
@@ -94,8 +116,7 @@ std::string Ax12Server::fetch_def_file_path(const std::string& service_name)
 
     if(path.length() == 0)
     {
-        ROS_FATAL("The definition file path is not set, shutting down...");
-        ros::shutdown();
+        ROS_ERROR("The definition file path is not set !");
     }
 
     return path;
@@ -109,8 +130,7 @@ void Ax12Server::set_ros_params(const std::string& def_file_path)
     int needed = snprintf(nullptr, 0, "rosparam load %s %s",  def_file_path.c_str(), ns.c_str()) + 1;
     if(needed < 0)
     {
-        ROS_FATAL("Cannot load parameters from definition file, shutting down...");
-        ros::shutdown();
+        ROS_ERROR("Cannot load parameters from definition file !");
     }
 
     char command[needed];
@@ -121,7 +141,7 @@ void Ax12Server::set_ros_params(const std::string& def_file_path)
 
     if(code)
     {
-        ROS_ERROR("Couldn't set the ROS params from the definition file");
+        ROS_ERROR("Cannot load parameters from definition file !");
     }
 }
 
