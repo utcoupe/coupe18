@@ -11,7 +11,7 @@ def callback(req):
     def_dir = os.path.join(curr_dir, "../def")
     req_split = req.request.split('/')
 
-    if req_split[0] in ["ai", "memory", "navigation", "movement", "processing", "recognition"]:
+    if req_split[0] in ["ai", "memory", "navigation", "movement", "processing", "recognition", "drivers"]:
         if not rospy.has_param('/robot'):
             rospy.logerr("Parameter '/robot' not set, cannot provide the definition file {}".format(req.request))
             req_final = ""

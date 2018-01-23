@@ -9,6 +9,7 @@
 #include <actionlib/server/action_server.h>
 #include <drivers_ax12/AngleCommandAction.h>
 #include <drivers_port_finder/GetPort.h>
+#include <memory_definitions/GetDefinition.h>
 
 typedef actionlib::ServerGoalHandle<drivers_ax12::AngleCommandAction> GoalHandle;
 
@@ -20,7 +21,7 @@ protected:
     ros::NodeHandle nh_;
     actionlib::ActionServer<drivers_ax12::AngleCommandAction> as_;
 
-    std::string action_name_, port_;
+    std::string action_name_, port_, def_file_path_;
 
     std::map<std::string, GoalHandle> current_goals; //maps id to goal
 
@@ -32,20 +33,20 @@ protected:
 public:
     void execute_goal_cb(GoalHandle goal_handle);
     std::string fetch_port();
+    std::string fetch_def_file_path();
+    void set_ros_params();
+
 
     Ax12Server(std::string name) :
             as_(nh_, name, boost::bind(&Ax12Server::execute_goal_cb, this, _1), false),
             action_name_(name)
     {
         as_.start();
-        port_ = fetch_port();
 
-        if(port_.length() == 0)
-        {
-            ROS_FATAL("The port is not set, shutting down...");
-            ros::shutdown();
-            return;
-        }
+        def_file_path_ = fetch_def_file_path();
+        // port_ = fetch_port();
+        set_ros_params();
+
 
 
         ROS_INFO("drivers_ax12 action server initialized (port %s), waiting for goals...", port_.c_str());

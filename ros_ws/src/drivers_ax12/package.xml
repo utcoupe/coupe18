@@ -15,12 +15,14 @@
   <build_depend>roscpp</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>drivers_port_finder</build_depend>
+  <build_depend>memory_definitions</build_depend>
   <exec_depend>actionlib</exec_depend>
   <exec_depend>actionlib_msgs</exec_depend>
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>drivers_port_finder</exec_depend>
+  <exec_depend>memory_definitions</exec_depend>
 
   <export>
   </export>
