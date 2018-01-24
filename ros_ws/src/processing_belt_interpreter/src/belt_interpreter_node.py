@@ -61,7 +61,8 @@ class BeltInterpreter(object):
 
         self.pub_static_transforms()
 
-        self._static_shapes = self.fetch_map_objects()
+        self._static_shapes, self._map_width, self._map_height = self.fetch_map_objects()
+
         self._sensors_sub = rospy.Subscriber(self.SENSORS_TOPIC, BeltRange,
                                              self.callback)
 
@@ -123,6 +124,7 @@ class BeltInterpreter(object):
             rect.y = 0
             rect.w = width
             rect.h = height
+
 
             static_points_nbr = 0
             total_points_nbr = 0
@@ -296,7 +298,16 @@ class BeltInterpreter(object):
                 if not shapes:
                     rospy.logwarn("No static objects fetched from map, all sensor data will be treated as dynamic rects.")
 
-                return shapes
+            response = get_map("/terrain/shape/*")
+
+            if not response.success:
+                msg ="Can't fetch dims from map. Shutting down."
+                rospy.logerr(msg)
+                raise rospy.ROSInitException(msg)
+            else:
+                dims = json.loads(response.response)
+                return shape, float(dims["width"]), float(dims["height"])
+
         except rospy.ServiceException as exc:
             msg = "Exception when fetching objects from map. Shutting down.\n {}".format(str(exc))
             rospy.logfatal(msg)
@@ -304,8 +315,13 @@ class BeltInterpreter(object):
 
     def is_static(self, point_st):
         # need a point stamped in the /map frame
+        x = point_st.point.x
+        y = point_st.point.y
+        if x < 0 or x > self._map_width or y < 0 or y > self._map_height:
+            return True
+
         for shape in self._static_shapes:
-            if shape.contains(point_st.point.x, point_st.point.y):
+            if shape.contains(x, y):
                 return True
 
         return False
