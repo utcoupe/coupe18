@@ -1,0 +1,11 @@
+<launch>
+    <group ns="processing">
+        <include file="$(find obstacle_detector)/launch/lidar_objects.launch" ns="lidar_objects"/>
+    </group>
+
+    <group ns="sensors">
+        <node pkg="urg_node" name="urg_node" type="urg_node" output="screen"/>
+    </group>
+
+    <node pkg="tf2_ros" type="static_transform_publisher" name="lidar_tf_publisher" args="0.1 -0.1 0.04 0 0 0 robot laser" />
+</launch>
