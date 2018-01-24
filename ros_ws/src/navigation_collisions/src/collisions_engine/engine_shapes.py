@@ -17,7 +17,7 @@ class SegmentObstacle(MapObstacle):
         self.length = math.sqrt((self.last.x - self.first.x) ** 2 + (self.last.y - self.first.y) ** 2)
         center_pos = Position((self.first.x + self.last.x) / 2.0,
                               (self.first.y + self.last.y) / 2.0,
-                              0.2) #TODO angle
+                              math.atan2(self.last.y - self.first.y, self.last.x - self.first.x))
         super(SegmentObstacle, self).__init__(center_pos, velocity)
 
     def segment(self):

@@ -41,13 +41,13 @@ class MarkersPublisher(object):
         marker.action = Marker.ADD
         if str(obj) == "rect":
             marker.scale.x = obj.width
-            marker.scale.x = obj.height
+            marker.scale.y = obj.height
         elif str(obj) == "circle":
             marker.scale.x = obj.radius * 2.0
-            marker.scale.x = obj.radius * 2.0
+            marker.scale.y = obj.radius * 2.0
         elif str(obj) == "segment":
             marker.scale.x = obj.length
-            marker.scale.x = 0.02
+            marker.scale.y = 0.02
         marker.scale.z = z_scale
         marker.color.r = color[0]
         marker.color.g = color[1]
