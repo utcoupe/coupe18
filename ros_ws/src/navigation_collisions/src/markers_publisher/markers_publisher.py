@@ -67,7 +67,7 @@ class MarkersPublisher(object):
         marker.pose.orientation.y = orientation[1]
         marker.pose.orientation.z = orientation[2]
         marker.pose.orientation.w = orientation[3]
-        marker.lifetime = rospy.Duration(1)
+        marker.lifetime = rospy.Duration(0.1)
 
         self.MarkersPUBL.publish(marker)
 
