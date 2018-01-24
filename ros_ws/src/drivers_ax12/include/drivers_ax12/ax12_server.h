@@ -17,8 +17,9 @@ const std::string PORT_FINDER_SERVICE = "/drivers/port_finder/get_port";
 const std::string DEFAULT_PORT = "/dev/ttyACM0";
 const uint32_t BAUD_RATE = 10000000;
 const uint8_t SCAN_RANGE = 20;
-const uint32_t DEFAULT_VEL = 200; //1-1023 (if 0 then set to maximum) (0.111 rpm per unit)
-
+const uint16_t DEFAULT_VEL = 200; //1-1023 (if 0 then set to maximum) (0.111 rpm per unit)
+const uint16_t DEFAULT_MIN = 0; //0-1023
+const uint16_t DEFAULT_MAX = 1023; //0-1023
 
 
 typedef actionlib::ServerGoalHandle<drivers_ax12::AngleCommandAction> GoalHandle;
@@ -47,9 +48,11 @@ public:
     void execute_goal_cb(GoalHandle goal_handle);
     std::string fetch_port(const std::string& service_name);
     std::string fetch_def_file_path(const std::string& service_name);
-    void set_ros_params(const std::string& def_file_path);
+    bool set_ros_params(const std::string& def_file_path);
     void init_workbench(const std::string& port);
-    void intersect_id_lists();
+    bool init_motor(uint8_t motor_id);
+    bool motor_id_exists(uint8_t motor_id);
+    bool position_is_valid(uint8_t motor_id, uint16_t position);
 
     Ax12Server(std::string name);
     ~Ax12Server();
