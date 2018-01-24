@@ -8,9 +8,6 @@ find_package(catkin REQUIRED COMPONENTS
     geometry_msgs
     memory_map
     message_generation
-    navigation_navigator
-    processing_belt_interpreter
-    obstacle_detector
 )
 
 ##############

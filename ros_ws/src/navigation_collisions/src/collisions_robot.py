@@ -1,3 +1,4 @@
+import math
 from collisions_engine import Position, Velocity, CollisionLevel, PathCheckZone
 
 
@@ -32,7 +33,7 @@ class Robot(object): #TODO Inherit from RectObstacle
         self._path_check_zone.update_waypoints(new_waypoints)
 
     def get_main_shapes(self):
-        return self._velocity.get_shapes(self._position)
+        return self._velocity.get_shapes(self._position, self._get_max_main_dist())
 
     def get_path_shapes(self):
         return self._path_check_zone.get_shapes(self._position)
@@ -41,3 +42,10 @@ class Robot(object): #TODO Inherit from RectObstacle
         return self._velocity.check_collisions(self._position, obstacles) + \
                self._path_check_zone.check_collisions(self._position, obstacles)
         # TODO remove duplicate collisions between the two
+
+    def _get_max_main_dist(self):
+        if isinstance(self._path_check_zone.waypoints, list) and len(self._path_check_zone.waypoints) > 0:
+            w = self._path_check_zone.waypoints[0]
+            return math.sqrt((w.x - self._position.x) ** 2 + (w.y - self._position.y) ** 2)
+        else:
+            return -1 # invalid waypoints
