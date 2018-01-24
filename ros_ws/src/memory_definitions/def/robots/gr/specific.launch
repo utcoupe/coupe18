@@ -1,6 +1,6 @@
 <launch>
     <group ns="processing">
-        <include file="$(find obstacle_detector)/launch/lidar_objects.launch" ns="lidar_objects"/>
+        <include file="$(find processing_lidar_objects)/launch/lidar_objects.launch" ns="lidar_objects"/>
     </group>
 
     <group ns="sensors">
