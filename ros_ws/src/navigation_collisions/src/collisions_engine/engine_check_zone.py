@@ -24,12 +24,10 @@ class VelocityCheckZone(CheckZone):
         super(VelocityCheckZone, self).__init__(width, height, collision_level)
 
     def get_shapes(self, robot_pos, vel_linear, vel_angular):
-        w, h = self._height, self._width
-        l = 0.0
-
-        if abs(vel_linear) > CollisionThresholds.VEL_MIN: # if the object is moving fast enough, extend the collision rect
-            w +=  CollisionThresholds.get_stop_distance(vel_linear)
-            l = w / 2.0 - self._height / 2.0
+        if abs(vel_linear) < CollisionThresholds.VEL_MIN: # if the object isn't moving fast enough, don't create the rect.
+            return []
+        w, h = self._height + CollisionThresholds.get_stop_distance(vel_linear), self._width
+        l = w / 2.0 - self._height / 2.0
 
         side_a = math.pi if vel_linear < 0 else 0
         return [RectObstacle(Position(robot_pos.x + l * math.cos(robot_pos.a + side_a),

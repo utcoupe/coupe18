@@ -55,6 +55,10 @@ class CollisionsResolver(object):
                     return True
             return False
 
+        def _segment_intersects_circle(segment, circle):
+            new_rect = RectObstacle(segment.position, circle.radius * 2, segment.length + 2 * circle.radius)
+            return _rect_intersects_circle(new_rect, circle)
+
         def _point_in_rect(point, rect): # Calculs persos #PS22
             phi = math.atan2(point.y - rect.position.y, point.x - rect.position.x)
             phi += 2 * math.pi if phi < 0 else 0
@@ -93,8 +97,9 @@ class CollisionsResolver(object):
                 return _segment_intersects_rect(obs1, obs2)
             return _segment_intersects_rect(obs2, obs1)
         elif "segment" in types and "circle" in types:
-            rospy.logwarn("TODO collision between segments and circles not implemented, skipping")
-            return False
+            if types[0] == "segment":
+                return _segment_intersects_circle(obs1, obs2)
+            return _segment_intersects_circle(obs2, obs1)
         elif "rect" in types and "point" in types:
             if types[0] == "rect":
                 return _point_in_rect(obs1, obs2)
