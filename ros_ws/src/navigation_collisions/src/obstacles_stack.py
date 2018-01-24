@@ -18,7 +18,6 @@ class ObstaclesStack():
 
     @staticmethod
     def updateBeltPoints(new_obstacles):
-        rospy.loginfo("setting belt")
         ObstaclesStack.BeltPoints = new_obstacles
 
     @staticmethod

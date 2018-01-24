@@ -27,6 +27,7 @@ class MarkersPublisher(object):
 
     def _publish_marker(self, ns, index, obj, z_scale, z_height, color):
         markertypes = {
+            "segment": Marker.CUBE,
             "rect": Marker.CUBE,
             "circle": Marker.CYLINDER,
             "mesh": Marker.MESH_RESOURCE
@@ -38,8 +39,15 @@ class MarkersPublisher(object):
         marker.id = index
 
         marker.action = Marker.ADD
-        marker.scale.x = obj.width  if str(obj) == "rect" else obj.radius * 2
-        marker.scale.y = obj.height if str(obj) == "rect" else obj.radius * 2
+        if str(obj) == "rect":
+            marker.scale.x = obj.width
+            marker.scale.x = obj.height
+        elif str(obj) == "circle":
+            marker.scale.x = obj.radius * 2.0
+            marker.scale.x = obj.radius * 2.0
+        elif str(obj) == "segment":
+            marker.scale.x = obj.length
+            marker.scale.x = 0.02
         marker.scale.z = z_scale
         marker.color.r = color[0]
         marker.color.g = color[1]
