@@ -120,6 +120,7 @@ bool Ax12Server::position_is_valid(uint8_t motor_id, uint16_t position)
 
 void Ax12Server::execute_goal_cb(GoalHandle goal_handle)
 {
+
     if(!goal_handle.isValid())
     {
         ROS_ERROR("Ax12 received invalid goal !");
@@ -162,7 +163,57 @@ void Ax12Server::execute_goal_cb(GoalHandle goal_handle)
     }
     else
     {
-        current_goals.insert(std::make_pair(goal_handle.getGoalID().id.c_str(), goal_handle));
+        current_goals.push_back(goal_handle);
+    }
+
+}
+
+void Ax12Server::main_loop(const ros::TimerEvent&)
+{
+    uint8_t motor_id;
+
+    int32_t curr_position;
+    int32_t goal_position;
+
+    ros::Rate r(MAIN_FREQUENCY);
+
+    for(auto it = current_goals.begin(); it != current_goals.end();)
+    {
+        motor_id = it->getGoal()->motor_id;
+        curr_position = dxl_wb_.itemRead(motor_id, "Present_Position");
+
+        if(dxl_wb_.itemRead(motor_id, "Moving"))
+        {
+            feedback_.position = curr_position;
+            it->publishFeedback(feedback_);
+            it++;
+            continue;
+        }
+
+        goal_position = it->getGoal()->position;
+
+        if(curr_position == goal_position)
+        {
+            result_.success = true;
+            it->setSucceeded();
+            it = current_goals.erase(it);
+            ROS_INFO("ax12 goal succeeded for motor id %d", motor_id);
+
+        }
+        else if(ros::Time::now().toSec() - it->getGoalID().stamp.toSec() > MAX_STOP_TIME)
+        {
+            result_.success = false;
+            it->setAborted();
+            it = current_goals.erase(it);
+            ROS_INFO("ax12 goal aborted for motor id %d", motor_id);
+        }
+        else
+        {
+            feedback_.position = curr_position;
+            it->publishFeedback(feedback_);
+            it++;
+        }
+
     }
 
 }
@@ -272,22 +323,23 @@ Ax12Server::Ax12Server(std::string name) :
     set_ros_params(def_file_path);
 
 
-    // port = fetch_port(PORT_FINDER_SERVICE);
+    port = fetch_port(PORT_FINDER_SERVICE);
 
 
     port = "/dev/ttyACM0";
-    //init_workbench(port);
-
-
+    init_workbench(port);
 
     ROS_INFO("drivers_ax12 action server initialized (port %s), waiting for goals...", port.c_str());
+
+    ros::Timer timer = nh_.createTimer(ros::Duration(1.0/MAIN_FREQUENCY), boost::bind(&Ax12Server::main_loop, this, _1));
+
 }
 
 Ax12Server::~Ax12Server()
 {
 
-    for (int index = 0; index < dxl_cnt_; index++)
-        dxl_wb_.itemWrite(dxl_id_[index], "Torque_Enable", 0);
+    //for (int index = 0; index < dxl_cnt_; index++)
+    //    dxl_wb_.itemWrite(dxl_id_[index], "Torque_Enable", 0);
 
     ros::shutdown();
 }

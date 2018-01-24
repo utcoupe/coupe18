@@ -3,7 +3,8 @@
 #define DRIVERS_AX12_AX12_SERVER_H
 
 #include <string>
-#include <map>
+#include <list>
+#include <thread>
 
 #include <ros/console.h>
 #include <actionlib/server/action_server.h>
@@ -12,6 +13,8 @@
 #include <memory_definitions/GetDefinition.h>
 #include <dynamixel_workbench.h>
 
+const double MAX_STOP_TIME = 5; //number of seconds to wait not moving before confirming the goal is not reached
+const double MAIN_FREQUENCY = 30;
 const std::string DEFINITIONS_SERVICE = "/memory/definitions/get";
 const std::string PORT_FINDER_SERVICE = "/drivers/port_finder/get_port";
 const std::string DEFAULT_PORT = "/dev/ttyACM0";
@@ -37,7 +40,7 @@ protected:
     uint8_t dxl_id_[SCAN_RANGE]; // ids of all the motors connected
     uint8_t dxl_cnt_; // number of ids in above array
 
-    std::map<std::string, GoalHandle> current_goals; //maps action id to goal
+    std::list<GoalHandle> current_goals;
 
     // create messages that are used to published feedback/result
     drivers_ax12::AngleCommandFeedback feedback_;
@@ -53,6 +56,7 @@ public:
     bool init_motor(uint8_t motor_id);
     bool motor_id_exists(uint8_t motor_id);
     bool position_is_valid(uint8_t motor_id, uint16_t position);
+    void main_loop(const ros::TimerEvent&);
 
     Ax12Server(std::string name);
     ~Ax12Server();
