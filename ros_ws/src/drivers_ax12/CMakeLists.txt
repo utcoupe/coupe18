@@ -13,7 +13,6 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   drivers_port_finder
-  memory_definitions
   dynamixel_workbench_toolbox
 )
 
@@ -32,7 +31,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES drivers_ax12
-  CATKIN_DEPENDS actionlib actionlib_msgs roscpp std_msgs drivers_port_finder memory_definitions dynamixel_workbench_toolbox
+  CATKIN_DEPENDS actionlib actionlib_msgs roscpp std_msgs drivers_port_finder dynamixel_workbench_toolbox
   #DEPENDS system_lib
 )
 
