@@ -20,7 +20,7 @@ class CollisionsSubscriptions(object):
         # Preparing to get the robot's position, belt frame_id transform.
         self._tf2_pos_buffer = tf2_ros.Buffer(cache_time=rospy.Duration(5.0))
         self._tf2_pos_listener = tf2_ros.TransformListener(self._tf2_pos_buffer)
-        self._tranform_listener = tf.TransformListener()
+        self._transform_listener = tf.TransformListener()
 
         # Callback buffers
         self._nav_status = 0 #STATUS_IDLE
@@ -90,7 +90,7 @@ class CollisionsSubscriptions(object):
             center.point.y = rect.y
             center.header = rect.header
             try:
-                center_map = self._tranform_listener.transformPoint("map", center)
+                center_map = self._transform_listener.transformPoint("map", center)
                 new_belt.append(RectObstacle(Position(center_map.point.x, center_map.point.y,
                                                       self._quaternion_to_euler_angle(transform.transform.rotation)[2]),
                                                       rect.w, rect.h))
@@ -103,11 +103,13 @@ class CollisionsSubscriptions(object):
         new_lidar = []
         if msg.header.frame_id != "map":
             rospy.logwarn("Lidar obstacles not in /map tf frame, skipping.")
+            return
         for segment in msg.segments:
             new_lidar.append(SegmentObstacle(Position(segment.first_point.x, segment.first_point.y),
                                              Position(segment.last_point.x,  segment.last_point.y)))
         for circle in msg.circles:
             new_lidar.append(CircleObstacle(Position(circle.center.x, circle.center.y), circle.radius))
+
         if len(new_lidar) > 0:
             ObstaclesStack.updateLidarObjects(new_lidar)
 
