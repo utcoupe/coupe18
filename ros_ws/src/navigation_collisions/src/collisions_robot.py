@@ -1,4 +1,4 @@
-from collisions_engine import Position, Velocity, CollisionLevel, PathCheckZone, MainCheckZone
+from collisions_engine import Position, Velocity, CollisionLevel, PathCheckZone
 
 
 class NavStatus(object):
@@ -6,15 +6,14 @@ class NavStatus(object):
     STATUS_NAVIGATING = 1
 
 
-class Robot(object):
+class Robot(object): #TODO Inherit from RectObstacle
     def __init__(self, width, height):
         self.width = width
         self.height = height
         self._position = Position(0, 0)
-        self._velocity = Velocity(0, 0)
+        self._velocity = Velocity(self.width, self.height)
         self._nav_status = NavStatus.STATUS_IDLE
 
-        self._main_check_zone = MainCheckZone(self.width, self.height, CollisionLevel.LEVEL_STOP)
         self._path_check_zone = PathCheckZone(self.width, self.height, CollisionLevel.LEVEL_DANGER)
 
     def update_position(self, tuple3):
@@ -33,12 +32,12 @@ class Robot(object):
         self._path_check_zone.update_waypoints(new_waypoints)
 
     def get_main_shapes(self):
-        return self._main_check_zone.get_shapes(self._position, self._velocity)
+        return self._velocity.get_shapes(self._position)
 
     def get_path_shapes(self):
         return self._path_check_zone.get_shapes(self._position)
 
     def check_collisions(self, obstacles):
-        return self._main_check_zone.check_collisions(self._position, self._velocity, obstacles) + \
+        return self._velocity.check_collisions(self._position, obstacles) + \
                self._path_check_zone.check_collisions(self._position, obstacles)
         # TODO remove duplicate collisions between the two

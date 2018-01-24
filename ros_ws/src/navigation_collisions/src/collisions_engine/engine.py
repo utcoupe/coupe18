@@ -19,8 +19,15 @@ class CollisionsResolver(object):
         collisions = []
         for robot_shape in robot_shapes:
             for obstacle_shape in obstacles_shapes:
+                intersecting = False
                 if CollisionsResolver.intersect(robot_shape, obstacle_shape):
                     collisions.append(obstacle_shape)
+                    intersecting = True
+
+                if obstacle_shape.velocity is not None and not intersecting: # if the obstacle has a velocity, check its velocity zone too.
+                    for vel_shape in obstacle_shape.velocity.get_shapes():
+                        if CollisionsResolver.intersect(robot_shape, vel_shape):
+                            collisions.append(vel_shape)
         return collisions
 
     @staticmethod

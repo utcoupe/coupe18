@@ -4,7 +4,7 @@ import tf2_ros, tf
 
 from obstacles_stack import Map, ObstaclesStack
 from collisions_robot import Robot
-from collisions_engine import Point, Position, SegmentObstacle, RectObstacle, CircleObstacle
+from collisions_engine import Point, Position, Velocity, SegmentObstacle, RectObstacle, CircleObstacle
 from status_services import StatusServices
 
 from geometry_msgs.msg import PointStamped
@@ -108,7 +108,10 @@ class CollisionsSubscriptions(object):
             new_lidar.append(SegmentObstacle(Position(segment.first_point.x, segment.first_point.y),
                                              Position(segment.last_point.x,  segment.last_point.y)))
         for circle in msg.circles:
-            new_lidar.append(CircleObstacle(Position(circle.center.x, circle.center.y), circle.radius))
+            vel_d = math.sqrt(circle.velocity.y ** 2 + circle.velocity.x ** 2)
+            vel_a = math.atan2(circle.velocity.y, circle.velocity.x)
+            new_lidar.append(CircleObstacle(Position(circle.center.x, circle.center.y, angle = vel_a), 
+                                            circle.radius, velocity = Velocity(circle.radius, circle.radius, vel_d, 0.0)))
 
         if len(new_lidar) > 0:
             ObstaclesStack.updateLidarObjects(new_lidar)
