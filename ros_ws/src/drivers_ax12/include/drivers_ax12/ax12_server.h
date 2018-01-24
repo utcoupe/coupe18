@@ -16,6 +16,7 @@
 const double MAX_STOP_TIME = 5; //number of seconds to wait not moving before confirming the goal is not reached
 const double MAIN_FREQUENCY = 30;
 const std::string DEFINITIONS_SERVICE = "/memory/definitions/get";
+const std::string DEFINITION_PATH = "drivers/ax12.yaml";
 const std::string PORT_FINDER_SERVICE = "/drivers/port_finder/get_port";
 const std::string DEFAULT_PORT = "/dev/ttyACM0";
 const uint32_t BAUD_RATE = 10000000;
