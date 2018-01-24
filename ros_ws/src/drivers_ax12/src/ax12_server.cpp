@@ -34,7 +34,7 @@ void Ax12Server::init_workbench(const std::string& port)
 
         if(!ros::param::has(param_key))
         {
-            ROS_WARN("No definition for AX-12 with ID %d, it will be ignored", ids[i])
+            ROS_WARN("No definition for AX-12 with ID %d, it will be ignored", ids[i]);
         }
         else
         {
@@ -183,6 +183,20 @@ void Ax12Server::execute_goal_cb(GoalHandle goal_handle)
     }
 
     goal_handle.setAccepted();
+
+    for(auto it = current_goals.begin(); it != current_goals.end();)
+    {
+        if(it->getGoal()->motor_id == motor_id)
+        {
+            it->setCanceled();
+            ROS_INFO("AX-12 action server received a goal for motor ID %d while another goal was running for that motor. The old goal was canceled.", motor_id);
+            it = current_goals.erase(it);
+        }
+        else
+        {
+            it++;
+        }
+    }
 
     success &= dxl_wb_.goalSpeed(motor_id, speed);
     success &= dxl_wb_.goalPosition(motor_id, position);
