@@ -6,7 +6,7 @@ from engine_shapes_attrib import Point, Position
 class MapObstacle(object):
     def __init__(self, position, velocity = None):
         self.position = position
-        self.pelocity = velocity
+        self.velocity = velocity
         self.spawn_time = time.time()
 
 

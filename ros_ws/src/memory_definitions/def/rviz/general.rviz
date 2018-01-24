@@ -9,8 +9,7 @@ Panels:
         - /World Markers1/Namespaces1
         - /Navigation Markers1
         - /Navigation Markers1/Namespaces1
-        - /LaserScan1
-        - /Obstacles1
+        - /Lidar Obstacles1
       Splitter Ratio: 0.517756999
     Tree Height: 1537
   - Class: rviz/Selection
@@ -117,6 +116,7 @@ Visualization Manager:
       Name: Navigation Markers
       Namespaces:
         collisions_main: true
+        collisions_obstacles: true
       Queue Size: 100
       Value: true
     - Alpha: 0.600000024
@@ -153,7 +153,7 @@ Visualization Manager:
       Class: Obstacles
       Enabled: true
       Margin color: 0; 170; 0
-      Name: Obstacles
+      Name: Lidar Obstacles
       Opacity: 0.75
       Segments color: 170; 170; 0
       Segments thickness: 0.0299999993
@@ -184,25 +184,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 4.64238787
+      Distance: 9.16324997
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 1.44829309
-        Y: 0.994057119
-        Z: 0.400546014
+        X: 1.77386117
+        Y: 0.158882126
+        Z: 0.0616588555
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.789796352
+      Pitch: 1.04479599
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.48318624
+      Yaw: 2.63818645
     Saved: ~
 Window Geometry:
   Displays:

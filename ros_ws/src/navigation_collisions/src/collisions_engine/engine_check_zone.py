@@ -19,25 +19,38 @@ class CheckZone(object):
         raise NotImplementedError("Must be overwritten.")
 
 
-class MainCheckZone(CheckZone):
+class VelocityCheckZone(CheckZone):
     def __init__(self, width, height, collision_level):
-        super(MainCheckZone, self).__init__(width, height, collision_level)
+        super(VelocityCheckZone, self).__init__(width, height, collision_level)
 
-    def get_shapes(self, robot_pos, velocity):
-        w, h = self._height + CollisionThresholds.get_stop_distance(velocity.linear), self._width
+    def get_shapes(self, robot_pos, vel_linear, vel_angular):
+        w, h = self._height + CollisionThresholds.get_stop_distance(vel_linear), self._width
         l = w / 2.0 - self._height / 2.0
-        side_a = math.pi if velocity.linear < 0 else 0
+        side_a = math.pi if vel_linear < 0 else 0
         return [RectObstacle(Position(robot_pos.x + l * math.cos(robot_pos.a + side_a),
                                       robot_pos.y + l * math.sin(robot_pos.a + side_a),
                                       robot_pos.a), w, h)]
 
-    def check_collisions(self, robot_pos, robot_vel, obstacles):
+    def check_collisions(self, robot_pos, vel_linear, vel_angular, obstacles):
         collisions = []
-        for o in CollisionsResolver.find_collisions(self.get_shapes(robot_pos, robot_vel), obstacles):
+        for o in CollisionsResolver.find_collisions(self.get_shapes(robot_pos, vel_linear, vel_angular), obstacles):
             approx_d = math.sqrt((robot_pos.x - o.position.x) ** 2 + \
                                  (robot_pos.y - o.position.y) ** 2) # Very approximate distance
             collisions.append(Collision(CollisionLevel.LEVEL_STOP, o, approx_d))
         return collisions
+
+
+class Velocity(object):
+    def __init__(self, width, height, linear = 0.0, angular = 0.0):
+        self.linear = linear
+        self.angular = angular
+        self._check_zone = VelocityCheckZone(width, height, CollisionLevel.LEVEL_STOP)
+
+    def get_shapes(self, object_pos):
+        return self._check_zone.get_shapes(object_pos, self.linear, self.angular)
+
+    def check_collisions(self, object_pos, obstacles): # Used only for the robot itself, not obstacles.
+        return self._check_zone.check_collisions(object_pos, self.linear, self.angular, obstacles)
 
 
 class PathCheckZone(CheckZone):

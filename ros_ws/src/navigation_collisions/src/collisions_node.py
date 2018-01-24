@@ -40,8 +40,8 @@ class CollisionsNode():
             if self.active:
                 for c in Map.Robot.check_collisions(ObstaclesStack.toList()):
                     self.publish_collision(c)
+                self.markers.publishCheckZones(Map.Robot)
 
-            self.markers.publishCheckZones(Map.Robot)
             self.markers.publishObstacles(ObstaclesStack.toList())
 
             ObstaclesStack.garbageCollect()

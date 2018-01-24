@@ -22,8 +22,14 @@ class MarkersPublisher(object):
 
     def publishObstacles(self, obstacles): # Temporaire ?
         if self._is_connected():
+            counter = 0
             for i, obs in enumerate(obstacles):
-                self._publish_marker("collisions_obstacles", i, obs, 0.35, 0.35 / 2.0, (1.0, 0.8, 0.3, 0.8))
+                self._publish_marker("collisions_obstacles", i + counter, obs, 0.35, 0.35 / 2.0, (1.0, 0.8, 0.3, 0.8))
+
+                if obs.velocity is not None: # if the bostacle has a velocity, draw its rect too.
+                    for vel_shape in obs.velocity.get_shapes(obs.position):
+                        counter += 1
+                        self._publish_marker("collisions_obstacles", i + counter, vel_shape, 0.02, 0.01, (1.0, 0.0, 0.0, 0.8))
 
     def _publish_marker(self, ns, index, obj, z_scale, z_height, color):
         markertypes = {
