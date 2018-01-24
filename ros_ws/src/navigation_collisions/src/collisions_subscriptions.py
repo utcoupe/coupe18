@@ -110,8 +110,9 @@ class CollisionsSubscriptions(object):
         for circle in msg.circles:
             vel_d = math.sqrt(circle.velocity.y ** 2 + circle.velocity.x ** 2)
             vel_a = math.atan2(circle.velocity.y, circle.velocity.x)
-            new_lidar.append(CircleObstacle(Position(circle.center.x, circle.center.y, angle = vel_a), 
-                                            circle.radius, velocity = Velocity(circle.radius, circle.radius, vel_d, 0.0)))
+            new_lidar.append(CircleObstacle(Position(circle.center.x, circle.center.y, angle = vel_a),
+                                            circle.radius, velocity = Velocity(circle.radius * 2, circle.radius * math.sqrt(3.0) / 2.0, 
+                                            vel_d, 0.0)))
 
         if len(new_lidar) > 0:
             ObstaclesStack.updateLidarObjects(new_lidar)
