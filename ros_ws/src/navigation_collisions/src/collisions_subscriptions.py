@@ -13,7 +13,7 @@ from memory_map.srv import MapGet
 from navigation_navigator.msg import Status
 from drivers_ard_asserv.msg import RobotSpeed
 from processing_belt_interpreter.msg import BeltFiltered
-from obstacle_detector.msg import Obstacles
+from processing_lidar_objects.msg import Obstacles
 
 class CollisionsSubscriptions(object):
     def __init__(self):
