@@ -13,7 +13,7 @@ class AsservController {
     Ros.listen('/drivers/ard_asserv/speed', function (e) {
       this.pushDataToChart(0, e.pwm_speed_left);
       this.pushDataToChart(1, e.pwm_speed_right);
-      this.pushDataToChart(5, e.wheel_speed_right);
+      this.pushDataToChart(5, e.wheel_speed_left);
       this.pushDataToChart(7, e.wheel_speed_right);
       this.pushDataToChart(6, e.linear_speed);
 
