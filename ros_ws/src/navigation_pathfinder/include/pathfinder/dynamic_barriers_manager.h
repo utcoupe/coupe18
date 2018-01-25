@@ -2,7 +2,9 @@
 #define DYNAMIC_BARRIERS_MANAGER_H
 
 #include "pathfinder/point.h"
+#include "pathfinder/BarriersSubscribers/abstract_barriers_subscriber.h"
 
+#include <memory>
 #include <vector>
 
 class DynamicBarriersManager
@@ -13,8 +15,7 @@ public:
     bool hasBarriers(const Point& pos);
     
 private:
-    std::vector< std::vector<bool> > occupancy; // TODO May change in the future, depending of the needs.
-    // TODO Add enemy_tracker client
+    std::vector< std::unique_ptr<AbstractBarriersSubscriber> > subscribers;
 };
 
 #endif // DYNAMIC_BARRIERS_MANAGER_H

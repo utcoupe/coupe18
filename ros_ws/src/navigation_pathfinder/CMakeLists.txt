@@ -9,6 +9,8 @@ find_package(catkin REQUIRED COMPONENTS
     genmsg
     geometry_msgs
     dynamic_reconfigure
+    processing_belt_interpreter
+#     processing_lidar_objects
 )
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH}) # Please note the use of CMAKE_CURRENT_SOURCE_DIR
