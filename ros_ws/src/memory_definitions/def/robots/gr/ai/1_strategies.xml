@@ -52,13 +52,6 @@
 				</target_pos>
 			</orderref>
 
-			<orderref ref="asserv_goto" name="going to (1, 1)">
-				<target_pos>
-					<x>2.3</x>
-					<y>0.3</y>
-					<theta>0</theta>
-				</target_pos>
-			</orderref>
 		</actions>
 		<actions_onfinish name="Actions after game">
 		</actions_onfinish>

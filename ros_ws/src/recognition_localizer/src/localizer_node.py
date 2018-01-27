@@ -3,6 +3,7 @@ import rospy
 import tf
 import tf2_ros
 from geometry_msgs.msg import Pose2D, TransformStamped
+from ai_game_status import StatusServices
 
 
 class Localizer(object):
@@ -19,14 +20,15 @@ class Localizer(object):
 
         self._data_asserv = None
 
-        rospy.loginfo("Localizer node initialized")
+        # Tell ai/game_status the node initialized successfuly.
+        StatusServices("recognition", "localizer").ready(True)
 
     def callback_asserv(self, data):
         self._data_asserv = data
 
     def run(self):
         rospy.loginfo("Localizer node started")
-        rate = rospy.Rate(25)
+        rate = rospy.Rate(100)
         while not rospy.is_shutdown():
             data = self.calculate()
             if data:

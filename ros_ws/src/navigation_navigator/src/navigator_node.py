@@ -15,6 +15,9 @@ from asserv import AsservClient
 from localizer import LocalizerClient
 from collisions import CollisionsClient
 
+from ai_game_status import StatusServices
+
+
 __author__ = "Gaëtan Blond"
 __date__ = 17/10/2017
 
@@ -62,7 +65,10 @@ class NavigatorNode(object):
 
         self._currentStatus = NavigatorStatuses.NAV_IDLE
         self._currentPath = {}
-    
+
+        # Tell ai/game_status the node initialized successfuly.
+        StatusServices("navigation", "navigator").ready(True)
+
     def _callbackForResults(self, idAct, result):
         """
         Callback called when a goto action to asserv ended.
@@ -75,7 +81,7 @@ class NavigatorNode(object):
             self._waitedResults[idAct] = GotoStatuses.SUCCESS
         else:
             self._waitedResults[idAct] = GotoStatuses.FAILURE
-    
+
     def _waitResult(self, idAct):
         """
         Wait for a goto (asserv) action to end.
@@ -143,6 +149,7 @@ class NavigatorNode(object):
             if (not resultAsserv) or (self._currentStatus == NavigatorStatuses.NAV_STOPPED):
                 result.success = False
             self._currentStatus = NavigatorStatuses.NAV_IDLE
+            self._collisionsClient.setEnabled(False)
             handledGoal.set_succeeded(result)
 
     def _handleDoGotoRequest (self, handledGoal):
@@ -155,6 +162,7 @@ class NavigatorNode(object):
         @param handledGoal: the received goal
         """
         self._currentStatus = NavigatorStatuses.NAV_NAVIGATING
+        self._collisionsClient.setEnabled(not handledGoal.get_goal().disable_collisions)
         posStart = self._localizerClient.getLastKnownPos()
         posEnd = handledGoal.get_goal().target_pos
         debugStr = "Asked to go from "
@@ -181,6 +189,7 @@ class NavigatorNode(object):
             rospy.logdebug("Navigation failed: " + e.message)
             result = DoGotoResult(False)
             self._currentStatus = NavigatorStatuses.NAV_IDLE
+            self._collisionsClient.setEnabled(False)
             self._updateStatus()
             handledGoal.set_succeeded(result)
 
@@ -194,9 +203,10 @@ class NavigatorNode(object):
 
     def _callbackAsservResume(self):
         self._currentStatus = NavigatorStatuses.NAV_NAVIGATING
+        self._collisionsClient.setEnabled(True)
         self._asservClient.resumeAsserv()
         self._updateStatus()
-    
+
     def _updateStatus (self):
         """
         Send the current status and waypoint list in the navigator's status topic.
@@ -206,7 +216,7 @@ class NavigatorNode(object):
         if len(self._currentPath) > 0:
             statusMsg.currentPath = self._currentPath
         self._statusPublisher.publish(statusMsg)
-        
+
 
     def startNode(self):
         """
@@ -234,4 +244,3 @@ if __name__ == "__main__":
         node.startNode ()
     except rospy.ROSInterruptException:
         pass
-

@@ -15,6 +15,7 @@
     <depend>geometry_msgs</depend>
     <depend>actionlib</depend>
     <depend>actionlib_msgs</depend>
+    <depend>drivers_port_finder</depend>
     <exec_depend>message_runtime</exec_depend>
     <export>
     </export>

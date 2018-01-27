@@ -4,6 +4,7 @@ import rospy
 
 from ai_game_status.msg import GameStatus
 from ai_game_status.srv import SetStatus
+from ai_game_status import StatusServices
 
 from ai_timer.srv import SetTimer, SetTimerResponse, Delay, DelayResponse
 from ai_timer.msg import GameTime
@@ -55,6 +56,9 @@ class TimerNode():
         self._game_status = Status.STATUS_INIT
 
         self.timer = TimerManager()
+
+        # Tell ai/game_status the node initialized successfuly.
+        StatusServices("ai", "timer").ready(True)
 
         r = rospy.Rate(5)
         while not rospy.is_shutdown():

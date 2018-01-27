@@ -16,6 +16,7 @@ class MarkersPublisher():
     def updateMarkers(self, world):
         if self._is_connected():
             self._publish_table(world)
+            self._publish_robot_stl(world)
             self._update_zones(world)
             self._publish_objects(world.get("/objects/^"))
 
@@ -27,6 +28,15 @@ class MarkersPublisher():
             "type": "fixed"
         })
         self._publish_marker(pos, world.get("/terrain/marker/^"))
+
+    def _publish_robot_stl(self, world):
+        pos = map_attributes.Position2D({
+            "frame_id": "/robot",
+            "x": 0,
+            "y": 0,
+            "type": "fixed"
+        })
+        self._publish_marker(pos, world.get("/entities/{}/marker/^".format(rospy.get_param("/robot"))))
 
     def _update_zones(self, world):
         for z in world.get("/zones/^").toList():
@@ -53,8 +63,8 @@ class MarkersPublisher():
 
         marker.action = Marker.ADD
         marker.scale.x = visual.get("scale")[0]
-        marker.scale.z = visual.get("scale")[1]
-        marker.scale.y = visual.get("scale")[2]
+        marker.scale.y = visual.get("scale")[1]
+        marker.scale.z = visual.get("scale")[2]
         marker.color.r = visual.get("color")[0]
         marker.color.g = visual.get("color")[1]
         marker.color.b = visual.get("color")[2]
