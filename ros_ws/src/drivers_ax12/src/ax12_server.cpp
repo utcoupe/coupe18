@@ -1,5 +1,5 @@
 #include "drivers_ax12/ax12_server.h"
-
+#include "drivers_ax12/lib/dynamixel.h"
 
 void Ax12Server::init_workbench(const std::string& port)
 {
@@ -9,16 +9,29 @@ void Ax12Server::init_workbench(const std::string& port)
      */
 
     std::string param_key;
+    int8_t port_index;
+    size_t port_num_index = port.find_last_of("0123456789");
+    port_index = port[port_num_index] - '0';
 
-    if(!dxl_wb_.begin(port.c_str(), BAUD_RATE)) {
-        ROS_FATAL("Unable to initialize the AX-12 dynamixel workbench (port: %s, baudrate: %d)", port.c_str(), BAUD_RATE);
+    if(port_num_index == std::string::npos || port_index < 0 || port_index > 9) {
+        ROS_ERROR("Unable to get the port index from the port %s", port.c_str());
+    }
+
+    if(!dxl_initialize(port_index, BAUD_RATE_INDEX)) {
+        ROS_FATAL("Unable to initialize the AX-12 library (port index: %d, baudrate index: %d)", port_index, BAUD_RATE_INDEX);
         ros::shutdown();
         return;
     }
 
-    if(!dxl_wb_.scan(dxl_id_, &dxl_cnt_, SCAN_RANGE))
-    {
-        ROS_ERROR("Unable to scan the AX-12 motors on %s", port.c_str());
+    for(uint8_t i = 0; i < SCAN_RANGE; i++) {
+        dxl_ping(i);
+        usleep(10000);
+
+        if(dxl_get_result() == COMM_RXSUCCESS)
+        {
+            ROS_DEBUG("AX-12 detected with id %d", i);
+            dxl_id_[dxl_cnt_++] = i;
+        }
     }
 
     ROS_INFO("Found %d AX-12 motors connected with a scan range of %d", dxl_cnt_, SCAN_RANGE);
@@ -47,8 +60,8 @@ bool Ax12Server::position_is_valid(uint8_t motor_id, uint16_t position)
      * Returns true if the position is within the range [min; max]
      */
 
-    int32_t min = dxl_wb_.itemRead(motor_id, "CW_Angle_Limit");
-    int32_t max = dxl_wb_.itemRead(motor_id, "CCW_Angle_Limit");
+    int32_t min = dxl_read_word(motor_id, CW_ANGLE_LIMIT_ADDR);
+    int32_t max = dxl_read_word(motor_id, CCW_ANGLE_LIMIT_ADDR);
 
     if(min < max)
     {
@@ -69,7 +82,6 @@ void Ax12Server::execute_goal_cb(GoalHandle goal_handle)
      * to move and adds the goal to the list of current goals
      */
 
-    bool success = true;
     auto goal = goal_handle.getGoal();
     uint8_t motor_id = goal->motor_id;
 
@@ -102,7 +114,7 @@ bool Ax12Server::handle_joint_goal(GoalHandle goal_handle)
     auto goal = goal_handle.getGoal();
     uint8_t motor_id = goal->motor_id;
     uint16_t position = goal->position;
-    bool success = true;
+    bool success;
 
     if(!position_is_valid(motor_id, position))
     {
@@ -135,8 +147,15 @@ bool Ax12Server::handle_joint_goal(GoalHandle goal_handle)
         }
     }
 
-    success &= dxl_wb_.jointMode(motor_id, speed, 50);
-    success &= dxl_wb_.goalPosition(motor_id, position);
+    //set joint mode
+    dxl_write_byte(motor_id, TORQUE_ENABLE_ADDR, 0);
+    dxl_write_word(motor_id, CW_ANGLE_LIMIT_ADDR, 0);
+    dxl_write_word(motor_id, CCW_ANGLE_LIMIT_ADDR, 1023);
+    dxl_write_byte(motor_id, TORQUE_ENABLE_ADDR, 1);
+    dxl_write_word(motor_id, MOVING_SPEED_ADDR, speed);
+    dxl_write_word(motor_id, GOAL_POSITION_ADDR, position);
+
+    success = dxl_get_result() == COMM_TXSUCCESS || dxl_get_result() == COMM_RXSUCCESS;
 
     if(!success) {
         goal_handle.setAborted();
@@ -179,7 +198,14 @@ bool Ax12Server::handle_wheel_goal(GoalHandle goal_handle)
         }
     }
 
-    success = dxl_wb_.wheelMode(motor_id, speed, 50);
+    // wheel mode
+    dxl_write_byte(motor_id, TORQUE_ENABLE_ADDR, 0);
+    dxl_write_word(motor_id, CW_ANGLE_LIMIT_ADDR, 0);
+    dxl_write_word(motor_id, CCW_ANGLE_LIMIT_ADDR, 0);
+    dxl_write_byte(motor_id, TORQUE_ENABLE_ADDR, 1);
+    dxl_write_word(motor_id, MOVING_SPEED_ADDR, speed);
+
+    success = dxl_get_result() == COMM_TXSUCCESS || dxl_get_result() == COMM_RXSUCCESS;
 
     if(!success) {
         goal_handle.setAborted();
@@ -207,9 +233,9 @@ void Ax12Server::main_loop(const ros::TimerEvent&)
     for(auto it = joint_goals.begin(); it != joint_goals.end();)
     {
         motor_id = it->getGoal()->motor_id;
-        curr_position = dxl_wb_.itemRead(motor_id, "Present_Position");
+        curr_position = dxl_read_word(motor_id, PRESENT_POSITION_ADDR);
 
-        if(dxl_wb_.itemRead(motor_id, "Moving"))
+        if(dxl_read_byte(motor_id, MOVING_ADDR))
         {
             feedback_.position = curr_position;
             it->publishFeedback(feedback_);

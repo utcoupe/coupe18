@@ -13,7 +13,6 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   drivers_port_finder
-  dynamixel_workbench_toolbox
 )
 
 add_action_files(
@@ -31,7 +30,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES drivers_ax12
-  CATKIN_DEPENDS actionlib actionlib_msgs roscpp std_msgs drivers_port_finder dynamixel_workbench_toolbox
+  CATKIN_DEPENDS actionlib actionlib_msgs roscpp std_msgs drivers_port_finder
   #DEPENDS system_lib
 )
 
@@ -40,12 +39,15 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+find_library(DXL_LIB dxl ${PROJECT_SOURCE_DIR}/lib)
+
 add_executable(ax12_node src/ax12_node.cpp src/ax12_server.cpp)
 
 add_dependencies(ax12_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(
   ax12_node
+  ${DXL_LIB}
   ${catkin_LIBRARIES}
 )
 

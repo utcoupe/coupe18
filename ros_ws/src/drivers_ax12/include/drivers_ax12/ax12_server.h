@@ -11,13 +11,24 @@
 #include <drivers_ax12/AngleCommandAction.h>
 #include <drivers_port_finder/GetPort.h>
 #include <memory_definitions/GetDefinition.h>
-#include <dynamixel_workbench.h>
+
+// words
+const int CW_ANGLE_LIMIT_ADDR = 6;
+const int CCW_ANGLE_LIMIT_ADDR = 8;
+const int GOAL_POSITION_ADDR = 30;
+const int MOVING_SPEED_ADDR = 32;
+const int PRESENT_POSITION_ADDR = 36;
+
+// bytes
+const int TORQUE_ENABLE_ADDR = 24;
+const int MOVING_ADDR = 46;
+
 
 const double MAX_STOP_TIME = 5; //number of seconds to wait not moving before confirming the goal is not reached
 const double MAIN_FREQUENCY = 30;
 const std::string PORT_FINDER_SERVICE = "/drivers/port_finder/get_port";
 const std::string DEFAULT_PORT = "/dev/ttyACM0";
-const uint32_t BAUD_RATE = 10000000;
+const uint32_t BAUD_RATE_INDEX = 1; //baudrate = 2000000 / (index + 1)
 const uint8_t SCAN_RANGE = 20;
 
 
@@ -30,8 +41,6 @@ class Ax12Server
 protected:
     ros::NodeHandle nh_;
     actionlib::ActionServer<drivers_ax12::AngleCommandAction> as_;
-
-    DynamixelWorkbench dxl_wb_; // workbench to communicate with motors
 
     uint8_t dxl_id_[SCAN_RANGE]; // ids of all the motors connected
     uint8_t dxl_cnt_; // number of ids in above array
@@ -54,10 +63,6 @@ public:
     bool handle_wheel_goal(GoalHandle goal_handle);
     Ax12Server(std::string name);
     ~Ax12Server();
-
-
-
-
 };
 
 #endif //DRIVERS_AX12_AX12_SERVER_H
