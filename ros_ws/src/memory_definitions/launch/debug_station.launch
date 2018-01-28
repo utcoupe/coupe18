@@ -1,5 +1,5 @@
 <launch>
-	<arg name="robot" default="GR" />
+	<arg name="robot" default="gr" />
 
     <param name="robot"  value="$(arg robot)" />
 

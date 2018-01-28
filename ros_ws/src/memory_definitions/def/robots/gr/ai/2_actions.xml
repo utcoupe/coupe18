@@ -23,7 +23,7 @@
 			<actionref ref="jack" needsprevious="true"/>
 
 			<orderref ref="timer_start" needsprevious="true">
-				<duration>20</duration>
+				<duration>97</duration>
 			</orderref>
 
 			<orderref ref="set_game_status_ingame" needsprevious="true"/>
