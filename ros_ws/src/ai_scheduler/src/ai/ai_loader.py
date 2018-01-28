@@ -47,7 +47,7 @@ class AILoader():
         if len(strategy_xml) == 1:
             return Strategy(strategy_xml[0], actions, orders, communicator)
         else:
-            rospy.logerr("FAIL Too many or no strategy to load with the given name. Aborting.")
+            rospy.logerr("FAIL Too many or no strategy to load with name '{}'. Aborting.".format(strategyname))
             return None
 
     def _get_path(self, filename):

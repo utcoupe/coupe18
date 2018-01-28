@@ -15,6 +15,13 @@ class Condition(object):
         self.value = xml.tag
         self.check = self.modes[self.mode]
 
+    def _check_attrib_keys_exist(self, xml, *keys_required):
+        for k in keys_required:
+            if k not in xml.attrib:
+                m = "{} condition needs a '{}' attribute.".format(self.TYPE_NAME, k)
+                rospy.logerr(m)
+                raise ValueError(m)
+
 
 def ConditionCreator(xml):
     if "type" not in xml.attrib:
@@ -36,8 +43,7 @@ class MapDictCondition(Condition):
             "is_equal": self._mode_is_equal
         }
 
-        if "path" not in xml.attrib:
-            raise KeyError("MapDict condition needs a 'path' attribute.")
+        self._check_attrib_keys_exist(xml, "path")
         self.path = xml.attrib["path"]
 
         super(MapDictCondition, self).__init__(xml)
@@ -56,7 +62,21 @@ class MapDictCondition(Condition):
 
 class TFCondition(Condition):
     TYPE_NAME = "tf"
-    pass
+
+    def __init__(self, xml):
+        self.modes = {
+            "is_equal": self._mode_max_distance
+        }
+
+        self._check_attrib_keys_exist(xml, "origin_frame", "target_frame")
+        self.origin_frame = xml.attrib["origin_frame"]
+        self.target_frame = xml.attrib["target_frame"]
+
+        super(TFCondition, self).__init__(xml)
+
+    def _mode_max_distance(self, communication):
+        transform = communication.GetTFTransform(self.origin_frame, self.target_frame)
+        return False
 
 
 class MemoryCompareCondition(Condition):

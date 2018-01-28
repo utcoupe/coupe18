@@ -11,8 +11,8 @@ class Strategy(Task):
         self.loadxml(xml, actions, orders)
 
     def loadxml(self, xml, actions, orders):
-        # Game Properties
-        GameProperties.GAME_DURATION = int(xml.find('game').find("time").text) # Save game duration in seconds
+        # Game Properties TODO DEPRECATED, remove ?
+        # GameProperties.GAME_DURATION = int(xml.find('game').find("time").text) # Save game duration in seconds
 
         # Fill actions
         self.TASKS = ActionList(xml.find("actions"), actions, orders)

@@ -1,59 +1,31 @@
 <strategies>
-	<!-- STRATEGY to test init workflow, SetPos, Navigation DoGoto -->
-	<strategy name="test_nav">
-		<game><time>100</time></game>
+	<!-- STRATEGY real game actions ! -->
+	<strategy name="button_then_distrib">
 		<actions name="In-Game Actions">
-			<actionref ref="jack"/>
+			<actionref ref="game_start"/>
 
-			<nextneedsprevious/>
-      		<orderref ref="timer_start">
-			  	<duration>97</duration>
-			</orderref>
+			<actionlist name="Main actions" needsprevious="true">
+				<actionref ref="activate_button"/>
 
-			<nextneedsprevious/>
-			<orderref ref="set_robot_pos">
-				<position>
-					<x>0.5</x>
-					<y>0.5</y>
-					<theta>0</theta>
-				</position>
-			</orderref>
+				<actionlist name="Do unicolor distributor">
+					<actionref ref="load_unicolor_distributor"/>
+					<actionref ref="fire_clean_balls" needsprevious="true"/>
+				</actionlist>
 
-			<nextneedsprevious/>
-			<orderref ref="set_game_status_ingame"/>
+				<actionlist name="Do multicolor distributor">
+					<actionref ref="load_multicolor_distributor"/>
+					<actionlist name="Unload multi balls" needsprevious="true">
+						<actionref ref="unload_dirty_balls"/>
+						<actionref ref="fire_clean_balls"/>
+					</actionlist>
+				</actionlist>
 
-			<nextneedsprevious/>
-			<orderref ref="delay">
-				<duration>1</duration>
-			</orderref>
+				<actionref ref="activate_bee"/>
+			</actionlist>
 
-			<nextneedsprevious/>
-			<orderref ref="asserv_goto" name="going to (1, 1)">
-				<target_pos>
-					<x>2.5</x>
-					<y>1.5</y>
-					<theta>0</theta>
-				</target_pos>
-			</orderref>
-
-			<orderref ref="asserv_goto" name="going to (1, 1)">
-				<target_pos>
-					<x>0.5</x>
-					<y>1.5</y>
-					<theta>0</theta>
-				</target_pos>
-			</orderref>
-
-			<orderref ref="asserv_goto" name="going to (1, 1)">
-				<target_pos>
-					<x>0.5</x>
-					<y>0.5</y>
-					<theta>0</theta>
-				</target_pos>
-			</orderref>
-
+			<actionref ref="goto_spawn"/>
 		</actions>
-		<actions_onfinish name="Actions after game">
+		<actions_onfinish name="After-Game Actions">
 		</actions_onfinish>
 	</strategy>
 </strategies>

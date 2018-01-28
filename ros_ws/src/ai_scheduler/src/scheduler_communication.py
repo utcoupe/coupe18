@@ -7,35 +7,41 @@ from ai_scheduler.msg import TaskResult
 import ai_scheduler.srv
 
 import navigation_navigator.msg
+import movement_actuators.msg
 import memory_map.srv
 import ai_game_status.srv
 import ai_timer.srv
 import drivers_ard_hmi.msg
 import drivers_ard_asserv.srv
 
-class RequestTypes():
+class RequestTypes(object):
     PUB_MSG = 0
     SUB_MSG = 1
     SERVICE = 2
     ACTION  = 3
 
-    SERVERS = {
-        "/ai/game_status/set_status":        (RequestTypes.SERVICE, ai_game_status.srv.SetStatus),
-        "/ai/timer/set_timer":               (RequestTypes.SERVICE, ai_timer.srv.SetTimer),
-        "/ai/timer/delay":                   (RequestTypes.SERVICE, ai_timer.srv.Delay),
+    SERVERS = None
 
-        "/memory/map/get":                   (RequestTypes.SERVICE, memory_map.srv.MapGet),
-        "/memory/map/transfer":              (RequestTypes.SERVICE, memory_map.srv.MapTransfer),
+    @staticmethod
+    def init():
+        RequestTypes.SERVERS = {
+            "/ai/game_status/set_status":        (RequestTypes.SERVICE, ai_game_status.srv.SetStatus),
+            "/ai/timer/set_timer":               (RequestTypes.SERVICE, ai_timer.srv.SetTimer),
+            "/ai/timer/delay":                   (RequestTypes.SERVICE, ai_timer.srv.Delay),
 
-        "/navigation/navigator/goto_action": (RequestTypes.ACTION,  navigation_navigator.msg.DoGotoAction, navigation_navigator.msg.DoGotoGoal),
+            "/memory/map/get":                   (RequestTypes.SERVICE, memory_map.srv.MapGet),
+            "/memory/map/transfer":              (RequestTypes.SERVICE, memory_map.srv.MapTransfer),
 
-        "/drivers/ard_asserv/set_pos":       (RequestTypes.SERVICE, drivers_ard_asserv.srv.SetPos),
+            "/navigation/navigator/goto_action": (RequestTypes.ACTION,  navigation_navigator.msg.DoGotoAction, navigation_navigator.msg.DoGotoGoal),
+            "/movement/actuators/dispatch":      (RequestTypes.ACTION,  movement_actuators.msg.dispatchAction, movement_actuators.msg.dispatchGoal),
 
-        "/feedback/ard_hmi/ros_event":       (RequestTypes.PUB_MSG, drivers_ard_hmi.msg.ROSEvent),
-        "/feedback/ard_hmi/hmi_event":       (RequestTypes.SUB_MSG, drivers_ard_hmi.msg.HMIEvent),
+            "/drivers/ard_asserv/set_pos":       (RequestTypes.SERVICE, drivers_ard_asserv.srv.SetPos),
 
-        "/test":                             (RequestTypes.PUB_MSG, TaskResult),
-        "/test2":                            (RequestTypes.SUB_MSG, TaskResult) }
+            "/feedback/ard_hmi/ros_event":       (RequestTypes.PUB_MSG, drivers_ard_hmi.msg.ROSEvent),
+            "/feedback/ard_hmi/hmi_event":       (RequestTypes.SUB_MSG, drivers_ard_hmi.msg.HMIEvent),
+
+            "/test":                             (RequestTypes.PUB_MSG, TaskResult),
+            "/test2":                            (RequestTypes.SUB_MSG, TaskResult) }
 
     @staticmethod
     def getRequestType(dest):
@@ -49,6 +55,9 @@ class RequestTypes():
 
 class AICommunication():
     _sub_msg_success = False
+
+    def __init__(self):
+        RequestTypes.init()
 
     def SendRequest(self, dest, params, callback = None):
         start_time = time.time()
@@ -84,11 +93,12 @@ class AICommunication():
         rospy.logwarn("waiting for message on topic '{}'...".format(dest))
         self._sub_msg_success = False
         rospy.Subscriber(dest, msg_class, self._sub_msg_callback)
+        timeout = 30 #seconds
 
         s = time.time()
-        while not self._sub_msg_success and (time.time() - s < 30): #TODO customizable timeout
+        while not self._sub_msg_success and (time.time() - s < timeout): #TODO customizable timeout
             time.sleep(0.02)
-        return TaskResult(0, "") if self._sub_msg_success else TaskResult(1, "Didn't receive any message in {} seconds.".format(15*60))
+        return TaskResult(0, "") if self._sub_msg_success else TaskResult(1, "Didn't receive any message in {} seconds.".format(timeout))
     def _sub_msg_callback(self, msg):
         self._sub_msg_success = True
 
