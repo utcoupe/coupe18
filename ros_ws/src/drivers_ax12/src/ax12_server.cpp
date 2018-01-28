@@ -24,7 +24,7 @@ void Ax12Server::init_workbench(const std::string& port)
     }
 
     for(uint8_t i = 1; i <= SCAN_RANGE; i++) {
-        ROS_DEBUG("Pinging AX-12 with id %d", i)
+        ROS_DEBUG("Pinging AX-12 with id %d", i);
         for(uint8_t j = 0; j < 100; j++) {
             dxl_ping(i);
             usleep(500);
