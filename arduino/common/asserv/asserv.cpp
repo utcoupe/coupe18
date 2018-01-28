@@ -25,8 +25,8 @@ void asservLoop();
 void asservStatus();
 
 // Run the loop for asserv at 100 Hz
-Timer asservLoopTimer = Timer(DT, &asservLoop);
-Timer asservStatusTimer = Timer(0.1, &asservStatus);
+Timer asservLoopTimer = Timer(10, &asservLoop);
+Timer asservStatusTimer = Timer(100, &asservStatus);
 
 //TODO make it proper with others
 // Flag to know if a computer is connected to the arduino
@@ -58,7 +58,7 @@ void setup() {
 #else
     Serial.begin(BAUDRATE, SERIAL_TYPE);
 #endif
-    Serial.setTimeout(50);
+    Serial.setTimeout(5);
 
 #ifdef __AVR_ATmega2560__
 	TCCR3B = (TCCR3B & 0xF8) | 0x01 ;
