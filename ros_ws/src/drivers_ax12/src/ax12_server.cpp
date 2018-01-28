@@ -25,7 +25,7 @@ void Ax12Server::init_workbench(const std::string& port)
 
     for(uint8_t i = 1; i <= SCAN_RANGE; i++) {
         ROS_DEBUG("Pinging AX-12 with id %d", i);
-        for(uint8_t j = 0; j < 100; j++) {
+        for(uint8_t j = 0; j < PING_PASS_NBR; j++) {
             dxl_ping(i);
             usleep(500);
             if (dxl_get_result() == COMM_RXSUCCESS) {
@@ -56,6 +56,23 @@ bool Ax12Server::motor_id_exists(uint8_t motor_id)
     {
         if(dxl_id_[i] == motor_id)
             return true;
+    }
+
+    return false;
+}
+
+bool Ax12Server::motor_id_connected(uint8_t motor_id)
+{
+
+    /*
+     * Returns true if the motor is still connected
+     */
+    for(uint8_t j = 0; j < PING_PASS_NBR; j++) {
+        dxl_ping(motor_id);
+        usleep(500);
+        if (dxl_get_result() == COMM_RXSUCCESS) {
+            return true;
+        }
     }
 
     return false;
@@ -92,6 +109,13 @@ void Ax12Server::execute_goal_cb(GoalHandle goal_handle)
     if(!motor_id_exists(motor_id))
     {
         ROS_ERROR("AX-12 action server received a goal for motor ID %d, but no such motor was detected", motor_id);
+        goal_handle.setRejected();
+        return;
+    }
+
+    if(!motor_id_connected(motor_id))
+    {
+        ROS_ERROR("AX-12 action server received a goal for motor ID %d, but the motor was disconnected", motor_id);
         goal_handle.setRejected();
         return;
     }
@@ -208,7 +232,8 @@ bool Ax12Server::handle_wheel_goal(GoalHandle goal_handle)
         goal_handle.setAborted();
     } else
     {
-        goal_handle.setSucceeded();
+        result_.success = true;
+        goal_handle.setSucceeded(result_);
     }
 
     return success;
@@ -244,7 +269,7 @@ void Ax12Server::main_loop(const ros::TimerEvent&)
         if(curr_position == goal_position)
         {
             result_.success = true;
-            it->setSucceeded();
+            it->setSucceeded(result_);
             it = joint_goals.erase(it);
             ROS_INFO("AX-12 position goal succeeded for motor ID %d", motor_id);
 
@@ -252,7 +277,7 @@ void Ax12Server::main_loop(const ros::TimerEvent&)
         else if(ros::Time::now().toSec() - it->getGoalID().stamp.toSec() > MAX_STOP_TIME)
         {
             result_.success = false;
-            it->setAborted();
+            it->setAborted(result_);
             it = joint_goals.erase(it);
             ROS_ERROR("AX-12 position goal aborted for motor ID %d", motor_id);
         }

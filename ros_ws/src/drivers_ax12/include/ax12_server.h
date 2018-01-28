@@ -23,7 +23,7 @@ const int PRESENT_POSITION_ADDR = 36;
 const int TORQUE_ENABLE_ADDR = 24;
 const int MOVING_ADDR = 46;
 
-
+const uint8_t PING_PASS_NBR = 100; //number of times a motor is pinged to make sure it is connected
 const double MAX_STOP_TIME = 5; //number of seconds to wait not moving before confirming the goal is not reached
 const double MAIN_FREQUENCY = 30;
 const std::string PORT_FINDER_SERVICE = "/drivers/port_finder/get_port";
@@ -57,6 +57,7 @@ public:
     std::string fetch_port(const std::string& service_name);
     void init_workbench(const std::string& port);
     bool motor_id_exists(uint8_t motor_id);
+    bool motor_id_connected(uint8_t motor_id);
     bool position_is_valid(uint8_t motor_id, uint16_t position);
     void main_loop(const ros::TimerEvent&);
     bool handle_joint_goal(GoalHandle goal_handle);
