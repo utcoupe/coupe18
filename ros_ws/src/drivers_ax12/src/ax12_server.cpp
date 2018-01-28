@@ -1,4 +1,4 @@
-#include "drivers_ax12/ax12_server.h"
+#include "ax12_server.h"
 #include "dynamixel.h"
 
 void Ax12Server::init_workbench(const std::string& port)

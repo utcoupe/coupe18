@@ -1,5 +1,5 @@
 #include "ros/ros.h"
-#include "drivers_ax12/ax12_server.h"
+#include "ax12_server.h"
 
 int main(int argc, char** argv)
 {
