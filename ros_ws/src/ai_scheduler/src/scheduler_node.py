@@ -2,7 +2,7 @@
 import time
 import rospy
 from scheduler_communication import AICommunication
-from ai import RobotAI
+from ai import RobotAI, GameProperties
 
 from drivers_ard_hmi.msg import SetStrategies, SetTeams, HMIEvent
 from ai_game_status.srv import SetStatus
@@ -16,7 +16,7 @@ class AINode():
         rospy.init_node(self.PackageName, log_level = rospy.DEBUG)
 
         self.AI = RobotAI()
-        self.available_strategies = self.AI.get_strategies()
+        self.AI.load_game_properties() # fetch available strategies and teams
 
         self._hmi_init = False
         self._ai_start_request = False
@@ -40,12 +40,12 @@ class AINode():
     def send_strategies(self):
         pub = rospy.Publisher("/feedback/ard_hmi/set_strategies", SetStrategies, queue_size=10)
         time.sleep(0.3)
-        pub.publish(SetStrategies(self.available_strategies))
+        pub.publish(GameProperties.AVAILABLE_STRATEGIES)
 
     def send_teams(self):
         pub = rospy.Publisher("/feedback/ard_hmi/set_teams", SetTeams, queue_size=10)
         time.sleep(0.3)
-        pub.publish(["GREEN", "ORANGE"])
+        pub.publish(GameProperties.AVAILABLE_TEAMS)
 
     def send_set_ingame(self): # TODO wrong place ?
         pub = rospy.Publisher("/ai/game_status/set_status", SetStatus, queue_size=10)

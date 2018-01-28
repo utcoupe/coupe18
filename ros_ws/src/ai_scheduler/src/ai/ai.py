@@ -10,8 +10,8 @@ class RobotAI():
         self.game_status = GameStatusClient()
         self._loader = AILoader()
 
-    def get_strategies(self):
-        return self._loader.get_strategies()
+    def load_game_properties(self):
+        return self._loader.load_game_properties()
 
     def start(self, strategyname, communicator):
         strategy = self._loader.load(strategyname, communicator)
@@ -25,7 +25,6 @@ class RobotAI():
         strategy.PrettyPrint()
         # Run the whole AI until there are no orders left to execute
         while not rospy.is_shutdown():
-            print "new turnldkjfhglskdjfhglskdfjhglskdjfhglskdjfhglskdjfghlskdjfhglskdjfghsldkfjghslkdfjghlskdfjghsldkfgjhs"
             if self.game_status.status == GameStatusConstants.STATUS_HALT:
                 rospy.logwarn("[AI] detected game_status STATUS_HALT, aborting actions.")
                 break

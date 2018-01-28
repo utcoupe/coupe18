@@ -1,4 +1,9 @@
 <strategies>
+	<teams>
+		<team name="green"/>
+		<team name="orange"/>
+	</teams>
+
 	<!-- STRATEGY real game actions ! -->
 	<strategy name="button_then_distrib">
 		<actions name="In-Game Actions">

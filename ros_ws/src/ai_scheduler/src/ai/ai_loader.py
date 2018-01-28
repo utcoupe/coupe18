@@ -2,7 +2,7 @@
 import os
 import rospy
 import xml.etree.ElementTree as ET
-from tasks import Strategy, ActionList, Action, Order
+from tasks import GameProperties, Strategy, ActionList, Action, Order
 
 from memory_definitions.srv import GetDefinition
 
@@ -14,10 +14,12 @@ class AILoader():
     def __init__(self):
         pass# self.xml_dirpath = os.path.dirname(__file__) + "/../../def/"
 
-    def get_strategies(self):
+    def load_game_properties(self):
         strat_path = self._get_path(self.STRATEGIES_FILE)
         xml_strategies = ET.parse(strat_path).getroot()
-        return [child.attrib["name"] for child in xml_strategies]
+
+        GameProperties.AVAILABLE_STRATEGIES = [strat.attrib["name"] for strat in xml_strategies.findall("strategy")]
+        GameProperties.AVAILABLE_TEAMS      = [team.attrib["name"]  for team  in xml_strategies.find("teams")]
 
     def load(self, strategyname, communicator):
         orders = self._load_orders()
