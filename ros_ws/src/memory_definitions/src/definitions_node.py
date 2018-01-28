@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from memory_definitions.srv import *
+from ai_game_status import StatusServices
 import rospy
 import os
 
@@ -32,6 +33,10 @@ def server():
     rospy.init_node('definitions')
     s = rospy.Service('/memory/definitions/get', GetDefinition, callback)
     rospy.logdebug("Definitions server ready")
+
+    # Tell ai/game_status the node initialized successfuly.
+    StatusServices("memory", "definitions").ready(True)
+
     rospy.spin()
 
 

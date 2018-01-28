@@ -1,10 +1,9 @@
 #!/usr/bin/python
-'''
-Imported from ai/game_status/import folder. 
-Template script for communicating with the game_status.
-'''
-
 import rospy
+
+'''
+Imported from ai/game_status. Template for communicating with the node.
+'''
 
 from ai_game_status.msg import GameStatus
 from ai_game_status.srv import ArmRequest, ArmRequestResponse, NodeReady

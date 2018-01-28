@@ -6,6 +6,7 @@ from libtools import Rect
 from enemy_tracker_tracker import EnemiesData
 import enemy_tracker_properties
 import rospy
+from ai_game_status import StatusServices
 
 
 class EnemyTrackerNode():
@@ -14,11 +15,13 @@ class EnemyTrackerNode():
     def __init__(self):
         self._node = rospy.init_node('enemy_tracker')
         self._namespace = '/recognition/enemy_tracker/'
-        self._belt_sub = rospy.Subscriber(
-            '/processing/belt_interpreter/points', BeltFiltered, self.importPoint)
+        self._belt_sub = rospy.Subscriber('/processing/belt_interpreter/points', BeltFiltered, self.importPoint)
         self.configure(None)
         self.rect = []
         self.data = []
+
+        # Tell ai/game_status the node initialized successfuly.
+        StatusServices("recognition", "enemy_tracker").ready(True)
 
     def importPoint(self, beltData):
         rects = []
@@ -35,10 +38,10 @@ class EnemyTrackerNode():
 
     def trackEnemies(self):
         pass
-    
+
     def updateData(auto_detect_change = False):
         pass
-    
+
     def configure(self, prop):
         if prop is None:
             #Default values

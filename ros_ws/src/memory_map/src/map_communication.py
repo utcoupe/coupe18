@@ -87,34 +87,40 @@ class MapServices():
 
     def on_fill_waypoint(self, req):
         s = time.time() * 1000
-        rospy.loginfo("FILL_WAYPOINT:{} ({}, {})".format(str(req.waypoint.name if req.waypoint.name else "<no name>"), req.waypoint.x, req.waypoint.y))
+        rospy.loginfo("FILL_WAYPOINT: {} ({}, {}{})".format(str(req.waypoint.name if req.waypoint.name else "<no name>"), 
+                                                           req.waypoint.pose.x, req.waypoint.pose.y,
+                                                           ", {}".format(req.waypoint.pose.theta) if req.waypoint.has_angle else ""))
 
-        try:
-            filled_waypoint, filled_waypoint_name = None, None
-            if req.waypoint.name != "" and (req.waypoint.x == 0 and req.waypoint.y == 0):
-                filled_waypoint = Map.get("/waypoints/{}/^".format(req.waypoint.name))
-                filled_waypoint_name = req.waypoint.name
-            elif req.waypoint.x != 0 and req.waypoint.y != 0:
-                waypoints = Map.get("/waypoints/^").Dict
-                for w in waypoints:
-                    if waypoints[w].get("position/x") == round(req.waypoint.x, 3) and waypoints[w].get("position/y") == round(req.waypoint.y, 3):
-                        filled_waypoint = waypoints[w]
+        filled_waypoint, filled_waypoint_name = None, req.waypoint.name
+        if filled_waypoint_name is not None and filled_waypoint_name != '': # name was given, complete the rest
+            filled_waypoint = Map.get("/waypoints/{}/^".format(req.waypoint.name))
+        else: # assume pose was given, find the waypoint name
+            waypoints = Map.get("/waypoints/^").Dict
+            for w in waypoints:
+                if waypoints[w].get("position/x") == round(req.waypoint.pose.x, 3) and \
+                   waypoints[w].get("position/y") == round(req.waypoint.pose.y, 3):
+                    if req.waypoint.has_angle:
+                        print waypoints[w].get("position/a")
+                        print round(req.waypoint.pose.theta, 3)
+                        if waypoints[w].get("position/a") == round(req.waypoint.pose.theta, 3):
+                            filled_waypoint      = waypoints[w]
+                            filled_waypoint_name = w
+                    else:
+                        filled_waypoint      = waypoints[w]
                         filled_waypoint_name = w
-                if not filled_waypoint:
-                    rospy.logerr("    Request failed : could not find waypoint that corresponds to the given coordinates.")
-            else:
-                rospy.logerr("    Request failed : could not find what needs to be filled. EITHER name or X/Y needs to be filled.")
-        except Exception as e:
-            rospy.logerr("    Request failed : " + str(e))
+            if filled_waypoint is None:
+                rospy.logerr("    Request failed : could not find waypoint that corresponds to the given coordinates.")
 
         success, w = False, None
-        if filled_waypoint_name and filled_waypoint:
+        if filled_waypoint_name is not None and filled_waypoint is not None:
             success = True
             w = memory_map.msg.Waypoint()
             w.name = filled_waypoint_name
-            w.x, w.y = filled_waypoint.get("position/x"), filled_waypoint.get("position/y")
-            rospy.logdebug("    Responding:{} ({}, {})".format(filled_waypoint_name, filled_waypoint.get("position/x"), filled_waypoint.get("position/y")))
+            w.frame_id = filled_waypoint.get("position/frame_id")
+            w.pose.x, w.pose.y = filled_waypoint.get("position/x"), filled_waypoint.get("position/y")
+            if req.waypoint.has_angle and "a" in filled_waypoint.Dict:
+                w.pose.theta = filled_waypoint.get("position/a")
+            rospy.logdebug("    Responding: {} ({}, {})".format(filled_waypoint_name, filled_waypoint.get("position/x"), filled_waypoint.get("position/y")))
 
-        rospy.logdebug("    Responding:error")
         rospy.logdebug("    Process took {0:.2f}ms".format(time.time() * 1000 - s))
         return memory_map.srv.FillWaypointResponse(success, w)
