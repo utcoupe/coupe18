@@ -23,7 +23,7 @@ void Ax12Server::init_workbench(const std::string& port)
         return;
     }
 
-    for(uint8_t i = 0; i < SCAN_RANGE; i++) {
+    for(uint8_t i = 1; i <= SCAN_RANGE; i++) {
         dxl_ping(i);
         usleep(10000);
 
@@ -328,9 +328,8 @@ Ax12Server::Ax12Server(std::string name) :
 
 Ax12Server::~Ax12Server()
 {
-
-    //for (int index = 0; index < dxl_cnt_; index++)
-    //    dxl_wb_.itemWrite(dxl_id_[index], "Torque_Enable", 0);
+    for (int index = 0; index < dxl_cnt_; index++)
+        dxl_write_byte(dxl_id_[index], TORQUE_ENABLE_ADDR, 0);
 
     ros::shutdown();
 }
