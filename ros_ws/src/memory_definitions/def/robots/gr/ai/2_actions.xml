@@ -46,15 +46,13 @@
 				</target_pos>
 			</orderref>
 
-			<team name="green">
-				<orderref ref="asserv_goto" name="approach button">
-					<target_pos>
-						<x>1.13</x>
-						<y>1.65</y>
-						<theta>1.5708</theta>
-					</target_pos>
-				</orderref>
-			</team>
+			<orderref ref="asserv_goto" name="approach button">
+				<target_pos>
+					<x>1.13</x>
+					<y>1.65</y>
+					<theta>1.5708</theta>
+				</target_pos>
+			</orderref>
 
 			<orderref ref="asserv_goto" name="accost button">
 				<target_pos>

@@ -13,9 +13,8 @@ class RobotAI():
     def load_game_properties(self):
         return self._loader.load_game_properties()
 
-    def start(self, strategyname, communicator):
-        strategy = self._loader.load(strategyname, communicator)
-        rospy.loginfo("[AI] Loaded strategy '{}', starting actions...".format(strategyname))
+    def start(self, communicator):
+        strategy = self._loader.load(communicator)
         self.execute(strategy)
 
     def halt(self):

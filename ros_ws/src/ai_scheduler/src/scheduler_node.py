@@ -20,7 +20,6 @@ class AINode():
 
         self._hmi_init = False
         self._ai_start_request = False
-        self._chosen_strat = ""
         rospy.Subscriber("/feedback/ard_hmi/hmi_event", HMIEvent, self.on_hmi_event)
 
         # Sending init status to ai/game_status, subscribing to game_status status pub.
@@ -33,7 +32,7 @@ class AINode():
                 self.send_strategies()
                 self.send_teams()
             if self._ai_start_request:
-                self.AI.start(self._chosen_strat, AICommunication())
+                self.AI.start(AICommunication())
                 self._ai_start_request = False
             r.sleep()
 
@@ -73,14 +72,14 @@ class AINode():
             self.AI.halt()
 
     def on_hmi_event(self, req):
-        print "hi"
         if req.event == req.EVENT_HMI_INITIALIZED:
             time.sleep(0.5)
             self._hmi_init = True
         if req.event == req.EVENT_START:
-            strat_name = self.available_strategies[req.chosen_strategy_id]
-            self._ai_start_request, self._chosen_strat = True, strat_name
-            rospy.loginfo("[AI] Starting actions ! Strategy '{}'.".format(strat_name))
+            GameProperties.CURRENT_STRATEGY = GameProperties.AVAILABLE_STRATEGIES[req.chosen_strategy_id]
+            GameProperties.CURRENT_TEAM     = GameProperties.AVAILABLE_TEAMS[req.chosen_team_id]
+            self._ai_start_request = True
+            rospy.loginfo("[AI] Starting actions ! Strategy '{}' and team '{}'.".format(GameProperties.CURRENT_STRATEGY, GameProperties.CURRENT_TEAM))
         elif req.event == req.EVENT_GAME_CANCEL:
             rospy.logwarn("[AI] HMI Asked to stop ! Stopping strategy execution.")
             self.AI.halt()
