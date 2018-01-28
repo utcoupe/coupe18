@@ -152,8 +152,8 @@ bool Ax12Server::handle_joint_goal(GoalHandle goal_handle)
     dxl_write_word(motor_id, MOVING_SPEED_ADDR, speed);
     dxl_write_word(motor_id, GOAL_POSITION_ADDR, position);
 
-    success = dxl_get_result() == COMM_TXSUCCESS || dxl_get_result() == COMM_RXSUCCESS;
-
+    //success = dxl_get_result() == COMM_TXSUCCESS || dxl_get_result() == COMM_RXSUCCESS;
+    success = true;
     if(!success) {
         goal_handle.setAborted();
     }
@@ -202,8 +202,8 @@ bool Ax12Server::handle_wheel_goal(GoalHandle goal_handle)
     dxl_write_byte(motor_id, TORQUE_ENABLE_ADDR, 1);
     dxl_write_word(motor_id, MOVING_SPEED_ADDR, speed);
 
-    success = dxl_get_result() == COMM_TXSUCCESS || dxl_get_result() == COMM_RXSUCCESS;
-
+    //success = dxl_get_result() == COMM_TXSUCCESS || dxl_get_result() == COMM_RXSUCCESS;
+    success = true;
     if(!success) {
         goal_handle.setAborted();
     } else
@@ -225,7 +225,6 @@ void Ax12Server::main_loop(const ros::TimerEvent&)
     uint8_t motor_id;
     int32_t curr_position;
     int32_t goal_position;
-    ros::Rate r(MAIN_FREQUENCY);
 
     for(auto it = joint_goals.begin(); it != joint_goals.end();)
     {
@@ -308,7 +307,11 @@ std::string Ax12Server::fetch_port(const std::string& service_name)
 }
 
 Ax12Server::Ax12Server(std::string name) :
-        as_(nh_, name, boost::bind(&Ax12Server::execute_goal_cb, this, _1), false)
+        as_(nh_, name, boost::bind(&Ax12Server::execute_goal_cb, this, _1), false),
+        dxl_cnt_(0),
+        joint_goals(),
+        feedback_(),
+        result_()
 {
     std::string port;
 

@@ -4,7 +4,7 @@
 int main(int argc, char** argv)
 {
     ros::init(argc, argv, "ax12");
-    Ax12Server server("command");
+    Ax12Server server("/drivers/ax12");
     ros::spin();
     return 0;
 }
