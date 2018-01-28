@@ -24,17 +24,24 @@ void Ax12Server::init_workbench(const std::string& port)
     }
 
     for(uint8_t i = 1; i <= SCAN_RANGE; i++) {
-        dxl_ping(i);
-        usleep(10000);
-
-        if(dxl_get_result() == COMM_RXSUCCESS)
-        {
-            ROS_DEBUG("AX-12 detected with id %d", i);
-            dxl_id_[dxl_cnt_++] = i;
+        ROS_DEBUG("Pinging AX-12 with id %d", i)
+        for(uint8_t j = 0; j < 100; j++) {
+            dxl_ping(i);
+            usleep(500);
+            if (dxl_get_result() == COMM_RXSUCCESS) {
+                ROS_DEBUG("AX-12 detected with id %d", i);
+                dxl_id_[dxl_cnt_++] = i;
+                break;
+            }
         }
+
     }
 
     ROS_INFO("Found %d AX-12 motors connected with a scan range of %d", dxl_cnt_, SCAN_RANGE);
+
+
+    for (int index = 0; index < dxl_cnt_; index++)
+        dxl_write_byte(dxl_id_[index], TORQUE_ENABLE_ADDR, 1);
 
 
 }
@@ -60,17 +67,7 @@ bool Ax12Server::position_is_valid(uint8_t motor_id, uint16_t position)
      * Returns true if the position is within the range [min; max]
      */
 
-    int32_t min = dxl_read_word(motor_id, CW_ANGLE_LIMIT_ADDR);
-    int32_t max = dxl_read_word(motor_id, CCW_ANGLE_LIMIT_ADDR);
-
-    if(min < max)
-    {
-        return (position >= min && position <= max);
-    }
-    else
-    {
-        return (position >= max && position <= min);
-    }
+    return position >= 0 && position <= 1023;
 
 }
 
@@ -149,7 +146,7 @@ bool Ax12Server::handle_joint_goal(GoalHandle goal_handle)
 
     //set joint mode
     dxl_write_byte(motor_id, TORQUE_ENABLE_ADDR, 0);
-    dxl_write_word(motor_id, CW_ANGLE_LIMIT_ADDR, 0);
+    dxl_write_word(motor_id, CW_ANGLE_LIMIT_ADDR, 1); //todo: set to 0
     dxl_write_word(motor_id, CCW_ANGLE_LIMIT_ADDR, 1023);
     dxl_write_byte(motor_id, TORQUE_ENABLE_ADDR, 1);
     dxl_write_word(motor_id, MOVING_SPEED_ADDR, speed);
