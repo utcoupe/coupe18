@@ -1,7 +1,3 @@
-#include <cstdlib>
-#include <iostream>
-#include <vector>
-
 #include <ros/ros.h>
 #include <dynamic_reconfigure/server.h>
 
@@ -11,12 +7,24 @@
 #include "pathfinder/map_storage.h"
 #include "pathfinder/pathfinder.h"
 #include "pathfinder/point.h"
+#include "pathfinder/BarriersSubscribers/processing_belt_interpreter_subscriber.h"
+
+#include <cstdlib>
+#include <iostream>
+#include <vector>
+#include <memory>
 
 using namespace std;
+using namespace Processing;
 
 const string                FINDPATH_SERVICE_NAME   = "/navigation/pathfinder/find_path";
 const pair<double, double>  TABLE_SIZE              = {3.0, 2.0}; // Scale corresponding to messages received by the node
 const string                MAP_FILE_NAME           = string(getenv ("UTCOUPE_WORKSPACE")) + "/ros_ws/src/navigation_pathfinder/def/map.bmp";
+
+const size_t                SIZE_MAX_QUEUE          = 10;
+const string                BELT_INTERPRETER_TOPIC  = "/processing/belt_interpreter/rects_filtered";
+
+unique_ptr<BeltInterpreterSubscriber> constructBeltInterpreterSubscriber(ros::NodeHandle& nodeHandle);
 
 int main (int argc, char* argv[])
 {
@@ -27,7 +35,10 @@ int main (int argc, char* argv[])
     // ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
     ros::NodeHandle nodeHandle;
     
-    Pathfinder pathfinder(MAP_FILE_NAME, TABLE_SIZE, true);
+    auto dynBarriersMng = make_shared<DynamicBarriersManager>();
+    dynBarriersMng->addBarrierSubscriber(constructBeltInterpreterSubscriber(nodeHandle));
+    
+    Pathfinder pathfinder(MAP_FILE_NAME, TABLE_SIZE, dynBarriersMng, true);
     ros::ServiceServer findPathServer = nodeHandle.advertiseService(FINDPATH_SERVICE_NAME, &Pathfinder::findPathCallback, &pathfinder);
     
     dynamic_reconfigure::Server<navigation_pathfinder::PathfinderNodeConfig> server;
@@ -41,4 +52,16 @@ int main (int argc, char* argv[])
     ros::spin();
     
     return 0;
+}
+
+unique_ptr<BeltInterpreterSubscriber> constructBeltInterpreterSubscriber(ros::NodeHandle& nodeHandle)
+{
+    auto subscriber = make_unique<BeltInterpreterSubscriber>();
+    nodeHandle.subscribe(
+        BELT_INTERPRETER_TOPIC,
+        SIZE_MAX_QUEUE,
+        &BeltInterpreterSubscriber::rectsFilteredTopicCallback,
+        subscriber.get()
+    );
+    return subscriber;
 }

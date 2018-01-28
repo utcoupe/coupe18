@@ -2,11 +2,13 @@
 
 #include "pathfinder/BarriersSubscribers/processing_belt_interpreter_subscriber.h"
 
+#include <utility>
+
 using namespace std;
 
-DynamicBarriersManager::DynamicBarriersManager(size_t height, size_t width)
+DynamicBarriersManager::DynamicBarriersManager()
 {
-    subscribers.push_back(make_unique<Processing::BeltInterpreterSubscriber>());
+    //
 }
 
 bool DynamicBarriersManager::hasBarriers(const Point& pos)
@@ -16,3 +18,9 @@ bool DynamicBarriersManager::hasBarriers(const Point& pos)
             return true;
     return false;
 }
+
+void DynamicBarriersManager::addBarrierSubscriber(unique_ptr<AbstractBarriersSubscriber> && subscriber)
+{
+    subscribers.push_back(std::move(subscriber));
+}
+

@@ -7,7 +7,8 @@
 
 using namespace std;
 
-Pathfinder::Pathfinder(const string& mapFileName, const std::pair< double, double >& tableSize, bool invertedY, bool render, const string& renderFile)
+Pathfinder::Pathfinder(const string& mapFileName, const std::pair< double, double >& tableSize, shared_ptr<DynamicBarriersManager> dynBarriersMng,
+                       bool invertedY, bool render, const string& renderFile)
 {
     _renderAfterComputing = render;
     _renderFile = renderFile;
@@ -21,7 +22,7 @@ Pathfinder::Pathfinder(const string& mapFileName, const std::pair< double, doubl
         _convertor.setInvertedY(invertedY);
     }
     
-    _dynBarriersMng = make_shared<DynamicBarriersManager>(_allowedPositions.size(), _allowedPositions.front().size());
+    _dynBarriersMng = dynBarriersMng;
 }
 
 

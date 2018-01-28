@@ -10,9 +10,10 @@
 class DynamicBarriersManager
 {
 public:
-    DynamicBarriersManager(size_t height, size_t width);
+    DynamicBarriersManager();
     
     bool hasBarriers(const Point& pos);
+    void addBarrierSubscriber(std::unique_ptr<AbstractBarriersSubscriber>&& subscriber);
     
 private:
     std::vector< std::unique_ptr<AbstractBarriersSubscriber> > subscribers;

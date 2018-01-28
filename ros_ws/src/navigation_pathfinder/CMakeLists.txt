@@ -31,6 +31,7 @@ generate_messages(
     DEPENDENCIES
     std_msgs
     geometry_msgs
+    processing_belt_interpreter
 )
 
 ################################################
