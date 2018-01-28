@@ -16,7 +16,7 @@
 		<params>
 		</params>
 		<conditions>
-			<chest ref = "robot_body_chest_modules" qty_left_min = "1" />
+			<condition type="map_dict" mode="is_equal" path="/objects/*">{bonjour: hi}</condition>
 		</conditions>
 		<actions exec="one">
 			<orderref ref="actuator_open">
@@ -33,7 +33,7 @@
 		<!-- The robot is already positioned, take it in -->
 		<params></params>
 		<conditions>
-			<chest ref = "robot_body_chest_modules" qty_in_min="1" />
+			
 		</conditions>
 		<actions exec="all" order="random">
 			<orderref ref="actuator_open">
