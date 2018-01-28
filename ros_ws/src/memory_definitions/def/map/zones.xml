@@ -1,0 +1,25 @@
+<zones>
+    <markers>
+        <marker id="magenta">
+            <ns>zones</ns>
+            <scale z="0.002">
+            <position z="0.001">
+            <orientation x="0" y="0" z="0"/>
+            <color r="1" g="0.1" b="0.7" a="0.9"/> <!-- magenta-ish -->
+        </marker>
+    </markers>
+
+    <definitions>
+        <zone name="spawn_zone">
+            <team name="green">
+                <position x="0.2" y="1.65" a="0.0">
+            </team>
+            <team name="orange">
+                <position x="2.8" y="1.65" a="3.141592">
+            </team>
+
+            <shape type="rect" width="0.4" height="0.2"/>
+            <marker id="magenta"/>
+        </zone>
+    </definitions>
+</zones>
