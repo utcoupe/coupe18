@@ -8,7 +8,7 @@
 
 #include <ros/console.h>
 #include <actionlib/server/action_server.h>
-#include <drivers_ax12/AngleCommandAction.h>
+#include <drivers_ax12/Ax12CommandAction.h>
 #include <drivers_port_finder/GetPort.h>
 #include <memory_definitions/GetDefinition.h>
 
@@ -32,7 +32,7 @@ const uint32_t BAUD_RATE_INDEX = 1; //baudrate = 2000000 / (index + 1)
 const uint8_t SCAN_RANGE = 20;
 
 
-typedef actionlib::ServerGoalHandle<drivers_ax12::AngleCommandAction> GoalHandle;
+typedef actionlib::ServerGoalHandle<drivers_ax12::Ax12CommandAction> GoalHandle;
 
 
 class Ax12Server
@@ -40,7 +40,7 @@ class Ax12Server
 
 protected:
     ros::NodeHandle nh_;
-    actionlib::ActionServer<drivers_ax12::AngleCommandAction> as_;
+    actionlib::ActionServer<drivers_ax12::Ax12CommandAction> as_;
 
     uint8_t dxl_id_[SCAN_RANGE]; // ids of all the motors connected
     uint8_t dxl_cnt_; // number of ids in above array
@@ -48,8 +48,8 @@ protected:
     std::list<GoalHandle> joint_goals;
 
     // create messages that are used to published feedback/result
-    drivers_ax12::AngleCommandFeedback feedback_;
-    drivers_ax12::AngleCommandResult result_;
+    drivers_ax12::Ax12CommandFeedback feedback_;
+    drivers_ax12::Ax12CommandResult result_;
 
 
 public:

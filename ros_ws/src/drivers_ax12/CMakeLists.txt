@@ -18,7 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_action_files(
   DIRECTORY action
   FILES
-  AngleCommand.action
+  Ax12Command.action
 )
 
 generate_messages(
