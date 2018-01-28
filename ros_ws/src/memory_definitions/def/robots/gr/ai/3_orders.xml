@@ -50,8 +50,11 @@
 		</message>
 	</order>
 
-	<order ref="actuator_set_pos" duration="1.5" reward="3">
-		<message dest="/test">
+	<order ref="actuator_servo_set_pos" duration="1.5" reward="15">
+		<message dest="/movement/actuators/dispatch">
+			<param name="name" type="string"/>
+			<param name="preset" type="string" optional="true"/> <!-- Set either a preset or param-->
+			<param name="param" type="int" optional="true"/>
 		</message>
 	</order>
 
@@ -68,6 +71,12 @@
 	<order ref="delay" duration="1">
 		<message dest="/ai/timer/delay">
 			<param name="duration" type="float"/>
+		</message>
+	</order>
+
+	<order ref="set_game_status_ingame" duration="0">
+		<message dest="/ai/game_status/set_status">
+			<param name="new_game_status" type="int" preset="true">1</param>
 		</message>
 	</order>
 

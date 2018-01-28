@@ -4,7 +4,6 @@ from definitions import *
 
 class Task(object):
     def __init__(self, xml, status = TaskStatus.FREE):
-
         self.Name = xml.attrib["name"] if "name" in xml.attrib else None
         self.Reward = int(xml.attrib["reward"]) if "reward" in xml.attrib else 0
         self.Status = status
@@ -40,4 +39,4 @@ class Task(object):
     def prettyprint(self, indentlevel):
         rospy.loginfo("\033[0m" + "  ║ " * (indentlevel - 1) + "  ╠═" + self.__repr__())
     def __repr__(self):
-        return "<Task with No Name>"
+        return "<Task with no name>"

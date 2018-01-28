@@ -10,25 +10,23 @@ class ActionList(Task):
     def __init__(self, xml, actions, orders):
         super(ActionList, self).__init__(xml)
         self.Name = xml.attrib["name"] if "name" in xml.attrib else xml.tag
-        self.executionMode    = ExecutionMode.fromText( xml.attrib["exec"])  if "exec"  in xml.attrib else ExecutionMode.ALL
-        self.executionOrder   = ExecutionOrder.fromText(xml.attrib["order"]) if "order" in xml.attrib else ExecutionOrder.LINEAR
+        self.executionMode  = ExecutionMode.fromText( xml.attrib["exec"])  if "exec"  in xml.attrib else ExecutionMode.ALL
+        self.executionOrder = ExecutionOrder.fromText(xml.attrib["order"]) if "order" in xml.attrib else ExecutionOrder.LINEAR
         self.Conditions = xml.find("conditions") if "conditions" in xml else None # Conditions that must be true before executing the actions.
 
-        self.TASKS = None
-        self.loadxml(xml, actions, orders)
+        self.TASKS = self.loadxml(xml, actions, orders)
         #if len(self.TASKS) < 2: raise ValueError, "ERROR {} task in a list, not accepted.".format(len(self.TASKS))
 
     def loadxml(self, xml, actions, orders):
-        self.TASKS = []
-        nextneedsprevious = False
+        tasks = []
         for node_xml in xml:
             tag = node_xml.tag
             if tag == "actionlist":
                 i = ActionList(node_xml, actions, orders)
                 i.setParent(self)
-                if nextneedsprevious:
-                    i.Status = TaskStatus.NEEDSPREVIOUS;nextneedsprevious = False
-                self.TASKS.append(i)
+                if "needsprevious" in node_xml.attrib and node_xml.attrib["needsprevious"] == 'true':
+                    i.Status = TaskStatus.NEEDSPREVIOUS
+                tasks.append(i)
             elif tag == "actionref":
                 instances = [action for action in actions if action.Ref == node_xml.attrib["ref"]]
                 if len(instances) != 1:
@@ -36,9 +34,11 @@ class ActionList(Task):
                 i = copy.deepcopy(instances[0])
                 i.setParent(self)
                 i.setParameters(node_xml)
-                if nextneedsprevious:
-                    i.Status = TaskStatus.NEEDSPREVIOUS;nextneedsprevious = False
-                self.TASKS.append(i)
+                if "needsprevious" in node_xml.attrib and node_xml.attrib["needsprevious"] == 'true':
+                    i.Status = TaskStatus.NEEDSPREVIOUS
+                if "name" in node_xml.attrib:
+                    i.Name = node_xml.attrib["name"]
+                tasks.append(i)
             elif tag == "orderref":
                 instances = [order for order in orders if order.Ref == node_xml.attrib["ref"]]
                 if len(instances) != 1:
@@ -46,15 +46,19 @@ class ActionList(Task):
                 i = copy.deepcopy(instances[0])
                 i.setParent(self)
                 i.setParameters(node_xml)
-                if nextneedsprevious:
-                    i.Status = TaskStatus.NEEDSPREVIOUS;nextneedsprevious = False
-                self.TASKS.append(i)
-            elif tag == "nextneedsprevious":
-                nextneedsprevious = True
+                if "needsprevious" in node_xml.attrib and node_xml.attrib["needsprevious"] == 'true':
+                    i.Status = TaskStatus.NEEDSPREVIOUS
+                if "name" in node_xml.attrib:
+                    i.Name = node_xml.attrib["name"]
+                tasks.append(i)
             elif tag == "conditions":
                 self.loadConditions(node_xml)
+            elif tag == "team":
+                if node_xml.attrib["name"] == GameProperties.CURRENT_TEAM:
+                    tasks += self.loadxml(node_xml, actions, orders)
             else:
                 rospy.logwarn("WARNING Element skipped at init because '{}' type was not recognized.".format(tag))
+        return tasks
 
     def loadConditions(self, xml):
         #Conditions definition
