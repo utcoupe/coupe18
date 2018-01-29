@@ -38,7 +38,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(ax12_node src/ax12_node.cpp src/ax12_server.cpp)
+add_executable(ax12_node src/ax12_node.cpp src/ax12_server.cpp src/ax12_driver.cpp)
 
 add_dependencies(ax12_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
