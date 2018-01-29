@@ -32,7 +32,7 @@ int main (int argc, char* argv[])
     
     ROS_INFO_STREAM("Starting pathfinder with map \"" + MAP_FILE_NAME + "\"...");
     
-    // ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
+    ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
     ros::NodeHandle nodeHandle;
     
     auto dynBarriersMng = make_shared<DynamicBarriersManager>();
@@ -56,12 +56,7 @@ int main (int argc, char* argv[])
 
 unique_ptr<BeltInterpreterSubscriber> constructBeltInterpreterSubscriber(ros::NodeHandle& nodeHandle)
 {
-    auto subscriber = make_unique<BeltInterpreterSubscriber>();
-    nodeHandle.subscribe(
-        BELT_INTERPRETER_TOPIC,
-        SIZE_MAX_QUEUE,
-        &BeltInterpreterSubscriber::rectsFilteredTopicCallback,
-        subscriber.get()
-    );
+    unique_ptr<BeltInterpreterSubscriber> subscriber(new BeltInterpreterSubscriber());
+    subscriber->subscribe(nodeHandle, SIZE_MAX_QUEUE, BELT_INTERPRETER_TOPIC);
     return subscriber;
 }

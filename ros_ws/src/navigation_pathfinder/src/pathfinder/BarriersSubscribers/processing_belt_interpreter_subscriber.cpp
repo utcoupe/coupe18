@@ -8,13 +8,25 @@ BeltInterpreterSubscriber::BeltInterpreterSubscriber ()
     //
 }
 
-bool BeltInterpreterSubscriber::hasBarrier(const Point& pos) const
+
+bool BeltInterpreterSubscriber::hasBarrier(const geometry_msgs::Pose2D& pos) const
 {
     for (const auto& rect : lastRectangles)
         if (isInsideRect(pos, rect))
             return true;
     return false;
 }
+
+void Processing::BeltInterpreterSubscriber::subscribe(ros::NodeHandle& nodeHandle, size_t sizeMaxQueue, string topic)
+{
+    subscriber = nodeHandle.subscribe(
+        topic,
+        sizeMaxQueue,
+        &Processing::BeltInterpreterSubscriber::rectsFilteredTopicCallback,
+        this
+    );
+}
+
 
 void BeltInterpreterSubscriber::rectsFilteredTopicCallback(const processing_belt_interpreter::BeltFiltered::ConstPtr& msg)
 {
@@ -23,16 +35,16 @@ void BeltInterpreterSubscriber::rectsFilteredTopicCallback(const processing_belt
     addRects(msg->unknown_rects);
 }
 
-void Processing::BeltInterpreterSubscriber::addRects(const std::vector<Rectangle>& rects)
+void Processing::BeltInterpreterSubscriber::addRects(const vector<Rectangle>& rects)
 {
     lastRectangles.insert(lastRectangles.end(), rects.begin(), rects.end());
 }
 
-bool Processing::BeltInterpreterSubscriber::isInsideRect(const Point& pos, const Rectangle& rect) const
+bool Processing::BeltInterpreterSubscriber::isInsideRect(const geometry_msgs::Pose2D& pos, const Rectangle& rect) const
 {
-    if (pos.getX() < rect.x || pos.getX() > (rect.x + rect.w))
+    if (pos.x < rect.x || pos.x > (rect.x + rect.w))
         return false;
-    if (pos.getY() < rect.y || pos.getY() > (rect.y + rect.h))
+    if (pos.y < rect.y || pos.y > (rect.y + rect.h))
         return false;
     return true;
 }

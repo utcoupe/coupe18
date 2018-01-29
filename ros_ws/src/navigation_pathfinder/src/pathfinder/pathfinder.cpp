@@ -12,17 +12,18 @@ Pathfinder::Pathfinder(const string& mapFileName, const std::pair< double, doubl
 {
     _renderAfterComputing = render;
     _renderFile = renderFile;
+    _dynBarriersMng = dynBarriersMng;
     
     _allowedPositions = _mapStorage.loadAllowedPositionsFromFile(mapFileName);
     if (_allowedPositions.size() == 0)
         ROS_FATAL("Allowed positions empty. Cannot define a scale.");
     else
     {
-        _convertor.setSizes(tableSize, make_pair<double,double>(_allowedPositions.front().size(), _allowedPositions.size()));
-        _convertor.setInvertedY(invertedY);
+        _convertor = make_shared<PosConvertor>();
+        _convertor->setSizes(tableSize, make_pair<double,double>(_allowedPositions.front().size(), _allowedPositions.size()));
+        _convertor->setInvertedY(invertedY);
+        _dynBarriersMng->setConvertor(_convertor);
     }
-    
-    _dynBarriersMng = dynBarriersMng;
 }
 
 
@@ -266,13 +267,13 @@ std::vector< Point > Pathfinder::directions() const
 
 Point Pathfinder::pose2DToPoint(const geometry_msgs::Pose2D& pos) const
 {
-    auto convertedPos = _convertor.fromRosToMapPos(pair<double, double>(pos.x, pos.y));
+    auto convertedPos = _convertor->fromRosToMapPos(pair<double, double>(pos.x, pos.y));
     return Point(convertedPos.first, convertedPos.second);
 }
 
 geometry_msgs::Pose2D Pathfinder::pointToPose2D(const Point& pos) const
 {
-    auto convertedPos = _convertor.fromMapToRosPos(pair<double, double>(pos.getX(), pos.getY()));
+    auto convertedPos = _convertor->fromMapToRosPos(pair<double, double>(pos.getX(), pos.getY()));
     geometry_msgs::Pose2D newPos;
     newPos.x = convertedPos.first;
     newPos.y = convertedPos.second;

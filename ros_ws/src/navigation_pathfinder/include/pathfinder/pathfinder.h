@@ -66,7 +66,7 @@ private:
     typedef std::vector<std::vector<bool> > Vect2DBool;
     
     /** Convertor object between inside and outside referentials **/
-    PosConvertor _convertor;
+    std::shared_ptr<PosConvertor> _convertor;
     
     /** Manager for loading and saving image files **/
     MapStorage _mapStorage;
