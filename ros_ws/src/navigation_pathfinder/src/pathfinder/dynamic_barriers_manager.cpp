@@ -35,6 +35,13 @@ void DynamicBarriersManager::setConvertor(std::shared_ptr<PosConvertor> converto
     _convertor = convertor;
 }
 
+void DynamicBarriersManager::updateSafetyMargin(const double& newMargin)
+{
+    for (auto& subscriber : subscribers)
+        subscriber->setSafetyMargin(newMargin);
+}
+
+
 geometry_msgs::Pose2D DynamicBarriersManager::pointToPose2D(const Point& pos) const
 {
     auto convertedPos = _convertor->fromMapToRosPos(pair<double, double>(pos.getX(), pos.getY()));

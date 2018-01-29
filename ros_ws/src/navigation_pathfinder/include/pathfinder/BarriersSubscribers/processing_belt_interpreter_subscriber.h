@@ -5,15 +5,13 @@
 #include "processing_belt_interpreter/BeltFiltered.h"
 #include "processing_belt_interpreter/RectangleStamped.h"
 
-#include "geometry_msgs/Pose2D.h"
-
 #include <vector>
 
 namespace Processing {
     class BeltInterpreterSubscriber : public AbstractBarriersSubscriber
     {
     public:
-        BeltInterpreterSubscriber();
+        BeltInterpreterSubscriber(const double& safetyMargin);
         
         bool hasBarrier(const geometry_msgs::Pose2D& pos) const;
         void subscribe(ros::NodeHandle& nodeHandle, std::size_t sizeMaxQueue, std::string topic);

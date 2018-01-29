@@ -96,10 +96,11 @@ bool Pathfinder::findPathCallback(navigation_pathfinder::FindPath::Request& req,
 
 void Pathfinder::reconfigureCallback(navigation_pathfinder::PathfinderNodeConfig& config, uint32_t level)
 {
-    ROS_INFO_STREAM ("Reconfigure request : " << config.render << " " << config.renderFile);
+    ROS_INFO_STREAM ("Reconfigure request : " << config.render << " " << config.renderFile << " " << config.safetyMargin);
     _renderAfterComputing = config.render;
     _renderFile = config.renderFile;
     // TODO detect env var and home
+    _dynBarriersMng->updateSafetyMargin(config.safetyMargin);
 }
 
 

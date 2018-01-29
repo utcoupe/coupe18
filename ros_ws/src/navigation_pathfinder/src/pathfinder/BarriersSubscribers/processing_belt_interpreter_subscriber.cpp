@@ -3,7 +3,8 @@
 using namespace Processing;
 using namespace std;
 
-BeltInterpreterSubscriber::BeltInterpreterSubscriber ()
+BeltInterpreterSubscriber::BeltInterpreterSubscriber (const double& safetyMargin):
+    AbstractBarriersSubscriber(safetyMargin)
 {
     //
 }
@@ -42,9 +43,9 @@ void Processing::BeltInterpreterSubscriber::addRects(const vector<Rectangle>& re
 
 bool Processing::BeltInterpreterSubscriber::isInsideRect(const geometry_msgs::Pose2D& pos, const Rectangle& rect) const
 {
-    if (pos.x < rect.x || pos.x > (rect.x + rect.w))
+    if (pos.x + _safetyMargin < rect.x || pos.x - _safetyMargin > (rect.x + rect.w))
         return false;
-    if (pos.y < rect.y || pos.y > (rect.y + rect.h))
+    if (pos.y + _safetyMargin < rect.y || pos.y - _safetyMargin > (rect.y + rect.h))
         return false;
     return true;
 }

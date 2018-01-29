@@ -22,6 +22,7 @@ const pair<double, double>  TABLE_SIZE              = {3.0, 2.0}; // Scale corre
 const string                MAP_FILE_NAME           = string(getenv ("UTCOUPE_WORKSPACE")) + "/ros_ws/src/navigation_pathfinder/def/map.bmp";
 
 const size_t                SIZE_MAX_QUEUE          = 10;
+const double                SAFETY_MARGIN           = 0.15;
 const string                BELT_INTERPRETER_TOPIC  = "/processing/belt_interpreter/rects_filtered";
 
 unique_ptr<BeltInterpreterSubscriber> constructBeltInterpreterSubscriber(ros::NodeHandle& nodeHandle);
@@ -32,7 +33,7 @@ int main (int argc, char* argv[])
     
     ROS_INFO_STREAM("Starting pathfinder with map \"" + MAP_FILE_NAME + "\"...");
     
-    ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
+    // ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
     ros::NodeHandle nodeHandle;
     
     auto dynBarriersMng = make_shared<DynamicBarriersManager>();
@@ -56,7 +57,7 @@ int main (int argc, char* argv[])
 
 unique_ptr<BeltInterpreterSubscriber> constructBeltInterpreterSubscriber(ros::NodeHandle& nodeHandle)
 {
-    unique_ptr<BeltInterpreterSubscriber> subscriber(new BeltInterpreterSubscriber());
+    unique_ptr<BeltInterpreterSubscriber> subscriber(new BeltInterpreterSubscriber(SAFETY_MARGIN));
     subscriber->subscribe(nodeHandle, SIZE_MAX_QUEUE, BELT_INTERPRETER_TOPIC);
     return subscriber;
 }
