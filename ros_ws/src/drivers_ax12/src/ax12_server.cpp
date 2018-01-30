@@ -339,6 +339,8 @@ bool Ax12Server::execute_set_service_cb(drivers_ax12::SetAx12Param::Request &req
         return true;
     }
 
+    ROS_INFO("Successfully changed parameter %d of motor with ID %d to %d", req.param, req.motor_id, req.value);
+
     res.success = (uint8_t)driver_.write_register(req.motor_id, *reg, req.value);
     return true;
 }
