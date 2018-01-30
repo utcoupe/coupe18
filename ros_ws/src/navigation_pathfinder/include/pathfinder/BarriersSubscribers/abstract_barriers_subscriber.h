@@ -5,16 +5,19 @@
 
 #include "geometry_msgs/Pose2D.h"
 
+#include <mutex>
+
 class AbstractBarriersSubscriber
 {
 public:
     AbstractBarriersSubscriber(const double& safetyMargin) : _safetyMargin(safetyMargin) {};
     
-    virtual bool hasBarrier(const geometry_msgs::Pose2D& pos) const = 0;
+    virtual bool hasBarrier(const geometry_msgs::Pose2D& pos) = 0;
     virtual void subscribe(ros::NodeHandle& nodeHandle, std::size_t sizeMaxQueue, std::string topic) = 0;
-    void setSafetyMargin(const double& safetyMargin) { _safetyMargin = _safetyMargin; }
+    void setSafetyMargin(const double& safetyMargin) { _safetyMargin = safetyMargin; }
 
 protected:
+    std::mutex g_mutex;
     ros::Subscriber subscriber;
     double _safetyMargin;
 };

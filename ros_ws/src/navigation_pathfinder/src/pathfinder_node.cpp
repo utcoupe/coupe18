@@ -33,7 +33,7 @@ int main (int argc, char* argv[])
     
     ROS_INFO_STREAM("Starting pathfinder with map \"" + MAP_FILE_NAME + "\"...");
     
-    // ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
+//     ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
     ros::NodeHandle nodeHandle;
     
     auto dynBarriersMng = make_shared<DynamicBarriersManager>();

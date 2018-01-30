@@ -10,8 +10,9 @@ BeltInterpreterSubscriber::BeltInterpreterSubscriber (const double& safetyMargin
 }
 
 
-bool BeltInterpreterSubscriber::hasBarrier(const geometry_msgs::Pose2D& pos) const
+bool BeltInterpreterSubscriber::hasBarrier(const geometry_msgs::Pose2D& pos)
 {
+    lock_guard<mutex> lock(g_mutex);
     for (const auto& rect : lastRectangles)
         if (isInsideRect(pos, rect))
             return true;
@@ -38,6 +39,7 @@ void BeltInterpreterSubscriber::rectsFilteredTopicCallback(const processing_belt
 
 void Processing::BeltInterpreterSubscriber::addRects(const vector<Rectangle>& rects)
 {
+    lock_guard<mutex> lock(g_mutex);
     lastRectangles.insert(lastRectangles.end(), rects.begin(), rects.end());
 }
 

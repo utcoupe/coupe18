@@ -13,7 +13,7 @@ namespace Processing {
     public:
         BeltInterpreterSubscriber(const double& safetyMargin);
         
-        bool hasBarrier(const geometry_msgs::Pose2D& pos) const;
+        bool hasBarrier(const geometry_msgs::Pose2D& pos);
         void subscribe(ros::NodeHandle& nodeHandle, std::size_t sizeMaxQueue, std::string topic);
         
     private:
