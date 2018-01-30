@@ -1,0 +1,41 @@
+<classes>
+    <zones>
+    
+    </zones>
+
+    <objects>
+        <object class="wall">
+            <position x="" y="" a=""/>
+            <feature layer="ground">
+                <shape/>
+                <offset/>
+            </feature>
+        </object>
+
+        <object class="cube_green">
+            <position x="" y="" a=""/>
+            <feature layer="ground">
+                <shape type="rect" w="" h=""/>
+                <offset x="" y="" a=""/>
+                <color name="green"/>
+                <marker>
+                    <scale z="0.06">
+                    <position z="0.3">
+                    <orientation x="0" y="0"/>
+                </marker>
+            </feature>
+        </object>
+
+        <object class="ball_green">
+            <shape type="circle" r="0.022"/>
+            <color name="green"/>
+            <markers>
+                <marker type="sphere">
+                    <scale z="0.044">
+                    <position z="0.3">
+                    <orientation x="0" y="0"/>
+                </marker>
+            </markers>
+        </object>
+    </objects>
+</classes>

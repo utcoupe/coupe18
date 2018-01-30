@@ -1,39 +1,106 @@
-<objects>
-    <terrain> <!-- structure incomplete-->
-        <objectref name="wall_top" class="wall">
-            <position x="0.03" y="1.6">
-            <shape type="rect" width="3.044" height="0.022">
-        </objectref>
-        <objectref name="uni_distributor" class="distributor">
-            <team name="green">
-                <position x="2.5" y="0.6" a="0">
-            </team>
-            <team name="orange">
-                <position x="2.5" y="0.6" a="3.141592">
-            </team>
-        </objectref>
-    </terrain>
+<container name="map">
+    <team name="green">
+        <container name="uni_distrib">
+            <features>
+                <feature layer="belt">
+                    <position x="" y="" a=""/>
+                    <shape type="rect" w="0.1" h="0.1">
+                </feature>
+            </features>
 
-    <objects>
-        <classes>
-            <object class="green_cube">
-                <position layer="ground">
-                <shape type="rect" width="0.06" height="0.06"/>
-                <marker>
-                    <ns>objects</ns>
-                    <scale z="0.06">
-                    <position z="0.3">
-                    <orientation x="0" y="0" z="0"/>
-                    <color r="0.1" g="1" b="0.1" a="0.9"/>
-                </marker>
-            </object>
-        </classes>
-        
-        <objectref name="cube1" class="green_cube">
-            <position x="0.03" y="1.6">
-        </objectref>
-        <objectref name="cube6" class="green_cube">
-            <position x="2.5" y="0.6">
-        </objectref>
-    </objects>
-</objects>
+            <waypoints>
+                <waypoint name="accost">
+                    <position x="" y="" a=""/>
+                    <shape type="rect" w="" h=""/>
+                    <marker id="waypoint_accost"/>
+                </waypoint>
+            </waypoints>
+
+            <objects min="0" max="8">
+                <objectref class="ball_green"/>
+                <objectref class="ball_green"/>
+                <objectref class="ball_green"/>
+                <objectref class="ball_green"/>
+                <objectref class="ball_green"/>
+                <objectref class="ball_green"/>
+                <objectref class="ball_green"/>
+                <objectref class="ball_green"/>
+            </objects>
+        </container>
+
+        <container name="multi_distrib">
+            <features>
+                <feature layer="belt">
+                    <position x="" y="" a=""/>
+                    <shape type="rect" w="0.1" h="0.1">
+                </feature>
+            </features>
+
+            <waypoints>
+                <waypoint name="accost">
+                    <position x="" y="" a=""/>
+                    <shape type="rect" w="" h=""/>
+                    <marker id="waypoint_accost"/>
+                </waypoint>
+            </waypoints>
+
+            <objects min="0" max="8">
+                <objectref class="ball_green" />
+                <objectref class="ball_orange"/>
+                <objectref class="ball_green" />
+                <objectref class="ball_orange"/>
+                <objectref class="ball_green" />
+                <objectref class="ball_orange"/>
+                <objectref class="ball_green" />
+                <objectref class="ball_orange"/>
+            </objects>
+        </object>
+
+        <container name="cube_grape_1">
+        </container>
+
+        <container name="cube_grape_2">
+        </container>
+
+        <container name="cube_grape_3">
+        </container>
+
+        <container name="cube_grape_4">
+        </container>
+
+        <container name="cube_grape_5">
+        </container>
+
+        <container name="cube_grape_6">
+        </container>
+    </team>
+
+
+
+
+
+    <team name="orange">
+        <include name="green">
+            <transform type="position" name="symetry">
+                <position x="1.5" y="1" a="1.57079">
+            </transform>
+        </include>
+    </team>
+</container>
+
+
+<object>
+    <features>
+    </features>
+
+    <waypoints>
+    </waypoints>
+</object>
+
+<object>
+    <features>
+    </features>
+
+    <waypoints>
+    </waypoints>
+</object>
