@@ -21,10 +21,16 @@ add_action_files(
   Ax12Command.action
 )
 
+add_service_files(
+  FILES
+  SetAx12Param.srv
+)
+
 generate_messages(
   DEPENDENCIES
   actionlib_msgs
 )
+
 
 catkin_package(
   INCLUDE_DIRS include

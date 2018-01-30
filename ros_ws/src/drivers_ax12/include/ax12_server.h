@@ -9,6 +9,7 @@
 #include <ros/console.h>
 #include <actionlib/server/action_server.h>
 #include <drivers_ax12/Ax12CommandAction.h>
+#include <drivers_ax12/SetAx12Param.h>
 #include <drivers_port_finder/GetPort.h>
 #include <memory_definitions/GetDefinition.h>
 
@@ -30,7 +31,7 @@ class Ax12Server
 protected:
     ros::NodeHandle nh_;
     actionlib::ActionServer<drivers_ax12::Ax12CommandAction> as_;
-
+    ros::ServiceServer set_param_service;
     std::list<GoalHandle> joint_goals_;
 
     // create messages that are used to published feedback/result
@@ -41,12 +42,14 @@ protected:
 
 public:
     void execute_goal_cb(GoalHandle goal_handle);
+    bool execute_set_service_cb(drivers_ax12::SetAx12Param::Request &req, drivers_ax12::SetAx12Param::Response &res);
     std::string fetch_port(const std::string& service_name);
     void init_driver(const std::string& port);
     void main_loop(const ros::TimerEvent&);
     bool handle_joint_goal(GoalHandle goal_handle);
     bool handle_wheel_goal(GoalHandle goal_handle);
-    Ax12Server(std::string name);
+    const Ax12Table::Register* service_param_to_register(uint8_t param);
+    Ax12Server(std::string action_name, std::string service_name);
     ~Ax12Server();
 };
 
