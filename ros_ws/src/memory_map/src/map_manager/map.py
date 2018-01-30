@@ -1,56 +1,47 @@
-#!/usr/bin/python
-import time
-import rospy
-from map_loader import MapLoader, LoadingHelpers
-from map_bases import DictManager, RequestPath
-from map_classes import Terrain, Zone, Waypoint, Entity, Container, Object
+from map_loader import MapLoader, LoadChecker
+from config import Config
+from robot import Robot
+from zone import Zone
+from feature import Feature
+from object import Object
 
-class Map():
-    CURRENT_TEAM = ''
-    MapDict = None
+class Map(object):
+    CONFIG = Config()
 
-    @staticmethod
-    def load():
-        starttime = time.time() * 1000
-        initdict_terrain   = MapLoader.loadFile("1_Terrain.yml")["terrain"]
-        initdict_zones     = MapLoader.loadFile("2_Zones.yml")["zones"]
-        initdict_waypoints = MapLoader.loadFile("3_Waypoints.yml")["waypoints"]
-        initdict_entities  = MapLoader.loadFile("4_Entities.yml")["entities"]
-        initdict_objects   = MapLoader.loadFile("5_Objects.yml")["objects"]
-        # Instantiate objects before creating the map dict
-        for zone in initdict_zones:
-            initdict_zones[zone] = Zone(initdict_zones[zone])
-        for waypoint in initdict_waypoints:
-            initdict_waypoints[waypoint] = Waypoint(initdict_waypoints[waypoint])
-        for entity in initdict_entities:
-            initdict_entities[entity] = Entity(initdict_entities[entity])
-        for obj in initdict_objects:
-            if "container_" in obj: # Create container.
-                initdict_objects[obj] = Container(initdict_objects[obj])
-            else: # Create object.
-                initdict_objects[obj] = Object(initdict_objects[obj])
-        rospy.loginfo("Loaded files in {0:.2f}ms.".format(time.time() * 1000 - starttime))
+    MAP_FEATURE = None
 
-        # Create main Map dict
-        Map.MapDict = DictManager({
-            "terrain": Terrain(initdict_terrain),
-            "zones": DictManager(initdict_zones),
-            "waypoints": DictManager(initdict_waypoints),
-            "entities": DictManager(initdict_entities),
-            "objects": DictManager(initdict_objects)
-        })
-        rospy.loginfo("Loaded map in {0:.2f}ms.".format(time.time() * 1000 - starttime))
+    ROBOTS      = []
+    WAYPOINTS   = []
+    ZONES       = []
+    OBJECTS     = []
 
     @staticmethod
-    def get(requestpath):
-        if requestpath[0] != "/":
-            rospy.logerr("    GET Request failed : global search needs to start with '/'.")
-            return None
-        return Map.MapDict.get(requestpath)
+    def load_config():
+        config_xml = MapLoader.loadFile(MapLoader.CONFIG_FILE)
+        Map.CONFIG.load(config_xml)
+
+        LoadChecker.checkNodesExist(config_xml, "map")
+        Map.MAP_FEATURE = Feature(config_xml.find("map").find("feature"))
 
     @staticmethod
-    def set(requestpath, mode, instance = None):
-        if requestpath[0] != "/":
-            rospy.logerr("    SET Request failed : global search needs to start with '/'.")
-            return None
-        return Map.MapDict.set(requestpath, mode, instance)
+    def load_robots(robot_name):
+        robots_xml = MapLoader.loadFile(MapLoader.ROBOTS_FILE)
+
+        for robot in robots_xml.findall("robot"):
+            r = Robot(robot)
+            if r.name == robot_name:
+                r.active = True
+            Map.ROBOTS.append(r)
+
+
+    @staticmethod
+    def load_objects(team_name):
+        classes_xml = MapLoader.loadFile(MapLoader.CLASSES_FILE)
+        objects_xml = MapLoader.loadFile(MapLoader.OBJECTS_FILE)
+
+        for z in classes_xml.find("zones").findall("zone"):
+            Map.ZONES.append(Zone(z))
+
+        classes = []
+        for c in classes_xml.find("objects").findall("object"):
+            classes.append(Object(c))
