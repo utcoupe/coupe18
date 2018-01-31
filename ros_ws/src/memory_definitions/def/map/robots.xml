@@ -2,7 +2,7 @@
     <robot name="gr">
         <features>
             <feature layer="ground">
-                <shape type="rect" w="0.1" h="0.1">
+                <shape type="rect" w="0.1" h="0.1"/>
             </feature>
         </features>
 

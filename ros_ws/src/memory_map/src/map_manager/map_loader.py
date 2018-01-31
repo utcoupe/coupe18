@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import os
+import rospy
 import xml.etree.ElementTree as ET
 import rospy
 
@@ -10,13 +10,15 @@ class LoadChecker():
     def checkNodesExist(xml, *node_names):
         for node in node_names:
             if not len(xml.findall(node)) > 0:
-                raise KeyError("ERROR While loading map : '{}' node name required inside '{}' node.".format(node, xml.tag))
+                rospy.logerr("ERROR While loading map : '{}' node required inside '{}' node.".format(node, xml.tag))
+                raise KeyError()
 
     @staticmethod
     def checkAttribsExist(xml, *attrib_names):
         for attrib in attrib_names:
             if not attrib in xml.attrib:
-                raise KeyError("ERROR While loading map : '{}' attribute required inside '{}' node.".format(attrib, xml.tag))
+                rospy.logerr("ERROR While loading map : '{}' attribute required inside '{}' node.".format(attrib, xml.tag))
+                raise KeyError()
 
 class MapLoader():
     CONFIG_FILE  = "config.xml"
@@ -55,4 +57,4 @@ class MapLoader():
         try:
             return ET.parse(path).getroot()
         except Exception as exc:
-            rospy.logerr("Could not load map XML file : " + str(exc))
+            rospy.logerr("Could not load map XML file from path '{}' : {}".format(path, str(exc)))

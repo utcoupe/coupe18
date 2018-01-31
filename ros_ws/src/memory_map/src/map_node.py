@@ -10,7 +10,7 @@ class MapNode():
     def __init__(self):
         rospy.init_node("map", log_level=rospy.DEBUG)
 
-        map_manager.Map.load_config()
+        map_manager.Map.load("gr", "green")
 
         # Starting and publishing the table STL to RViz
         #self.markers = MarkersPublisher()
@@ -20,14 +20,17 @@ class MapNode():
 
         # Starting service handlers (Get, Set, Transfer, GetOccupancy)
         #map_communication.MapServices(occupancy)
+        print "loaded map"
 
-        self.run()
+        #self.run()
 
     def run(self):
         r = rospy.Rate(10)
         while not rospy.is_shutdown():
             if rospy.has_param("/current_team"):
                 map_manager.Map.CONFIG.CURRENT_TEAM = rospy.get_param("/current_team")
+            if rospy.has_param("/robot"):
+                map_manager.Map.CONFIG.CURRENT_ROBOT = rospy.get_param("/robot")
             #self.markers.updateMarkers(map_manager.Map)
             r.sleep()
 

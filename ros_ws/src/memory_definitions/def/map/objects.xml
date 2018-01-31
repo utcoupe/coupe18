@@ -3,75 +3,81 @@
         <container name="uni_distrib">
             <features>
                 <feature layer="belt">
-                    <position x="" y="" a=""/>
-                    <shape type="rect" w="0.1" h="0.1">
+                    <position x="0" y="0" a="0"/>
+                    <shape type="rect" w="0.1" h="0.1"/>
                 </feature>
             </features>
 
             <waypoints>
                 <waypoint name="accost">
-                    <position x="" y="" a=""/>
-                    <shape type="rect" w="" h=""/>
+                    <position x="0" y="0" a="0"/>
+                    <shape type="rect" w="1" h="1"/>
                     <marker id="waypoint_accost"/>
                 </waypoint>
             </waypoints>
 
-            <objects min="0" max="8">
-                <objectref class="ball_green"/>
-                <objectref class="ball_green"/>
-                <objectref class="ball_green"/>
-                <objectref class="ball_green"/>
-                <objectref class="ball_green"/>
-                <objectref class="ball_green"/>
-                <objectref class="ball_green"/>
-                <objectref class="ball_green"/>
-            </objects>
+            <elements min="0" max="8">
+                <object class="ball_green"/>
+                <object class="ball_green"/>
+                <object class="ball_green"/>
+                <object class="ball_green"/>
+                <object class="ball_green"/>
+                <object class="ball_green"/>
+                <object class="ball_green"/>
+                <object class="ball_green"/>
+            </elements>
         </container>
 
-        <container name="multi_distrib">
+        <container name="multi_distrib" class="distrib">
             <features>
                 <feature layer="belt">
-                    <position x="" y="" a=""/>
-                    <shape type="rect" w="0.1" h="0.1">
+                    <position x="0" y="1" a="2"/>
+                    <shape type="rect" w="0.1" h="0.1"/>
                 </feature>
             </features>
 
             <waypoints>
                 <waypoint name="accost">
-                    <position x="" y="" a=""/>
-                    <shape type="rect" w="" h=""/>
+                    <position x="2" y="3" a="5"/>
+                    <shape type="rect" w="6" h="2"/>
                     <marker id="waypoint_accost"/>
                 </waypoint>
             </waypoints>
 
-            <objects min="0" max="8">
-                <objectref class="ball_green" />
-                <objectref class="ball_orange"/>
-                <objectref class="ball_green" />
-                <objectref class="ball_orange"/>
-                <objectref class="ball_green" />
-                <objectref class="ball_orange"/>
-                <objectref class="ball_green" />
-                <objectref class="ball_orange"/>
-            </objects>
-        </object>
+            <elements min="0" max="8">
+                <object class="ball_green" />
+                <object class="ball_orange"/>
+                <object class="ball_green" />
+                <object class="ball_orange"/>
+                <object class="ball_green" />
+                <object class="ball_orange"/>
+                <object class="ball_green" />
+                <object class="ball_orange"/>
+            </elements>
+        </container>
 
         <container name="cube_grape_1">
+            <elements min="0" max="5"/>
         </container>
 
         <container name="cube_grape_2">
+            <elements min="0" max="5"/>
         </container>
 
         <container name="cube_grape_3">
+            <elements min="0" max="5"/>
         </container>
 
         <container name="cube_grape_4">
+            <elements min="0" max="5"/>
         </container>
 
         <container name="cube_grape_5">
+            <elements min="0" max="5"/>
         </container>
 
         <container name="cube_grape_6">
+            <elements min="0" max="5"/>
         </container>
     </team>
 
@@ -82,25 +88,8 @@
     <team name="orange">
         <include name="green">
             <transform type="position" name="symetry">
-                <position x="1.5" y="1" a="1.57079">
+                <position x="1.5" y="1" a="1.57079"/>
             </transform>
         </include>
     </team>
 </container>
-
-
-<object>
-    <features>
-    </features>
-
-    <waypoints>
-    </waypoints>
-</object>
-
-<object>
-    <features>
-    </features>
-
-    <waypoints>
-    </waypoints>
-</object>
