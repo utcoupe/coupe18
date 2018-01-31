@@ -182,9 +182,12 @@ class NavigatorNode(object):
             for point in path:
                 cb = partial(self._callbackAsservForDoGotoAction, handledGoal, False)
                 self._asservClient.doGoto(point, False, cb)
-            # For the last point we specify the angle
+            
+            hasAngle = False
+            if handledGoal.get_goal().mode == handledGoal.get_goal().GOTOA:
+                hasAngle = True
             cb = partial(self._callbackAsservForDoGotoAction, handledGoal, True)
-            self._asservClient.doGoto(posEnd, True, cb)
+            self._asservClient.doGoto(posEnd, hasAngle, cb)
         except Exception, e:
             rospy.logdebug("Navigation failed: " + e.message)
             result = DoGotoResult(False)

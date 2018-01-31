@@ -27,7 +27,7 @@ class LocalizerClient(Thread):
                 newPose = Pose2D(x=tmpPos.x, y=tmpPos.y)
                 if newPose != self._lastKnownPos:
                     self._lastKnownPos = newPose
-                    rospy.logdebug("tf2 frame : " + str(self._lastKnownPos.x) + ", " + str(self._lastKnownPos.y))
+                    # rospy.logdebug("tf2 frame : " + str(self._lastKnownPos.x) + ", " + str(self._lastKnownPos.y))
                 rate.sleep()
             except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
                 rate.sleep()
