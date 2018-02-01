@@ -1,10 +1,10 @@
 waypoints:
-    construction_site_1:
+    way1:
         position:
             frame_id: /map
             x: 0.18
             y: 0.19
-            a: 0.00304
+            a: 0.003
             type: fixed  # TODO useless ? can be different ?
         marker:
             ns: waypoints

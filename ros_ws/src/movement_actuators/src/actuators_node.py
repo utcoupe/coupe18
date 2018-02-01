@@ -8,6 +8,8 @@ import actionlib
 import movement_actuators.msg
 import actuators_properties
 import drivers_ard_others.msg
+from ai_game_status import StatusServices
+
 
 class ActuatorsNode():
     """Dispatch commands from AI to the correct node"""
@@ -22,13 +24,16 @@ class ActuatorsNode():
         self._call_stack = {}
         self._action_server = actionlib.SimpleActionServer(
             self._action_name, movement_actuators.msg.dispatchAction, execute_cb=self.dispatch, auto_start=False)
-        
+
         # TODO: rename arduino
         self._arduino_move = rospy.Publisher(
             '/drivers/ard_others/move', drivers_ard_others.msg.MoveMsg)
         self._arduino_response = rospy.Subscriber(
             '/drivers/ard_others/move_response', drivers_ard_others.msg.MoveResponseMsg, self.ard_callback)
         self._action_server.start()
+
+        # Tell ai/game_status the node initialized successfuly.
+        StatusServices("movement", "actuators").ready(True)
 
     def dispatch(self, command):
         #-----Actuator check
@@ -71,7 +76,7 @@ class ActuatorsNode():
         elif actuator.family == 'ax12':
             self._action_server.set_succeeded(sendToAx12(
                 actuator.id, command.order, param, timeout))
-            return 
+            return
 
         self._action_server.set_succeeded(False)
 
