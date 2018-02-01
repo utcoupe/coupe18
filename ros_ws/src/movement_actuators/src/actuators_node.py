@@ -22,14 +22,9 @@ class ActuatorsNode():
         self._action_name = '{}dispatch'.format(self._namespace)
         self._lock = threading.RLock()
         self._call_stack = {}
-        self._action_server = actionlib.SimpleActionServer(
-            self._action_name, movement_actuators.msg.dispatchAction, execute_cb=self.dispatch, auto_start=False)
-
-        # TODO: rename arduino
-        self._arduino_move = rospy.Publisher(
-            '/drivers/ard_others/move', drivers_ard_others.msg.MoveMsg)
-        self._arduino_response = rospy.Subscriber(
-            '/drivers/ard_others/move_response', drivers_ard_others.msg.MoveResponseMsg, self.ard_callback)
+        self._action_server = actionlib.SimpleActionServer( self._action_name, movement_actuators.msg.dispatchAction, execute_cb=self.dispatch, auto_start=False)
+        self._arduino_move = rospy.Publisher( '/drivers/ard_others/move', drivers_ard_others.msg.Move, queue_size=30)  # TODO check the queue_size
+        self._arduino_response = rospy.Subscriber( '/drivers/ard_others/move_response', drivers_ard_others.msg.MoveResponse, self.ard_callback)
         self._action_server.start()
 
         # Tell ai/game_status the node initialized successfuly.
@@ -81,7 +76,7 @@ class ActuatorsNode():
         self._action_server.set_succeeded(False)
 
     def sendToArduino(self, ard_id, ard_type, order, param, timeout):
-        msg = drivers_ard_others.msg.MoveMsg()
+        msg = drivers_ard_others.msg.Move()
         msg.id = ard_id
         msg.type = {
                 'digital': msg.TYPE_DIGITAL,
