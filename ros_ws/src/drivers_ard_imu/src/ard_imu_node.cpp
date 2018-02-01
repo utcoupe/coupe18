@@ -68,12 +68,15 @@ void loop()
 
   // Get sensors' data
   accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+
   sensorValues.x = ax;
   sensorValues.y = ay;
   sensorValues.z = az;
-  //sensorValues[3] = gx;
-  //sensorValues[4] = gy;
-  //sensorValues[5] = gz;
+  pub_sensor1.publish(&sensorValues);
+
+  sensorValues.x = gx;
+  sensorValues.y = gy;
+  sensorValues.z = gz;
   pub_sensor1.publish(&sensorValues);
 
   blinkState = !blinkState;
