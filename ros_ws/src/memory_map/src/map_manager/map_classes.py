@@ -55,10 +55,9 @@ class Zone(DictManager):
 
 class Waypoint(DictManager):
     def __init__(self, initdict):
-        LoadingHelpers.checkKeysExist(initdict, "position", "marker")
+        LoadingHelpers.checkKeysExist(initdict, "position")
         super(Waypoint, self).__init__({
-            "position": Position2D(initdict["position"]),
-            "marker": MarkerRViz(initdict["marker"])
+            "position": Position2D(initdict["position"])
         })
 
 

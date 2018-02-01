@@ -101,8 +101,6 @@ class MapServices():
                 if waypoints[w].get("position/x") == round(req.waypoint.pose.x, 3) and \
                    waypoints[w].get("position/y") == round(req.waypoint.pose.y, 3):
                     if req.waypoint.has_angle:
-                        print waypoints[w].get("position/a")
-                        print round(req.waypoint.pose.theta, 3)
                         if waypoints[w].get("position/a") == round(req.waypoint.pose.theta, 3):
                             filled_waypoint      = waypoints[w]
                             filled_waypoint_name = w
