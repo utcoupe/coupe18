@@ -74,56 +74,17 @@ terrain:
                     type: rect
                     width: 1.212
                     height: 0.250
-        
-        layer_belt:
-            wall_bottom:
+        layer_pathfinder:
+            _include: 
+                - layer_ground
+                - layer_belt
+            uni_distrib_green:
                 position:
                     frame_id: /map
-                    x: 1.500
-                    y: -0.200
+                    x: 1.5
+                    y: 1.125
                     type: fixed
                 shape:
                     type: rect
-                    width: 3.800
-                    height: 0.400
-                    
-            wall_left:
-                position:
-                    frame_id: /map
-                    x: -0.200
-                    y: 0.750
-                    type: fixed
-                shape:
-                    type: rect
-                    width: 0.400
-                    height: 2.300
-            wall_top:
-                position:
-                    frame_id: /map
-                    x: 1.500
-                    y: 1.700
-                    type: fixed
-                shape:
-                    type: rect
-                    width: 3.800
-                    height: 0.400
-            wall_right:
-                position:
-                    frame_id: /map
-                    x: 3.200
-                    y: 0.750
-                    type: fixed
-                shape:
-                    type: rect
-                    width: 0.400
-                    height: 2.300
-            station:
-                position:
-                    frame_id: /map
-                    x: 1.500
-                    y: 0.125
-                    type: fixed
-                shape:
-                    type: rect
-                    width: 1.224
+                    width: 1.212
                     height: 0.250

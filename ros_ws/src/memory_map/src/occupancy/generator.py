@@ -14,18 +14,25 @@ class OccupancyGenerator():
         final_path = os.path.dirname(__file__) + "/img/" + layer_name + ".bmp"
         layers = world.get("/terrain/walls/^")
         if not layer_name in layers.Dict.keys():
-            rospy.logerr("    Tried to get layer '{}''s image, but it hasn't been generated. Aborting.".format(layer_name))
+            rospy.logerr("    Couldn't find layer '{}'. Aborting.".format(layer_name))
             return None
-        img = self.generateStaticOccupancy(layers.Dict[layer_name], margin)
+        img = self.generateStaticOccupancy(layers, layer_name, margin)
         img.save(final_path)
         return final_path
 
-    def generateStaticOccupancy(self, layer, margin = 0.0): # margin in m.
+    def generateStaticOccupancy(self, layers, layer_name, margin = 0.0): # margin in m.
         img = Image.new("RGB", self.ImgSize, (255, 255, 255))
 
         draw = ImageDraw.Draw(img)
 
-        for wall in layer.toList():
+        walls = layers.Dict[layer_name].toList()
+        for i in layers.Dict[layer_name].includes:
+            if i in layers.Dict.keys():
+                walls += layers.Dict[i].toList()
+            else:
+                rospy.logerr("Couldn't find layer to include named '{}', skipping.".format(i))
+
+        for wall in walls:
             position, shape = wall.get("position/^").toDict(), wall.get("shape/^").toDict()
 
             pos = self.world_to_img_pos((position["x"], position["y"]))

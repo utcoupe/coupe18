@@ -37,7 +37,7 @@ class Map():
         for entity in initdict_entities:
             initdict_entities[entity] = Entity(initdict_entities[entity])
         for obj in initdict_objects:
-            if "container_" in obj:
+            if "_container_" in obj:
                 initdict_objects[obj] = Container(initdict_objects[obj])
             else:
                 initdict_objects[obj] = Object(initdict_objects[obj])
