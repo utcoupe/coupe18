@@ -1,39 +1,38 @@
 #!/usr/bin/python
 import rospy
 import map_manager
-#import map_communication
-#from markers import MarkersPublisher
-#from occupancy import OccupancyGenerator
+import map_communication
+from markers import MarkersPublisher
+from occupancy import OccupancyGenerator
 
 
 class MapNode():
     def __init__(self):
         rospy.init_node("map", log_level=rospy.DEBUG)
+        rospy.logdebug("Started /memory/map node.")
 
-        map_manager.Map.load("gr", "green")
-        print map_manager.Map.OBJECTS[0].elements[0].features
-
+        map_manager.Map.load()
 
         # Starting and publishing the table STL to RViz
-        #self.markers = MarkersPublisher()
+        self.markers = MarkersPublisher()
 
         # Generate static occupancy images for pathfinder, etc.
-        #occupancy = OccupancyGenerator(map_manager.Map)
+        occupancy = OccupancyGenerator(map_manager.Map)
 
         # Starting service handlers (Get, Set, Transfer, GetOccupancy)
-        #map_communication.MapServices(occupancy)
-        print "loaded map"
+        map_communication.MapServices(occupancy)
+        rospy.loginfo("[memory/map] Map request servers ready.")
 
-        #self.run()
+        map_manager.Map.swap_team("orange")
+
+        self.run()
 
     def run(self):
         r = rospy.Rate(10)
         while not rospy.is_shutdown():
             if rospy.has_param("/current_team"):
-                map_manager.Map.CONFIG.CURRENT_TEAM = rospy.get_param("/current_team")
-            if rospy.has_param("/robot"):
-                map_manager.Map.CONFIG.CURRENT_ROBOT = rospy.get_param("/robot")
-            #self.markers.updateMarkers(map_manager.Map)
+                map_manager.Map.CURRENT_TEAM = rospy.get_param("/current_team")
+            self.markers.updateMarkers(map_manager.Map)
             r.sleep()
 
 

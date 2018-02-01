@@ -1,54 +1,85 @@
-from map_feature import Feature
-from map_loader import LoadChecker
+#!/usr/bin/python
+from map_loader import LoadingHelpers
+from map_bases import DictManager
+from map_attributes import Position2D, Shape2D, MarkerRViz, Trajectory
 
 
-class Waypoint(object):
-    def __init__(self, xml):
-        self.feature = Feature(xml)
+class Terrain(DictManager):
+    def __init__(self, initdict):
+        LoadingHelpers.checkKeysExist(initdict, "shape", "marker", "walls")
+
+        # Instantiate the walls before creating the dict
+        for layer in initdict["walls"]:
+            for wall in initdict["walls"][layer]:
+                initdict["walls"][layer][wall] = Wall(initdict["walls"][layer][wall])
+            initdict["walls"][layer] = DictManager(initdict["walls"][layer])
+
+        super(Terrain, self).__init__({
+            "shape": Shape2D(initdict["shape"]),
+            "marker": MarkerRViz(initdict["marker"]),
+            "walls": DictManager(initdict["walls"]),
+        })
 
 
-class Zone(object):
-    def __init__(self, xml):
-        self.feature = Feature(xml)
+class Wall(DictManager):
+    def __init__(self, initdict):
+        LoadingHelpers.checkKeysExist(initdict, "position", "shape")
+        super(Wall, self).__init__({
+            "position": Position2D(initdict["position"]),
+            "shape": Shape2D(initdict["shape"])
+        })
 
 
-class Object(object):
-    def __init__(self, xml, classes):
-        self.name = xml.attrib["name"] if "name" in xml.attrib else xml.attrib["class"]
-        self.features = []
-        self.waypoints = []
-
-        # Pre-loading class info if available
-        if "class" in xml.attrib:
-            base = [c for c in classes if c.name == xml.attrib["class"]]
-            if len(base) == 1:
-                self.features = base[0].features
-                self.waypoints = base[0].waypoints
-
-        # Loading features list
-        if xml.find("features") is not None:
-            for f in xml.find("features").findall("feature"):
-                self.features.append(Feature(f))
-
-        # Loading waypoints list
-        if xml.find("waypoints") is not None:
-            for w in xml.find("waypoints").findall("waypoint"):
-                self.waypoints.append(Waypoint(w))
+class Zone(DictManager):
+    def __init__(self, initdict):
+        LoadingHelpers.checkKeysExist(initdict, "position", "shape", "marker", "properties")
+        super(Zone, self).__init__({
+            "position": Position2D(initdict["position"]),
+            "shape": Shape2D(initdict["shape"]),
+            "marker": MarkerRViz(initdict["marker"]),
+            "properties": DictManager(initdict["properties"])
+        })
 
 
-class Container(Object):
-    def __init__(self, xml, classes):
-        super(Container, self).__init__(xml, classes)
+class Waypoint(DictManager):
+    def __init__(self, initdict):
+        LoadingHelpers.checkKeysExist(initdict, "position", "marker")
+        super(Waypoint, self).__init__({
+            "position": Position2D(initdict["position"]),
+            "marker": MarkerRViz(initdict["marker"])
+        })
 
-        # Loading elements list
-        LoadChecker.checkNodesExist(xml, "elements")
-        LoadChecker.checkAttribsExist(xml.find("elements"), "min", "max")
-        self.min = xml.find("elements").attrib["min"]
-        self.max = xml.find("elements").attrib["max"]
 
-        self.elements = []
-        for o in xml.find("elements").findall("object"):
-            self.elements.append(Object(o, classes))
+class Entity(DictManager):
+    def __init__(self, initdict):
+        LoadingHelpers.checkKeysExist(initdict, "position", "shape", "marker", "containers", "trajectory")
 
-        for c in xml.find("elements").findall("container"):
-            self.elements.append(Container(c, classes))
+        for container in initdict["containers"]:
+            initdict["containers"][container] = Container(initdict["containers"][container])
+
+        super(Entity, self).__init__({
+            "position": Position2D(initdict["position"]),
+            "shape": Shape2D(initdict["shape"]),
+            "marker": MarkerRViz(initdict["marker"]),
+            "chest": DictManager(initdict["containers"]),
+            "trajectory": Trajectory(initdict["trajectory"])
+        })
+
+
+class Container(DictManager):
+    def __init__(self, initdict):
+        for obj in initdict:
+            initdict[obj] = Object(initdict[obj])
+        super(Container, self).__init__(initdict)
+
+
+class Object(DictManager):
+    def __init__(self, initdict):
+        LoadingHelpers.checkKeysExist(initdict, "type", "position", "shape", "marker", "properties")
+        super(Object, self).__init__({
+            "type": initdict["type"],
+            "position": Position2D(initdict["position"]),
+            "shape": Shape2D(initdict["shape"]),
+            "marker": MarkerRViz(initdict["marker"]),
+            "properties": DictManager(initdict["properties"]),
+        })

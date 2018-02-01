@@ -1,0 +1,8 @@
+config:
+    teams:
+        green:
+            default: True
+        orange:
+            default: False
+            transforms:
+                - map_x_mirror
