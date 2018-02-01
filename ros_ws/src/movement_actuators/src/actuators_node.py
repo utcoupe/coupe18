@@ -3,7 +3,7 @@
 
 import rospy
 import random
-import RLock
+import threading
 import actionlib
 import movement_actuators.msg
 import actuators_properties
@@ -100,7 +100,7 @@ class ActuatorsNode():
 
         event.wait(timeout)
         success = False
-        if(type(self._call_stack[msg.order_nb])==bool)
+        if type(self._call_stack[msg.order_nb])==bool :
             success = self._call_stack[msg.order_nb]
         with self._lock:
             del self._call_stack[msg.order_nb]
@@ -118,14 +118,14 @@ class ActuatorsNode():
             self._call_stack[ard_id] = event
         return ard_id
 
-        def ard_callback(self, msg):
-            with self._lock:
-                if msg.order_nb in self._call_stack:
-                    event = self._call_stack[msg.order_nb]
-                    self._call_stack[msg.order_nb] = msg.success
-                    event.set()
-                else:
-                    rospy.logwarn('Unknow id received : {}'.format(msg.order_nb))
+    def ard_callback(self, msg):
+        with self._lock:
+            if msg.order_nb in self._call_stack:
+                event = self._call_stack[msg.order_nb]
+                self._call_stack[msg.order_nb] = msg.success
+                event.set()
+            else:
+                rospy.logwarn('Unknow id received : {}'.format(msg.order_nb))
 
 if __name__ == '__main__':
     actuators_properties.initActuatorsList()
