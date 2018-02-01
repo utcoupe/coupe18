@@ -2,9 +2,12 @@
 # -*-coding:Utf-8 -*
 
 import rospy
+import random
+import RLock
 import actionlib
 import movement_actuators.msg
 import actuators_properties
+import drivers_ard_others.msg
 
 class ActuatorsNode():
     """Dispatch commands from AI to the correct node"""
@@ -15,12 +18,16 @@ class ActuatorsNode():
         self._node = rospy.init_node('actuators')
         self._namespace = '/movement/actuators/'
         self._action_name = '{}dispatch'.format(self._namespace)
+        self._lock = threading.RLock()
+        self._call_stack = {}
         self._action_server = actionlib.SimpleActionServer(
             self._action_name, movement_actuators.msg.dispatchAction, execute_cb=self.dispatch, auto_start=False)
         
         # TODO: rename arduino
-        self._arduino_client = actionlib.SimpleActionClient(
-            '{}arduino'.format(self._namespace), movement_actuators.msg.arduinoAction)
+        self._arduino_move = rospy.Publisher(
+            '/drivers/ard_others/move', drivers_ard_others.msg.MoveMsg)
+        self._arduino_response = rospy.Subscriber(
+            '/drivers/ard_others/move_response', drivers_ard_others.msg.MoveResponseMsg, self.ard_callback)
         self._action_server.start()
 
     def dispatch(self, command):
@@ -58,8 +65,8 @@ class ActuatorsNode():
             timeout = command.timeout
         #-----Time to send !
         if actuator.family == 'arduino':
-            # self._action_server.set_succeeded(self.sendToArduino(actuator.id, command.order, param, timeout))
-            self._action_server.set_succeeded(False)
+            self._action_server.set_succeeded(self.sendToArduino(
+                actuator.id, actuator.type, command.order, param, timeout))
             return
         elif actuator.family == 'ax12':
             self._action_server.set_succeeded(sendToAx12(
@@ -68,15 +75,52 @@ class ActuatorsNode():
 
         self._action_server.set_succeeded(False)
 
-    def sendToArduino(self, id, order, param, timeout):
-        _arduino_client.wait_for_server()
-        goal = actuators.msg.arduinoGoal(id=id, order=order, param=param)
-        _arduino_client.send_goal(goal)
-        _arduino_client.wait_for_result(rospy.Duration(0, timeout * 1000))
-        return _arduino_client.get_result().success
+    def sendToArduino(self, ard_id, ard_type, order, param, timeout):
+        msg = drivers_ard_others.msg.MoveMsg()
+        msg.id = ard_id
+        msg.type = {
+                'digital': msg.TYPE_DIGITAL,
+                'pwm': msg.TYPE_PWM,
+                'servo': msg.TYPE_SERVO
+            }[ard_type]
+        #Mode is not implemented yet:
+        #msg.mode = order
+        msg.dest_value = param
 
+        event = threading.Event()
+        event.clear()
+        msg.order_nb = self.generateId(event)
+
+        _arduino_move.publish(msg)
+
+        event.wait(timeout)
+        success = False
+        if(type(self._call_stack[msg.order_nb])==bool)
+            success = self._call_stack[msg.order_nb]
+        with self._lock:
+            del self._call_stack[msg.order_nb]
+        return success
+    
     def sendToAx12(self, id, order, param, timeout):
+        rospy.logwarn('Ax12 control is not implemented yet.')
         return False
+    
+    def generateId(self, event):
+        with self._lock:
+            ard_id = random.randint(1, 10000)
+            while ard_id in self._call_stack:
+                ard_id = random.randint(1, 10000)
+            self._call_stack[ard_id] = event
+        return ard_id
+
+        def ard_callback(self, msg):
+            with self._lock:
+                if msg.order_nb in self._call_stack:
+                    event = self._call_stack[msg.order_nb]
+                    self._call_stack[msg.order_nb] = msg.success
+                    event.set()
+                else:
+                    rospy.logwarn('Unknow id received : {}'.format(msg.order_nb))
 
 if __name__ == '__main__':
     actuators_properties.initActuatorsList()
