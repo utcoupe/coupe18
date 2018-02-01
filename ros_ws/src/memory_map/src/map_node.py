@@ -23,15 +23,13 @@ class MapNode():
         map_communication.MapServices(occupancy)
         rospy.loginfo("[memory/map] Map request servers ready.")
 
-        map_manager.Map.swap_team("orange")
-
         self.run()
 
     def run(self):
         r = rospy.Rate(10)
         while not rospy.is_shutdown():
             if rospy.has_param("/current_team"):
-                map_manager.Map.CURRENT_TEAM = rospy.get_param("/current_team")
+                map_manager.Map.swap_team(rospy.get_param("/current_team"))
             self.markers.updateMarkers(map_manager.Map)
             r.sleep()
 

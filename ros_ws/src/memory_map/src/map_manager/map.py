@@ -55,10 +55,11 @@ class Map():
 
     @staticmethod
     def swap_team(team_name):
-        for team in Map.Teams:
-            if team.name == team_name:
-                return team.swap()
-        return False
+        if team_name != Map.CurrentTeam:
+            for team in Map.Teams:
+                if team.name == team_name:
+                    team.swap()
+                    Map.CurrentTeam = team_name
 
     @staticmethod
     def get(requestpath):
@@ -73,3 +74,7 @@ class Map():
             rospy.logerr("    SET Request failed : global search needs to start with '/'.")
             return None
         return Map.MapDict.set(requestpath, mode, instance)
+
+    @staticmethod
+    def transform(codes):
+        return Map.MapDict.transform(codes)

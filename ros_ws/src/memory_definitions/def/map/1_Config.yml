@@ -5,4 +5,4 @@ config:
         orange:
             default: False
             transforms:
-                - map_x_mirror
+                - x_mirror
