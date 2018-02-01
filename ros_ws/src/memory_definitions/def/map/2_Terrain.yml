@@ -74,6 +74,8 @@ terrain:
                     type: rect
                     width: 1.212
                     height: 0.250
+
+
         layer_belt:
             beacon_top_left:
                 position:
@@ -158,7 +160,7 @@ terrain:
             castle_orange:
                 position:
                     frame_id: /map
-                    x: 3.180
+                    x: 2.820
                     y: 2.180
                     type: fixed
                 shape:
@@ -205,6 +207,8 @@ terrain:
                     type: rect
                     width: 0.05
                     height: 0.1
+
+
         layer_pathfinder:
             _include: 
                 - layer_ground

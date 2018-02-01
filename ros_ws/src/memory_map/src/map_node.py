@@ -17,7 +17,7 @@ class MapNode():
         self.markers = MarkersPublisher()
 
         # Generate static occupancy images for pathfinder, etc.
-        occupancy = OccupancyGenerator(map_manager.Map)
+        occupancy = OccupancyGenerator()
 
         # Starting service handlers (Get, Set, Transfer, GetOccupancy)
         map_communication.MapServices(occupancy)

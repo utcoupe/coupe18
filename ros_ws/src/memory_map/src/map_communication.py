@@ -76,8 +76,9 @@ class MapServices():
         s = time.time() * 1000
         rospy.loginfo("GET_OCCUPANCY:" + str(req.layer_name))
 
+        path = self.occupancy_generator.generateLayer(Map, req.layer_name, req.img_width, req.margin)
         try:
-            path = self.occupancy_generator.generateLayer(Map, req.layer_name, req.margin)
+            path = self.occupancy_generator.generateLayer(Map, req.layer_name, req.img_width, req.margin)
         except Exception as e:
             rospy.logerr("    Request failed : " + str(e))
 
@@ -87,7 +88,7 @@ class MapServices():
 
     def on_fill_waypoint(self, req):
         s = time.time() * 1000
-        rospy.loginfo("FILL_WAYPOINT: {} ({}, {}{})".format(str(req.waypoint.name if req.waypoint.name else "<no name>"), 
+        rospy.loginfo("FILL_WAYPOINT: {} ({}, {}{})".format(str(req.waypoint.name if req.waypoint.name else "<no name>"),
                                                            req.waypoint.pose.x, req.waypoint.pose.y,
                                                            ", {}".format(req.waypoint.pose.theta) if req.waypoint.has_angle else ""))
 
