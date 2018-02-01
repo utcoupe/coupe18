@@ -15,6 +15,8 @@ class Team(object):
     def swap(self):
         success = map.Map.transform(self.transforms)
 
-        if success: rospy.loginfo("Swapped map to team '{}' successfully.".format(self.name))
+        if success:
+            rospy.loginfo("Swapped map to team '{}' successfully.".format(self.name))
+            map.Map.CurrentTeam = self.name
         else: rospy.logerr("Couldn't swap map to team '{}'.".format(self.name))
         return success

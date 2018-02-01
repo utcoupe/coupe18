@@ -6,3 +6,4 @@ config:
             default: False
             transforms:
                 - x_mirror
+                - a_mirror

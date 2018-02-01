@@ -13,6 +13,7 @@ class Position2D(DictManager):
     def transform(self, codes):
         if "x_mirror" in codes:
             self.Dict["x"] = map.Map.get("/terrain/shape/^").Dict["width"] - self.Dict["x"]
+        if "a_mirror" in codes:
             if "a" in self.Dict.keys():
                 self.Dict["a"] = math.pi - self.Dict["a"]
         return True

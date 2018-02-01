@@ -14,25 +14,66 @@ terrain:
         mesh_path: "package://memory_definitions/def/map/robotcities2018_map.stl"
     walls:
         layer_ground:
-            test:
+            wall_top:
                 position:
                     frame_id: /map
-                    x: 0
-                    y: 0
+                    x: 1.5
+                    y: 2.011
                     type: fixed
                 shape:
                     type: rect
-                    width: 1.5
-                    height: 0.5
-            circle:
+                    width: 3.044
+                    height: 0.022
+            wall_bottom:
                 position:
                     frame_id: /map
-                    x: 0.6
-                    y: 0.6
+                    x: 1.5
+                    y: -0.011
                     type: fixed
                 shape:
-                    type: circle
-                    radius: 0.3
+                    type: rect
+                    width: 3.044
+                    height: 0.022
+            wall_left:
+                position:
+                    frame_id: /map
+                    x: -0.011
+                    y: 1
+                    type: fixed
+                shape:
+                    type: rect
+                    width: 0.022
+                    height: 2.0
+            wall_right:
+                position:
+                    frame_id: /map
+                    x: 3.011
+                    y: 1
+                    type: fixed
+                shape:
+                    type: rect
+                    width: 0.022
+                    height: 2.0
+            stations:
+                position:
+                    frame_id: /map
+                    x: 1.5
+                    y: 0.125
+                    type: fixed
+                shape:
+                    type: rect
+                    width: 1.212
+                    height: 0.250
+            uni_distrib_green:
+                position:
+                    frame_id: /map
+                    x: 1.5
+                    y: 0.125
+                    type: fixed
+                shape:
+                    type: rect
+                    width: 1.212
+                    height: 0.250
         
         layer_belt:
             wall_bottom:

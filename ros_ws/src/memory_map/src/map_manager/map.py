@@ -59,7 +59,8 @@ class Map():
             for team in Map.Teams:
                 if team.name == team_name:
                     team.swap()
-                    Map.CurrentTeam = team_name
+                    return
+            rospy.logerr("Found no team with name '{}', aborting team swap.".format(team_name))
 
     @staticmethod
     def get(requestpath):
