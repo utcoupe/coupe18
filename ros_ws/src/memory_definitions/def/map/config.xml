@@ -2,7 +2,7 @@
     <map>
         <feature>
             <position x="0" y="0" a="0"/>
-            <shape type="rect" w="" h=""/>
+            <shape type="rect" w="3" h="2"/>
             <marker>
                 <type>mesh</type>
                 <ns>table</ns>

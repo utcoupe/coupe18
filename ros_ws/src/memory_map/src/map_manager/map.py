@@ -1,9 +1,8 @@
 from map_loader import MapLoader, LoadChecker
-from config import Config
+from map_config import Config
 from robot import Robot
-from zone import Zone
-from feature import Feature
-from object import Object, Container
+from map_feature import Feature
+from map_classes import Object, Container, Zone
 
 class Map(object):
     CONFIG = Config()

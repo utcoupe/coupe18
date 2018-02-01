@@ -1,5 +1,5 @@
 from map_loader import LoadChecker
-from feature import Feature
+from map_feature import Feature
 
 
 class Layer(object):
@@ -19,10 +19,12 @@ class Color(object):
         self.r = xml.attrib["r"]
         self.g = xml.attrib["g"]
         self.b = xml.attrib["b"]
+        self.a = xml.attrib["a"] if "a" in xml.attrib else 1.0
 
 
 class Config(object):
     CURRENT_TEAM = None
+    DEFAULT_FRAME_ID = "map"
 
     LAYERS = []
     COLORS = []

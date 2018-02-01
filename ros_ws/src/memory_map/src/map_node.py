@@ -11,6 +11,8 @@ class MapNode():
         rospy.init_node("map", log_level=rospy.DEBUG)
 
         map_manager.Map.load("gr", "green")
+        print map_manager.Map.OBJECTS[0].elements[0].features
+
 
         # Starting and publishing the table STL to RViz
         #self.markers = MarkersPublisher()

@@ -57,7 +57,15 @@
         </container>
 
         <container name="cube_grape_1">
-            <elements min="0" max="5"/>
+            <elements min="0" max="5">
+                <object class="cube_green">
+                    <features>
+                        <feature id="main">
+                            <position x="2" y="1"/>
+                        </feature>
+                    </features>
+                </object>
+            </elements>
         </container>
 
         <container name="cube_grape_2">
