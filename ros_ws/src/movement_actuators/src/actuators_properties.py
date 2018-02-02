@@ -11,16 +11,19 @@ class ActuatorsProperties():
     """Explore Actuators' Properties"""
 
     def __init__(self, xml_actuators):
-        self.id = xml_actuators.get('id')
+        self.id = int(xml_actuators.get('id'))
         self.name = xml_actuators.get('name')
         self.type = xml_actuators.get('type')
         self.family = xml_actuators.get('family')
-        self.default_timeout=xml_actuators.find('timeout').get('value')
+        self.default_timeout = int( xml_actuators.find('timeout').get('value') )
         positions = xml_actuators.find('positions')
         self.default_position = positions.get('default')
         self.preset = {}
         for preset in positions.findall('preset'):
-            self.preset[preset.get('name')] = preset.get('value')
+            self.preset[preset.get('name')] = int( preset.get('value') )
+    
+    def __repr__(self):
+        return '{}({})[{}-{}]'.format(self.name,self.id,self.family,self.type)
 
 
 def initActuatorsList():

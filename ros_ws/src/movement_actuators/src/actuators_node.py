@@ -37,7 +37,7 @@ class ActuatorsNode():
         except KeyError as identifier:
             rospy.logwarn('The action dispatch should be called with a name instead of an id.')
             for actuator in actuators_properties.getActuatorsList().values():
-                if actuator.id == str(command.id):
+                if actuator.id == command.id:
                     break
                 actuator = None
             if actuator == None:
@@ -56,7 +56,7 @@ class ActuatorsNode():
                              command.preset + '" in actuator "' + actuator.name + '"')
                 return
         else:
-            param = command.param
+            param = int(command.param) #TODO check param
         #-----Timeout check
         timeout = None
         if command.timeout<=0:
@@ -65,12 +65,12 @@ class ActuatorsNode():
             timeout = command.timeout
         #-----Time to send !
         if actuator.family == 'arduino':
-            self._action_server.set_succeeded(self.sendToArduino(
-                actuator.id, actuator.type, command.order, param, timeout))
+            self._result.success = self.sendToArduino( actuator.id, actuator.type, command.order, param, timeout )
+            self._action_server.set_succeeded(self._result)
             return
         elif actuator.family == 'ax12':
-            self._action_server.set_succeeded(sendToAx12(
-                actuator.id, command.order, param, timeout))
+            self._result.success = self.sendToAx12( actuator.id, command.order, param, timeout)
+            self._action_server.set_succeeded(self._result)
             return
 
         self._action_server.set_succeeded(False)
@@ -91,16 +91,15 @@ class ActuatorsNode():
         event.clear()
         msg.order_nb = self.generateId(event)
 
-        _arduino_move.publish(msg)
-
-        event.wait(timeout)
+        self._arduino_move.publish(msg)
+        event.wait(timeout / 1000.0)
         success = False
         if type(self._call_stack[msg.order_nb])==bool :
             success = self._call_stack[msg.order_nb]
         with self._lock:
             del self._call_stack[msg.order_nb]
         return success
-    
+
     def sendToAx12(self, id, order, param, timeout):
         rospy.logwarn('Ax12 control is not implemented yet.')
         return False

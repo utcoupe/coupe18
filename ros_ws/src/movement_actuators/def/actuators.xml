@@ -15,7 +15,7 @@
             <preset name="CLOSE" value="10" />
         </positions>
     </act>
-    <act name="cc1" id="1" type="ccmotor" family="arduino">
+    <act name="cc1" id="1" type="pwm" family="arduino">
         <timeout value="10000"/> <!-- Default timeout -->
         <positions default="0">
             <preset name="spinmax" value="390" />
