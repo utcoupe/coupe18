@@ -2,6 +2,7 @@
 # -*-coding:Utf-8 -*
 
 import rospy
+import time
 import random
 import threading
 import actionlib
@@ -10,6 +11,8 @@ import actuators_properties
 import drivers_ard_others.msg
 from ai_game_status import StatusServices
 
+
+def current_milli_time(): return int(round(time.time() * 1000))
 
 class ActuatorsNode():
     """Dispatch commands from AI to the correct node"""
@@ -92,7 +95,11 @@ class ActuatorsNode():
         msg.order_nb = self.generateId(event)
 
         self._arduino_move.publish(msg)
+        ts = current_milli_time()
         event.wait(timeout / 1000.0)
+        ts = current_milli_time() - ts
+        if ts >= timeout:
+            rospy.loginfo('Timeout reached')
         success = False
         if type(self._call_stack[msg.order_nb])==bool :
             success = self._call_stack[msg.order_nb]
