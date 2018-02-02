@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
 import rospy
 from definitions import *
 from actionlist import ActionList
 from task import Task
+
 
 class Strategy(Task):
     def __init__(self, xml, actions, orders, communicator):
@@ -20,11 +22,14 @@ class Strategy(Task):
     def getNext(self): # Returns the next free task (ActionList, Action or Order).
         return self.TASKS.getNext()
 
+    def sendReward(self, communicator):
+        communicator.SendRequest("/ai/scheduler/score", {"score": self.TASKS.getActiveReward()})
+
     def getStatus(self):
         return self.TASKS.getStatus()
 
     def PrettyPrint(self):
-        rospy.loginfo('[STRATEGY] ' + self.__repr__())
+        rospy.loginfo("[STRATEGY {}⚡ ACTIVE] {}".format(self.TASKS.getActiveReward(), self.__repr__()))
         self.TASKS.prettyprint(1)
         self.TASKS_ONFINISH.prettyprint(1)
 

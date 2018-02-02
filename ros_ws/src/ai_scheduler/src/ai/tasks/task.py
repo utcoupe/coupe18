@@ -22,6 +22,9 @@ class Task(object):
     def getReward(self):
         return self.Reward
 
+    def getActiveReward(self):
+        return self.getReward() if self.getStatus() == TaskStatus.SUCCESS else 0
+
     def setParent(self, parent):
         self.Parent = parent
 

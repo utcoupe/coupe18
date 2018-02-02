@@ -7,10 +7,10 @@
 	<!-- STRATEGY real game actions ! -->
 	<strategy name="button_then_distrib">
 		<actions name="In-Game Actions">
-			<actionref ref="game_start"/>
-
 			<orderref ref="delay" name="5 points bee loaded" reward="5"/>
 			<orderref ref="delay" name="5 points home installed" reward="5"/>
+
+			<actionref ref="game_start"/>
 
 			<actionlist name="Main actions" needsprevious="true">
 				<actionref ref="activate_button"/>

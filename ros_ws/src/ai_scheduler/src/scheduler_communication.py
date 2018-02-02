@@ -25,6 +25,7 @@ class RequestTypes(object):
     @staticmethod
     def init():
         RequestTypes.SERVERS = {
+            "/ai/scheduler/score":               (RequestTypes.PUB_MSG, ai_scheduler.msg.AIScore),
             "/ai/game_status/set_status":        (RequestTypes.SERVICE, ai_game_status.srv.SetStatus),
             "/ai/timer/set_timer":               (RequestTypes.SERVICE, ai_timer.srv.SetTimer),
             "/ai/timer/delay":                   (RequestTypes.SERVICE, ai_timer.srv.Delay),

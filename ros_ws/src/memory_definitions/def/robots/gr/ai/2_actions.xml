@@ -46,15 +46,7 @@
 				</target_pos>
 			</orderref>
 
-			<orderref ref="asserv_goto" name="approach button">
-				<target_pos>
-					<x>1.13</x>
-					<y>1.65</y>
-					<theta>1.5708</theta>
-				</target_pos>
-			</orderref>
-
-			<orderref ref="asserv_goto" name="accost button">
+			<orderref ref="asserv_goto" name="accost button" needsprevious="true">
 				<target_pos>
 					<x>1.13</x>
 					<y>1.8</y>
@@ -86,7 +78,7 @@
 		</actions>
 	</action>
 
-	<action ref="load_unicolor_distributor" name="Load unicolor distributor" reward="10">
+	<action ref="load_unicolor_distributor" name="Load unicolor distributor">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -98,7 +90,7 @@
 				</target_pos>
 			</orderref>
 
-			<orderref ref="asserv_goto" name="accost distributor">
+			<orderref ref="asserv_goto" name="accost distributor" needsprevious="true">
 				<target_pos>
 					<x>0.28</x>
 					<y>1.16</y>
@@ -106,7 +98,7 @@
 				</target_pos>
 			</orderref>
 
-			<orderref ref="delay" name="LOAD UNI ACTIONS (delay for now)" reward="10">
+			<orderref ref="delay" name="LOAD UNI ACTIONS (delay for now)" needsprevious="true" reward="10">
 				<duration>2</duration>
 			</orderref> <!-- TEMPORARY -->
 
@@ -120,7 +112,7 @@
 		</actions>
 	</action>
 
-	<action ref="load_multicolor_distributor" name="Load multicolor distributor" reward="10">
+	<action ref="load_multicolor_distributor" name="Load multicolor distributor">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -132,7 +124,7 @@
 				</target_pos>
 			</orderref>
 
-			<orderref ref="asserv_goto" name="accost distributor">
+			<orderref ref="asserv_goto" name="accost distributor" needsprevious="true">
 				<target_pos>
 					<x>2.39</x>
 					<y>0.28</y>
@@ -140,7 +132,7 @@
 				</target_pos>
 			</orderref>
 
-			<orderref ref="delay" name="LOAD MULTI ACTIONS (delay for now)" reward="10">
+			<orderref ref="delay" name="LOAD MULTI ACTIONS (delay for now)" needsprevious="true" reward="10">
 				<duration>2</duration>
 			</orderref> <!-- TEMPORARY -->
 
@@ -166,7 +158,7 @@
 				</target_pos>
 			</orderref>
 
-			<orderref ref="delay" name="FIRE (delay for now)">
+			<orderref ref="delay" name="FIRE (delay for now)" needsprevious="true">
 				<duration>3</duration>
 			</orderref> <!-- TEMPORARY -->
 		</actions>
@@ -202,7 +194,7 @@
 				</target_pos>
 			</orderref>
 
-			<orderref ref="asserv_goto" name="accost station">
+			<orderref ref="asserv_goto" name="accost station" needsprevious="true">
 				<target_pos>
 					<x>1.2</x>
 					<y>0.5</y>
@@ -210,7 +202,7 @@
 				</target_pos>
 			</orderref>
 
-			<orderref ref="delay" name="UNLOAD ACTIONS (delay for now)">
+			<orderref ref="delay" name="UNLOAD ACTIONS (delay for now)" needsprevious="true">
 				<duration>2</duration>
 			</orderref> <!-- TEMPORARY -->
 
@@ -236,7 +228,7 @@
 				</target_pos>
 			</orderref>
 
-			<orderref ref="asserv_goto" name="accost bee">
+			<orderref ref="asserv_goto" name="accost bee" needsprevious="true">
 				<target_pos>
 					<x>0.21</x>
 					<y>0.15</y>
@@ -244,7 +236,7 @@
 				</target_pos>
 			</orderref>
 
-			<orderref ref="delay" name="ACTIVATE ACTIONS (delay for now)">
+			<orderref ref="delay" name="ACTIVATE ACTIONS (delay for now)" needsprevious="true">
 				<duration>2</duration>
 			</orderref> <!-- TEMPORARY -->
 

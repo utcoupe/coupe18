@@ -15,7 +15,14 @@ class Action(Task):
     def loadxml(self, xml, actions, orders):
         self.TASKS = ActionList(xml.find("actions"), actions, orders)
         self.TASKS.setParent(self)
+        self.TASKS.Reward = self.Reward
         self.fetchBoundParams(xml)
+
+    def getReward(self):
+        return self.TASKS.getReward()
+
+    def getActiveReward(self):
+        return self.TASKS.getActiveReward()
 
     def getParamForBind(self, bind):
         for t in self.TASKS.TASKS:
@@ -48,6 +55,9 @@ class Action(Task):
         for p in self.BoundParams:
             if self.BoundParams[p].bind == p:
                 self.BoundParams[p].checkValues()
+
+    def getActiveReward(self):
+        return self.getReward() if self.getStatus() == TaskStatus.SUCCESS else 0
 
     def getDuration(self):
         return self.TASKS.getDuration()

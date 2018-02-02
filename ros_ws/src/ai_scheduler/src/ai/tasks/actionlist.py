@@ -58,6 +58,9 @@ class ActionList(Task):
     def getReward(self):
         return self.Reward + sum([task.getReward() for task in self.TASKS])
 
+    def getActiveReward(self):
+        return self.getReward() if self.getStatus() == TaskStatus.SUCCESS else sum([task.getActiveReward() for task in self.TASKS])
+
     def getDuration(self):
         return sum([task.getDuration() for task in self.TASKS])
 
