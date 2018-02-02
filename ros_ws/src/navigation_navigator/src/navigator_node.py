@@ -8,12 +8,13 @@ import actionlib
 
 from geometry_msgs.msg import Pose2D
 from navigation_navigator.srv import Goto
-from navigation_navigator.msg import Status, DoGotoResult, DoGotoAction
+from navigation_navigator.msg import Status, DoGotoResult, DoGotoAction, DoGotoWaypointResult, DoGotoWaypointAction
 
 from pathfinder import PathfinderClient
 from asserv import AsservClient
 from localizer import LocalizerClient
 from collisions import CollisionsClient
+from map import MapClient
 
 from ai_game_status import StatusServices
 
@@ -55,12 +56,14 @@ class NavigatorNode(object):
         """
 
         self._actionSrv_Dogoto = ""
+        self._actionSrv_doGotoWaypoint = ""
         self._statusPublisher = ""
 
         self._pathfinderClient = ""
         self._asservClient = ""
         self._localizerClient = ""
         self._collisionsClient = ""
+        self._mapClient = ""
 
         self._currentStatus = NavigatorStatuses.NAV_IDLE
         self._currentPath = {}
@@ -100,33 +103,44 @@ class NavigatorNode(object):
         will have treated all points.
         @param handledGoal: the received goal
         """
-        self._currentStatus = NavigatorStatuses.NAV_NAVIGATING
-        self._collisionsClient.setEnabled(not handledGoal.get_goal().disable_collisions)
         posStart = self._localizerClient.getLastKnownPos()
         posEnd = handledGoal.get_goal().target_pos
+        hasAngle = False
+        if handledGoal.get_goal().mode == handledGoal.get_goal().GOTOA:
+            hasAngle = True
+        self._executeGoto(posStart, posEnd, hasAngle, handledGoal)
+
+    def _handleDoGotoWaypointRequest(self, handledGoal):
+        rospy.logdebug("request waypoint")
+        startPos = self._localizerClient.getLastKnownPos()
+        endPos = self._mapClient.getPosFromWaypoint(handledGoal.get_goal().waypoint_name)
+        hasAngle = False
+        if handledGoal.get_goal().mode == handledGoal.get_goal().GOTOA:
+            hasAngle = True
+        self._executeGoto(startPos, endPos, hasAngle, handledGoal)
+
+
+    def _executeGoto (self, startPos, endPos, hasAngle, handledGoal):
+        self._currentStatus = NavigatorStatuses.NAV_NAVIGATING
+        self._collisionsClient.setEnabled(not handledGoal.get_goal().disable_collisions)
         debugStr = "Asked to go from "
-        debugStr += pointToStr(posStart)
-        debugStr += " to " + pointToStr(posEnd)
+        debugStr += pointToStr(startPos)
+        debugStr += " to " + pointToStr(endPos)
         rospy.logdebug(debugStr)
         handledGoal.set_accepted()
         try:
             # sends the request to the pathfinder
-            path = self._pathfinderClient.FindPath(posStart, posEnd)
+            path = self._pathfinderClient.FindPath(startPos, endPos)
             self._printPath (path)
             # then sends the path point per point to the arduino_asserv
-            path.pop() # The last point will be given endPosition
+            path.pop() # The last point will be given end Position
             self._currentPath = path[:]
-            self._currentPath.append(posEnd)
             self._updateStatus()
             for point in path:
                 cb = partial(self._callbackAsservForDoGotoAction, handledGoal, False)
                 self._asservClient.doGoto(point, False, cb)
-            
-            hasAngle = False
-            if handledGoal.get_goal().mode == handledGoal.get_goal().GOTOA:
-                hasAngle = True
             cb = partial(self._callbackAsservForDoGotoAction, handledGoal, True)
-            self._asservClient.doGoto(posEnd, hasAngle, cb)
+            self._asservClient.doGoto(endPos, hasAngle, cb)
         except Exception, e:
             rospy.logdebug("Navigation failed: " + e.message)
             result = DoGotoResult(False)
@@ -170,11 +184,14 @@ class NavigatorNode(object):
         self._asservClient = AsservClient()
         self._localizerClient = LocalizerClient()
         self._collisionsClient = CollisionsClient(self._callbackEmergencyStop, self._callbackAsservResume)
-        # Create action server and topic publisher
+        self._mapClient = MapClient()
+        # Create action servers and topic publisher
         self._actionSrv_Dogoto = actionlib.ActionServer(FULL_NODE_NAME + "/goto_action", DoGotoAction, self._handleDoGotoRequest, auto_start=False)
+        self._actionSrv_doGotoWaypoint = actionlib.ActionServer(FULL_NODE_NAME + "/gotowaypoint_action", DoGotoWaypointAction, self._handleDoGotoWaypointRequest, auto_start=False)
         self._statusPublisher = rospy.Publisher(FULL_NODE_NAME + "/status", Status, queue_size=10)
         # Launch the node
         self._actionSrv_Dogoto.start()
+        self._actionSrv_doGotoWaypoint.start()
         rospy.loginfo ("Ready to navigate!")
         self._updateStatus()
         rospy.spin ()
