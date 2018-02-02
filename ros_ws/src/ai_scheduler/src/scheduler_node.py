@@ -46,27 +46,6 @@ class AINode():
         time.sleep(0.3)
         pub.publish(GameProperties.AVAILABLE_TEAMS)
 
-    def send_set_ingame(self): # TODO wrong place ?
-        pub = rospy.Publisher("/ai/game_status/set_status", SetStatus, queue_size=10)
-        time.sleep(0.3)
-        s = SetStatus()
-        s.new_game_status = 2 # STATUS_INGAME TODO do more "better" ?
-        pub.publish(s)
-
-    # def runAI(self):
-    #     #Debug: show task tree when starting the system
-    #     rospy.loginfo("[AI] Launching robot with strategy :")
-    #     self.AI.strategy.PrettyPrint()
-
-    #     # Run the whole AI until there are no orders left to execute
-    #     while not rospy.is_shutdown():
-    #         if self.AI.strategy.canContinue():
-    #             self.AI.strategy.getNext().execute(self.communication)
-    #         else:
-    #             rospy.loginfo("[AI] In-Game actions finished!")
-    #             break
-    #         self.AI.strategy.PrettyPrint()
-
     def on_game_status(self, msg):
         if msg.game_status == msg.STATUS_HALT:
             self.AI.halt()
@@ -78,9 +57,11 @@ class AINode():
         if req.event == req.EVENT_START:
             GameProperties.CURRENT_STRATEGY = GameProperties.AVAILABLE_STRATEGIES[req.chosen_strategy_id]
             GameProperties.CURRENT_TEAM     = GameProperties.AVAILABLE_TEAMS[req.chosen_team_id]
+            rospy.set_param("/current_strategy", GameProperties.CURRENT_STRATEGY)
+            rospy.set_param("/current_team",     GameProperties.CURRENT_TEAM)
             self._ai_start_request = True
             rospy.loginfo("[AI] Starting actions ! Strategy '{}' and team '{}'.".format(GameProperties.CURRENT_STRATEGY, GameProperties.CURRENT_TEAM))
-        elif req.event == req.EVENT_GAME_CANCEL:
+        elif req.event == req.EVENT_GAME_CANCEL: # TODO remove ? Should be trigerred by a game_status HALT
             rospy.logwarn("[AI] HMI Asked to stop ! Stopping strategy execution.")
             self.AI.halt()
 

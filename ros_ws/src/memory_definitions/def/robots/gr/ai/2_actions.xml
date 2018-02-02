@@ -34,7 +34,7 @@
 		</actions>
 	</action>
 
-	<action ref="activate_button" name="Go and activate Home Button" reward="30">
+	<action ref="activate_button" name="Go and activate Home Button" reward="25">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -46,15 +46,7 @@
 				</target_pos>
 			</orderref>
 
-			<orderref ref="asserv_goto" name="approach button">
-				<target_pos>
-					<x>1.13</x>
-					<y>1.65</y>
-					<theta>1.5708</theta>
-				</target_pos>
-			</orderref>
-
-			<orderref ref="asserv_goto" name="accost button">
+			<orderref ref="asserv_goto" name="accost button" needsprevious="true">
 				<target_pos>
 					<x>1.13</x>
 					<y>1.8</y>
@@ -72,7 +64,7 @@
 				<preset>OPEN</preset>
 			</orderref>
 
-			<orderref ref="delay" name="LOAD MULTI ACTIONS (delay for now)">
+			<orderref ref="delay">
 				<duration>2</duration>
 			</orderref> <!-- TEMPORARY -->
 
@@ -98,7 +90,7 @@
 				</target_pos>
 			</orderref>
 
-			<orderref ref="asserv_goto" name="accost distributor">
+			<orderref ref="asserv_goto" name="accost distributor" needsprevious="true">
 				<target_pos>
 					<x>0.28</x>
 					<y>1.16</y>
@@ -106,7 +98,7 @@
 				</target_pos>
 			</orderref>
 
-			<orderref ref="delay" name="LOAD UNI ACTIONS (delay for now)">
+			<orderref ref="delay" name="LOAD UNI ACTIONS (delay for now)" needsprevious="true" reward="10">
 				<duration>2</duration>
 			</orderref> <!-- TEMPORARY -->
 
@@ -132,7 +124,7 @@
 				</target_pos>
 			</orderref>
 
-			<orderref ref="asserv_goto" name="accost distributor">
+			<orderref ref="asserv_goto" name="accost distributor" needsprevious="true">
 				<target_pos>
 					<x>2.39</x>
 					<y>0.28</y>
@@ -140,7 +132,7 @@
 				</target_pos>
 			</orderref>
 
-			<orderref ref="delay" name="LOAD MULTI ACTIONS (delay for now)">
+			<orderref ref="delay" name="LOAD MULTI ACTIONS (delay for now)" needsprevious="true" reward="10">
 				<duration>2</duration>
 			</orderref> <!-- TEMPORARY -->
 
@@ -154,7 +146,25 @@
 		</actions>
 	</action>
 
-	<action ref="fire_clean_balls" name="Fire clean balls to water tower">
+	<action ref="fire_full_clean_balls" name="Fire clean balls to water tower" reward="40">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="asserv_goto" name="goto tower fire position">
+				<target_pos>
+					<x>0.6</x>
+					<y>1.4</y>
+					<theta>2.3562</theta>
+				</target_pos>
+			</orderref>
+
+			<orderref ref="delay" name="FIRE (delay for now)" needsprevious="true">
+				<duration>3</duration>
+			</orderref> <!-- TEMPORARY -->
+		</actions>
+	</action>
+
+	<action ref="fire_half_clean_balls" name="Fire clean balls to water tower" reward="20">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -172,7 +182,7 @@
 		</actions>
 	</action>
 
-	<action ref="unload_dirty_balls" name="Unload dirty balls to station">
+	<action ref="unload_dirty_balls" name="Unload dirty balls to station" reward="40">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -184,7 +194,7 @@
 				</target_pos>
 			</orderref>
 
-			<orderref ref="asserv_goto" name="accost station">
+			<orderref ref="asserv_goto" name="accost station" needsprevious="true">
 				<target_pos>
 					<x>1.2</x>
 					<y>0.5</y>
@@ -192,7 +202,7 @@
 				</target_pos>
 			</orderref>
 
-			<orderref ref="delay" name="UNLOAD ACTIONS (delay for now)">
+			<orderref ref="delay" name="UNLOAD ACTIONS (delay for now)" needsprevious="true">
 				<duration>2</duration>
 			</orderref> <!-- TEMPORARY -->
 
@@ -206,7 +216,7 @@
 		</actions>
 	</action>
 
-	<action ref="activate_bee" name="Activate bee">
+	<action ref="activate_bee" name="Activate bee" reward="50">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -218,7 +228,7 @@
 				</target_pos>
 			</orderref>
 
-			<orderref ref="asserv_goto" name="accost bee">
+			<orderref ref="asserv_goto" name="accost bee" needsprevious="true">
 				<target_pos>
 					<x>0.21</x>
 					<y>0.15</y>
@@ -226,7 +236,7 @@
 				</target_pos>
 			</orderref>
 
-			<orderref ref="delay" name="ACTIVATE ACTIONS (delay for now)">
+			<orderref ref="delay" name="ACTIVATE ACTIONS (delay for now)" needsprevious="true">
 				<duration>2</duration>
 			</orderref> <!-- TEMPORARY -->
 

@@ -15,8 +15,14 @@ class Action(Task):
     def loadxml(self, xml, actions, orders):
         self.TASKS = ActionList(xml.find("actions"), actions, orders)
         self.TASKS.setParent(self)
+        self.TASKS.Reward = self.Reward
         self.fetchBoundParams(xml)
 
+    def getReward(self):
+        return self.TASKS.getReward()
+
+    def getActiveReward(self):
+        return self.TASKS.getActiveReward()
 
     def getParamForBind(self, bind):
         for t in self.TASKS.TASKS:
@@ -26,22 +32,17 @@ class Action(Task):
     def fetchBoundParams(self, xml):
         if "params" not in [node.tag for node in xml]:
             return
-
         boundParamsList = []
-
         for param in xml.find("params"):
             if "name" not in param.attrib:
                 raise KeyError("Parameters need a 'name' attribute ! (action '{}')".format(self.Name))
-
             name = param.attrib["name"]
-
             finalBind = self.getParamForBind(name)
 
             if not finalBind:
                 raise KeyError("No parameter bound with '{}' !".format(name))
             else:
                 boundParamsList.append(finalBind)
-
         self.BoundParams = {p.bind: p for p in boundParamsList}
 
     def setParameters(self, orderref_xml):
@@ -55,8 +56,8 @@ class Action(Task):
             if self.BoundParams[p].bind == p:
                 self.BoundParams[p].checkValues()
 
-
-
+    def getActiveReward(self):
+        return self.getReward() if self.getStatus() == TaskStatus.SUCCESS else 0
 
     def getDuration(self):
         return self.TASKS.getDuration()
@@ -79,6 +80,7 @@ class Action(Task):
     def prettyprint(self, indentlevel):
         super(Action, self).prettyprint(indentlevel)
         self.TASKS.prettyprint(indentlevel + 1, hide = True)
+
     def __repr__(self):
         c = Console();c.setstyle(Colors.BOLD);c.setstyle(Colors.BLUE)
         c.addtext("[{} Action]".format(self.getStatusEmoji()))

@@ -7,6 +7,9 @@
 	<!-- STRATEGY real game actions ! -->
 	<strategy name="button_then_distrib">
 		<actions name="In-Game Actions">
+			<orderref ref="delay" name="5 points bee loaded" reward="5"/>
+			<orderref ref="delay" name="5 points home installed" reward="5"/>
+
 			<actionref ref="game_start"/>
 
 			<actionlist name="Main actions" needsprevious="true">
@@ -14,20 +17,21 @@
 
 				<actionlist name="Do unicolor distributor">
 					<actionref ref="load_unicolor_distributor"/>
-					<actionref ref="fire_clean_balls" needsprevious="true"/>
+					<actionref ref="fire_full_clean_balls" needsprevious="true"/>
 				</actionlist>
 
 				<actionlist name="Do multicolor distributor">
 					<actionref ref="load_multicolor_distributor"/>
 					<actionlist name="Unload multi balls" needsprevious="true">
 						<actionref ref="unload_dirty_balls"/>
-						<actionref ref="fire_clean_balls"/>
+						<actionref ref="fire_half_clean_balls"/>
 					</actionlist>
 				</actionlist>
 
 				<actionref ref="activate_bee"/>
 			</actionlist>
 
+			<orderref ref="delay" name="10 points no game over" reward="10"/>
 			<actionref ref="goto_spawn"/>
 		</actions>
 		<actions_onfinish name="After-Game Actions">

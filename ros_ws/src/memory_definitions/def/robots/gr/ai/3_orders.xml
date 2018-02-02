@@ -25,32 +25,7 @@
 		</message>
 	</order>
 
-	<order ref="funny_action" duration="1">
-		<message dest="/test">
-		</message>
-	</order>
-
-	<order ref="actuator_startup_sequence">
-		<message dest="/test">
-		</message>
-	</order>
-
-	<order ref="actuator_toggle" duration="1.5" reward="3">
-		<message dest="/test">
-		</message>
-	</order>
-
-	<order ref="actuator_open" duration="1.5" reward="3">
-		<message dest="/test">
-		</message>
-	</order>
-
-	<order ref="actuator_close" duration="1.5" reward="3">
-		<message dest="/test">
-		</message>
-	</order>
-
-	<order ref="actuator_servo_set_pos" duration="1.5" reward="15">
+	<order ref="actuator_servo_set_pos" duration="1.5">
 		<message dest="/movement/actuators/dispatch">
 			<param name="name" type="string"/>
 			<param name="preset" type="string" optional="true"/> <!-- Set either a preset or param-->
@@ -70,7 +45,7 @@
 	<!-- AI Specific -->
 	<order ref="delay" duration="1">
 		<message dest="/ai/timer/delay">
-			<param name="duration" type="float"/>
+			<param name="duration" type="float" optional="true">0</param>
 		</message>
 	</order>
 
