@@ -18,7 +18,7 @@ class MapNode():
         self.markers = MarkersPublisher()
 
         # Generate static occupancy images for pathfinder, etc.
-        occupancy = OccupancyGenerator(map_manager.Map)
+        occupancy = OccupancyGenerator()
 
         # Starting service handlers (Get, Set, Transfer, GetOccupancy)
         map_communication.MapServices(occupancy)
@@ -32,6 +32,8 @@ class MapNode():
     def run(self):
         r = rospy.Rate(10)
         while not rospy.is_shutdown():
+            if rospy.has_param("/current_team"):
+                map_manager.Map.swap_team(rospy.get_param("/current_team"))
             self.markers.updateMarkers(map_manager.Map)
             r.sleep()
 

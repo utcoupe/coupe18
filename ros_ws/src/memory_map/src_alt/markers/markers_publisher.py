@@ -17,8 +17,7 @@ class MarkersPublisher():
         if self._is_connected():
             self._publish_table(world)
             self._publish_robot_stl(world)
-            self._publish_zones(world)
-            self._publish_waypoints(world)
+            self._update_zones(world)
             self._publish_objects(world.get("/objects/^"))
 
     def _publish_table(self, world):
@@ -39,36 +38,9 @@ class MarkersPublisher():
         })
         self._publish_marker(pos, world.get("/entities/{}/marker/^".format(rospy.get_param("/robot"))))
 
-    def _publish_zones(self, world):
+    def _update_zones(self, world):
         for z in world.get("/zones/^").toList():
             self._publish_marker(z.get("position/^"), z.get("marker/^"))
-
-    def _publish_waypoints(self, world):
-        i = 0
-        for z in world.get("/waypoints/^").toList():
-            m = {
-                "ns": "waypoints",
-                "id": i,
-                "type": "arrow",
-                "scale": [0.08, 0.03, 0.03],
-                "z": 0.08,
-                "orientation": [0, 1.57079, 0],
-                "color": [0.8, 0.5, 0.1, 0.95]
-            }
-            self._publish_marker(z.get("position/^"), m)
-            if "a" in z.get("position/^").Dict.keys():
-                i += 1
-                n = {
-                    "ns": "waypoints",
-                    "id": i,
-                    "type": "arrow",
-                    "scale": [0.06, 0.015, 0.015],
-                    "z": 0,
-                    "orientation": [0, 0, z.get("position/^").Dict["a"]],
-                    "color": [0.8, 0.5, 0.1, 0.95]
-                }
-                self._publish_marker(z.get("position/^"), n)
-            i += 1
 
     def _publish_objects(self, objects_dictman):
         for e in objects_dictman.Dict.keys():
@@ -81,7 +53,6 @@ class MarkersPublisher():
         markertypes = {
             "cube": Marker.CUBE,
             "sphere": Marker.SPHERE,
-            "arrow": Marker.ARROW,
             "mesh": Marker.MESH_RESOURCE
         }
         marker = Marker()
