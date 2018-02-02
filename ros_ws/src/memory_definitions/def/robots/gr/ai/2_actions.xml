@@ -34,7 +34,7 @@
 		</actions>
 	</action>
 
-	<action ref="activate_button" name="Go and activate Home Button" reward="30">
+	<action ref="activate_button" name="Go and activate Home Button" reward="25">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -72,7 +72,7 @@
 				<preset>OPEN</preset>
 			</orderref>
 
-			<orderref ref="delay" name="LOAD MULTI ACTIONS (delay for now)">
+			<orderref ref="delay">
 				<duration>2</duration>
 			</orderref> <!-- TEMPORARY -->
 
@@ -86,7 +86,7 @@
 		</actions>
 	</action>
 
-	<action ref="load_unicolor_distributor" name="Load unicolor distributor">
+	<action ref="load_unicolor_distributor" name="Load unicolor distributor" reward="10">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -106,7 +106,7 @@
 				</target_pos>
 			</orderref>
 
-			<orderref ref="delay" name="LOAD UNI ACTIONS (delay for now)">
+			<orderref ref="delay" name="LOAD UNI ACTIONS (delay for now)" reward="10">
 				<duration>2</duration>
 			</orderref> <!-- TEMPORARY -->
 
@@ -120,7 +120,7 @@
 		</actions>
 	</action>
 
-	<action ref="load_multicolor_distributor" name="Load multicolor distributor">
+	<action ref="load_multicolor_distributor" name="Load multicolor distributor" reward="10">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -140,7 +140,7 @@
 				</target_pos>
 			</orderref>
 
-			<orderref ref="delay" name="LOAD MULTI ACTIONS (delay for now)">
+			<orderref ref="delay" name="LOAD MULTI ACTIONS (delay for now)" reward="10">
 				<duration>2</duration>
 			</orderref> <!-- TEMPORARY -->
 
@@ -154,7 +154,7 @@
 		</actions>
 	</action>
 
-	<action ref="fire_clean_balls" name="Fire clean balls to water tower">
+	<action ref="fire_full_clean_balls" name="Fire clean balls to water tower" reward="40">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -172,7 +172,25 @@
 		</actions>
 	</action>
 
-	<action ref="unload_dirty_balls" name="Unload dirty balls to station">
+	<action ref="fire_half_clean_balls" name="Fire clean balls to water tower" reward="20">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="asserv_goto" name="goto tower fire position">
+				<target_pos>
+					<x>0.6</x>
+					<y>1.4</y>
+					<theta>2.3562</theta>
+				</target_pos>
+			</orderref>
+
+			<orderref ref="delay" name="FIRE (delay for now)">
+				<duration>3</duration>
+			</orderref> <!-- TEMPORARY -->
+		</actions>
+	</action>
+
+	<action ref="unload_dirty_balls" name="Unload dirty balls to station" reward="40">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -206,7 +224,7 @@
 		</actions>
 	</action>
 
-	<action ref="activate_bee" name="Activate bee">
+	<action ref="activate_bee" name="Activate bee" reward="50">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">

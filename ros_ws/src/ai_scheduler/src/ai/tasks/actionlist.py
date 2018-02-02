@@ -13,9 +13,7 @@ class ActionList(Task):
         self.executionMode  = ExecutionMode.fromText( xml.attrib["exec"])  if "exec"  in xml.attrib else ExecutionMode.ALL
         self.executionOrder = ExecutionOrder.fromText(xml.attrib["order"]) if "order" in xml.attrib else ExecutionOrder.LINEAR
         self.Conditions = xml.find("conditions") if "conditions" in xml else None # Conditions that must be true before executing the actions.
-
         self.TASKS = self.loadxml(xml, actions, orders)
-        #if len(self.TASKS) < 2: raise ValueError, "ERROR {} task in a list, not accepted.".format(len(self.TASKS))
 
     def loadxml(self, xml, actions, orders):
         tasks = []
@@ -27,24 +25,14 @@ class ActionList(Task):
                 if "needsprevious" in node_xml.attrib and node_xml.attrib["needsprevious"] == 'true':
                     i.Status = TaskStatus.NEEDSPREVIOUS
                 tasks.append(i)
-            elif tag == "actionref":
-                instances = [action for action in actions if action.Ref == node_xml.attrib["ref"]]
+            elif tag == "actionref" or tag == "orderref":
+                instances = [action for action in actions if action.Ref == node_xml.attrib["ref"]] if tag == "actionref" else \
+                            [order  for order  in orders  if order.Ref  == node_xml.attrib["ref"]]
                 if len(instances) != 1:
                     raise KeyError, "{} action instance(s) found with the name '{}'.".format(len(instances), node_xml.attrib["ref"])
                 i = copy.deepcopy(instances[0])
                 i.setParent(self)
-                i.setParameters(node_xml)
-                if "needsprevious" in node_xml.attrib and node_xml.attrib["needsprevious"] == 'true':
-                    i.Status = TaskStatus.NEEDSPREVIOUS
-                if "name" in node_xml.attrib:
-                    i.Name = node_xml.attrib["name"]
-                tasks.append(i)
-            elif tag == "orderref":
-                instances = [order for order in orders if order.Ref == node_xml.attrib["ref"]]
-                if len(instances) != 1:
-                    raise KeyError, "{} order instance(s) found with the name '{}'.".format(len(instances), node_xml.attrib["ref"])
-                i = copy.deepcopy(instances[0])
-                i.setParent(self)
+                i.Reward = int(node_xml.attrib["reward"]) if "reward" in node_xml.attrib else i.Reward
                 i.setParameters(node_xml)
                 if "needsprevious" in node_xml.attrib and node_xml.attrib["needsprevious"] == 'true':
                     i.Status = TaskStatus.NEEDSPREVIOUS
@@ -69,13 +57,14 @@ class ActionList(Task):
 
     def getReward(self):
         return self.Reward + sum([task.getReward() for task in self.TASKS])
+
     def getDuration(self):
         return sum([task.getDuration() for task in self.TASKS])
+
     def getNext(self):
         # Decides the next task(s) to execute based on the childs' statuses and the ExecutionOrder XML setting.
         for task in self.TASKS: # Execute any pending task in any case  #TODO#1 will create problems ?
             if task.getStatus() == TaskStatus.PENDING: return task
-
 
         if   self.executionOrder == ExecutionOrder.LINEAR:
             for task in self.TASKS:
@@ -104,13 +93,11 @@ class ActionList(Task):
                     result = task
             return result
 
-
-
     def execute(self, communicator):
         if self.getStatus() in [TaskStatus.FREE, TaskStatus.PENDING]:
             self.getNext().execute(communicator)
         else:
-            raise ValueError, "ERROR asked to execute a task that's not free"
+            rospy.logerr("ERROR asked to execute a task that's not free")
 
     def refreshStatus(self):
         # unblock or block tasks that need previous tasks
@@ -159,14 +146,12 @@ class ActionList(Task):
             #TODO Block all dependent nodes
             return
 
-    def find_executable_childs(self):
-        pass
-
     def prettyprint(self, indentlevel, hide = False):
         if not hide:
             super(ActionList, self).prettyprint(indentlevel)
         for task in self.TASKS:
             task.prettyprint(indentlevel + (1 if not hide else 0))
+
     def __repr__(self):
         c = Console();c.setstyle(Colors.BOLD);c.setstyle(Colors.RED)
         c.addtext("[{} ActionList] {} ".format(self.getStatusEmoji(), self.Name))

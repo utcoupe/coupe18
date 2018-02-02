@@ -17,7 +17,6 @@ class Action(Task):
         self.TASKS.setParent(self)
         self.fetchBoundParams(xml)
 
-
     def getParamForBind(self, bind):
         for t in self.TASKS.TASKS:
             if t.getParamForBind(bind):
@@ -26,22 +25,17 @@ class Action(Task):
     def fetchBoundParams(self, xml):
         if "params" not in [node.tag for node in xml]:
             return
-
         boundParamsList = []
-
         for param in xml.find("params"):
             if "name" not in param.attrib:
                 raise KeyError("Parameters need a 'name' attribute ! (action '{}')".format(self.Name))
-
             name = param.attrib["name"]
-
             finalBind = self.getParamForBind(name)
 
             if not finalBind:
                 raise KeyError("No parameter bound with '{}' !".format(name))
             else:
                 boundParamsList.append(finalBind)
-
         self.BoundParams = {p.bind: p for p in boundParamsList}
 
     def setParameters(self, orderref_xml):
@@ -54,9 +48,6 @@ class Action(Task):
         for p in self.BoundParams:
             if self.BoundParams[p].bind == p:
                 self.BoundParams[p].checkValues()
-
-
-
 
     def getDuration(self):
         return self.TASKS.getDuration()
@@ -79,6 +70,7 @@ class Action(Task):
     def prettyprint(self, indentlevel):
         super(Action, self).prettyprint(indentlevel)
         self.TASKS.prettyprint(indentlevel + 1, hide = True)
+
     def __repr__(self):
         c = Console();c.setstyle(Colors.BOLD);c.setstyle(Colors.BLUE)
         c.addtext("[{} Action]".format(self.getStatusEmoji()))

@@ -11,18 +11,12 @@ class Strategy(Task):
         self.loadxml(xml, actions, orders)
 
     def loadxml(self, xml, actions, orders):
-        # Game Properties TODO DEPRECATED, remove ?
-        # GameProperties.GAME_DURATION = int(xml.find('game').find("time").text) # Save game duration in seconds
-
-        # Fill actions
         self.TASKS = ActionList(xml.find("actions"), actions, orders)
         self.TASKS_ONFINISH = ActionList(xml.find("actions_onfinish"), actions, orders)
 
     def canContinue(self):
-        '''TODO
-        if timer.is_finished():
-            return False'''
         return self.getStatus() in [TaskStatus.FREE, TaskStatus.PENDING, TaskStatus.WAITINGFORRESPONSE]
+
     def getNext(self): # Returns the next free task (ActionList, Action or Order).
         return self.TASKS.getNext()
 
@@ -33,5 +27,6 @@ class Strategy(Task):
         rospy.loginfo('[STRATEGY] ' + self.__repr__())
         self.TASKS.prettyprint(1)
         self.TASKS_ONFINISH.prettyprint(1)
+
     def __repr__(self):
         return self.Name
