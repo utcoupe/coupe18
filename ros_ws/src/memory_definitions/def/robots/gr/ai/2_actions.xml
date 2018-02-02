@@ -12,13 +12,24 @@
 		<params></params>
 		<conditions></conditions>
 		<actions>
-			<orderref ref="set_robot_pos">
-				<position>
-					<x>0.2</x>
-					<y>1.65</y>
-					<theta>0</theta>
-				</position>
-			</orderref>
+			<team name="green">
+				<orderref ref="set_robot_pos">
+					<position>
+						<x>0.2</x>
+						<y>1.65</y>
+						<theta>0</theta>
+					</position>
+				</orderref>
+			</team>
+			<team name="orange">
+				<orderref ref="set_robot_pos">
+					<position>
+						<x>2.8</x>
+						<y>1.65</y>
+						<theta>3.141592</theta>
+					</position>
+				</orderref>
+			</team>
 
 			<actionref ref="jack" needsprevious="true"/>
 
@@ -38,20 +49,14 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto" name="approach button">
-				<target_pos>
-					<x>1.13</x>
-					<y>1.65</y>
-					<theta>1.5708</theta>
-				</target_pos>
+			<orderref ref="asserv_goto_waypoint" name="approach button">>
+				<mode>1</mode>
+				<waypoint_name>way_button_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="asserv_goto" name="accost button" needsprevious="true">
-				<target_pos>
-					<x>1.13</x>
-					<y>1.8</y>
-					<theta>1.5708</theta>
-				</target_pos>
+			<orderref ref="asserv_goto_waypoint" name="accost button" needsprevious="true">
+				<mode>1</mode>
+				<waypoint_name>way_button_accost</waypoint_name>
 			</orderref>
 
 			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
@@ -68,12 +73,9 @@
 				<duration>2</duration>
 			</orderref> <!-- TEMPORARY -->
 
-			<orderref ref="asserv_goto" name="go back to approach">
-				<target_pos>
-					<x>1.13</x>
-					<y>1.65</y>
-					<theta>1.5708</theta>
-				</target_pos>
+			<orderref ref="asserv_goto_waypoint" name="go back to approach">
+				<mode>1</mode>
+				<waypoint_name>way_button_accost</waypoint_name>
 			</orderref>
 		</actions>
 	</action>
@@ -82,32 +84,23 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto" name="approach distributor">
-				<target_pos>
-					<x>0.4</x>
-					<y>1.16</y>
-					<theta>3.1415</theta>
-				</target_pos>
+			<orderref ref="asserv_goto_waypoint" name="approach distributor">>
+				<mode>1</mode>
+				<waypoint_name>way_uni_distrib_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="asserv_goto" name="accost distributor" needsprevious="true">
-				<target_pos>
-					<x>0.28</x>
-					<y>1.16</y>
-					<theta>3.1415</theta>
-				</target_pos>
+			<orderref ref="asserv_goto_waypoint" name="accost distributor" needsprevious="true">
+				<mode>1</mode>
+				<waypoint_name>way_uni_distrib_accost</waypoint_name>
 			</orderref>
 
 			<orderref ref="delay" name="LOAD UNI ACTIONS (delay for now)" needsprevious="true" reward="10">
 				<duration>2</duration>
 			</orderref> <!-- TEMPORARY -->
 
-			<orderref ref="asserv_goto" name="go back to approach">
-				<target_pos>
-					<x>0.4</x>
-					<y>1.16</y>
-					<theta>3.1415</theta>
-				</target_pos>
+			<orderref ref="asserv_goto_waypoint" name="go back to approach">>
+				<mode>1</mode>
+				<waypoint_name>way_uni_distrib_approach</waypoint_name>
 			</orderref>
 		</actions>
 	</action>
@@ -116,32 +109,23 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto" name="approach distributor">
-				<target_pos>
-					<x>2.39</x>
-					<y>0.4</y>
-					<theta>3.1415</theta>
-				</target_pos>
+			<orderref ref="asserv_goto_waypoint" name="approach distributor">>
+				<mode>1</mode>
+				<waypoint_name>way_multi_distrib_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="asserv_goto" name="accost distributor" needsprevious="true">
-				<target_pos>
-					<x>2.39</x>
-					<y>0.28</y>
-					<theta>3.1415</theta>
-				</target_pos>
+			<orderref ref="asserv_goto_waypoint" name="accost distributor" needsprevious="true">
+				<mode>1</mode>
+				<waypoint_name>way_multi_distrib_accost</waypoint_name>
 			</orderref>
 
 			<orderref ref="delay" name="LOAD MULTI ACTIONS (delay for now)" needsprevious="true" reward="10">
 				<duration>2</duration>
 			</orderref> <!-- TEMPORARY -->
 
-			<orderref ref="asserv_goto" name="go back to approach">
-				<target_pos>
-					<x>2.39</x>
-					<y>0.4</y>
-					<theta>3.1415</theta>
-				</target_pos>
+			<orderref ref="asserv_goto_waypoint" name="go back to approach">>
+				<mode>1</mode>
+				<waypoint_name>way_multi_distrib_approach</waypoint_name>
 			</orderref>
 		</actions>
 	</action>
@@ -150,12 +134,9 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto" name="goto tower fire position">
-				<target_pos>
-					<x>0.6</x>
-					<y>1.4</y>
-					<theta>2.3562</theta>
-				</target_pos>
+			<orderref ref="asserv_goto_waypoint" name="goto fire position">>
+				<mode>1</mode>
+				<waypoint_name>way_fire</waypoint_name>
 			</orderref>
 
 			<orderref ref="delay" name="FIRE (delay for now)" needsprevious="true">
@@ -168,12 +149,9 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto" name="goto tower fire position">
-				<target_pos>
-					<x>0.6</x>
-					<y>1.4</y>
-					<theta>2.3562</theta>
-				</target_pos>
+			<orderref ref="asserv_goto_waypoint" name="goto fire position">>
+				<mode>1</mode>
+				<waypoint_name>way_fire</waypoint_name>
 			</orderref>
 
 			<orderref ref="delay" name="FIRE (delay for now)">
@@ -186,32 +164,23 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto" name="approach station">
-				<target_pos>
-					<x>1.2</x>
-					<y>0.7</y>
-					<theta>-1.5708</theta>
-				</target_pos>
+			<orderref ref="asserv_goto_waypoint" name="approach station">>
+				<mode>1</mode>
+				<waypoint_name>way_station_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="asserv_goto" name="accost station" needsprevious="true">
-				<target_pos>
-					<x>1.2</x>
-					<y>0.5</y>
-					<theta>-1.5708</theta>
-				</target_pos>
+			<orderref ref="asserv_goto_waypoint" name="accost station">>
+				<mode>1</mode>
+				<waypoint_name>way_station_accost</waypoint_name>
 			</orderref>
 
 			<orderref ref="delay" name="UNLOAD ACTIONS (delay for now)" needsprevious="true">
 				<duration>2</duration>
 			</orderref> <!-- TEMPORARY -->
 
-			<orderref ref="asserv_goto" name="go back to approach">
-				<target_pos>
-					<x>1.2</x>
-					<y>0.4</y>
-					<theta>-1.5708</theta>
-				</target_pos>
+			<orderref ref="asserv_goto_waypoint" name="approach station">>
+				<mode>1</mode>
+				<waypoint_name>way_station_approach</waypoint_name>
 			</orderref>
 		</actions>
 	</action>
@@ -220,32 +189,23 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto" name="approach bee">
-				<target_pos>
-					<x>0.21</x>
-					<y>0.4</y>
-					<theta>-1.5708</theta>
-				</target_pos>
+			<orderref ref="asserv_goto_waypoint" name="approach bee">>
+				<mode>1</mode>
+				<waypoint_name>way_bee_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="asserv_goto" name="accost bee" needsprevious="true">
-				<target_pos>
-					<x>0.21</x>
-					<y>0.15</y>
-					<theta>-1.5708</theta>
-				</target_pos>
+			<orderref ref="asserv_goto_waypoint" name="accost bee">>
+				<mode>1</mode>
+				<waypoint_name>way_bee_approach</waypoint_name>
 			</orderref>
 
 			<orderref ref="delay" name="ACTIVATE ACTIONS (delay for now)" needsprevious="true">
 				<duration>2</duration>
 			</orderref> <!-- TEMPORARY -->
 
-			<orderref ref="asserv_goto" name="go back to approach">
-				<target_pos>
-					<x>0.21</x>
-					<y>0.28</y>
-					<theta>-1.5708</theta>
-				</target_pos>
+			<orderref ref="asserv_goto_waypoint" name="approach bee">>
+				<mode>1</mode>
+				<waypoint_name>way_bee_approach</waypoint_name>
 			</orderref>
 		</actions>
 	</action>
@@ -254,20 +214,14 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto" name="approach spawn">
-				<target_pos>
-					<x>0.4</x>
-					<y>1.65</y>
-					<theta>0</theta>
-				</target_pos>
+			<orderref ref="asserv_goto_waypoint" name="approach spawn">>
+				<mode>1</mode>
+				<waypoint_name>way_spawn_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="asserv_goto" name="goto spawn" needsprevious="true">
-				<target_pos>
-					<x>0.2</x>
-					<y>1.65</y>
-					<theta>0</theta>
-				</target_pos>
+			<orderref ref="asserv_goto_waypoint" name="goto spawn">>
+				<mode>1</mode>
+				<waypoint_name>way_spawn</waypoint_name>
 			</orderref>
 		</actions>
 	</action>

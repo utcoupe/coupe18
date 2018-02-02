@@ -34,13 +34,6 @@
 	</order>
 
 
-	<!-- Wheels -->
-	<order ref="wheels_goto" duration="1">
-		<message dest="/test">
-		</message>
-	</order>
-
-
 
 	<!-- AI Specific -->
 	<order ref="delay" duration="1">
@@ -68,9 +61,17 @@
 		</message>
 	</order>
 
-	<order ref="asserv_goto">
+	<order ref="asserv_goto_pos">
 		<message dest="/navigation/navigator/goto_action">
 			<param name="target_pos" type="pose2d"/>
+		</message>
+	</order>
+
+	<order ref="asserv_goto_waypoint">
+		<message dest="/navigation/navigator/gotowaypoint_action">
+			<param name="mode" type="int"/> <!-- 0 = GOTO, 1 = GOTOA -->
+			<param name="waypoint_name" type="string"/>
+			<param name="disable_collisions" type="bool" optional="true">false</param>
 		</message>
 	</order>
 

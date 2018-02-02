@@ -34,6 +34,7 @@ class RequestTypes(object):
             "/memory/map/transfer":              (RequestTypes.SERVICE, memory_map.srv.MapTransfer),
 
             "/navigation/navigator/goto_action": (RequestTypes.ACTION,  navigation_navigator.msg.DoGotoAction, navigation_navigator.msg.DoGotoGoal),
+            "/navigation/navigator/gotowaypoint_action": (RequestTypes.ACTION,  navigation_navigator.msg.DoGotoWaypointAction, navigation_navigator.msg.DoGotoWaypointGoal),
             "/movement/actuators/dispatch":      (RequestTypes.ACTION,  movement_actuators.msg.dispatchAction, movement_actuators.msg.dispatchGoal),
 
             "/drivers/ard_asserv/set_pos":       (RequestTypes.SERVICE, drivers_ard_asserv.srv.SetPos),
