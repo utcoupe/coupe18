@@ -17,18 +17,18 @@
 			<team name="green">
 				<orderref ref="set_robot_pos">
 					<position>
-						<x>0.124</x>
-						<y>1.65</y>
-						<theta>0</theta>
+						<x>0.216</x>
+						<y>1.477</y>
+						<theta>-1.57079</theta>
 					</position>
 				</orderref>
 			</team>
 			<team name="orange">
 				<orderref ref="set_robot_pos">
 					<position>
-						<x>2.876</x>
-						<y>1.65</y>
-						<theta>3.141592</theta>
+						<x>2.784</x>
+						<y>1.477</y>
+						<theta>-1.57079</theta>
 					</position>
 				</orderref>
 			</team>

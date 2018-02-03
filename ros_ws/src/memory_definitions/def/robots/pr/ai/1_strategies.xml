@@ -13,8 +13,6 @@
 			<actionref ref="game_start"/>
 
 			<actionlist name="Main actions">
-				<actionref ref="activate_button"/>
-
 				<actionlist name="Do unicolor distributor">
 					<actionref ref="load_unicolor_distributor"/>
 					<actionref ref="fire_full_clean_balls"/>
