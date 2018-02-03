@@ -187,7 +187,7 @@ void Ax12Server::main_loop(const ros::TimerEvent&)
 
         goal_position = it->getGoal()->position;
 
-        if(curr_position == goal_position)
+        if(curr_position >= (goal_position - POSITION_MARGIN) && curr_position <= (goal_position + POSITION_MARGIN))
         {
             ROS_DEBUG("Motor has reached the goal position");
             result_.success = true;
@@ -362,7 +362,7 @@ Ax12Server::Ax12Server(std::string action_name, std::string service_name) :
 
     ROS_INFO("AX-12 action server initialized for port %s, waiting for goals", port.c_str());
 
-    ros::Timer timer = nh_.createTimer(ros::Duration(1.0/MAIN_FREQUENCY), boost::bind(&Ax12Server::main_loop, this, _1));
+    timer_ = nh_.createTimer(ros::Duration(1.0/MAIN_FREQUENCY), &Ax12Server::main_loop, this);
 
 }
 
