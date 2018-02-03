@@ -5,6 +5,13 @@ from actionlist import ActionList
 
 
 class Action(Task):
+    '''
+    Differences between an action and an actionlist:
+        - actions are defined in their own xml file, separated from the strategy.
+            This helps having a strategy file defining only the order of the main actions execution.
+        - actions can reference each other, not lists.
+    '''
+
     def __init__(self, xml, actions, orders):
         super(Action, self).__init__(xml)
         self.Ref = xml.attrib["ref"]

@@ -46,6 +46,20 @@ class ExecutionOrder():
         elif text == 'mostreward'  : return ExecutionOrder.MOSTREWARD
         else: raise ValueError, "ExecutionOrder '{}' not recognized.".format(text)
 
+class RepeatMode():
+    ONCE                = ('once'               , '1')    # Will execute the block one time.
+    FOR                 = ('for'                , '')    # Will execute the given amount of times, no matter the fails.
+    WHILE               = ('while'              , '∞')    # Will execute tasks in the list until one is successful.
+    @staticmethod
+    def toEmoji(mode):
+        return mode[1]
+    @staticmethod
+    def fromText(text):
+        if text == 'once'          : return RepeatMode.ONCE
+        elif text.isdigit()        : return RepeatMode.FOR
+        elif text == 'while'       : return RepeatMode.WHILE
+        else: raise ValueError, "RepeatMode '{}' not recognized.".format(text)
+
 class GameProperties():
     GAME_DURATION = None
     REWARD_POINTS = 0

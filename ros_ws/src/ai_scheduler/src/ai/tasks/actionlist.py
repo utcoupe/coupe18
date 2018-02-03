@@ -7,11 +7,19 @@ from task import Task
 
 
 class ActionList(Task):
+    MAX_REPEATS = 50 # If repeat mode is 'while', this will be the repeat limit.
+
     def __init__(self, xml, actions, orders):
         super(ActionList, self).__init__(xml)
         self.Name = xml.attrib["name"] if "name" in xml.attrib else xml.tag
-        self.executionMode  = ExecutionMode.fromText( xml.attrib["exec"])  if "exec"  in xml.attrib else ExecutionMode.ALL
-        self.executionOrder = ExecutionOrder.fromText(xml.attrib["order"]) if "order" in xml.attrib else ExecutionOrder.LINEAR
+        self.executionMode  = ExecutionMode.fromText( xml.attrib["exec"])   if "exec"  in xml.attrib else ExecutionMode.ALL
+        self.repeatMode     = RepeatMode.fromText(    xml.attrib["repeat"]) if "repeat"in xml.attrib else RepeatMode.ONCE
+        self._repeats = 0 # used to track how many times the list already repeated
+        self._repeats_max = ActionList.MAX_REPEATS
+        if self.repeatMode == RepeatMode.ONCE: self._repeats_max = 1
+        if self.repeatMode == RepeatMode.FOR:  self._repeats_max = int(xml.attrib["repeat"])
+        print "max repeats" + str(self._repeats_max)
+        self.executionOrder = ExecutionOrder.fromText(xml.attrib["order"])  if "order" in xml.attrib else ExecutionOrder.LINEAR
         self.Conditions = xml.find("conditions") if "conditions" in xml else None # Conditions that must be true before executing the actions.
         self.TASKS = self.loadxml(xml, actions, orders)
 
@@ -102,6 +110,16 @@ class ActionList(Task):
         else:
             rospy.logerr("ERROR asked to execute a task that's not free")
 
+    def _markSuccess(self):
+        if self.repeatMode != RepeatMode.ONCE:
+            if (self.repeatMode == RepeatMode.WHILE or self.repeatMode == RepeatMode.FOR) and self._repeats < self._repeats_max - 1:
+                self._repeats += 1
+                for task in self.TASKS:
+                    task.setStatus(TaskStatus.FREE, refresh_parent = False)
+                self.setStatus(TaskStatus.FREE)
+                return
+        self.setStatus(TaskStatus.SUCCESS)
+
     def refreshStatus(self):
         # unblock or block tasks that need previous tasks
         previous_task = self.TASKS[0]
@@ -123,8 +141,7 @@ class ActionList(Task):
 
         if self.executionMode == ExecutionMode.ONE:
             if len([1 for c in child_statuses if c == TaskStatus.SUCCESS]) == 1:
-                self.setStatus(TaskStatus.SUCCESS)
-                #TODO block all dependent tasks too
+                self._markSuccess()
                 for task in self.TASKS:
                     if task.getStatus() in [TaskStatus.FREE, TaskStatus.PENDING]:
                         task.setStatus(TaskStatus.BLOCKED)
@@ -139,10 +156,10 @@ class ActionList(Task):
 
         if self.executionMode == ExecutionMode.ALL:
             if len([1 for c in child_statuses if c == TaskStatus.SUCCESS]) == len(child_statuses):
-                self.setStatus(TaskStatus.SUCCESS);return
+                self._markSuccess();return
         elif self.executionMode == ExecutionMode.ATLEASTONE:
             if len([1 for c in child_statuses if c == TaskStatus.SUCCESS]) >= 1:
-                self.setStatus(TaskStatus.SUCCESS);return
+                self._markSuccess();return
 
         if TaskStatus.ERROR in child_statuses:
             self.setStatus(TaskStatus.ERROR)
