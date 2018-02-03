@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actuators> 
-    <act name="gripper_1" id="42" type="servo" family="arduino">
-        <timeout value="5000"/> <!-- Default timeout -->
+    <act name="servo_button" id="0" type="servo" family="arduino">
+        <timeout value="500"/> <!-- Default timeout -->
         <positions default="0">
-            <preset name="OPEN" value="180" />
+            <preset name="OPEN" value="170" />
             <preset name="CLOSE" value="20" />
             <preset name="armed" value="42" />
         </positions>
@@ -15,10 +15,18 @@
             <preset name="CLOSE" value="10" />
         </positions>
     </act>
-    <act name="cc1" id="1" type="ccmotor" family="arduino">
+    <act name="cc1" id="1" type="pwm" family="arduino">
         <timeout value="10000"/> <!-- Default timeout -->
         <positions default="0">
             <preset name="spinmax" value="390" />
+        </positions>
+    </act>
+    <act name="barrel" id="6" type="ax12" family="ax12">
+        <timeout value="300"/> <!-- Default timeout -->
+        <positions default="450">
+            <preset name="HIGH" value="450" />
+            <preset name="CANON" value="850" />
+            <preset name="BIN" value="250" />
         </positions>
     </act>
 </actuators>

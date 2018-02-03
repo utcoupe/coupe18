@@ -25,40 +25,11 @@
 		</message>
 	</order>
 
-	<order ref="funny_action" duration="1">
-		<message dest="/test">
-		</message>
-	</order>
-
-	<order ref="actuator_startup_sequence">
-		<message dest="/test">
-		</message>
-	</order>
-
-	<order ref="actuator_toggle" duration="1.5" reward="3">
-		<message dest="/test">
-		</message>
-	</order>
-
-	<order ref="actuator_open" duration="1.5" reward="3">
-		<message dest="/test">
-		</message>
-	</order>
-
-	<order ref="actuator_close" duration="1.5" reward="3">
-		<message dest="/test">
-		</message>
-	</order>
-
-	<order ref="actuator_set_pos" duration="1.5" reward="3">
-		<message dest="/test">
-		</message>
-	</order>
-
-
-	<!-- Wheels -->
-	<order ref="wheels_goto" duration="1">
-		<message dest="/test">
+	<order ref="actuator_servo_set_pos" duration="1.5">
+		<message dest="/movement/actuators/dispatch">
+			<param name="name" type="string"/>
+			<param name="preset" type="string" optional="true"/> <!-- Set either a preset or param-->
+			<param name="param" type="int" optional="true"/>
 		</message>
 	</order>
 
@@ -67,7 +38,13 @@
 	<!-- AI Specific -->
 	<order ref="delay" duration="1">
 		<message dest="/ai/timer/delay">
-			<param name="duration" type="float"/>
+			<param name="duration" type="float" optional="true">0</param>
+		</message>
+	</order>
+
+	<order ref="set_game_status_ingame" duration="0">
+		<message dest="/ai/game_status/set_status">
+			<param name="new_game_status" type="int" preset="true">1</param>
 		</message>
 	</order>
 
@@ -84,9 +61,17 @@
 		</message>
 	</order>
 
-	<order ref="asserv_goto">
+	<order ref="asserv_goto_pos">
 		<message dest="/navigation/navigator/goto_action">
 			<param name="target_pos" type="pose2d"/>
+		</message>
+	</order>
+
+	<order ref="asserv_goto_waypoint">
+		<message dest="/navigation/navigator/gotowaypoint_action">
+			<param name="mode" type="int"/> <!-- 0 = GOTO, 1 = GOTOA -->
+			<param name="waypoint_name" type="string"/>
+			<param name="disable_collisions" type="bool" optional="true">false</param>
 		</message>
 	</order>
 

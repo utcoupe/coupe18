@@ -12,17 +12,14 @@ The scheduler is a fully-recursive task manager and executer. Calling the `findN
 will recursively call the ActionLists and Actions until an Order is returned. This Order is then triggered with its function
 `execute()`, which will send an `action` message to the node specified in the XML definition file.
 
-__NOTE 1__ : The Definition files and main launch files are currently located in this package, but will soon be moved to the `Definitions` package.
-The AI will retrieve these files during initialization.
-
-__NOTE 2__ : For now, the orders are implemented as services. They will soon be sent as `action` messages. This will enable the AI to execute several
+__NOTE 1__ : For now, the orders are implemented as services. They will soon be sent as `action` messages. This will enable the AI to execute several
 Orders at the same time.
 
-__NOTE 3__ : Conditions (e.g. ask for the Map server if there are enough elements in a container) and parameters (e.g. position for a generic `goto` order) are
+__NOTE 2__ : Conditions (e.g. ask for the Map server if there are enough elements in a container) are
 yet to be implemented.
 
 ### Order definitions
-The orders are defined in the file `3_Orders.xml`. The `<order>` node has to have a `ref` attribute, in order for it to be referenced from the outside. It can take an optional `duration` attribute, which is a manual estimation. This node must have a `<message>` child node, with a `dest` attributes, representing the service or action the message will be sent to. A message node holds multiple `<param>`, mirroring the structure of the ROS request message sent. Each `<param>` has a `name`, matching the name of the parameter in the ROS message, and a `type`, used to parse the parameter. A parameter can be `optional`, which means it doesn't have to be filled when the order is called (the default value will be put in by ROS). It can be `preset` : in that case, the parameter cannot be set when the order is called, the value is constant and cannot be changed. To finish, default values can be set in the order definition. Note that a param with a default value is therefore optional, and a param cannot be preset and optional.
+The orders are defined in the file `3_orders.xml`. The `<order>` node has to have a `ref` attribute, in order for it to be referenced from the outside. It can take an optional `duration` attribute, which is a manual estimation. This node must have a `<message>` child node, with a `dest` attributes, representing the service or action the message will be sent to. A message node holds multiple `<param>`, mirroring the structure of the ROS request message sent. Each `<param>` has a `name`, matching the name of the parameter in the ROS message, and a `type`, used to parse the parameter. A parameter can be `optional`, which means it doesn't have to be filled when the order is called (the default value will be put in by ROS). It can be `preset` : in that case, the parameter cannot be set when the order is called, the value is constant and cannot be changed. To finish, default values can be set in the order definition. Note that a param with a default value is therefore optional, and a param cannot be preset and optional.
 
 #### Example
 Let's assume we want to send a request to `/asserv/goto`, with the following ROS definition :
@@ -32,6 +29,7 @@ float64 number
 uint8 command
 string message
 ```
+
 Here is a valid example of the order definition, with all the elements seen above :
 ```xml
 <order ref="goto" duration="1">
@@ -60,6 +58,38 @@ Let's continue with our defined order from above. Suppose we want to reference i
 </orderref>
 ```
 
+### Action definitions
+
+The actions are defined in the file `2_actions.xml`. The `<action>` node has to have a `ref` attribute, in order for it to be referenced from the outside. This node has three children :
+- The `<conditions>` node is yet to be implemented.
+- The `<params>` node holds all the parameters used when calling this action. They are defined identically to the parameters in the message of an order, seen above, with the `name`, `type`, `preset` and `optional` attributes. For them to be useful, the parameters given to an action have to be passed to the orders or the actions that are called from this action. This will be discussed in the next part.
+- The `<action>` node doc is TODO
+
+### Action parameters binding
+An action has a bunch of children (`orderref` and/or `actionref`). The parameters of the parent action can be passed to these children for them to use them. To do that, we use the `bind` attributes on the children's parameters like so :
+
+```xml
+<action ref="goto_spawn">
+  <params>
+    <param name="speed"/>
+  </params>
+  <actions exec="all" order="linear">
+    <orderref ref="wheels_goto">
+      <target_pos>
+        <x>6.5</x>
+        <y>7.5</y>
+        <theta>7</theta>
+      </target_pos>
+      <speed bind="speed"/>
+    </orderref>
+  </actions>
+</action>
+```
+Here, the order `wheels_goto` requires two parameters. The `target_pos` one is given directly in the `orderref`. However, no value is passed for the `speed` one. Instead, it is binded to the parameter named `speed` of the parent action. The `speed` parameter of this action is defined in the `params` node. When the `goto_spawn` action will be referenced, the `speed` parameter given to it will be passed to the order reference of `wheels_goto`. Note that the names for the parent parameter and the binded parameter do not have to match.
+
+### Action references
+
+The call of an action works the same as the order reference, replacing `orderref` by `actionref`.
+
 ### Adding new parameter types
 In order to parse correctly all wanted type, one has to add a parser class, child of the `Param` class, for each type of parameter. Check out `ai_params.py` for more details.
-

@@ -1,7 +1,7 @@
 #!/bin/usr/python
 import rospy
 from timer_client import TimerClient
-from game_status_client import GameStatusClient
+from game_status_client import GameStatusClient, GameStatusConstants
 from ai_loader import AILoader
 
 class RobotAI():
@@ -9,25 +9,30 @@ class RobotAI():
         self.timer = TimerClient() # Timer client.
         self.game_status = GameStatusClient()
         self._loader = AILoader()
+        self._halt_request = False
 
-    def get_strategies(self):
-        return self._loader.get_strategies()
+    def load_game_properties(self):
+        return self._loader.load_game_properties()
 
-    def start(self, strategyname, communicator):
-        strategy = self._loader.load(strategyname, communicator)
-        rospy.loginfo("[AI] Loaded strategy '{}', starting actions...".format(strategyname))
+    def start(self, communicator):
+        strategy = self._loader.load(communicator)
         self.execute(strategy)
 
     def halt(self):
-        pass
+        self._halt_request = True
 
     def execute(self, strategy):
         strategy.PrettyPrint()
         # Run the whole AI until there are no orders left to execute
         while not rospy.is_shutdown():
-            if strategy.canContinue() and self.game_status.game_status != 2: # 2 = STATUS_HALT
+            if self.game_status.status == GameStatusConstants.STATUS_HALT:
+                rospy.logwarn("[AI] detected game_status STATUS_HALT, aborting actions.")
+                break
+
+            if strategy.canContinue():
                 strategy.getNext().execute(strategy.communicator)
             else:
                 rospy.loginfo("[AI] In-Game actions finished!")
                 break
             strategy.PrettyPrint()
+            strategy.sendReward(strategy.communicator)

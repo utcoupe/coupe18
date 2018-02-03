@@ -76,8 +76,9 @@ class MapServices():
         s = time.time() * 1000
         rospy.loginfo("GET_OCCUPANCY:" + str(req.layer_name))
 
+        path = self.occupancy_generator.generateLayer(Map, req.layer_name, req.img_width, req.margin)
         try:
-            path = self.occupancy_generator.generateLayer(Map, req.layer_name, req.margin)
+            path = self.occupancy_generator.generateLayer(Map, req.layer_name, req.img_width, req.margin)
         except Exception as e:
             rospy.logerr("    Request failed : " + str(e))
 
@@ -87,7 +88,7 @@ class MapServices():
 
     def on_fill_waypoint(self, req):
         s = time.time() * 1000
-        rospy.loginfo("FILL_WAYPOINT: {} ({}, {}{})".format(str(req.waypoint.name if req.waypoint.name else "<no name>"), 
+        rospy.loginfo("FILL_WAYPOINT: {} ({}, {}{})".format(str(req.waypoint.name if req.waypoint.name else "<no name>"),
                                                            req.waypoint.pose.x, req.waypoint.pose.y,
                                                            ", {}".format(req.waypoint.pose.theta) if req.waypoint.has_angle else ""))
 
@@ -100,8 +101,6 @@ class MapServices():
                 if waypoints[w].get("position/x") == round(req.waypoint.pose.x, 3) and \
                    waypoints[w].get("position/y") == round(req.waypoint.pose.y, 3):
                     if req.waypoint.has_angle:
-                        print waypoints[w].get("position/a")
-                        print round(req.waypoint.pose.theta, 3)
                         if waypoints[w].get("position/a") == round(req.waypoint.pose.theta, 3):
                             filled_waypoint      = waypoints[w]
                             filled_waypoint_name = w

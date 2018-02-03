@@ -11,7 +11,8 @@ Author: Pierre LACLAU, December 2017, UTCoupe.
 #include <drivers_ard_hmi/HMIEvent.h>       // HMI sends events : JACK, GAME_STOP
 #include <drivers_ard_hmi/ROSEvent.h>       // ROS sends events : ASK_JACK, GAME_STOP
 #include <ai_game_status/GameStatus.h>      // ROS sends game and init status (to  determine when RPi ready).
-#include <ai_timer/GameTime.h>        // ROS sends the timer status (for the ingame progress bar).
+#include <ai_timer/GameTime.h>              // ROS sends the timer status (for the ingame progress bar).
+#include <ai_scheduler/AIScore.h>           // ROS sends the timer status (for the ingame progress bar).
 ros::NodeHandle nh;
 
 //Creating OLED display instances
@@ -56,6 +57,7 @@ uint8_t teams_count = 0;
 
 int chosen_strat = -1;
 int chosen_team = -1;
+int current_score = 0;
 
 int game_status = -1;
 int init_status = -1;
@@ -143,8 +145,8 @@ void on_game_status(const ai_game_status::GameStatus& msg){
     game_status = msg.game_status;
     init_status = msg.init_status;
 
-    if(game_status == 1 /*INGAME*/)
-        ui.transitionToFrame(5);
+    if(game_status == 1 && current_frame != 5 /*INGAME*/)
+        ui.switchToFrame(5);
 }
 
 void on_game_timer(const ai_timer::GameTime& msg){
@@ -154,16 +156,21 @@ void on_game_timer(const ai_timer::GameTime& msg){
     }
 }
 
+void on_score(const ai_scheduler::AIScore& msg){
+    current_score = msg.score;
+}
+
 void on_ros_event(const drivers_ard_hmi::ROSEvent& msg){
     if(msg.event == 0) //asked to respond for JACK
-        ui.transitionToFrame(4);
+        ui.switchToFrame(4);
 }
 
 ros::Subscriber<drivers_ard_hmi::SetStrategies> sub_strats("/feedback/ard_hmi/set_strategies", &on_set_strategies);
 ros::Subscriber<drivers_ard_hmi::SetTeams>      sub_teams      ("/feedback/ard_hmi/set_teams", &on_set_teams);
 ros::Subscriber<drivers_ard_hmi::ROSEvent>      sub_ros_events ("/feedback/ard_hmi/ros_event", &on_ros_event);
 ros::Subscriber<ai_game_status::GameStatus>     sub_game_status("/ai/game_status/status",      &on_game_status);
-ros::Subscriber<ai_timer::GameTime>             sub_game_timer ("/ai/game_status/timer",       &on_game_timer);
+ros::Subscriber<ai_timer::GameTime>             sub_game_timer ("/ai/timer/time",             &on_game_timer);
+ros::Subscriber<ai_scheduler::AIScore>          sub_score      ("/ai/scheduler/score",         &on_score);
 
 drivers_ard_hmi::HMIEvent hmi_event_msg;
 ros::Publisher hmi_event_pub("/feedback/ard_hmi/hmi_event", &hmi_event_msg);
@@ -329,7 +336,8 @@ void drawInGameFrame(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x,
     
     display->setTextAlignment(TEXT_ALIGN_CENTER);
     display->setFont(ArialMT_Plain_24);
-    display->drawString(64 + x, 22 + y, "178pts");
+    String text = String(current_score) + "pts";
+    display->drawString(64 + x, 22 + y, text);
     
     int percentage = 0;
     if(elapsed_time != -1 && game_duration > 0) percentage = int(100 * elapsed_time / game_duration);
@@ -358,6 +366,7 @@ void setup() {
     nh.subscribe(sub_teams);
     nh.subscribe(sub_game_status);
     nh.subscribe(sub_game_timer);
+    nh.subscribe(sub_score);
     nh.subscribe(sub_ros_events);
     nh.advertise(hmi_event_pub);
     
@@ -380,10 +389,6 @@ void loop() {
     update_leds();
     ui.update();
 
-    if(current_frame != 5 && game_status == 1 /*INGAME*/)
-        ui.transitionToFrame(5); //if game starts, goto game screen no matter what.
-    if(current_frame == 5 && game_status != 1 /*INGAME*/)
-        ui.transitionToFrame(0); //if game ends, go back to init screen.
     if(game_status == -1) {
         hmi_event_msg.event = hmi_event_msg.EVENT_HMI_INITIALIZED; // tell ros that hmi is alive until it responds back
         hmi_event_pub.publish(&hmi_event_msg);

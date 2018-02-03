@@ -171,6 +171,13 @@ class DictManager(MapElement):
         del self.Dict[lastkey]
         return True
 
+    def transform(self, codes):
+        success = True
+        for elem in self.Dict:
+            if isinstance(self.Dict[elem], DictManager):
+                success = min(success, self.Dict[elem].transform(codes))
+        return success
+
 
 
 class RequestPath():

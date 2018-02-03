@@ -50,7 +50,7 @@ ordre alphabétique : plus visuel)
 - Créer des serveurs de `topics`/`services`/`actions` nommés de la forme `/namespace/package/server_name` s'ils peuvent être accédés par des paquets 
 extérieurs (ATTENTION : avec un `/` au début pour créer un nom absolu), `server_name` s'ils sont internes.
 
-- Nommer les variables dans les fichiers de définition `.msg`/`.srv`/`.action` en format `var_name`.
+- Nommer les fichiers de définition `.msg`/`.srv`/`.action` en PascalCase (e.g. `GetValues.srv`) et les variables dedans en minuscules (format `var_name`).
 
 ### Python
 

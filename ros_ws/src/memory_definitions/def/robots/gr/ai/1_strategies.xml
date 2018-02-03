@@ -1,99 +1,40 @@
 <strategies>
-	<!-- STRATEGY : <description here> -->
-	<!-- NOTE : The actions are in a rather random order. This strategy is set up for testing purposes only !-->
-	<strategy name="strategy_ftw">
-		<game>
-			<time>100</time>
-		</game>
+	<teams>
+		<team name="green"/>
+		<team name="orange"/>
+	</teams>
+
+	<!-- STRATEGY real game actions ! -->
+	<strategy name="button_then_distrib">
 		<actions name="In-Game Actions">
-			<actionref ref="jack"/>
-			<nextneedsprevious/>
-      		<orderref ref="timer_start">
-			  	<duration>97</duration>
-			</orderref>
-			<nextneedsprevious/>
-			<actionlist name="Main actions" order="linear">
-				<conditions>
-				</conditions>
-				<orderref ref="wheels_goto"/>
-				<actionlist name="Take Modules" exec="all" order="linear" reward="100">
+			<orderref ref="delay" name="5 points bee loaded" reward="5"/>
+			<orderref ref="delay" name="5 points home installed" reward="5"/>
 
-					<actionlist name="Load modules" exec="+" order="random">
-						<actionref ref="load_module"/>
-						<actionref ref="load_module"/>
-						<actionref ref="load_module"/>
-					</actionlist>
+			<actionref ref="game_start"/>
 
-					<nextneedsprevious/> <!-- This actionList needs the previous task to be OK in order to run-->
-					<actionlist name="Unload on left platform" exec="+" order="linear">
-						<conditions>
-						</conditions>
-						<actionref ref = "unload_module"/>
-						<nextneedsprevious/>
-						<actionref ref = "unload_module"/>
-						<actionref ref = "unload_module"/>
-					</actionlist>
+			<actionlist name="Main actions" needsprevious="true">
+				<actionref ref="activate_button"/>
 
-
+				<actionlist name="Do unicolor distributor">
+					<actionref ref="load_unicolor_distributor"/>
+					<actionref ref="fire_full_clean_balls" needsprevious="true"/>
 				</actionlist>
+
+				<actionlist name="Do multicolor distributor">
+					<actionref ref="load_multicolor_distributor"/>
+					<actionlist name="Unload multi balls" needsprevious="true">
+						<actionref ref="unload_dirty_balls"/>
+						<actionref ref="fire_half_clean_balls"/>
+					</actionlist>
+				</actionlist>
+
+				<actionref ref="activate_bee"/>
 			</actionlist>
+
+			<orderref ref="delay" name="10 points no game over" reward="10"/>
+			<actionref ref="goto_spawn"/>
 		</actions>
-		<actions_onfinish name="Actions after game">
-			<orderref ref="funny_action"/>
-		</actions_onfinish>
-	</strategy>
-
-	<!-- Testing init workflow, SetPos, Navigation DoGoto -->
-	<strategy name="test_nav">
-		<game><time>100</time></game>
-		<actions name="In-Game Actions">
-			<actionref ref="jack"/>
-			<nextneedsprevious/>
-      		<orderref ref="timer_start">
-			  	<duration>97</duration>
-			</orderref>
-			<nextneedsprevious/>
-			<orderref ref="set_robot_pos">
-				<position>
-					<x>0.5</x>
-					<y>0.5</y>
-					<theta>0</theta>
-				</position>
-			</orderref>
-
-			<nextneedsprevious/>
-
-			<orderref ref="delay">
-				<duration>4</duration>
-			</orderref>
-
-			<nextneedsprevious/>
-			<orderref ref="asserv_goto" name="going to (1, 1)">
-				<target_pos>
-					<x>2.5</x>
-					<y>1.5</y>
-					<theta>0</theta>
-				</target_pos>
-			</orderref>
-
-			<orderref ref="asserv_goto" name="going to (1, 1)">
-				<target_pos>
-					<x>0.5</x>
-					<y>1.5</y>
-					<theta>0</theta>
-				</target_pos>
-			</orderref>
-
-			<orderref ref="asserv_goto" name="going to (1, 1)">
-				<target_pos>
-					<x>0.5</x>
-					<y>0.5</y>
-					<theta>0</theta>
-				</target_pos>
-			</orderref>
-
-		</actions>
-		<actions_onfinish name="Actions after game">
+		<actions_onfinish name="After-Game Actions">
 		</actions_onfinish>
 	</strategy>
 </strategies>

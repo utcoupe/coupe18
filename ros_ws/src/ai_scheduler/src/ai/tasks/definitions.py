@@ -50,6 +50,12 @@ class GameProperties():
     GAME_DURATION = None
     REWARD_POINTS = 0
 
+    AVAILABLE_STRATEGIES = []
+    AVAILABLE_TEAMS      = []
+
+    CURRENT_STRATEGY     = ''
+    CURRENT_TEAM         = ''
+
 
 class Colors():
     BOLD  = "\033[1m"
