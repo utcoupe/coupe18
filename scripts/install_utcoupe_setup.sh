@@ -77,34 +77,20 @@ function env_setup() {
 		if [ "$SHELL" = "/bin/zsh" ]; then
 			echo "export UTCOUPE_WORKSPACE=$PWD" >> $HOME/.zshrc
 			echo "export ROS_LANG_DISABLE=genlisp:geneus" >> $HOME/.zshrc
+			echo "export ROSCONSOLE_FORMAT='[${node}:${severity}] [${time}] : ${message}'" >> $HOME/.zshrc
 			red_echo "Warning :\n"
 			red_echo "Please \"source ~/.zshrc\" and run again this script if necessary\n"
 			exit 1
 		else
 			echo "export UTCOUPE_WORKSPACE=$PWD" >> $HOME/.bashrc
 			echo "export ROS_LANG_DISABLE=genlisp:geneus" >> $HOME/.bashrc
+			echo "export ROSCONSOLE_FORMAT='[${node}:${severity}] [${time}] : ${message}'" >> $HOME/.bashrc
             		source $HOME/.bashrc
 		fi
-	fi
-	# Add a file where to find UTCOUPE_WORKSPACE for node launched at startup
-	if [ ! -f "/etc/default/utcoupe" ]; then
-		sudo touch "/etc/default/utcoupe"
-		sudo sh -c "echo 'UTCOUPE_WORKSPACE=$PWD' >> /etc/default/utcoupe"
 	fi
 	# Add the current user to the dialout group (to r/w in /dev files)
 	if ! id -Gn $USER | grep -qw "dialout"; then
 	        sudo usermod -a -G dialout $USER
-	fi
-	# Setup GPIO + add the current user to the gpio group (to r/w in /dev files)
-	if grep -q "gpio" /etc/group && ! id -Gn $USER | grep -qw "gpio"; then
-		sudo chgrp -R gpio /sys/class/gpio
-		sudo chmod -R g+rw /sys/class/gpio
-	        sudo usermod -a -G gpio $USER
-	fi
-	# Create the utcoupe folder where log files are stored
-	if [ ! -d "/var/log/utcoupe" ]; then
-		sudo mkdir /var/log/utcoupe
-		sudo chown $USER:$USER /var/log/utcoupe
 	fi
 	# Untar all libraries
 	for f in $PWD/libs/*; do
@@ -116,16 +102,15 @@ function env_setup() {
 	if ! grep "utcoupe" /etc/hosts > /dev/null; then
 	    sudo sh -c "echo '#UTCoupe raspberry pi Ethernet IP when connected on the UTC network\n172.18.159.254	utcoupe_rpi31\n172.18.161.161	utcoupe_rpi32\n172.18.161.162	utcoupe_rpi33' >> /etc/hosts"
 	fi
-	#TODO add ssh to the raspi (must be connected...)
 }
 
 ### Then install the UTCoupe ROS workspace
 function install_ros_workspace() {
-	# Download the submodules code
-	git submodule update --init --recursive
 	# Install the UTCoupe ROS specific packages
 	#TODO use the requirements system
 	pip install pyserial numpy scipy pymongo pyclipper pillow
+	printf "Download, compile and install all ROS external nodes needed by UTCoupe, this may take a while."
+	./scripts/install_external_nodes.sh
 }
 
 ### Main install_script function, ask the user to install each main components
@@ -151,7 +136,7 @@ function launch_script() {
 
 # Check that the folder has been cloned from git and not downloaded, because submodules won't work...
 if [ ! -d ".git" ]; then
-	red_echo "You have to clone this repository from git, not downloading it."
+	red_echo "You have to clone this repository from git, not download it."
 	exit 1
 fi
 
