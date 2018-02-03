@@ -77,7 +77,7 @@ uint8_t pwm_actuators_states[NUM_PWM_ACTUATORS]             = {0, 255};
 // Names : motor_canon1, motor_canon2
 
 #define NUM_SERVO_ACTUATORS 1
-const int pins_servo_actuators_pwm[NUM_SERVO_ACTUATORS]     = {9};
+const int pins_servo_actuators_pwm[NUM_SERVO_ACTUATORS]     = {D6};
 int16_t servo_actuators_states[NUM_SERVO_ACTUATORS]         = {90};
 Servo servo_actuators_objects[NUM_SERVO_ACTUATORS];
 // Names : servo_main_door
@@ -85,9 +85,12 @@ Servo servo_actuators_objects[NUM_SERVO_ACTUATORS];
 // Actuators ROS callbacks
 
 drivers_ard_others::MoveResponse move_response_msg;
-ros::Publisher move_responses_pub("/drivers/ard_others/move_responses", &move_response_msg);
+ros::Publisher move_responses_pub("/drivers/ard_others/move_response", &move_response_msg);
 
 void send_move_response(int order_nb, bool success) {
+    if(success) nh.loginfo("Move request succeeded.");
+    else nh.logerror("Move request failed.");
+
     move_response_msg.order_nb = order_nb;
     move_response_msg.success = success;
     move_responses_pub.publish(&move_response_msg);
@@ -112,7 +115,7 @@ void on_move(const drivers_ard_others::Move& msg){
         case msg.TYPE_PWM:
             if(msg.id >= 0 && msg.id <= NUM_PWM_ACTUATORS) {
                 if(msg.dest_value >= 0 && msg.dest_value <= 255)
-                    pwm_actuators_states[msg.id] = bool(msg.dest_value);
+                    pwm_actuators_states[msg.id] = msg.dest_value;
                 else {
                     nh.logerror("MOVE failed : dest_value invalid (0 to 255).");
                     success = false;
@@ -124,7 +127,7 @@ void on_move(const drivers_ard_others::Move& msg){
         case msg.TYPE_SERVO:
             if(msg.id >= 0 && msg.id <= NUM_SERVO_ACTUATORS) {
                 if(msg.dest_value >= 0 && msg.dest_value <= 180)
-                    digital_actuators_states[msg.id] = bool(msg.dest_value);
+                    servo_actuators_states[msg.id] = msg.dest_value;
                 else {
                     nh.logerror("MOVE failed : dest_value invalid (0 to 180).");
                     success = false;
@@ -136,6 +139,7 @@ void on_move(const drivers_ard_others::Move& msg){
             break;
     }
 
+    nh.loginfo("Finished move order handling.");
     if(msg.order_nb != 0) send_move_response(msg.order_nb, success); // send response if order_nb provided.
 }
 
@@ -225,7 +229,7 @@ void setup() {
     Wire.begin();
 
     // Components init
-    init_sensors();
+    //init_sensors();
     init_actuators();
 
     nh.loginfo("Node '/arduinos/others' initialized correctly.");
@@ -233,7 +237,7 @@ void setup() {
 
 void loop() {
     // Components loop
-    loop_sensors();
+    //loop_sensors();
     loop_actuators();
 
     // ROS loop

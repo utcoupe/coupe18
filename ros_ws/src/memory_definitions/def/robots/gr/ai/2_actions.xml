@@ -40,10 +40,6 @@
 			</orderref>
 
 			<orderref ref="set_game_status_ingame" needsprevious="true"/>
-
-			<orderref ref="delay" needsprevious="true">
-				<duration>1</duration>
-			</orderref>
 		</actions>
 	</action>
 
@@ -56,7 +52,12 @@
 				<waypoint_name>way_button_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="accost button" needsprevious="true">
+			<orderref ref="actuator_servo_set_pos" name="close servo">
+				<name>servo_button</name>
+				<preset>CLOSE</preset>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint" name="accost button">
 				<mode>1</mode>
 				<waypoint_name>way_button_accost</waypoint_name>
 			</orderref>
@@ -66,14 +67,18 @@
 				<preset>OPEN</preset>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="close button">
-				<name>servo_button</name>
-				<preset>OPEN</preset>
+			<orderref ref="delay">
+				<duration>1</duration>
 			</orderref>
 
-			<orderref ref="delay">
+			<orderref ref="actuator_servo_set_pos" name="close servo">
+				<name>servo_button</name>
+				<preset>CLOSE</preset>
+			</orderref>
+
+			<!-- <orderref ref="delay">
 				<duration>2</duration>
-			</orderref> <!-- TEMPORARY -->
+			</orderref> TEMPORARY -->
 
 			<orderref ref="asserv_goto_waypoint" name="go back to approach">
 				<mode>1</mode>
@@ -96,9 +101,19 @@
 				<waypoint_name>way_uni_distrib_accost</waypoint_name>
 			</orderref>
 
-			<orderref ref="delay" name="LOAD UNI ACTIONS (delay for now)" needsprevious="true" reward="10">
-				<duration>2</duration>
-			</orderref> <!-- TEMPORARY -->
+			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+				<name>servo_button</name>
+				<preset>OPEN</preset>
+			</orderref>
+
+			<orderref ref="delay">
+				<duration>1</duration>
+			</orderref>
+
+			<orderref ref="actuator_servo_set_pos" name="close servo">
+				<name>servo_button</name>
+				<preset>CLOSE</preset>
+			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="go back to approach">>
 				<mode>1</mode>
@@ -121,9 +136,19 @@
 				<waypoint_name>way_multi_distrib_accost</waypoint_name>
 			</orderref>
 
-			<orderref ref="delay" name="LOAD MULTI ACTIONS (delay for now)" needsprevious="true" reward="10">
-				<duration>2</duration>
-			</orderref> <!-- TEMPORARY -->
+			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+				<name>servo_button</name>
+				<preset>OPEN</preset>
+			</orderref>
+
+			<orderref ref="delay">
+				<duration>1</duration>
+			</orderref>
+
+			<orderref ref="actuator_servo_set_pos" name="close servo">
+				<name>servo_button</name>
+				<preset>CLOSE</preset>
+			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="go back to approach">>
 				<mode>1</mode>
@@ -141,9 +166,19 @@
 				<waypoint_name>way_fire</waypoint_name>
 			</orderref>
 
-			<orderref ref="delay" name="FIRE (delay for now)" needsprevious="true">
-				<duration>3</duration>
-			</orderref> <!-- TEMPORARY -->
+			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+				<name>servo_button</name>
+				<preset>OPEN</preset>
+			</orderref>
+
+			<orderref ref="delay">
+				<duration>1</duration>
+			</orderref>
+
+			<orderref ref="actuator_servo_set_pos" name="close servo">
+				<name>servo_button</name>
+				<preset>CLOSE</preset>
+			</orderref>
 		</actions>
 	</action>
 
@@ -156,9 +191,19 @@
 				<waypoint_name>way_fire</waypoint_name>
 			</orderref>
 
-			<orderref ref="delay" name="FIRE (delay for now)">
-				<duration>3</duration>
-			</orderref> <!-- TEMPORARY -->
+			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+				<name>servo_button</name>
+				<preset>OPEN</preset>
+			</orderref>
+
+			<orderref ref="delay">
+				<duration>1</duration>
+			</orderref>
+
+			<orderref ref="actuator_servo_set_pos" name="close servo">
+				<name>servo_button</name>
+				<preset>CLOSE</preset>
+			</orderref>
 		</actions>
 	</action>
 
@@ -176,9 +221,19 @@
 				<waypoint_name>way_station_accost</waypoint_name>
 			</orderref>
 
-			<orderref ref="delay" name="UNLOAD ACTIONS (delay for now)" needsprevious="true">
-				<duration>2</duration>
-			</orderref> <!-- TEMPORARY -->
+			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+				<name>servo_button</name>
+				<preset>OPEN</preset>
+			</orderref>
+
+			<orderref ref="delay">
+				<duration>1</duration>
+			</orderref>
+
+			<orderref ref="actuator_servo_set_pos" name="close servo">
+				<name>servo_button</name>
+				<preset>CLOSE</preset>
+			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="approach station">>
 				<mode>1</mode>
@@ -201,9 +256,19 @@
 				<waypoint_name>way_bee_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="delay" name="ACTIVATE ACTIONS (delay for now)" needsprevious="true">
-				<duration>2</duration>
-			</orderref> <!-- TEMPORARY -->
+			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+				<name>servo_button</name>
+				<preset>OPEN</preset>
+			</orderref>
+
+			<orderref ref="delay">
+				<duration>1</duration>
+			</orderref>
+
+			<orderref ref="actuator_servo_set_pos" name="close servo">
+				<name>servo_button</name>
+				<preset>CLOSE</preset>
+			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="approach bee">>
 				<mode>1</mode>

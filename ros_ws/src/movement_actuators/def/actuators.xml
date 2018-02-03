@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actuators> 
-    <act name="gripper_1" id="42" type="servo" family="arduino">
-        <timeout value="5000"/> <!-- Default timeout -->
+    <act name="servo_button" id="0" type="servo" family="arduino">
+        <timeout value="500"/> <!-- Default timeout -->
         <positions default="0">
-            <preset name="OPEN" value="180" />
+            <preset name="OPEN" value="170" />
             <preset name="CLOSE" value="20" />
             <preset name="armed" value="42" />
         </positions>
