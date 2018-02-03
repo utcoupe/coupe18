@@ -1,3 +1,0 @@
-[submodule "ros_ws/src/external_nodes/teraranger"]
-	path = ros_ws/src/external_nodes/teraranger
-	url = https://github.com/Terabee/teraranger.git
