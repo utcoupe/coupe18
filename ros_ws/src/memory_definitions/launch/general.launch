@@ -44,4 +44,5 @@
         <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
     </group>
 
+	<include file="$(find memory_definitions)/def/robots/$(arg robot)/specific.launch"/>
 </launch>

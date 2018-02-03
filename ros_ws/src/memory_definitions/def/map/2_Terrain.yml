@@ -3,14 +3,14 @@ terrain:
         type: rect
         width: 3.0
         height: 2.0
-    marker:
+    _marker:
         ns: table
         id: 0
         type: mesh
         scale: [0.001, 0.001, 0.001]
         z: 0.0
         orientation: [1.57079632679, 0, 0]
-        color: [0.8, 0.8, 0.8, 1.0]
+        color: light_gray
         mesh_path: "package://memory_definitions/def/map/robotcities2018_map.stl"
     walls:
         layer_ground:

@@ -9,7 +9,7 @@ from ai_game_status import StatusServices
 
 class MapNode():
     def __init__(self):
-        rospy.init_node("map", log_level=rospy.DEBUG)
+        rospy.init_node("map", log_level=rospy.INFO)
         rospy.logdebug("Started /memory/map node.")
 
         map_manager.Map.load()

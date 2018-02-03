@@ -10,14 +10,14 @@ entities:
             type: rect
             width: 0.3
             height: 0.2
-        marker:
+        _marker:
             ns: robots
             id: 0
             type: cube
             scale: [0.2, 0.3, 0.35]
             z: 0.175
             orientation: [0, 0, 0]
-            color: [0.3, 0.3, 0.5, 0.95]
+            color: purple
         containers: []
         trajectory:
             history: null
@@ -33,60 +33,15 @@ entities:
             type: rect
             width: 0.2
             height: 0.15
-        marker:
+        _marker:
             ns: robots
             id: 1
             type: cube
             scale: [0.4, 0.4, 0.35]
             z: 0.175
             orientation: [0, 0, 0]
-            color: [1, 0.2, 0.2, 1.0]
+            color: purple
         containers: []
         trajectory:
             history: null
             currentpath: null
-    ge:
-        position:
-            frame_id: /map
-            x: 0.33
-            y: 0.42
-            a: 3.1415
-            type: dynamic
-        shape:
-            type: circle
-            radius: 0.3
-        marker:
-            ns: robots
-            id: 2
-            type: cube
-            scale: [0.4, 0.4, 0.35]
-            z: 0.175
-            orientation: [0, 0, 0]
-            color: [1, 0.2, 0.2, 1.0]
-        containers: []
-        trajectory:
-            history: null
-            currentpath: null
-    PE:
-        position:
-            frame_id: /map
-            x: 243
-            y: 42
-            a: 3.1415
-            type: dynamic
-        shape:
-            type: circle
-            radius: 0.2
-        marker:
-            ns: robots
-            id: 3
-            type: cube
-            scale: [0.4, 0.4, 0.35]
-            z: 0.175
-            orientation: [0, 0, 0]
-            color: [1, 0.2, 0.2, 1.0]
-        containers: []
-        trajectory:
-            history: null
-            currentpath: null
-

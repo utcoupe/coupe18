@@ -8,7 +8,7 @@ import map_manager
 
 class MapNode():
     def __init__(self):
-        rospy.init_node("map", log_level=rospy.DEBUG)
+        rospy.init_node("map", log_level=rospy.INFO)
 
         map_manager.Map.load("gr", "green")
         print map_manager.Map.OBJECTS[0].elements[0].features

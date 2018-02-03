@@ -1,14 +1,15 @@
 #ifndef MAP_STORAGE_H
 #define MAP_STORAGE_H
 
-#include <cmath>
-#include <vector>
-
-#include <SFML/Graphics/Image.hpp>
-
 #include <ros/console.h>
 
 #include "pathfinder/point.h"
+#include "pathfinder/dynamic_barriers_manager.h"
+
+#include <memory>
+#include <vector>
+
+#include <SFML/Graphics/Image.hpp>
 
 class MapStorage
 {
@@ -19,7 +20,7 @@ public:
     MapStorage() {}
     
     Vect2DBool loadAllowedPositionsFromFile(const std::string& fileName);
-    void saveMapToFile(const std::string& fileName, const Vect2DBool& allowedPos, const Vect2DBool& barriersPos, const std::vector<Point>& path, const std::vector<Point>& smoothPath);
+    void saveMapToFile(const std::string& fileName, const Vect2DBool& allowedPos, std::shared_ptr<DynamicBarriersManager> dynBarriersMng, const std::vector<Point>& path, const std::vector<Point>& smoothPath);
 
 private:
     const sf::Color ALLOWED_POS_COLOR       = sf::Color(255, 255, 255);
