@@ -92,7 +92,7 @@ function env_setup() {
 	if ! id -Gn $USER | grep -qw "dialout"; then
 	        sudo usermod -a -G dialout $USER
 	fi
-	# Untar all libraries
+	# Untar all libraries (the copy is done in install_ros function)
 	for f in $PWD/libs/*; do
 		if [ ! -d $f ]; then
 			tar -C $PWD/libs -xzf $f
