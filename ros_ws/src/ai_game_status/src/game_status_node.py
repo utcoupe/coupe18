@@ -17,6 +17,7 @@ class Status():
 
     INIT_CHECKLIST = {  # Please comment the lines instead of deleting them.
         "/ai/scheduler": None,
+        "/ai/timer": None,
 
         "/memory/map": None,
         "/memory/definitions": None,
@@ -35,7 +36,8 @@ class Status():
         "/processing/belt_interpreter": None,
         # "/processing/lidar_objects": None,
 
-        "/drivers/ard_asserv": None
+        "/drivers/ard_asserv": None,
+        "/drivers/port_finder": None,
     }
 
 

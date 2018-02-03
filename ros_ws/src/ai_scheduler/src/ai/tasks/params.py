@@ -143,7 +143,7 @@ class BoolParser(Param):
     def parseValue(self, xml):
         self.parseBind(xml)
         if xml.text:
-            self.value["data"] = bool(xml.text)
+            self.value["data"] = bool(int(xml.text))
 
     def getRos(self):
         return self.value["data"]

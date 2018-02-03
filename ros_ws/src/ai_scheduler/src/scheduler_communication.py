@@ -92,7 +92,7 @@ class AICommunication():
             return TaskResult(2, "ai_communication.py could not send message to topic '{}': {}".format(dest, e))
 
     def _sub_msg(self, dest, msg_class):
-        rospy.logwarn("waiting for message on topic '{}'...".format(dest))
+        rospy.loginfo("waiting for message on topic '{}'...".format(dest))
         self._sub_msg_success = False
         rospy.Subscriber(dest, msg_class, self._sub_msg_callback)
         timeout = 30 #seconds

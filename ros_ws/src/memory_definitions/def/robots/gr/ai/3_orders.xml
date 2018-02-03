@@ -71,7 +71,7 @@
 		<message dest="/navigation/navigator/gotowaypoint_action">
 			<param name="mode" type="int"/> <!-- 0 = GOTO, 1 = GOTOA -->
 			<param name="waypoint_name" type="string"/>
-			<param name="disable_collisions" type="bool" optional="true">false</param>
+			<param name="disable_collisions" type="bool" optional="true">0</param>
 		</message>
 	</order>
 

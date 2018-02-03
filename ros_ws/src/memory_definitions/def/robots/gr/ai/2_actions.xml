@@ -82,7 +82,7 @@
 
 			<orderref ref="asserv_goto_waypoint" name="go back to approach">
 				<mode>1</mode>
-				<waypoint_name>way_button_accost</waypoint_name>
+				<waypoint_name>way_button_approach</waypoint_name>
 			</orderref>
 		</actions>
 	</action>
