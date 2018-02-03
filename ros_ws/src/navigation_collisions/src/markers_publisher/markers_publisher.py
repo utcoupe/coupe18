@@ -22,11 +22,18 @@ class MarkersPublisher(object):
 
     def publishObstacles(self, obstacles): # Temporaire ?
         if self._is_connected():
+            counter = 0
             for i, obs in enumerate(obstacles):
-                self._publish_marker("collisions_obstacles", i, obs, 0.35, 0.35 / 2.0, (1.0, 0.8, 0.3, 0.8))
+                self._publish_marker("collisions_obstacles", i + counter, obs, 0.35, 0.35 / 2.0, (1.0, 0.8, 0.3, 0.8))
+
+                if obs.velocity is not None: # if the bostacle has a velocity, draw its rect too.
+                    for vel_shape in obs.velocity.get_shapes(obs.position):
+                        counter += 1
+                        self._publish_marker("collisions_obstacles", i + counter, vel_shape, 0.02, 0.01, (1.0, 0.0, 0.0, 0.8))
 
     def _publish_marker(self, ns, index, obj, z_scale, z_height, color):
         markertypes = {
+            "segment": Marker.CUBE,
             "rect": Marker.CUBE,
             "circle": Marker.CYLINDER,
             "mesh": Marker.MESH_RESOURCE
@@ -38,8 +45,15 @@ class MarkersPublisher(object):
         marker.id = index
 
         marker.action = Marker.ADD
-        marker.scale.x = obj.width  if str(obj) == "rect" else obj.radius * 2
-        marker.scale.y = obj.height if str(obj) == "rect" else obj.radius * 2
+        if str(obj) == "rect":
+            marker.scale.x = obj.width
+            marker.scale.y = obj.height
+        elif str(obj) == "circle":
+            marker.scale.x = obj.radius * 2.0
+            marker.scale.y = obj.radius * 2.0
+        elif str(obj) == "segment":
+            marker.scale.x = obj.length
+            marker.scale.y = 0.02
         marker.scale.z = z_scale
         marker.color.r = color[0]
         marker.color.g = color[1]
@@ -53,7 +67,7 @@ class MarkersPublisher(object):
         marker.pose.orientation.y = orientation[1]
         marker.pose.orientation.z = orientation[2]
         marker.pose.orientation.w = orientation[3]
-        marker.lifetime = rospy.Duration(1)
+        marker.lifetime = rospy.Duration(0.1)
 
         self.MarkersPUBL.publish(marker)
 

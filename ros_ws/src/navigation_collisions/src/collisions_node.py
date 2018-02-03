@@ -14,7 +14,7 @@ from ai_game_status import StatusServices
 
 class CollisionsNode():
     def __init__(self):
-        rospy.init_node("collisions", log_level=rospy.DEBUG)
+        rospy.init_node("collisions", log_level=rospy.INFO)
         self.active = False # navigation/navigator activates this node through a service.
 
         self.subscriptions = CollisionsSubscriptions()

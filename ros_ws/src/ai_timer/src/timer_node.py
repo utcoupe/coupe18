@@ -47,7 +47,7 @@ class TimerManager():
 
 class TimerNode():
     def __init__(self):
-        rospy.init_node("timer", log_level=rospy.DEBUG)
+        rospy.init_node("timer", log_level=rospy.INFO)
         self._set_timer_srv = rospy.Service("/ai/timer/set_timer", SetTimer,  self.on_set_timer)
         self._delay_srv     = rospy.Service("/ai/timer/delay",     Delay,  self.on_delay)
         self._timer_pub     = rospy.Publisher("/ai/timer/time",    GameTime,  queue_size = 10)

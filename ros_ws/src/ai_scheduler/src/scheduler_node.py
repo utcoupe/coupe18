@@ -13,7 +13,7 @@ class AINode():
     def __init__(self):
         self.DepartmentName, self.PackageName = "ai", "scheduler"
 
-        rospy.init_node(self.PackageName, log_level = rospy.DEBUG)
+        rospy.init_node(self.PackageName, log_level = rospy.INFO)
 
         self.AI = RobotAI()
         self.AI.load_game_properties() # fetch available strategies and teams

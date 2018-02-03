@@ -1,847 +1,351 @@
+classes:
+    cube:
+        collision: true # is the object to be avoided in the pathfinder
+        position:
+            frame_id: /map
+            type: pickable
+            a: 0
+        shape:
+            type: rect
+            width: 0.06
+            height: 0.06
+        _marker:
+            ns: cubes
+            z_scale: 0.06
+            z: 0.03
+            orientation: [0, 0, 0]
+
+    ball:
+        collision: false
+        position:
+            frame_id: /map
+            type: pickable
+            a: 0
+        shape:
+            type: circle
+            radius: 0.022
+        color: green #default, overritten when orange
+        _marker:
+            ns: balls
+            type: sphere
+            z_scale: 0.044
+            z: 1 #default
+            orientation: [0, 0, 0]
+
+
 objects:
-    cube_1:
-        type: object
-        position:
-            frame_id: /map
-            x: 0.850
-            y: 1.520
-            a: 43.3
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-        marker:
-            ns: cubes
-            id: 1
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [0.1, 1.0, 0.1, 1.0]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
+    container_grape_1:
+        cube_1:
+            class: cube
+            position:
+                x: 0.850
+                y: 1.520
+            color: black
+        cube_2:
+            class: cube
+            position:
+                x: 0.790
+                y: 1.460
             color: green
-
-    cube_2:
-        type: object
-        position:
-            frame_id: /map
-            x: 0.790
-            y: 1.460
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [20, 20, 255]
-        marker:
-            ns: cubes
-            id: 2
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [0.1, 0.1, 1.0, 1.0]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
+        cube_3:
+            class: cube
+            position:
+                x: 0.850
+                y: 1.460
+            color: yellow
+        cube_4:
+            class: cube
+            position:
+                x: 0.910
+                y: 1.460
+            color: orange
+        cube_5:
+            class: cube
+            position:
+                x: 0.850
+                y: 1.400
             color: blue
 
-    cube_3:
-        type: object
-        position:
-            frame_id: /map
-            x: 0.850
-            y: 1.460
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [255, 255, 20]
-        marker:
-            ns: cubes
-            id: 3
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [1, 1, 0.1, 1]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
-            color: yellow
-
-    cube_4:
-        type: object
-        position:
-            frame_id: /map
-            x: 0.910
-            y: 1.460
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [20, 20, 20]
-        marker:
-            ns: cubes
-            id: 4
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [0.1, 0.1, 0.1, 1]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
+    container_grape_2:
+        cube_1:
+            class: cube
+            position:
+                x: 0.3
+                y: 0.95
             color: black
-
-    cube_5:
-        type: object
-        position:
-            frame_id: /map
-            x: 0.850
-            y: 1.400
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [255, 140, 20]
-        marker:
-            ns: cubes
-            id: 5
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [1, 0.5, 0.1, 1]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
-            color: orange
-
-
-
-
-
-
-    cube_6:
-        type: object
-        position:
-            frame_id: /map
-            x: 0.300
-            y: 0.870
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-        marker:
-            ns: cubes
-            id: 6
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [0.1, 1.0, 0.1, 1.0]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
+        cube_2:
+            class: cube
+            position:
+                x: 0.24
+                y: 0.89
             color: green
-
-    cube_7:
-        type: object
-        position:
-            frame_id: /map
-            x: 0.240
-            y: 0.810
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [20, 20, 255]
-        marker:
-            ns: cubes
-            id: 7
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [0.1, 0.1, 1.0, 1.0]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
+        cube_3:
+            class: cube
+            position:
+                x: 0.3
+                y: 0.89
+            color: yellow
+        cube_4:
+            class: cube
+            position:
+                x: 0.36
+                y: 0.89
+            color: orange
+        cube_5:
+            class: cube
+            position:
+                x: 0.3
+                y: 0.83
             color: blue
 
-    cube_8:
-        type: object
-        position:
-            frame_id: /map
-            x: 0.300
-            y: 0.810
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [255, 255, 20]
-        marker:
-            ns: cubes
-            id: 8
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [1, 1, 0.1, 1]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
-            color: yellow
-
-    cube_9:
-        type: object
-        position:
-            frame_id: /map
-            x: 0.360
-            y: 0.810
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [20, 20, 20]
-        marker:
-            ns: cubes
-            id: 9
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [0.1, 0.1, 0.1, 1]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
+    container_grape_3:
+        cube_1:
+            class: cube
+            position:
+                x: 1.1
+                y: 0.56
             color: black
-
-    cube_10:
-        type: object
-        position:
-            frame_id: /map
-            x: 0.300
-            y: 0.750
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [255, 140, 20]
-        marker:
-            ns: cubes
-            id: 10
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [1, 0.5, 0.1, 1]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
-            color: orange
-
-
-
-
-
-
-    cube_11:
-        type: object
-        position:
-            frame_id: /map
-            x: 0.710
-            y: 0.240
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-        marker:
-            ns: cubes
-            id: 11
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [0.1, 1.0, 0.1, 1.0]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
+        cube_2:
+            class: cube
+            position:
+                x: 1.04
+                y: 0.5
             color: green
-
-    cube_12:
-        type: object
-        position:
-            frame_id: /map
-            x: 0.650
-            y: 0.180
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [20, 20, 255]
-        marker:
-            ns: cubes
-            id: 12
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [0.1, 0.1, 1.0, 1.0]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
+        cube_3:
+            class: cube
+            position:
+                x: 1.1
+                y: 0.5
+            color: yellow
+        cube_4:
+            class: cube
+            position:
+                x: 1.16
+                y: 0.5
+            color: orange
+        cube_5:
+            class: cube
+            position:
+                x: 1.1
+                y: 0.44
             color: blue
 
-    cube_13:
-        type: object
-        position:
-            frame_id: /map
-            x: 0.710
-            y: 0.180
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [255, 255, 20]
-        marker:
-            ns: cubes
-            id: 13
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [1, 1, 0.1, 1]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
-            color: yellow
-
-    cube_14:
-        type: object
-        position:
-            frame_id: /map
-            x: 0.770
-            y: 0.180
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [20, 20, 20]
-        marker:
-            ns: cubes
-            id: 14
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [0.1, 0.1, 0.1, 1]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
+    container_grape_4:
+        cube_1:
+            class: cube
+            position:
+                x: 2.150
+                y: 1.520
             color: black
-
-    cube_15:
-        type: object
-        position:
-            frame_id: /map
-            x: 0.710
-            y: 0.120
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [255, 140, 20]
-        marker:
-            ns: cubes
-            id: 15
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [1, 0.5, 0.1, 1]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
-            color: orange
-
-
-
-
-
-
-
-
-
-
-
-    cube_16:
-        type: object
-        position:
-            frame_id: /map
-            x: 2.150
-            y: 1.520
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-        marker:
-            ns: cubes
-            id: 16
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [0.1, 1.0, 0.1, 1.0]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
+        cube_2:
+            class: cube
+            position:
+                x: 2.210
+                y: 1.460
             color: green
-
-    cube_17:
-        type: object
-        position:
-            frame_id: /map
-            x: 2.090
-            y: 1.460
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [20, 20, 255]
-        marker:
-            ns: cubes
-            id: 17
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [0.1, 0.1, 1.0, 1.0]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
+        cube_3:
+            class: cube
+            position:
+                x: 2.150
+                y: 1.460
+            color: yellow
+        cube_4:
+            class: cube
+            position:
+                x: 2.090
+                y: 1.460
+            color: orange
+        cube_5:
+            class: cube
+            position:
+                x: 2.150
+                y: 1.400
             color: blue
 
-    cube_18:
-        type: object
-        position:
-            frame_id: /map
-            x: 2.150
-            y: 1.460
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [255, 255, 20]
-        marker:
-            ns: cubes
-            id: 18
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [1, 1, 0.1, 1]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
-            color: yellow
-
-    cube_19:
-        type: object
-        position:
-            frame_id: /map
-            x: 2.210
-            y: 1.460
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [20, 20, 20]
-        marker:
-            ns: cubes
-            id: 19
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [0.1, 0.1, 0.1, 1]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
+    container_grape_5:
+        cube_1:
+            class: cube
+            position:
+                x: 2.7
+                y: 0.95
             color: black
-
-    cube_20:
-        type: object
-        position:
-            frame_id: /map
-            x: 2.15
-            y: 1.400
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [255, 140, 20]
-        marker:
-            ns: cubes
-            id: 20
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [1, 0.5, 0.1, 1]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
-            color: orange
-
-
-
-
-
-
-    cube_21:
-        type: object
-        position:
-            frame_id: /map
-            x: 2.700
-            y: 0.870
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-        marker:
-            ns: cubes
-            id: 21
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [0.1, 1.0, 0.1, 1.0]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
+        cube_2:
+            class: cube
+            position:
+                x: 2.76
+                y: 0.89
             color: green
-
-    cube_22:
-        type: object
-        position:
-            frame_id: /map
-            x: 2.640
-            y: 0.810
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [20, 20, 255]
-        marker:
-            ns: cubes
-            id: 22
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [0.1, 0.1, 1.0, 1.0]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
+        cube_3:
+            class: cube
+            position:
+                x: 2.7
+                y: 0.89
+            color: yellow
+        cube_4:
+            class: cube
+            position:
+                x: 2.64
+                y: 0.89
+            color: orange
+        cube_5:
+            class: cube
+            position:
+                x: 2.7
+                y: 0.83
             color: blue
 
-    cube_23:
-        type: object
-        position:
-            frame_id: /map
-            x: 2.700
-            y: 0.810
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [255, 255, 20]
-        marker:
-            ns: cubes
-            id: 23
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [1, 1, 0.1, 1]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
-            color: yellow
-
-    cube_24:
-        type: object
-        position:
-            frame_id: /map
-            x: 2.760
-            y: 0.810
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [20, 20, 20]
-        marker:
-            ns: cubes
-            id: 24
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [0.1, 0.1, 0.1, 1]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
+    container_grape_6:
+        cube_1:
+            class: cube
+            position:
+                x: 1.9
+                y: 0.56
             color: black
-
-    cube_25:
-        type: object
-        position:
-            frame_id: /map
-            x: 2.700
-            y: 0.750
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [255, 140, 20]
-        marker:
-            ns: cubes
-            id: 25
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [1, 0.5, 0.1, 1]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
-            color: orange
-
-
-
-
-
-
-    cube_26:
-        type: object
-        position:
-            frame_id: /map
-            x: 2.290
-            y: 0.240
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-        marker:
-            ns: cubes
-            id: 26
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [0.1, 1.0, 0.1, 1.0]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
+        cube_2:
+            class: cube
+            position:
+                x: 1.96
+                y: 0.5
             color: green
-
-    cube_27:
-        type: object
-        position:
-            frame_id: /map
-            x: 2.230
-            y: 0.180
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [20, 20, 255]
-        marker:
-            ns: cubes
-            id: 27
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [0.1, 0.1, 1.0, 1.0]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
+        cube_3:
+            class: cube
+            position:
+                x: 1.9
+                y: 0.5
+            color: yellow
+        cube_4:
+            class: cube
+            position:
+                x: 1.84
+                y: 0.5
+            color: orange
+        cube_5:
+            class: cube
+            position:
+                x: 1.9
+                y: 0.44
             color: blue
 
-    cube_28:
-        type: object
-        position:
-            frame_id: /map
-            x: 2.290
-            y: 0.180
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [255, 255, 20]
-        marker:
-            ns: cubes
-            id: 28
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [1, 1, 0.1, 1]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
-            color: yellow
 
-    cube_29:
-        type: object
-        position:
-            frame_id: /map
-            x: 2.350
-            y: 0.180
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [20, 20, 20]
-        marker:
-            ns: cubes
-            id: 29
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [0.1, 0.1, 0.1, 1]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
-            color: black
 
-    cube_30:
-        type: object
-        position:
-            frame_id: /map
-            x: 2.290
-            y: 0.120
-            a: 0
-            type: pickable #TODO usable value ?
-        shape:
-            type: rect
-            width: 0.06
-            height: 0.06
-            color: [255, 140, 20]
-        marker:
-            ns: cubes
-            id: 30
-            type: cube
-            scale: [0.06, 0.06, 0.06]
-            z: 0.03
-            orientation: [0, 0, 0]
-            color: [1, 0.5, 0.1, 1]
-        properties:
-            ground_obstacle: true # is the object to be avoided in the pathfinder
-            color: orange
 
-    _container_balls:
+
+    container_uni_distrib:
         ball_1:
-            type: object
+            class: ball
             position:
-                frame_id: /map
                 x: 0.015
                 y: 1.16
-                a: 0
-                type: pickable #TODO usable value ?
-            shape:
-                type: circle
-                radius: 0.044
-                color: [255, 140, 20] #TODO sert a rien
-            marker:
-                ns: balls
-                id: 1
-                type: sphere
-                scale: [0.044, 0.044, 0.044]
+            _marker:
                 z: 0.65
-                orientation: [0, 0, 0]
-                color: [0.2, 1.0, 0.2, 1.0]
-            properties:
-                ground_obstacle: false
-                color: green
-
         ball_2:
-            type: object
+            class: ball
             position:
-                frame_id: /map
                 x: 0.015
                 y: 1.16
-                a: 0
-                type: pickable #TODO usable value ?
-            shape:
-                type: circle
-                radius: 0.044
-                color: [255, 140, 20] #TODO sert a rien
-            marker:
-                ns: balls
-                id: 2
-                type: sphere
-                scale: [0.044, 0.044, 0.044]
+            _marker:
                 z: 0.7
-                orientation: [0, 0, 0]
-                color: [0.2, 1.0, 0.2, 1.0]
-            properties:
-                ground_obstacle: false
-                color: green
-
         ball_3:
-            type: object
+            class: ball
             position:
-                frame_id: /map
                 x: 0.015
                 y: 1.16
-                a: 0
-                type: pickable #TODO usable value ?
-            shape:
-                type: circle
-                radius: 0.044
-                color: [255, 140, 20] #TODO sert a rien
-            marker:
-                ns: balls
-                id: 3
-                type: sphere
-                scale: [0.044, 0.044, 0.044]
+            _marker:
                 z: 0.75
-                orientation: [0, 0, 0]
-                color: [0.2, 1.0, 0.2, 1.0]
-            properties:
-                ground_obstacle: false
-                color: green
+        ball_4:
+            class: ball
+            position:
+                x: 0.015
+                y: 1.16
+            _marker:
+                z: 0.8
+        ball_5:
+            class: ball
+            position:
+                x: 0.015
+                y: 1.16
+            _marker:
+                z: 0.85
+        ball_6:
+            class: ball
+            position:
+                x: 0.015
+                y: 1.16
+            _marker:
+                z: 0.9
+        ball_7:
+            class: ball
+            position:
+                x: 0.015
+                y: 1.16
+            _marker:
+                z: 0.95
+        ball_8:
+            class: ball
+            position:
+                x: 0.015
+                y: 1.16
+            _marker:
+                z: 1
+
+    container_multi_distrib:
+        ball_1:
+            class: ball
+            position:
+                x: 2.39
+                y: 0.015
+            _marker:
+                z: 0.65
+        ball_2:
+            class: ball
+            position:
+                x: 2.39
+                y: 0.015
+            color: orange
+            _marker:
+                z: 0.7
+        ball_3:
+            class: ball
+            position:
+                x: 2.39
+                y: 0.015
+            _marker:
+                z: 0.75
+        ball_4:
+            class: ball
+            position:
+                x: 2.39
+                y: 0.015
+            color: orange
+            _marker:
+                z: 0.8
+        ball_5:
+            class: ball
+            position:
+                x: 2.39
+                y: 0.015
+            _marker:
+                z: 0.85
+        ball_6:
+            class: ball
+            position:
+                x: 2.39
+                y: 0.015
+            color: orange
+            _marker:
+                z: 0.9
+        ball_7:
+            class: ball
+            position:
+                x: 2.39
+                y: 0.015
+            _marker:
+                z: 0.95
+        ball_8:
+            class: ball
+            position:
+                x: 2.39
+                y: 0.015
+            color: orange
+            _marker:
+                z: 1
