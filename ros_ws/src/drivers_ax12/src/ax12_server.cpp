@@ -112,9 +112,16 @@ bool Ax12Server::handle_joint_goal(GoalHandle goal_handle)
     success &= driver_.write_register(motor_id, GOAL_POSITION, position);
 
     if(!success)
+    {
         goal_handle.setAborted();
+        ROS_DEBUG("No success setting goal and speed, not adding the goal to the list");
+    }
     else
+    {
         joint_goals_.push_back(goal_handle);
+        ROS_DEBUG("Success setting goal and speed, adding the goal to the list");
+
+    }
 
     return success;
 }
@@ -176,13 +183,18 @@ void Ax12Server::main_loop(const ros::TimerEvent&)
     int16_t moving;
     int32_t goal_position;
 
+    ROS_DEBUG("Entered feedback loop");
+
     for(auto it = joint_goals_.begin(); it != joint_goals_.end();)
     {
         motor_id = it->getGoal()->motor_id;
+        ROS_DEBUG("Checking state of motor %d", motor_id);
+
         driver_.read_register(motor_id, PRESENT_POSITION, curr_position);
         driver_.read_register(motor_id, MOVING, moving);
         if(moving)
         {
+            ROS_DEBUG("Motor is moving, publishing feedback");
             feedback_.position = curr_position;
             it->publishFeedback(feedback_);
             it++;
@@ -193,6 +205,7 @@ void Ax12Server::main_loop(const ros::TimerEvent&)
 
         if(curr_position == goal_position)
         {
+            ROS_DEBUG("Motor has reached the goal position");
             result_.success = true;
             it->setSucceeded(result_);
             it = joint_goals_.erase(it);
@@ -201,6 +214,7 @@ void Ax12Server::main_loop(const ros::TimerEvent&)
         }
         else if(ros::Time::now().toSec() - it->getGoalID().stamp.toSec() > MAX_STOP_TIME)
         {
+            ROS_DEBUG("Timeout reached for motor");
             result_.success = false;
             it->setAborted(result_);
             it = joint_goals_.erase(it);
@@ -208,6 +222,7 @@ void Ax12Server::main_loop(const ros::TimerEvent&)
         }
         else
         {
+            ROS_DEBUG("Motor stopped but still no timeout, publishing feedback");
             feedback_.position = curr_position;
             it->publishFeedback(feedback_);
             it++;
