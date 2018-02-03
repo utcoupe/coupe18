@@ -6,7 +6,7 @@
 			<actionlist repeat="3">
 				<orderref ref="ask_for_jack"/>
 			</actionlist>
-			<orderref ref="wait_for_jack" needsprevious="true"/>
+			<orderref ref="wait_for_jack"/>
 		</actions>
 	</action>
 
@@ -17,7 +17,7 @@
 			<team name="green">
 				<orderref ref="set_robot_pos">
 					<position>
-						<x>0.2</x>
+						<x>0.124</x>
 						<y>1.65</y>
 						<theta>0</theta>
 					</position>
@@ -26,20 +26,20 @@
 			<team name="orange">
 				<orderref ref="set_robot_pos">
 					<position>
-						<x>2.8</x>
+						<x>2.876</x>
 						<y>1.65</y>
 						<theta>3.141592</theta>
 					</position>
 				</orderref>
 			</team>
 
-			<actionref ref="jack" needsprevious="true"/>
+			<actionref ref="jack"/>
 
-			<orderref ref="timer_start" needsprevious="true">
+			<orderref ref="timer_start">
 				<duration>97</duration>
 			</orderref>
 
-			<orderref ref="set_game_status_ingame" needsprevious="true"/>
+			<orderref ref="set_game_status_ingame"/>
 		</actions>
 	</action>
 
@@ -62,25 +62,23 @@
 				<waypoint_name>way_button_accost</waypoint_name>
 			</orderref>
 
-			<actionlist repeat="2">
-				<orderref ref="actuator_servo_set_pos" name="activate button with servo">
-					<name>servo_button</name>
-					<preset>OPEN</preset>
-				</orderref>
+			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+				<name>servo_button</name>
+				<preset>OPEN</preset>
+			</orderref>
 
-				<orderref ref="delay">
-					<duration>1</duration>
-				</orderref>
+			<orderref ref="delay">
+				<duration>1</duration>
+			</orderref>
 
-				<orderref ref="actuator_servo_set_pos" name="close servo">
-					<name>servo_button</name>
-					<preset>CLOSE</preset>
-				</orderref>
+			<orderref ref="actuator_servo_set_pos" name="close servo">
+				<name>servo_button</name>
+				<preset>CLOSE</preset>
+			</orderref>
 
-				<orderref ref="delay">
-					<duration>1</duration>
-				</orderref>
-			</actionlist>
+			<orderref ref="delay">
+				<duration>1</duration>
+			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="go back to approach">
 				<mode>1</mode>
@@ -98,23 +96,23 @@
 				<waypoint_name>way_uni_distrib_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="accost distributor" needsprevious="true">
+			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+				<name>servo_lock</name>
+				<preset>LEFT</preset>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint" name="accost distributor">
 				<mode>1</mode>
 				<waypoint_name>way_uni_distrib_accost</waypoint_name>
 			</orderref>
 
 			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
-				<name>servo_button</name>
-				<preset>OPEN</preset>
+				<name>servo_lock</name>
+				<preset>RIGHT</preset>
 			</orderref>
 
 			<orderref ref="delay">
-				<duration>1</duration>
-			</orderref>
-
-			<orderref ref="actuator_servo_set_pos" name="close servo">
-				<name>servo_button</name>
-				<preset>CLOSE</preset>
+				<duration>2</duration>
 			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="go back to approach">>
@@ -133,23 +131,23 @@
 				<waypoint_name>way_multi_distrib_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="accost distributor" needsprevious="true">
+			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+				<name>servo_lock</name>
+				<preset>LEFT</preset>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint" name="accost distributor">
 				<mode>1</mode>
 				<waypoint_name>way_multi_distrib_accost</waypoint_name>
 			</orderref>
 
 			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
-				<name>servo_button</name>
-				<preset>OPEN</preset>
+				<name>servo_lock</name>
+				<preset>RIGHT</preset>
 			</orderref>
 
 			<orderref ref="delay">
-				<duration>1</duration>
-			</orderref>
-
-			<orderref ref="actuator_servo_set_pos" name="close servo">
-				<name>servo_button</name>
-				<preset>CLOSE</preset>
+				<duration>2</duration>
 			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="go back to approach">>
@@ -168,19 +166,25 @@
 				<waypoint_name>way_fire</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
-				<name>servo_button</name>
-				<preset>OPEN</preset>
-			</orderref>
+			<actionlist repeat="10">
+				<actionref ref="/drivers/ax12/goal">
+					<motor_id>6</motor_id>
+					<position>500</position>
+				</actionref>
 
-			<orderref ref="delay">
-				<duration>1</duration>
-			</orderref>
+				<orderref ref="delay">
+					<duration>1</duration>
+				</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="close servo">
-				<name>servo_button</name>
-				<preset>CLOSE</preset>
-			</orderref>
+				<actionref ref="/drivers/ax12/goal">
+					<motor_id>6</motor_id>
+					<position>850</position>
+				</actionref>
+
+				<orderref ref="delay">
+					<duration>1</duration>
+				</orderref>
+			</actionlist>
 		</actions>
 	</action>
 

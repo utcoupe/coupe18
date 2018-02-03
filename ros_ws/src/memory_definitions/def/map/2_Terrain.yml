@@ -212,4 +212,3 @@ terrain:
         layer_pathfinder:
             _include: 
                 - layer_ground
-                - layer_belt
