@@ -155,6 +155,7 @@ class PortFinder:
                         # Received a null character, close and open again the port
                         if len(read_data) != 0 and read_data[0] == '\x00':
                             read_data = ""
+                        rospy.loginfo("Try number {} for {}, data = {}".format(loop_counter, element[1], read_data))
                         loop_counter += 1
                 except serial.SerialException:
                     rospy.logerr("Try to open port {} but it fails...".format(element[1]))

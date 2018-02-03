@@ -19,8 +19,8 @@ ros::NodeHandle nh;
 // ---- SENSORS DEPARTMENT ----
 
 #define NUM_BELT_SENSORS 2
-const int pins_belt_sensors_shut[NUM_BELT_SENSORS]     = {2, 3};
-const uint8_t belt_sensors_addresses[NUM_BELT_SENSORS] = {22, 25};
+const int pins_belt_sensors_shut[NUM_BELT_SENSORS]     = {40, 42};
+const uint8_t belt_sensors_addresses[NUM_BELT_SENSORS] = {22, 24};
 const String belt_sensors_names[NUM_BELT_SENSORS]      = {"sensor1", "sensor2"};
 VL53L0X belt_sensors[NUM_BELT_SENSORS];
 
@@ -231,7 +231,7 @@ void setup() {
     Wire.begin();
 
     // Components init
-    //init_sensors();
+    init_sensors();
     init_actuators();
 
     nh.loginfo("Node '/arduinos/others' initialized correctly.");
@@ -239,7 +239,7 @@ void setup() {
 
 void loop() {
     // Components loop
-    //loop_sensors();
+    loop_sensors();
     loop_actuators();
 
     // ROS loop

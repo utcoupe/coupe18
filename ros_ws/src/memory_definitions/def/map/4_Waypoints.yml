@@ -18,14 +18,14 @@ waypoints:
         position:
             frame_id: /map
             x: 1.13
-            y: 1.65
+            y: 1.785 #1.65 PR
             a: 1.57079
             type: fixed
     way_button_accost:
         position:
             frame_id: /map
             x: 1.13
-            y: 1.895
+            y: 1.9 #1.895 PR
             a: 1.57079
             type: fixed
 
@@ -48,21 +48,21 @@ waypoints:
             frame_id: /map
             x: 2.390
             y: 0.400
-            a: 1.57079
+            a: -1.57079
             type: fixed
     way_multi_distrib_accost:
         position:
             frame_id: /map
             x: 2.390
             y: 0.105
-            a: 1.57079
+            a: -1.57079
             type: fixed
 
     way_fire:
         position:
             frame_id: /map
             x: 0.600
-            y: 1.400
+            y: 1.500
             a: -0.7854
             type: fixed
 
@@ -94,4 +94,37 @@ waypoints:
             x: 0.21
             y: 0.15
             a: 1.57079
+            type: fixed
+
+
+
+
+
+    way_grape_1_approach:
+        position:
+            frame_id: /map
+            x: 1.13
+            y: 1.0
+            a: 3.141592
+            type: fixed
+    way_grape_1_accost:
+        position:
+            frame_id: /map
+            x: 0.85
+            y: 1.0
+            a: -1.57079
+            type: fixed
+    way_grape_1_pushed:
+        position:
+            frame_id: /map
+            x: 0.85
+            y: 1.58
+            a: -1.57079
+            type: fixed
+    way_grape_1_released:
+        position:
+            frame_id: /map
+            x: 0.85
+            y: 1.48
+            a: -1.57079
             type: fixed

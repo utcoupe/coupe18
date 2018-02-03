@@ -1,0 +1,273 @@
+<actions>
+	<action ref="jack">
+		<params/>
+		<conditions/>
+		<actions exec="all" order="linear">
+			<actionlist repeat="3">
+				<orderref ref="ask_for_jack"/>
+			</actionlist>
+			<orderref ref="wait_for_jack"/>
+		</actions>
+	</action>
+
+	<action ref="game_start" name="Game start routine actions">
+		<params></params>
+		<conditions></conditions>
+		<actions>
+			<team name="green">
+				<orderref ref="set_robot_pos">
+					<position>
+						<x>0.124</x>
+						<y>1.65</y>
+						<theta>0</theta>
+					</position>
+				</orderref>
+			</team>
+			<team name="orange">
+				<orderref ref="set_robot_pos">
+					<position>
+						<x>2.876</x>
+						<y>1.65</y>
+						<theta>3.141592</theta>
+					</position>
+				</orderref>
+			</team>
+
+			<actionref ref="jack"/>
+
+			<orderref ref="timer_start">
+				<duration>97</duration>
+			</orderref>
+
+			<orderref ref="set_game_status_ingame"/>
+		</actions>
+	</action>
+
+	<action ref="activate_button" name="Go and activate Home Button" reward="25">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="asserv_goto_waypoint" name="approach button">
+				<waypoint_name>way_button_approach</waypoint_name>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint" name="accost button">
+				<waypoint_name>way_button_accost</waypoint_name>
+				<direction>0</direction>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint" name="go back to approach">
+				<waypoint_name>way_button_approach</waypoint_name>
+			</orderref>
+		</actions>
+	</action>
+
+	<action ref="load_unicolor_distributor" name="Load unicolor distributor">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="asserv_goto_waypoint" name="approach distributor">>
+				<waypoint_name>way_uni_distrib_approach</waypoint_name>
+			</orderref>
+
+			<orderref ref="actuator_set" name="activate button with servo">
+				<name>servo_lock</name>
+				<preset>LEFT</preset>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint" name="accost distributor">
+				<waypoint_name>way_uni_distrib_accost</waypoint_name>
+			</orderref>
+
+			<orderref ref="actuator_set" name="activate button with servo">
+				<name>servo_lock</name>
+				<preset>RIGHT</preset>
+			</orderref>
+
+			<orderref ref="delay">
+				<duration>2</duration>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint" name="go back to approach">>
+				<waypoint_name>way_uni_distrib_approach</waypoint_name>
+				<direction>0</direction>
+			</orderref>
+		</actions>
+	</action>
+
+	<action ref="load_multicolor_distributor" name="Load multicolor distributor">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="asserv_goto_waypoint" name="approach distributor">>
+				<waypoint_name>way_multi_distrib_approach</waypoint_name>
+			</orderref>
+
+			<orderref ref="actuator_set" name="activate button with servo">
+				<name>servo_lock</name>
+				<preset>LEFT</preset>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint" name="accost distributor">
+				<waypoint_name>way_multi_distrib_accost</waypoint_name>
+			</orderref>
+
+			<orderref ref="actuator_set" name="activate button with servo">
+				<name>servo_lock</name>
+				<preset>RIGHT</preset>
+			</orderref>
+
+			<orderref ref="delay">
+				<duration>2</duration>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint" name="go back to approach">
+				<waypoint_name>way_multi_distrib_approach</waypoint_name>
+				<direction>0</direction>
+			</orderref>
+		</actions>
+	</action>
+
+	<action ref="fire_full_clean_balls" name="Fire clean balls to water tower" reward="40">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="asserv_goto_waypoint" name="goto fire position">
+				<waypoint_name>way_fire</waypoint_name>
+			</orderref>
+
+			<orderref ref="actuator_set" name="activate button with servo">
+				<name>canon</name>
+				<preset>ON</preset>
+			</orderref>
+
+			<actionlist repeat="10">
+				<orderref ref="actuator_ax12_set_pos">
+					<motor_id>6</motor_id>
+					<position>500</position>
+				</orderref>
+
+				<!-- <orderref ref="delay">
+					<duration>1</duration>
+				</orderref> -->
+
+				<orderref ref="actuator_ax12_set_pos">
+					<motor_id>6</motor_id>
+					<position>850</position>
+				</orderref>
+
+				<!-- <orderref ref="delay">
+					<duration>1</duration>
+				</orderref> -->
+			</actionlist>
+
+			<orderref ref="actuator_set" name="activate button with servo">
+				<name>canon</name>
+				<preset>OFF</preset>
+			</orderref>
+		</actions>
+	</action>
+
+	<action ref="fire_half_clean_balls" name="Fire clean balls to water tower" reward="20">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="asserv_goto_waypoint" name="goto fire position">
+				<waypoint_name>way_fire</waypoint_name>
+			</orderref>
+
+			<orderref ref="actuator_set" name="activate button with servo">
+				<name>servo_button</name>
+				<preset>OPEN</preset>
+			</orderref>
+
+			<orderref ref="delay">
+				<duration>1</duration>
+			</orderref>
+
+			<orderref ref="actuator_set" name="close servo">
+				<name>servo_button</name>
+				<preset>CLOSE</preset>
+			</orderref>
+		</actions>
+	</action>
+
+	<action ref="unload_dirty_balls" name="Unload dirty balls to station" reward="40">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="asserv_goto_waypoint" name="approach station">
+				<waypoint_name>way_station_approach</waypoint_name>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint" name="accost station">
+				<waypoint_name>way_station_accost</waypoint_name>
+			</orderref>
+
+			<orderref ref="actuator_set" name="activate button with servo">
+				<name>servo_button</name>
+				<preset>OPEN</preset>
+			</orderref>
+
+			<orderref ref="delay">
+				<duration>1</duration>
+			</orderref>
+
+			<orderref ref="actuator_set" name="close servo">
+				<name>servo_button</name>
+				<preset>CLOSE</preset>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint" name="approach station">
+				<waypoint_name>way_station_approach</waypoint_name>
+			</orderref>
+		</actions>
+	</action>
+
+	<action ref="activate_bee" name="Activate bee" reward="50">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="asserv_goto_waypoint" name="approach bee">
+				<waypoint_name>way_bee_approach</waypoint_name>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint" name="accost bee">
+				<waypoint_name>way_bee_accost</waypoint_name>
+			</orderref>
+
+			<orderref ref="actuator_set" name="activate button with servo">
+				<name>servo_button</name>
+				<preset>OPEN</preset>
+			</orderref>
+
+			<orderref ref="delay">
+				<duration>1</duration>
+			</orderref>
+
+			<orderref ref="actuator_set" name="close servo">
+				<name>servo_button</name>
+				<preset>CLOSE</preset>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint" name="approach bee">
+				<waypoint_name>way_bee_approach</waypoint_name>
+				<direction>0</direction>
+			</orderref>
+		</actions>
+	</action>
+
+	<action ref="goto_spawn" name="Go to spawn">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="asserv_goto_waypoint" name="approach spawn">
+				<waypoint_name>way_spawn_approach</waypoint_name>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint" name="goto spawn">
+				<waypoint_name>way_spawn</waypoint_name>
+			</orderref>
+		</actions>
+	</action>
+</actions>
