@@ -37,7 +37,8 @@ class Status():
         # "/processing/lidar_objects": None,
 
         "/drivers/ard_asserv": None,
-        "/drivers/port_finder": None,
+        "/drivers/dard_asserv": None,
+        "/drivers/port_finder": None
     }
 
 
@@ -61,11 +62,25 @@ class GameStatusNode():
                 self.check_init_checklist()
                 if time.time() - self._init_start_time > GameStatusNode.INIT_TIMEOUT:
                     if len([n for n in Status.INIT_CHECKLIST if Status.INIT_CHECKLIST[n] in [None, False]]) > 0:
-                        self.init_status = Status.INIT_FAILED
-                    else: self.init_status = Status.INIT_INITIALIZED
+                        self.set_init_status(Status.INIT_FAILED)
+                    else:
+                        self.set_init_status(Status.INIT_INITIALIZED)
+                        rospy.loginfo("All nodes initialized successfully, ready to start !")
             self.publish_statuses() # publish game status at 5Hz.
 
             r.sleep()
+
+    def set_init_status(self, new_status):
+        if new_status == Status.INIT_INITIALIZING:
+            rospy.loginfo("game_status set to INITIALIZING.")
+        elif new_status == Status.INIT_INITIALIZED:
+            rospy.loginfo("All nodes initialized successfully, ready to start !")
+        elif new_status == Status.INIT_FAILED:
+            rospy.logerr("Init timeout reached, certain nodes failed ({}) or didn't respond ({}) ! "
+                         "System will continue, but be careful..".format(
+                         str([n for n in Status.INIT_CHECKLIST if Status.INIT_CHECKLIST[n] == False]),
+                         str([n for n in Status.INIT_CHECKLIST if Status.INIT_CHECKLIST[n] == None])))
+        self.init_status = new_status
 
     def publish_statuses(self):
         m = GameStatus()
@@ -88,7 +103,7 @@ class GameStatusNode():
             if Status.INIT_CHECKLIST[node] in [None, False]:
                 return
         if self.init_status == Status.INIT_INITIALIZING:
-            self.init_status = Status.INIT_INITIALIZED
+            self.set_init_status(Status.INIT_INITIALIZED)
         else:
             rospy.logerr("Unexpected behaviour : init_status checklist got full but status is not INITIALIZING.")
 

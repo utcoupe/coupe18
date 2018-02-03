@@ -133,7 +133,7 @@ class NavigatorNode(object):
             path = self._pathfinderClient.FindPath(startPos, endPos)
             self._printPath (path)
             # then sends the path point per point to the arduino_asserv
-            path.pop() # The last point will be given end Position
+            path.pop(0) # The last point will be given end Position
             self._currentPath = path[:]
             self._updateStatus()
             for point in path:
