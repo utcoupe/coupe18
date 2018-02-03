@@ -4,10 +4,11 @@ import random
 import rospy
 from definitions import *
 from task import Task
+from order import Order
 
 
 class ActionList(Task):
-    MAX_REPEATS = 50 # If repeat mode is 'while', this will be the repeat limit.
+    MAX_REPEATS = 5 # If repeat mode is 'while', this will be the repeat limit.
 
     def __init__(self, xml, actions, orders):
         super(ActionList, self).__init__(xml)
@@ -110,14 +111,21 @@ class ActionList(Task):
         else:
             rospy.logerr("ERROR asked to execute a task that's not free")
 
+    def resetStatus(self, refresh_parent=False): # wipes all progress of this list and all descendent tasks.
+        self.setStatus(TaskStatus.FREE, refresh_parent)
+        if not refresh_parent: #TODO ~~~~
+            self._repeats = 0
+        for task in self.TASKS:
+            task.resetStatus()
+
     def _markSuccess(self):
         if self.repeatMode != RepeatMode.ONCE:
-            if (self.repeatMode == RepeatMode.WHILE or self.repeatMode == RepeatMode.FOR) and self._repeats < self._repeats_max - 1:
+            if self.repeatMode == RepeatMode.WHILE or self.repeatMode == RepeatMode.FOR:
                 self._repeats += 1
-                for task in self.TASKS:
-                    task.setStatus(TaskStatus.FREE, refresh_parent = False)
-                self.setStatus(TaskStatus.FREE)
-                return
+                if self._repeats < self._repeats_max: # if repeat limit not reached yet, mark everything as free
+                    print "resetting status of task and children"
+                    self.resetStatus(refresh_parent=True)
+                    return
         self.setStatus(TaskStatus.SUCCESS)
 
     def refreshStatus(self):
@@ -176,8 +184,10 @@ class ActionList(Task):
         c = Console();c.setstyle(Colors.BOLD);c.setstyle(Colors.RED)
         c.addtext("[{} ActionList] {} ".format(self.getStatusEmoji(), self.Name))
         c.endstyle();c.setstyle(Colors.GRAY)
-        c.addtext("[{} {}{}{}]".format(ExecutionMode.toEmoji(self.executionMode),
-                                                ExecutionOrder.toEmoji(self.executionOrder),
-                                                ", {}⚡".format(self.getReward()) if self.getReward() else "",
-                                                ", ~{}⌛".format(int(self.getDuration())) if self.getDuration() else ""))
+        c.addtext("[{}{}{}{}{}]".format(ExecutionMode.toEmoji(self.executionMode),
+                                       " " + ExecutionOrder.toEmoji(self.executionOrder),
+                                       " {}/{}".format(str(self._repeats), str(self._repeats_max)) \
+                                            + RepeatMode.toEmoji(self.repeatMode) if self.repeatMode != RepeatMode.ONCE else "",
+                                       ", {}⚡".format(self.getReward()) if self.getReward() else "",
+                                       ", ~{}⌛".format(int(self.getDuration())) if self.getDuration() else ""))
         return c.getText()

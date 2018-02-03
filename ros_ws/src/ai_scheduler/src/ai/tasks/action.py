@@ -72,6 +72,10 @@ class Action(Task):
     def getNext(self):
         return self.TASKS.getNext()
 
+    def resetStatus(self, refresh_parent=False): # wipes all progress of this list and all descendent tasks.
+        self.setStatus(TaskStatus.FREE, refresh_parent)
+        self.TASKS.resetStatus()
+
     def refreshStatus(self):
         self.setStatus(self.TASKS.getStatus())
 
@@ -93,8 +97,10 @@ class Action(Task):
         c.addtext("[{} Action]".format(self.getStatusEmoji()))
         c.endstyle();c.setstyle(Colors.BLUE);c.addtext(" {0} ".format(self.Name));c.endstyle();c.setstyle(Colors.GRAY)
 
-        c.addtext("[{} {}{}{}]".format(ExecutionMode.toEmoji(self.TASKS.executionMode),
-                                        ExecutionOrder.toEmoji(self.TASKS.executionOrder),
-                                        ", {}⚡".format(self.getReward()) if self.getReward() else "",
-                                        ", ~{}⌛".format(int(self.TASKS.getDuration())) if self.TASKS.getDuration() else ""))
+        c.addtext("[{}{}{}{}{}]".format(ExecutionMode.toEmoji(self.TASKS.executionMode),
+                                       " " + ExecutionOrder.toEmoji(self.TASKS.executionOrder),
+                                       " {}/{}".format(str(self.TASKS._repeats), str(self.TASKS._repeats_max)) \
+                                            + RepeatMode.toEmoji(self.TASKS.repeatMode) if self.TASKS.repeatMode != RepeatMode.ONCE else "",
+                                       ", {}⚡".format(self.getReward()) if self.getReward() else "",
+                                       ", ~{}⌛".format(int(self.TASKS.getDuration())) if self.TASKS.getDuration() else ""))
         return c.getText()

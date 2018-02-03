@@ -28,11 +28,13 @@ class Order(Task):
             for b in p.getBoundParams():
                 if b.bind == bind:
                     return b
-
         return False
 
     def getDuration(self):
         return self.Duration
+
+    def resetStatus(self, refresh_parent=False): # wipes all progress of this list and all descendent tasks.
+        self.setStatus(TaskStatus.FREE, refresh_parent) #TODO on all types of tasks, reset to needsprevious if it was like that at init
 
     def execute(self, communicator):
         self.setStatus(TaskStatus.WAITINGFORRESPONSE)
