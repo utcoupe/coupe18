@@ -74,7 +74,6 @@ bool Ax12Server::handle_joint_goal(GoalHandle goal_handle)
     auto goal = goal_handle.getGoal();
     uint8_t motor_id = goal->motor_id;
     uint16_t position = goal->position;
-    bool success = true;
 
     if(position <= 0 || position > 1023)
     {
@@ -107,23 +106,14 @@ bool Ax12Server::handle_joint_goal(GoalHandle goal_handle)
         }
     }
 
-    success &= driver_.joint_mode(motor_id);
-    success &= driver_.write_register(motor_id, MOVING_SPEED, speed);
-    success &= driver_.write_register(motor_id, GOAL_POSITION, position);
+    driver_.joint_mode(motor_id);
+    driver_.write_register(motor_id, MOVING_SPEED, speed);
+    driver_.write_register(motor_id, GOAL_POSITION, position);
 
-    if(!success)
-    {
-        goal_handle.setAborted();
-        ROS_DEBUG("No success setting goal and speed, not adding the goal to the list");
-    }
-    else
-    {
-        joint_goals_.push_back(goal_handle);
-        ROS_DEBUG("Success setting goal and speed, adding the goal to the list");
 
-    }
-
-    return success;
+    joint_goals_.push_back(goal_handle);
+    ROS_DEBUG("Success setting goal and speed, adding the goal to the list");
+    return true;
 }
 
 bool Ax12Server::handle_wheel_goal(GoalHandle goal_handle)
@@ -131,7 +121,6 @@ bool Ax12Server::handle_wheel_goal(GoalHandle goal_handle)
     auto goal = goal_handle.getGoal();
     uint8_t motor_id = goal->motor_id;
     uint16_t speed = goal->speed;
-    bool success = true;
 
     if(speed < 0 || speed > 2047)
     {
@@ -156,19 +145,14 @@ bool Ax12Server::handle_wheel_goal(GoalHandle goal_handle)
         }
     }
 
-    success &= driver_.wheel_mode(motor_id);
-    success &= driver_.write_register(motor_id, MOVING_SPEED, speed);
+    driver_.wheel_mode(motor_id);
+    driver_.write_register(motor_id, MOVING_SPEED, speed);
 
-    if(!success) {
-        goal_handle.setAborted();
-    }
-    else
-    {
-        result_.success = true;
-        goal_handle.setSucceeded(result_);
-    }
 
-    return success;
+    result_.success = true;
+    goal_handle.setSucceeded(result_);
+
+    return true;
 }
 
 void Ax12Server::main_loop(const ros::TimerEvent&)
