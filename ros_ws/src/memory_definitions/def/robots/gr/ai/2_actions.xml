@@ -17,7 +17,7 @@
 			<team name="green">
 				<orderref ref="set_robot_pos">
 					<position>
-						<x>0.100</x>
+						<x>0.114</x>
 						<y>1.785</y>
 						<theta>3.141592</theta>
 					</position>
@@ -26,7 +26,7 @@
 			<team name="orange">
 				<orderref ref="set_robot_pos">
 					<position>
-						<x>2.9</x>
+						<x>2.886</x>
 						<y>1.785</y>
 						<theta>0.0</theta>
 					</position>
@@ -88,6 +88,46 @@
 			<orderref ref="asserv_goto_waypoint" name="push them to the zone">
 				<waypoint_name>way_grape_1_released</waypoint_name>
 			</orderref>
+
+
+
+
+
+
+			<orderref ref="asserv_goto_waypoint" name="go behind the cubes">
+                                <waypoint_name>way_grape_2_approach</waypoint_name>
+                        </orderref>
+
+                        <orderref ref="asserv_goto_waypoint" name="go behind the cubes">
+                                <waypoint_name>way_grape_2_accost</waypoint_name>
+				<direction>0</direction>
+                        </orderref>
+
+                        <orderref ref="delay">
+                                <duration>0</duration>
+                        </orderref>
+
+			<orderref ref="asserv_goto_waypoint" name="push them to the zone">
+                                <waypoint_name>way_grape_2_pushed</waypoint_name>
+                                <direction>0</direction>
+                        </orderref>
+
+                        <orderref ref="asserv_goto_waypoint" name="release">
+                                <waypoint_name>way_grape_2_released</waypoint_name>
+                        </orderref>
+
+			<orderref ref="asserv_goto_waypoint" name="goto bee approach">
+                                <waypoint_name>way_bee_approach</waypoint_name>
+                        </orderref>
+
+			<orderref ref="asserv_goto_waypoint" name="goto bee accost">
+                                <waypoint_name>way_bee_accost</waypoint_name>
+                        </orderref>
+
+                        <orderref ref="asserv_goto_waypoint" name="goto bee accost">
+                                <waypoint_name>way_bee_approach</waypoint_name>
+				<direction>0</direction>
+                        </orderref>
 		</actions>
 	</action>
 </actions>
