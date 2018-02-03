@@ -8,7 +8,7 @@ from order import Order
 
 
 class ActionList(Task):
-    MAX_REPEATS = 5 # If repeat mode is 'while', this will be the repeat limit.
+    MAX_REPEATS = 50 # If repeat mode is 'while', this will be the repeat limit.
 
     def __init__(self, xml, actions, orders):
         super(ActionList, self).__init__(xml)

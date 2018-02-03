@@ -3,7 +3,7 @@
 		<params/>
 		<conditions/>
 		<actions exec="all" order="linear">
-			<actionlist repeat="while">
+			<actionlist repeat="3">
 				<orderref ref="ask_for_jack"/>
 			</actionlist>
 			<orderref ref="wait_for_jack" needsprevious="true"/>
@@ -13,7 +13,7 @@
 	<action ref="game_start" name="Game start routine actions">
 		<params></params>
 		<conditions></conditions>
-		<actions repeat="2">
+		<actions>
 			<team name="green">
 				<orderref ref="set_robot_pos">
 					<position>
@@ -62,23 +62,25 @@
 				<waypoint_name>way_button_accost</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
-				<name>servo_button</name>
-				<preset>OPEN</preset>
-			</orderref>
+			<actionlist repeat="2">
+				<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+					<name>servo_button</name>
+					<preset>OPEN</preset>
+				</orderref>
 
-			<orderref ref="delay">
-				<duration>1</duration>
-			</orderref>
+				<orderref ref="delay">
+					<duration>1</duration>
+				</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="close servo">
-				<name>servo_button</name>
-				<preset>CLOSE</preset>
-			</orderref>
+				<orderref ref="actuator_servo_set_pos" name="close servo">
+					<name>servo_button</name>
+					<preset>CLOSE</preset>
+				</orderref>
 
-			<!-- <orderref ref="delay">
-				<duration>2</duration>
-			</orderref> TEMPORARY -->
+				<orderref ref="delay">
+					<duration>1</duration>
+				</orderref>
+			</actionlist>
 
 			<orderref ref="asserv_goto_waypoint" name="go back to approach">
 				<mode>1</mode>
@@ -253,7 +255,7 @@
 
 			<orderref ref="asserv_goto_waypoint" name="accost bee">>
 				<mode>1</mode>
-				<waypoint_name>way_bee_approach</waypoint_name>
+				<waypoint_name>way_bee_accost</waypoint_name>
 			</orderref>
 
 			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
