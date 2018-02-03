@@ -25,7 +25,7 @@
 		</message>
 	</order>
 
-	<order ref="actuator_servo_set_pos" duration="1.5">
+	<order ref="actuator_set" duration="1.5">
 		<message dest="/movement/actuators/dispatch">
 			<param name="name" type="string"/>
 			<param name="preset" type="string" optional="true"/> <!-- Set either a preset or param-->
@@ -34,13 +34,12 @@
 	</order>
 
 	<order ref="actuator_ax12_set_pos" duration="1.5">
-		<message dest="/drivers/ax12/goal">
+		<message dest="/drivers/ax12">
 			<param name="motor_id" type="int"/>
 			<param name="position" type="int"/> <!-- Set either a preset or param-->
-			<param name="mode" preset="true">0</param>
+			<param name="mode" type="int" preset="true">0</param>
 		</message>
 	</order>
-
 
 
 	<!-- AI Specific -->

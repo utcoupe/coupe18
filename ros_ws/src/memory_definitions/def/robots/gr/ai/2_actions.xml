@@ -160,19 +160,19 @@
 			</orderref>
 
 			<actionlist repeat="10">
-				<actionref ref="/drivers/ax12/goal">
+				<orderref ref="actuator_ax12_set_pos">
 					<motor_id>6</motor_id>
 					<position>500</position>
-				</actionref>
+				</orderref>
 
 				<orderref ref="delay">
 					<duration>1</duration>
 				</orderref>
 
-				<actionref ref="/drivers/ax12/goal">
+				<orderref ref="actuator_ax12_set_pos">
 					<motor_id>6</motor_id>
 					<position>850</position>
-				</actionref>
+				</orderref>
 
 				<orderref ref="delay">
 					<duration>1</duration>
