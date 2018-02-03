@@ -9,9 +9,9 @@ waypoints:
     way_spawn:
         position:
             frame_id: /map
-            x: 0.2
-            y: 1.65
-            a: 0.0
+            x: 0.228
+            y: 1.448
+            a: -1.57079
             type: fixed
 
     way_button_approach:
@@ -61,8 +61,8 @@ waypoints:
     way_fire:
         position:
             frame_id: /map
-            x: 0.600
-            y: 1.500
+            x: 1.75
+            y: 0.85
             a: -0.7854
             type: fixed
 
