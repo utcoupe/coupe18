@@ -19,7 +19,7 @@ class MapClient(object):
         self._connectToServer()
 
     def getPosFromWaypoint(self, waypointName):
-        waypoint = Waypoint(name = waypointName)
+        waypoint = Waypoint(name = waypointName, has_angle = True)
         return self._fillWaypointSrv.call(waypoint = waypoint).filled_waypoint.pose
     
     def _connectToServer(self):

@@ -78,7 +78,7 @@
 
 	<order ref="asserv_goto_waypoint">
 		<message dest="/navigation/navigator/gotowaypoint_action">
-			<param name="mode" type="int" preset="true">1</message> <!-- 0 = GOTO, 1 = GOTOA -->
+			<param name="mode" type="int" preset="true">1</param> <!-- 0 = GOTO, 1 = GOTOA -->
 			<param name="waypoint_name" type="string"/>
 			<param name="disable_collisions" type="bool" optional="true">0</param>
 			<param name="direction" type="int" optional="true">1</param>

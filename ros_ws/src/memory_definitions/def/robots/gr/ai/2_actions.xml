@@ -47,8 +47,7 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="approach button">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="approach button">
 				<waypoint_name>way_button_approach</waypoint_name>
 			</orderref>
 
@@ -58,7 +57,6 @@
 			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="accost button">
-				<mode>1</mode>
 				<waypoint_name>way_button_accost</waypoint_name>
 			</orderref>
 
@@ -81,8 +79,8 @@
 			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="go back to approach">
-				<mode>1</mode>
 				<waypoint_name>way_button_approach</waypoint_name>
+				<direction>0</direction>
 			</orderref>
 		</actions>
 	</action>
@@ -92,7 +90,6 @@
 		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<orderref ref="asserv_goto_waypoint" name="approach distributor">>
-				<mode>1</mode>
 				<waypoint_name>way_uni_distrib_approach</waypoint_name>
 			</orderref>
 
@@ -102,7 +99,6 @@
 			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="accost distributor">
-				<mode>1</mode>
 				<waypoint_name>way_uni_distrib_accost</waypoint_name>
 			</orderref>
 
@@ -116,8 +112,8 @@
 			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="go back to approach">>
-				<mode>1</mode>
 				<waypoint_name>way_uni_distrib_approach</waypoint_name>
+				<direction>0</direction>
 			</orderref>
 		</actions>
 	</action>
@@ -127,7 +123,6 @@
 		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<orderref ref="asserv_goto_waypoint" name="approach distributor">>
-				<mode>1</mode>
 				<waypoint_name>way_multi_distrib_approach</waypoint_name>
 			</orderref>
 
@@ -137,7 +132,6 @@
 			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="accost distributor">
-				<mode>1</mode>
 				<waypoint_name>way_multi_distrib_accost</waypoint_name>
 			</orderref>
 
@@ -150,9 +144,9 @@
 				<duration>2</duration>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="go back to approach">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="go back to approach">
 				<waypoint_name>way_multi_distrib_approach</waypoint_name>
+				<direction>0</direction>
 			</orderref>
 		</actions>
 	</action>
@@ -161,8 +155,7 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="goto fire position">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="goto fire position">
 				<waypoint_name>way_fire</waypoint_name>
 			</orderref>
 
@@ -192,8 +185,7 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="goto fire position">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="goto fire position">
 				<waypoint_name>way_fire</waypoint_name>
 			</orderref>
 
@@ -217,13 +209,11 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="approach station">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="approach station">
 				<waypoint_name>way_station_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="accost station">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="accost station">
 				<waypoint_name>way_station_accost</waypoint_name>
 			</orderref>
 
@@ -241,8 +231,7 @@
 				<preset>CLOSE</preset>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="approach station">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="approach station">
 				<waypoint_name>way_station_approach</waypoint_name>
 			</orderref>
 		</actions>
@@ -252,13 +241,11 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="approach bee">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="approach bee">
 				<waypoint_name>way_bee_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="accost bee">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="accost bee">
 				<waypoint_name>way_bee_accost</waypoint_name>
 			</orderref>
 
@@ -276,9 +263,9 @@
 				<preset>CLOSE</preset>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="approach bee">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="approach bee">
 				<waypoint_name>way_bee_approach</waypoint_name>
+				<direction>0</direction>
 			</orderref>
 		</actions>
 	</action>
@@ -287,13 +274,11 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="approach spawn">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="approach spawn">
 				<waypoint_name>way_spawn_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="goto spawn">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="goto spawn">
 				<waypoint_name>way_spawn</waypoint_name>
 			</orderref>
 		</actions>
