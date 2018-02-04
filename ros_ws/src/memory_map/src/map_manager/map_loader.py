@@ -34,6 +34,12 @@ class LoadingHelpers():
             rospy.logerr(m)
             raise ValueError(m)
 
+    @staticmethod
+    def mergeDicts(a, b): # if a key exists on both dicts, will take b's value.
+        c = a.copy()   # start with x's keys and values
+        c.update(b)    # modifies z with y's keys and values & returns None
+        return c
+
 
 class MapLoader():
     @staticmethod

@@ -4,126 +4,90 @@ classes:
         position:
             frame_id: /map
             type: pickable
+            a: 0
         shape:
             type: rect
             width: 0.06
-        color: green
+            height: 0.06
         marker:
             ns: cubes
             z_scale: 0.06
             z: 0.03
             orientation: [0, 0, 0]
-    ball:
+
+    ball_green:
         collision: false
         position:
             frame_id: /map
             type: pickable
+            a: 0
         shape:
             type: circle
-            radius: 0.044
+            radius: 0.022
+        color: green
         marker:
             ns: balls
             type: sphere
             z_scale: 0.044
-            z: 0.75
+            z: 1 #default
             orientation: [0, 0, 0]
+
+    ball_orange:
+        collision: false
+        position:
+            frame_id: /map
+            type: pickable
+            a: 0
+        shape:
+            type: circle
+            radius: 0.022
+        color: orange
+        marker:
+            ns: balls
+            type: sphere
+            z_scale: 0.044
+            z: 1 #default
+            orientation: [0, 0, 0]
+
 
 objects:
     container_grape_1:
         cube_1:
             class: cube
             position:
-                frame_id: /map
                 x: 0.850
                 y: 1.520
-                a: 43.3
-                type: pickable
-            shape:
-                type: rect
-                width: 0.06
-                height: 0.06
             color: green
-            marker:
-                ns: cubes
-                z_scale: 0.06
-                z: 0.03
-                orientation: [0, 0, 0]
 
         cube_2:
             class: cube
             position:
-                frame_id: /map
-                x: 0.790
-                y: 1.460
-                a: 0
-                type: pickable
-            shape:
-                type: rect
-                width: 0.06
-                height: 0.06
-            color: green
-            marker:
-                ns: cubes
-                z_scale: 0.06
-                z: 0.03
-                orientation: [0, 0, 0]
+                x: 0.950
+                y: 1.520
+            color: black
 
 
     container_balls:
         ball_1:
-            class: ball
+            class: ball_green
             position:
-                frame_id: /map
                 x: 0.015
                 y: 1.16
-                a: 0
-                type: pickable
-            shape:
-                type: circle
-                radius: 0.022
-            color: green
             marker:
-                ns: balls
-                type: sphere
-                z_scale: 0.044
                 z: 0.65
-                orientation: [0, 0, 0]
 
         ball_2:
-            class: ball
+            class: ball_orange
             position:
-                frame_id: /map
                 x: 0.015
                 y: 1.16
-                a: 0
-                type: pickable
-            shape:
-                type: circle
-                radius: 0.022
-            color: orange
             marker:
-                ns: balls
-                type: sphere
-                z_scale: 0.044
                 z: 0.7
-                orientation: [0, 0, 0]
 
         ball_3:
-            class: ball
+            class: ball_green
             position:
-                frame_id: /map
                 x: 0.015
                 y: 1.16
-                a: 0
-                type: pickable
-            shape:
-                type: circle
-                radius: 0.022
-            color: green
             marker:
-                ns: balls
-                type: sphere
-                z_scale: 0.044
                 z: 0.75
-                orientation: [0, 0, 0]
-# Map YML just got way easier to fill up and read :)

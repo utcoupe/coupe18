@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import copy
 from map_loader import LoadingHelpers
 from map_bases import DictManager
 from map_attributes import Position2D, Shape2D, MarkerRViz, Trajectory
@@ -87,11 +88,20 @@ class Container(DictManager):
 
 class Object(DictManager):
     def __init__(self, initdict, obj_classes):
-        LoadingHelpers.checkKeysExist(initdict, "position", "shape", "marker")
-
         # Autofilling if class is available
         if "class" in initdict:
-            obj_class = [obj_classes[d] for d in obj_classes if d == initdict["class"]][0]
+            obj_class = copy.deepcopy([obj_classes[d] for d in obj_classes if d == initdict["class"]][0])
+            new_initdict = LoadingHelpers.mergeDicts(obj_class, initdict)
+            for field in ["position", "shape", "marker"]:
+                if field in initdict and field in obj_class:
+                    new_initdict[field] = LoadingHelpers.mergeDicts(obj_class[field], initdict[field])
+                elif field in initdict:
+                    new_initdict[field] = initdict[field]
+                elif field in obj_class:
+                    new_initdict[field] = obj_class[field]
+            initdict = new_initdict
+
+        LoadingHelpers.checkKeysExist(initdict, "position", "shape", "marker")
 
         d = {}
         if "color" in initdict:
