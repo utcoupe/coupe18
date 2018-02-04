@@ -11,9 +11,7 @@ zones:
             height: 0.3
         marker:
             ns: zones
-            id: 1
-            type: cube
-            scale: [0.55, 0.3, 0.001]
+            z_scale: 0.001
             z: 0.001
             orientation: [0, 0, 0]
             color: orange

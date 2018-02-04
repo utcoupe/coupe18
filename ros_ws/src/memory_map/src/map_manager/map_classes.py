@@ -49,7 +49,7 @@ class Zone(DictManager):
         super(Zone, self).__init__({
             "position": Position2D(initdict["position"]),
             "shape": Shape2D(initdict["shape"]),
-            "marker": MarkerRViz(initdict["marker"]),
+            "marker": MarkerRViz(initdict["marker"], shape = Shape2D(initdict["shape"])),
             "properties": DictManager(initdict["properties"])
         })
 
@@ -63,11 +63,11 @@ class Waypoint(DictManager):
 
 
 class Entity(DictManager):
-    def __init__(self, initdict):
+    def __init__(self, initdict, obj_classes):
         LoadingHelpers.checkKeysExist(initdict, "position", "shape", "marker", "containers", "trajectory")
 
         for container in initdict["containers"]:
-            initdict["containers"][container] = Container(initdict["containers"][container])
+            initdict["containers"][container] = Container(initdict["containers"][container], obj_classes)
 
         super(Entity, self).__init__({
             "position": Position2D(initdict["position"]),
@@ -79,15 +79,19 @@ class Entity(DictManager):
 
 
 class Container(DictManager):
-    def __init__(self, initdict):
+    def __init__(self, initdict, obj_classes):
         for obj in initdict:
-            initdict[obj] = Object(initdict[obj])
+            initdict[obj] = Object(initdict[obj], obj_classes)
         super(Container, self).__init__(initdict)
 
 
 class Object(DictManager):
-    def __init__(self, initdict):
+    def __init__(self, initdict, obj_classes):
         LoadingHelpers.checkKeysExist(initdict, "position", "shape", "marker")
+
+        # Autofilling if class is available
+        if "class" in initdict:
+            obj_class = [obj_classes[d] for d in obj_classes if d == initdict["class"]][0]
 
         d = {}
         if "color" in initdict:

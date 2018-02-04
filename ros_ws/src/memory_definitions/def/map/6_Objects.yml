@@ -80,7 +80,7 @@ objects:
                 type: pickable
             shape:
                 type: circle
-                radius: 0.044
+                radius: 0.022
             color: green
             marker:
                 ns: balls
@@ -99,11 +99,8 @@ objects:
                 type: pickable
             shape:
                 type: circle
-                radius: 0.044
-            shape:
-                type: circle
-                radius: 0.044
-            color: green
+                radius: 0.022
+            color: orange
             marker:
                 ns: balls
                 type: sphere
@@ -121,10 +118,7 @@ objects:
                 type: pickable
             shape:
                 type: circle
-                radius: 0.044
-            shape:
-                type: circle
-                radius: 0.044
+                radius: 0.022
             color: green
             marker:
                 ns: balls

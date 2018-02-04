@@ -11,10 +11,10 @@ class Color(DictManager):
             raise ValueError("ERROR Color must be a list with 4 elements in it (RBGA).")
         super(Color, self).__init__({
             "name": name,
-            "r": initdict[0],
-            "g": initdict[1],
-            "b": initdict[2],
-            "a": initdict[3]
+            "r": float(initdict[0]),
+            "g": float(initdict[1]),
+            "b": float(initdict[2]),
+            "a": float(initdict[3])
         })
 
 class Position2D(DictManager):
@@ -48,6 +48,7 @@ class MarkerRViz(DictManager):
                 LoadingHelpers.checkKeysExist(initdict, "type")
                 initdict["scale"] = (float(shape.Dict["radius"]) * 2.0, float(shape.Dict["radius"]) * 2.0, initdict["z_scale"])
             elif shape.Dict["type"] == "rect":
+                initdict["type"] = "cube"
                 initdict["scale"] = (float(shape.Dict["width"]), float(shape.Dict["height"]), initdict["z_scale"])
             else:
                 raise KeyError("Marker could not be autofilled with shape '{}', not implemented.".format(shape.Dict["type"]))

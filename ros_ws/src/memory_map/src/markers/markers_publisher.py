@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import math
 import rospy
-from map_manager import map_attributes
+from map_manager import map_attributes, DictManager
 from visualization_msgs.msg import Marker
 
 
@@ -28,7 +28,7 @@ class MarkersPublisher():
             "y": 0.022 + 2,
             "type": "fixed"
         })
-        self._publish_marker(pos, world.get("/terrain/marker/^"))
+        self._publish_marker(0, pos, world.get("/terrain/marker/^"))
 
     def _publish_robot_stl(self, world):
         pos = map_attributes.Position2D({
@@ -37,67 +37,66 @@ class MarkersPublisher():
             "y": 0,
             "type": "fixed"
         })
-        self._publish_marker(pos, world.get("/entities/{}/marker/^".format(rospy.get_param("/robot"))))
+        self._publish_marker(0, pos, world.get("/entities/{}/marker/^".format(rospy.get_param("/robot"))))
 
     def _publish_zones(self, world):
-        for z in world.get("/zones/^").toList():
-            self._publish_marker(z.get("position/^"), z.get("marker/^"))
+        for i, z in enumerate(world.get("/zones/^").toList()):
+            self._publish_marker(i, z.get("position/^"), z.get("marker/^"))
 
     def _publish_waypoints(self, world):
         i = 0
         for z in world.get("/waypoints/^").toList():
-            m = {
+            m = DictManager({
                 "ns": "waypoints",
-                "id": i,
                 "type": "arrow",
                 "scale": [0.08, 0.03, 0.03],
                 "z": 0.08,
                 "orientation": [0, 1.57079, 0],
-                "color": [0.8, 0.5, 0.1, 0.95]
-            }
-            self._publish_marker(z.get("position/^"), m)
+                "color": map_attributes.Color("brown", [0.8, 0.5, 0.1, 0.95])
+            })
+            self._publish_marker(i, z.get("position/^"), m)
             if "a" in z.get("position/^").Dict.keys():
                 i += 1
-                n = {
+                n = DictManager({
                     "ns": "waypoints",
-                    "id": i,
                     "type": "arrow",
                     "scale": [0.06, 0.015, 0.015],
                     "z": 0,
                     "orientation": [0, 0, z.get("position/^").Dict["a"]],
-                    "color": [0.8, 0.5, 0.1, 0.95]
-                }
-                self._publish_marker(z.get("position/^"), n)
+                    "color": map_attributes.Color("brown", [0.8, 0.5, 0.1, 0.95])
+                })
+                self._publish_marker(i, z.get("position/^"), n)
             i += 1
 
-    def _publish_objects(self, objects_dictman):
-        for e in objects_dictman.Dict.keys():
+    def _publish_objects(self, objects_dictman, j = 0):
+        for i, e in enumerate(objects_dictman.Dict.keys()):
             if "container_" in e:
-                self._publish_objects(objects_dictman.get("{}/^".format(e)))
+                self._publish_objects(objects_dictman.get("{}/^".format(e)), i)
             else:
-                self._publish_marker(objects_dictman.Dict[e].get("position/^"), objects_dictman.Dict[e].get("marker/^"))
+                self._publish_marker(i + j, objects_dictman.Dict[e].get("position/^"), objects_dictman.Dict[e].get("marker/^"))
 
-    def _publish_marker(self, position, visual):
+    def _publish_marker(self, marker_id, position, visual):
         markertypes = {
             "cube": Marker.CUBE,
             "sphere": Marker.SPHERE,
             "arrow": Marker.ARROW,
             "mesh": Marker.MESH_RESOURCE
         }
+
         marker = Marker()
         marker.header.frame_id = position.get("frame_id")
         marker.type = markertypes[visual.get("type")]
         marker.ns = visual.get("ns")
-        marker.id = visual.get("id")
+        marker.id = marker_id
 
         marker.action = Marker.ADD
         marker.scale.x = visual.get("scale")[0]
         marker.scale.y = visual.get("scale")[1]
         marker.scale.z = visual.get("scale")[2]
-        marker.color.r = visual.get("color")[0]
-        marker.color.g = visual.get("color")[1]
-        marker.color.b = visual.get("color")[2]
-        marker.color.a = visual.get("color")[3]
+        marker.color.r = visual.Dict["color"].Dict["r"]
+        marker.color.g = visual.get("color/^").get("g")
+        marker.color.b = visual.get("color/^").get("b")
+        marker.color.a = visual.get("color/^").get("a")
         marker.pose.position.x = position.get("x")
         marker.pose.position.y = position.get("y")
         marker.pose.position.z = visual.get("z")

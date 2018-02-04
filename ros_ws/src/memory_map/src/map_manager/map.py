@@ -23,7 +23,8 @@ class Map():
         initdict_zones     = MapLoader.loadFile("3_Zones.yml")["zones"]
         initdict_waypoints = MapLoader.loadFile("4_Waypoints.yml")["waypoints"]
         initdict_entities  = MapLoader.loadFile("5_Entities.yml")["entities"]
-        initdict_objects   = MapLoader.loadFile("6_Objects.yml")["objects"]
+        initdict_objects   = MapLoader.loadFile("6_Objects.yml")
+        obj_classes = initdict_objects["classes"]
         rospy.loginfo("Loaded files in {0:.2f}ms.".format(time.time() * 1000 - starttime))
 
         # Setting current team to the default set one.
@@ -44,12 +45,13 @@ class Map():
         for waypoint in initdict_waypoints:
             initdict_waypoints[waypoint] = Waypoint(initdict_waypoints[waypoint])
         for entity in initdict_entities:
-            initdict_entities[entity] = Entity(initdict_entities[entity])
-        for obj in initdict_objects:
+            initdict_entities[entity] = Entity(initdict_entities[entity], obj_classes)
+
+        for obj in initdict_objects["objects"]:
             if "container_" in obj:
-                initdict_objects[obj] = Container(initdict_objects[obj])
+                initdict_objects["objects"][obj] = Container(initdict_objects["objects"][obj], obj_classes)
             else:
-                initdict_objects[obj] = Object(initdict_objects[obj])
+                initdict_objects["objects"][obj] = Object(initdict_objects["objects"][obj], obj_classes)
 
         # Create main Map dict
         Map.MAP_DICT = DictManager({
@@ -57,7 +59,7 @@ class Map():
             "zones":     DictManager(initdict_zones),
             "waypoints": DictManager(initdict_waypoints),
             "entities":  DictManager(initdict_entities),
-            "objects":   DictManager(initdict_objects)
+            "objects":   DictManager(initdict_objects["objects"])
         })
         rospy.loginfo("Loaded map in {0:.2f}ms.".format(time.time() * 1000 - starttime))
 
