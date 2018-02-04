@@ -16,7 +16,7 @@ zones:
             scale: [0.55, 0.3, 0.001]
             z: 0.001
             orientation: [0, 0, 0]
-            color: [0.1, 0.7, 0.1, 1.0]
+            color: orange
 
         properties:
             walkable: true

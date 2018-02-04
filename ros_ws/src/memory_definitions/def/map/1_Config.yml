@@ -7,3 +7,8 @@ config:
             transforms:
                 - x_mirror
                 - a_mirror
+    
+    colors:
+        green:  [1, 2, 3, 4]
+        orange: [5, 6, 7, 8]
+        light_gray: [5, 6, 7, 8]

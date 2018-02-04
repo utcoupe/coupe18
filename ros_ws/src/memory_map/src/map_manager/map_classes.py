@@ -2,6 +2,7 @@
 from map_loader import LoadingHelpers
 from map_bases import DictManager
 from map_attributes import Position2D, Shape2D, MarkerRViz, Trajectory
+import map
 
 
 class Terrain(DictManager):
@@ -86,11 +87,18 @@ class Container(DictManager):
 
 class Object(DictManager):
     def __init__(self, initdict):
-        LoadingHelpers.checkKeysExist(initdict, "type", "position", "shape", "marker", "properties")
-        super(Object, self).__init__({
-            "type": initdict["type"],
+        LoadingHelpers.checkKeysExist(initdict, "position", "shape", "marker")
+
+        d = {}
+        if "color" in initdict:
+            d["color"] = [c for c in map.Map.Colors if c.Dict["name"] == initdict["color"]][0]
+        if "properties" in initdict:
+            d["properties"] = DictManager(initdict["properties"])
+        d["shape"] = Shape2D(initdict["shape"])
+
+        d = {
             "position": Position2D(initdict["position"]),
-            "shape": Shape2D(initdict["shape"]),
-            "marker": MarkerRViz(initdict["marker"]),
-            "properties": DictManager(initdict["properties"]),
-        })
+            "marker": MarkerRViz(initdict["marker"], shape = d["shape"] if "shape" in d else None, \
+                                                     color = d["color"] if "color" in d else None)
+        }
+        super(Object, self).__init__(d)

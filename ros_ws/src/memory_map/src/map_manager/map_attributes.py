@@ -5,6 +5,18 @@ from map_loader import LoadingHelpers
 from map_bases import DictManager
 
 
+class Color(DictManager):
+    def __init__(self, name, initdict):
+        if not (isinstance(initdict, list) and len(initdict) == 4):
+            raise ValueError("ERROR Color must be a list with 4 elements in it (RBGA).")
+        super(Color, self).__init__({
+            "name": name,
+            "r": initdict[0],
+            "g": initdict[1],
+            "b": initdict[2],
+            "a": initdict[3]
+        })
+
 class Position2D(DictManager):
     def __init__(self, initdict):
         LoadingHelpers.checkKeysExist(initdict, "frame_id", "x", "y", "type")
@@ -26,9 +38,28 @@ class Shape2D(DictManager):
 
 
 class MarkerRViz(DictManager):
-    def __init__(self, initdict):
-        LoadingHelpers.checkKeysExist(initdict, "ns", "id", "type", "scale", "z", "orientation", "color")
-        # TODO let some arguments be optional (orientation not given -> 0, 0, 0)
+    def __init__(self, initdict, shape = None, color = None):
+        LoadingHelpers.checkKeysExist(initdict, "ns", "orientation")
+
+        # Autofill based on other info
+        if shape is not None:
+            LoadingHelpers.checkKeysExist(initdict, "z_scale")
+            if shape.Dict["type"] == "circle":
+                LoadingHelpers.checkKeysExist(initdict, "type")
+                initdict["scale"] = (float(shape.Dict["radius"]) * 2.0, float(shape.Dict["radius"]) * 2.0, initdict["z_scale"])
+            elif shape.Dict["type"] == "rect":
+                initdict["scale"] = (float(shape.Dict["width"]), float(shape.Dict["height"]), initdict["z_scale"])
+            else:
+                raise KeyError("Marker could not be autofilled with shape '{}', not implemented.".format(shape.Dict["type"]))
+        else:
+            LoadingHelpers.checkKeysExist(initdict, "scale")
+
+        if color is not None:
+            initdict["color"] = color
+        else:
+            LoadingHelpers.checkKeysExist(initdict, "color")
+            initdict["color"] = [c for c in map.Map.Colors if c.Dict["name"] == initdict["color"]][0]
+
         super(MarkerRViz, self).__init__(initdict)
 
 

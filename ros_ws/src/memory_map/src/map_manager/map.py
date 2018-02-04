@@ -3,13 +3,17 @@ import time
 import rospy
 from map_loader import MapLoader, LoadingHelpers
 from map_bases import DictManager, RequestPath
+from map_attributes import Color
 from map_classes import Terrain, Zone, Waypoint, Entity, Container, Object
 from map_teams import Team
 
 class Map():
+    MAP_DICT = None
+
+    # Internal global variables
+    Colors = []
     Teams = []
     CurrentTeam = ''
-    MapDict = None
 
     @staticmethod
     def load():
@@ -20,6 +24,7 @@ class Map():
         initdict_waypoints = MapLoader.loadFile("4_Waypoints.yml")["waypoints"]
         initdict_entities  = MapLoader.loadFile("5_Entities.yml")["entities"]
         initdict_objects   = MapLoader.loadFile("6_Objects.yml")["objects"]
+        rospy.loginfo("Loaded files in {0:.2f}ms.".format(time.time() * 1000 - starttime))
 
         # Setting current team to the default set one.
         for team in initdict_config["teams"]:
@@ -29,6 +34,10 @@ class Map():
                 Map.CurrentTeam = team
             Map.Teams.append(Team(team, initdict_config["teams"][team]))
 
+        # Loading the color palette
+        for color in initdict_config["colors"]:
+            Map.Colors.append(Color(color, initdict_config["colors"][color]))
+
         # Instantiate objects before creating the map dict
         for zone in initdict_zones:
             initdict_zones[zone] = Zone(initdict_zones[zone])
@@ -37,14 +46,13 @@ class Map():
         for entity in initdict_entities:
             initdict_entities[entity] = Entity(initdict_entities[entity])
         for obj in initdict_objects:
-            if "_container_" in obj:
+            if "container_" in obj:
                 initdict_objects[obj] = Container(initdict_objects[obj])
             else:
                 initdict_objects[obj] = Object(initdict_objects[obj])
-        rospy.loginfo("Loaded files in {0:.2f}ms.".format(time.time() * 1000 - starttime))
 
         # Create main Map dict
-        Map.MapDict = DictManager({
+        Map.MAP_DICT = DictManager({
             "terrain":   Terrain(initdict_terrain),
             "zones":     DictManager(initdict_zones),
             "waypoints": DictManager(initdict_waypoints),
@@ -67,15 +75,15 @@ class Map():
         if requestpath[0] != "/":
             rospy.logerr("    GET Request failed : global search needs to start with '/'.")
             return None
-        return Map.MapDict.get(requestpath)
+        return Map.MAP_DICT.get(requestpath)
 
     @staticmethod
     def set(requestpath, mode, instance = None):
         if requestpath[0] != "/":
             rospy.logerr("    SET Request failed : global search needs to start with '/'.")
             return None
-        return Map.MapDict.set(requestpath, mode, instance)
+        return Map.MAP_DICT.set(requestpath, mode, instance)
 
     @staticmethod
     def transform(codes):
-        return Map.MapDict.transform(codes)
+        return Map.MAP_DICT.transform(codes)
