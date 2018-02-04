@@ -15,7 +15,7 @@ classes:
             z: 0.03
             orientation: [0, 0, 0]
 
-    ball_green:
+    ball:
         collision: false
         position:
             frame_id: /map
@@ -24,24 +24,7 @@ classes:
         shape:
             type: circle
             radius: 0.022
-        color: green
-        marker:
-            ns: balls
-            type: sphere
-            z_scale: 0.044
-            z: 1 #default
-            orientation: [0, 0, 0]
-
-    ball_orange:
-        collision: false
-        position:
-            frame_id: /map
-            type: pickable
-            a: 0
-        shape:
-            type: circle
-            radius: 0.022
-        color: orange
+        color: green #default, overritten when orange
         marker:
             ns: balls
             type: sphere
@@ -57,37 +40,312 @@ objects:
             position:
                 x: 0.850
                 y: 1.520
-            color: green
-
+            color: black
         cube_2:
             class: cube
             position:
-                x: 0.950
+                x: 0.790
+                y: 1.460
+            color: green
+        cube_3:
+            class: cube
+            position:
+                x: 0.850
+                y: 1.460
+            color: yellow
+        cube_4:
+            class: cube
+            position:
+                x: 0.910
+                y: 1.460
+            color: orange
+        cube_5:
+            class: cube
+            position:
+                x: 0.850
+                y: 1.400
+            color: blue
+
+    container_grape_2:
+        cube_1:
+            class: cube
+            position:
+                x: 0.3
+                y: 0.95
+            color: black
+        cube_2:
+            class: cube
+            position:
+                x: 0.24
+                y: 0.89
+            color: green
+        cube_3:
+            class: cube
+            position:
+                x: 0.3
+                y: 0.89
+            color: yellow
+        cube_4:
+            class: cube
+            position:
+                x: 0.36
+                y: 0.89
+            color: orange
+        cube_5:
+            class: cube
+            position:
+                x: 0.3
+                y: 0.83
+            color: blue
+
+    container_grape_3:
+        cube_1:
+            class: cube
+            position:
+                x: 1.1
+                y: 0.56
+            color: black
+        cube_2:
+            class: cube
+            position:
+                x: 1.04
+                y: 0.5
+            color: green
+        cube_3:
+            class: cube
+            position:
+                x: 1.1
+                y: 0.5
+            color: yellow
+        cube_4:
+            class: cube
+            position:
+                x: 1.16
+                y: 0.5
+            color: orange
+        cube_5:
+            class: cube
+            position:
+                x: 1.1
+                y: 0.44
+            color: blue
+
+    container_grape_4:
+        cube_1:
+            class: cube
+            position:
+                x: 2.150
                 y: 1.520
             color: black
+        cube_2:
+            class: cube
+            position:
+                x: 2.210
+                y: 1.460
+            color: green
+        cube_3:
+            class: cube
+            position:
+                x: 2.150
+                y: 1.460
+            color: yellow
+        cube_4:
+            class: cube
+            position:
+                x: 2.090
+                y: 1.460
+            color: orange
+        cube_5:
+            class: cube
+            position:
+                x: 2.150
+                y: 1.400
+            color: blue
+
+    container_grape_5:
+        cube_1:
+            class: cube
+            position:
+                x: 2.7
+                y: 0.95
+            color: black
+        cube_2:
+            class: cube
+            position:
+                x: 2.76
+                y: 0.89
+            color: green
+        cube_3:
+            class: cube
+            position:
+                x: 2.7
+                y: 0.89
+            color: yellow
+        cube_4:
+            class: cube
+            position:
+                x: 2.64
+                y: 0.89
+            color: orange
+        cube_5:
+            class: cube
+            position:
+                x: 2.7
+                y: 0.83
+            color: blue
+
+    container_grape_6:
+        cube_1:
+            class: cube
+            position:
+                x: 1.9
+                y: 0.56
+            color: black
+        cube_2:
+            class: cube
+            position:
+                x: 1.96
+                y: 0.5
+            color: green
+        cube_3:
+            class: cube
+            position:
+                x: 1.9
+                y: 0.5
+            color: yellow
+        cube_4:
+            class: cube
+            position:
+                x: 1.84
+                y: 0.5
+            color: orange
+        cube_5:
+            class: cube
+            position:
+                x: 1.9
+                y: 0.44
+            color: blue
 
 
-    container_balls:
+
+
+
+    container_uni_distrib:
         ball_1:
-            class: ball_green
+            class: ball
             position:
                 x: 0.015
                 y: 1.16
             marker:
                 z: 0.65
-
         ball_2:
-            class: ball_orange
+            class: ball
             position:
                 x: 0.015
                 y: 1.16
             marker:
                 z: 0.7
-
         ball_3:
-            class: ball_green
+            class: ball
             position:
                 x: 0.015
                 y: 1.16
             marker:
                 z: 0.75
+        ball_4:
+            class: ball
+            position:
+                x: 0.015
+                y: 1.16
+            marker:
+                z: 0.8
+        ball_5:
+            class: ball
+            position:
+                x: 0.015
+                y: 1.16
+            marker:
+                z: 0.85
+        ball_6:
+            class: ball
+            position:
+                x: 0.015
+                y: 1.16
+            marker:
+                z: 0.9
+        ball_7:
+            class: ball
+            position:
+                x: 0.015
+                y: 1.16
+            marker:
+                z: 0.95
+        ball_8:
+            class: ball
+            position:
+                x: 0.015
+                y: 1.16
+            marker:
+                z: 1
+
+    container_multi_distrib:
+        ball_1:
+            class: ball
+            position:
+                x: 2.39
+                y: 0.015
+            marker:
+                z: 0.65
+        ball_2:
+            class: ball
+            position:
+                x: 2.39
+                y: 0.015
+            color: orange
+            marker:
+                z: 0.7
+        ball_3:
+            class: ball
+            position:
+                x: 2.39
+                y: 0.015
+            marker:
+                z: 0.75
+        ball_4:
+            class: ball
+            position:
+                x: 2.39
+                y: 0.015
+            color: orange
+            marker:
+                z: 0.8
+        ball_5:
+            class: ball
+            position:
+                x: 2.39
+                y: 0.015
+            marker:
+                z: 0.85
+        ball_6:
+            class: ball
+            position:
+                x: 2.39
+                y: 0.015
+            color: orange
+            marker:
+                z: 0.9
+        ball_7:
+            class: ball
+            position:
+                x: 2.39
+                y: 0.015
+            marker:
+                z: 0.95
+        ball_8:
+            class: ball
+            position:
+                x: 2.39
+                y: 0.015
+            color: orange
+            marker:
+                z: 1

@@ -1,20 +1,20 @@
 zones:
-    construction_site_green:
+    spawn_zone:
         position:
-            x: 0.475
-            y: 1.85
+            x: 0.2
+            y: 1.675
             type: fixed
             frame_id: map
         shape:
             type: rect
-            width: 0.55
-            height: 0.3
+            width: 0.400
+            height: 0.650
         marker:
             ns: zones
             z_scale: 0.001
             z: 0.001
             orientation: [0, 0, 0]
-            color: orange
+            color: green
 
         properties:
             walkable: true

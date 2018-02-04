@@ -17,7 +17,7 @@ entities:
             scale: [0.2, 0.3, 0.35]
             z: 0.175
             orientation: [0, 0, 0]
-            color: green
+            color: purple
         containers: []
         trajectory:
             history: null
@@ -40,7 +40,7 @@ entities:
             scale: [0.4, 0.4, 0.35]
             z: 0.175
             orientation: [0, 0, 0]
-            color: green
+            color: purple
         containers: []
         trajectory:
             history: null

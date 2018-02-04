@@ -68,12 +68,15 @@ class MarkersPublisher():
                 self._publish_marker(i, z.get("position/^"), n)
             i += 1
 
-    def _publish_objects(self, objects_dictman, j = 0):
-        for i, e in enumerate(objects_dictman.Dict.keys()):
+    def _publish_objects(self, objects_dictman, j = 0): # TODO containers inside containers
+        i = 0
+        for e in objects_dictman.Dict.keys():
             if "container_" in e:
-                self._publish_objects(objects_dictman.get("{}/^".format(e)), i)
+                i += self._publish_objects(objects_dictman.get("{}/^".format(e)), i)
             else:
                 self._publish_marker(i + j, objects_dictman.Dict[e].get("position/^"), objects_dictman.Dict[e].get("marker/^"))
+            i += 1
+        return i
 
     def _publish_marker(self, marker_id, position, visual):
         markertypes = {
