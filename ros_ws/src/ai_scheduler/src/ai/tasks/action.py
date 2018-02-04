@@ -5,6 +5,13 @@ from actionlist import ActionList
 
 
 class Action(Task):
+    '''
+    Differences between an action and an actionlist:
+        - actions are defined in their own xml file, separated from the strategy.
+            This helps having a strategy file defining only the order of the main actions execution.
+        - actions can reference each other, not lists.
+    '''
+
     def __init__(self, xml, actions, orders):
         super(Action, self).__init__(xml)
         self.Ref = xml.attrib["ref"]
@@ -65,6 +72,10 @@ class Action(Task):
     def getNext(self):
         return self.TASKS.getNext()
 
+    def resetStatus(self, refresh_parent=False): # wipes all progress of this list and all descendent tasks.
+        self.setStatus(TaskStatus.FREE, refresh_parent)
+        self.TASKS.resetStatus()
+
     def refreshStatus(self):
         self.setStatus(self.TASKS.getStatus())
 
@@ -86,8 +97,10 @@ class Action(Task):
         c.addtext("[{} Action]".format(self.getStatusEmoji()))
         c.endstyle();c.setstyle(Colors.BLUE);c.addtext(" {0} ".format(self.Name));c.endstyle();c.setstyle(Colors.GRAY)
 
-        c.addtext("[{} {}{}{}]".format(ExecutionMode.toEmoji(self.TASKS.executionMode),
-                                        ExecutionOrder.toEmoji(self.TASKS.executionOrder),
-                                        ", {}⚡".format(self.getReward()) if self.getReward() else "",
-                                        ", ~{}⌛".format(int(self.TASKS.getDuration())) if self.TASKS.getDuration() else ""))
+        c.addtext("[{}{}{}{}{}]".format(ExecutionMode.toEmoji(self.TASKS.executionMode),
+                                       " " + ExecutionOrder.toEmoji(self.TASKS.executionOrder),
+                                       " {}/{}".format(str(self.TASKS._repeats), str(self.TASKS._repeats_max)) \
+                                            + RepeatMode.toEmoji(self.TASKS.repeatMode) if self.TASKS.repeatMode != RepeatMode.ONCE else "",
+                                       ", {}⚡".format(self.getReward()) if self.getReward() else "",
+                                       ", ~{}⌛".format(int(self.TASKS.getDuration())) if self.TASKS.getDuration() else ""))
         return c.getText()

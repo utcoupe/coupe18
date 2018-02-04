@@ -37,7 +37,6 @@ class Status():
         # "/processing/lidar_objects": None,
 
         "/drivers/ard_asserv": None,
-        "/drivers/dard_asserv": None,
         "/drivers/port_finder": None
     }
 
