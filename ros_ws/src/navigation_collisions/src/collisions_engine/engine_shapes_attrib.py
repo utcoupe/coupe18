@@ -1,9 +1,3 @@
-class Velocity(object):
-    def __init__(self, linear, angular):
-        self.linear = linear
-        self.angular = angular
-
-
 class Point(object):
     def __init__(self, x, y):
         self.x = x
