@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import copy
+import rospy
 from map_loader import LoadingHelpers
 from map_bases import DictManager
 from map_attributes import Position2D, Shape2D, MarkerRViz, Trajectory
@@ -82,8 +83,23 @@ class Entity(DictManager):
 class Container(DictManager):
     def __init__(self, initdict, obj_classes):
         for obj in initdict:
-            initdict[obj] = Object(initdict[obj], obj_classes)
+            if "container_" in obj:
+                initdict[obj] = Container(initdict[obj], obj_classes)
+            else:
+                initdict[obj] = Object(initdict[obj], obj_classes)
         super(Container, self).__init__(initdict)
+
+    def get_objects(self, collisions_only = False):
+        objects = []
+        for o in self.Dict:
+            if isinstance(self.Dict[o], Container):
+                objects += self.Dict[o].get_objects(collisions_only)
+            elif isinstance(self.Dict[o], Object):
+                if self.Dict[o].Dict["collision"] == collisions_only or collisions_only is False:
+                    objects.append(self.Dict[o].get("*"))
+            else:
+                rospy.logwarn("Not recognized DictManager type found while retrieving map objects, passing.")
+        return objects
 
 
 class Object(DictManager):
@@ -101,18 +117,18 @@ class Object(DictManager):
                     new_initdict[field] = obj_class[field]
             initdict = new_initdict
 
-        LoadingHelpers.checkKeysExist(initdict, "position", "shape", "marker")
+        LoadingHelpers.checkKeysExist(initdict, "collision", "position", "shape", "marker")
 
         d = {}
+        if "collision" in initdict:
+            d["collision"] = initdict["collision"]
         if "color" in initdict:
             d["color"] = [c for c in map.Map.Colors if c.Dict["name"] == initdict["color"]][0]
         if "properties" in initdict:
             d["properties"] = DictManager(initdict["properties"])
         d["shape"] = Shape2D(initdict["shape"])
 
-        d = {
-            "position": Position2D(initdict["position"]),
-            "marker": MarkerRViz(initdict["marker"], shape = d["shape"] if "shape" in d else None, \
-                                                     color = d["color"] if "color" in d else None)
-        }
+        d["position"] = Position2D(initdict["position"])
+        d["marker"]   = MarkerRViz(initdict["marker"], shape = d["shape"] if "shape" in d else None, \
+                                                       color = d["color"] if "color" in d else None)
         super(Object, self).__init__(d)

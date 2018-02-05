@@ -25,6 +25,7 @@ add_service_files(
     MapSet.srv
     MapTransfer.srv
     MapGetOccupancy.srv
+    MapGetObjects.srv
     FillWaypoint.srv
 )
 

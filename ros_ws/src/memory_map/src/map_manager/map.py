@@ -47,19 +47,13 @@ class Map():
         for entity in initdict_entities:
             initdict_entities[entity] = Entity(initdict_entities[entity], obj_classes)
 
-        for obj in initdict_objects["objects"]:
-            if "container_" in obj:
-                initdict_objects["objects"][obj] = Container(initdict_objects["objects"][obj], obj_classes)
-            else:
-                initdict_objects["objects"][obj] = Object(initdict_objects["objects"][obj], obj_classes)
-
         # Create main Map dict
         Map.MAP_DICT = DictManager({
             "terrain":   Terrain(initdict_terrain),
             "zones":     DictManager(initdict_zones),
             "waypoints": DictManager(initdict_waypoints),
             "entities":  DictManager(initdict_entities),
-            "objects":   DictManager(initdict_objects["objects"])
+            "objects":   Container(initdict_objects["objects"], obj_classes)
         })
         rospy.loginfo("Loaded map in {0:.2f}ms.".format(time.time() * 1000 - starttime))
 
@@ -78,6 +72,10 @@ class Map():
             rospy.logerr("    GET Request failed : global search needs to start with '/'.")
             return None
         return Map.MAP_DICT.get(requestpath)
+
+    @staticmethod
+    def get_objects(collisions_only = False):
+        return Map.MAP_DICT.Dict["objects"].get_objects(collisions_only)
 
     @staticmethod
     def set(requestpath, mode, instance = None):
