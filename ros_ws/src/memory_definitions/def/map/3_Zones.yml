@@ -9,7 +9,7 @@ zones:
             type: rect
             width: 0.400
             height: 0.650
-        marker:
+        _marker:
             ns: zones
             z_scale: 0.001
             z: 0.001

@@ -28,7 +28,7 @@ class MarkersPublisher():
             "y": 0.022 + 2,
             "type": "fixed"
         })
-        self._publish_marker(0, pos, world.get("/terrain/marker/^"))
+        self._publish_marker(0, pos, world.get("/terrain/_marker/^"))
 
     def _publish_robot_stl(self, world):
         pos = map_attributes.Position2D({
@@ -37,11 +37,11 @@ class MarkersPublisher():
             "y": 0,
             "type": "fixed"
         })
-        self._publish_marker(0, pos, world.get("/entities/{}/marker/^".format(rospy.get_param("/robot"))))
+        self._publish_marker(0, pos, world.get("/entities/{}/_marker/^".format(rospy.get_param("/robot"))))
 
     def _publish_zones(self, world):
         for i, z in enumerate(world.get("/zones/^").toList()):
-            self._publish_marker(i, z.get("position/^"), z.get("marker/^"))
+            self._publish_marker(i, z.get("position/^"), z.get("_marker/^"))
 
     def _publish_waypoints(self, world):
         i = 0
@@ -74,7 +74,7 @@ class MarkersPublisher():
             if "container_" in e:
                 i += self._publish_objects(objects_dictman.get("{}/^".format(e)), i)
             else:
-                self._publish_marker(i + j, objects_dictman.Dict[e].get("position/^"), objects_dictman.Dict[e].get("marker/^"))
+                self._publish_marker(i + j, objects_dictman.Dict[e].get("position/^"), objects_dictman.Dict[e].get("_marker/^"))
             i += 1
         return i
 

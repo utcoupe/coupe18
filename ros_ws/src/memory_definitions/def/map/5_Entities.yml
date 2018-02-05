@@ -10,7 +10,7 @@ entities:
             type: rect
             width: 0.3
             height: 0.2
-        marker:
+        _marker:
             ns: robots
             id: 0
             type: cube
@@ -33,7 +33,7 @@ entities:
             type: rect
             width: 0.2
             height: 0.15
-        marker:
+        _marker:
             ns: robots
             id: 1
             type: cube

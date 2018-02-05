@@ -49,14 +49,14 @@ class MapServices():
         rospy.loginfo("GET_OBJECTS:collisions_only=" + str(req.collisions_only))
 
         success = False
-        response = Map.get_objects(collisions_only=req.collisions_only)
+        objects = Map.get_objects(collisions_only=req.collisions_only)
 
-        if response != None:
+        if objects != None:
             success = True
 
-        rospy.logdebug("    Responding: {} object(s) found.".format(len(response)))
+        rospy.logdebug("    Responding: {} object(s) found.".format(len(objects)))
         rospy.logdebug("    Process took {0:.2f}ms".format(time.time() * 1000 - s))
-        return memory_map.srv.MapGetResponse(success, response)
+        return memory_map.srv.MapGetObjectsResponse(success, objects)
 
     def on_set(self, req):
         s = time.time() * 1000

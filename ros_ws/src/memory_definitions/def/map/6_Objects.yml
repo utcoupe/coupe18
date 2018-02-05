@@ -9,7 +9,7 @@ classes:
             type: rect
             width: 0.06
             height: 0.06
-        marker:
+        _marker:
             ns: cubes
             z_scale: 0.06
             z: 0.03
@@ -25,7 +25,7 @@ classes:
             type: circle
             radius: 0.022
         color: green #default, overritten when orange
-        marker:
+        _marker:
             ns: balls
             type: sphere
             z_scale: 0.044
@@ -236,56 +236,56 @@ objects:
             position:
                 x: 0.015
                 y: 1.16
-            marker:
+            _marker:
                 z: 0.65
         ball_2:
             class: ball
             position:
                 x: 0.015
                 y: 1.16
-            marker:
+            _marker:
                 z: 0.7
         ball_3:
             class: ball
             position:
                 x: 0.015
                 y: 1.16
-            marker:
+            _marker:
                 z: 0.75
         ball_4:
             class: ball
             position:
                 x: 0.015
                 y: 1.16
-            marker:
+            _marker:
                 z: 0.8
         ball_5:
             class: ball
             position:
                 x: 0.015
                 y: 1.16
-            marker:
+            _marker:
                 z: 0.85
         ball_6:
             class: ball
             position:
                 x: 0.015
                 y: 1.16
-            marker:
+            _marker:
                 z: 0.9
         ball_7:
             class: ball
             position:
                 x: 0.015
                 y: 1.16
-            marker:
+            _marker:
                 z: 0.95
         ball_8:
             class: ball
             position:
                 x: 0.015
                 y: 1.16
-            marker:
+            _marker:
                 z: 1
 
     container_multi_distrib:
@@ -294,7 +294,7 @@ objects:
             position:
                 x: 2.39
                 y: 0.015
-            marker:
+            _marker:
                 z: 0.65
         ball_2:
             class: ball
@@ -302,14 +302,14 @@ objects:
                 x: 2.39
                 y: 0.015
             color: orange
-            marker:
+            _marker:
                 z: 0.7
         ball_3:
             class: ball
             position:
                 x: 2.39
                 y: 0.015
-            marker:
+            _marker:
                 z: 0.75
         ball_4:
             class: ball
@@ -317,14 +317,14 @@ objects:
                 x: 2.39
                 y: 0.015
             color: orange
-            marker:
+            _marker:
                 z: 0.8
         ball_5:
             class: ball
             position:
                 x: 2.39
                 y: 0.015
-            marker:
+            _marker:
                 z: 0.85
         ball_6:
             class: ball
@@ -332,14 +332,14 @@ objects:
                 x: 2.39
                 y: 0.015
             color: orange
-            marker:
+            _marker:
                 z: 0.9
         ball_7:
             class: ball
             position:
                 x: 2.39
                 y: 0.015
-            marker:
+            _marker:
                 z: 0.95
         ball_8:
             class: ball
@@ -347,5 +347,5 @@ objects:
                 x: 2.39
                 y: 0.015
             color: orange
-            marker:
+            _marker:
                 z: 1

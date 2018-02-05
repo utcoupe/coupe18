@@ -3,7 +3,7 @@ terrain:
         type: rect
         width: 3.0
         height: 2.0
-    marker:
+    _marker:
         ns: table
         id: 0
         type: mesh
