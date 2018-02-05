@@ -14,7 +14,7 @@ external_nodes=(
 	["laser_proc"]="https://github.com/ros-perception/laser_proc"
 	["urg_node"]="https://github.com/ros-drivers/urg_node"
 	["urg_c"]="https://github.com/ros-drivers/urg_c"
-	["obstacle_detector"]="https://github.com/tysik/obstacle_detector"
+	["processing_lidar_objects"]="https://github.com/utcoupe/obstacle_detector.git"
 )
 
 function fetch_missing_nodes() {
