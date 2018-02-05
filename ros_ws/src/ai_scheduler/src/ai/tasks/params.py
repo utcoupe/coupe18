@@ -22,6 +22,7 @@
 import copy
 import std_msgs.msg
 import geometry_msgs.msg
+import memory_map.msg
 
 
 class Param(object):    # base class for parsing xml to param object
@@ -142,7 +143,7 @@ class BoolParser(Param):
     def parseValue(self, xml):
         self.parseBind(xml)
         if xml.text:
-            self.value["data"] = bool(xml.text)
+            self.value["data"] = bool(int(xml.text))
 
     def getRos(self):
         return self.value["data"]
@@ -218,3 +219,16 @@ class Pose2DParser(Param):
             'theta': FloatParser()
         }
         super(Pose2DParser, self).__init__(xml)
+
+
+class WaypointParser(Param):
+    TYPE_NAME = "waypoint"
+    TYPE_ROS = memory_map.msg.Waypoint
+
+    def __init__(self, xml=None):
+        self.value = {
+            'name': StringParser(),
+            'frame_id': StringParser(),
+            'pose': Pose2DParser()
+        }
+        super(WaypointParser, self).__init__(xml)

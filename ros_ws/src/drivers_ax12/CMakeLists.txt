@@ -1,26 +1,55 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(drivers_ax12)
 
+add_compile_options(-std=c++11)
+
+add_subdirectory(${PROJECT_SOURCE_DIR}/lib)
+
 find_package(catkin REQUIRED COMPONENTS
-    rospy
-    actionlib
-    actionlib_msgs
-    message_generation)
-
-
-## Generate actions
-add_action_files(DIRECTORY action FILES AngleCommand.action)
-
-# Generate added messages and services with any dependencies listed here
-generate_messages(
-    DEPENDENCIES
-    actionlib_msgs
+  actionlib
+  actionlib_msgs
+  message_generation
+  message_runtime
+  roscpp
+  std_msgs
+  drivers_port_finder
 )
 
+add_action_files(
+  DIRECTORY action
+  FILES
+  Ax12Command.action
+)
+
+add_service_files(
+  FILES
+  SetAx12Param.srv
+)
+
+generate_messages(
+  DEPENDENCIES
+  actionlib_msgs
+)
+
+
 catkin_package(
-    CATKIN_DEPENDS message_runtime
+  INCLUDE_DIRS include
+  LIBRARIES drivers_ax12
+  CATKIN_DEPENDS actionlib actionlib_msgs roscpp std_msgs drivers_port_finder
+  #DEPENDS system_lib
 )
 
 include_directories(
-    ${catkin_INCLUDE_DIRS}
+  include
+  ${catkin_INCLUDE_DIRS}
+)
+
+add_executable(ax12_node src/ax12_node.cpp src/ax12_server.cpp src/ax12_driver.cpp)
+
+add_dependencies(ax12_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+target_link_libraries(
+  ax12_node
+  dxl
+  ${catkin_LIBRARIES}
 )

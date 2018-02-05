@@ -7,28 +7,35 @@ from ai_scheduler.msg import TaskResult
 import ai_scheduler.srv
 
 import navigation_navigator.msg
+import movement_actuators.msg
 import memory_map.srv
+import ai_game_status.srv
 import ai_timer.srv
 import drivers_ard_hmi.msg
 import drivers_ard_asserv.srv
 
-class RequestTypes():
+class RequestTypes(object):
     PUB_MSG = 0
     SUB_MSG = 1
     SERVICE = 2
     ACTION  = 3
 
-class AICommunication():
-    _sub_msg_success = False
+    SERVERS = None
 
-    def SendRequest(self, dest, params, callback):
-        servers = {
+    @staticmethod
+    def init():
+        RequestTypes.SERVERS = {
+            "/ai/scheduler/score":               (RequestTypes.PUB_MSG, ai_scheduler.msg.AIScore),
+            "/ai/game_status/set_status":        (RequestTypes.SERVICE, ai_game_status.srv.SetStatus),
             "/ai/timer/set_timer":               (RequestTypes.SERVICE, ai_timer.srv.SetTimer),
             "/ai/timer/delay":                   (RequestTypes.SERVICE, ai_timer.srv.Delay),
 
+            "/memory/map/get":                   (RequestTypes.SERVICE, memory_map.srv.MapGet),
             "/memory/map/transfer":              (RequestTypes.SERVICE, memory_map.srv.MapTransfer),
 
             "/navigation/navigator/goto_action": (RequestTypes.ACTION,  navigation_navigator.msg.DoGotoAction, navigation_navigator.msg.DoGotoGoal),
+            "/navigation/navigator/gotowaypoint_action": (RequestTypes.ACTION,  navigation_navigator.msg.DoGotoWaypointAction, navigation_navigator.msg.DoGotoWaypointGoal),
+            "/movement/actuators/dispatch":      (RequestTypes.ACTION,  movement_actuators.msg.dispatchAction, movement_actuators.msg.dispatchGoal),
 
             "/drivers/ard_asserv/set_pos":       (RequestTypes.SERVICE, drivers_ard_asserv.srv.SetPos),
 
@@ -36,28 +43,42 @@ class AICommunication():
             "/feedback/ard_hmi/hmi_event":       (RequestTypes.SUB_MSG, drivers_ard_hmi.msg.HMIEvent),
 
             "/test":                             (RequestTypes.PUB_MSG, TaskResult),
-            "/test2":                            (RequestTypes.SUB_MSG, TaskResult)
-        }
-        def getRequestType(dest):
-            return servers[dest][0]
-        def getRequestClass(dest):
-            return servers[dest][1]
-        def getActionGoalClass(dest):
-            return servers[dest][2]
+            "/test2":                            (RequestTypes.SUB_MSG, TaskResult) }
 
+    @staticmethod
+    def getRequestType(dest):
+        return RequestTypes.SERVERS[dest][0]
+    @staticmethod
+    def getRequestClass(dest):
+        return RequestTypes.SERVERS[dest][1]
+    @staticmethod
+    def getActionGoalClass(dest):
+        return RequestTypes.SERVERS[dest][2]
+
+class AICommunication():
+    _sub_msg_success = False
+
+    def __init__(self):
+        RequestTypes.init()
+
+    def SendRequest(self, dest, params, callback = None):
         start_time = time.time()
-        if dest in servers:
-            if getRequestType(dest) == RequestTypes.PUB_MSG:
-                response = self._pub_msg(dest, getRequestClass(dest), params)
-            elif getRequestType(dest) == RequestTypes.SUB_MSG:
-                response = self._sub_msg(dest, getRequestClass(dest))
-            elif getRequestType(dest) == RequestTypes.SERVICE:
-                response = self._send_service(dest, getRequestClass(dest), params)
-            elif getRequestType(dest) == RequestTypes.ACTION:
-                response = self._send_blocking_action(dest, getRequestClass(dest), getActionGoalClass(dest), params)
+        if dest in RequestTypes.SERVERS:
+            if RequestTypes.getRequestType(dest) == RequestTypes.PUB_MSG:
+                response = self._pub_msg(dest, RequestTypes.getRequestClass(dest), params)
+            elif RequestTypes.getRequestType(dest) == RequestTypes.SUB_MSG:
+                response = self._sub_msg(dest, RequestTypes.getRequestClass(dest))
+            elif RequestTypes.getRequestType(dest) == RequestTypes.SERVICE:
+                response = self._send_service(dest, RequestTypes.getRequestClass(dest), params)
+            elif RequestTypes.getRequestType(dest) == RequestTypes.ACTION:
+                response = self._send_blocking_action(dest, RequestTypes.getRequestClass(dest),
+                                                      RequestTypes.getActionGoalClass(dest), params)
             # response = TaskResult() # DEBUG Force success response
             # response.result = response.RESULT_SUCCESS if bool(input("success ?")) else response.RESULT_FAIL
-            callback(response, time.time() - start_time)
+            if callback is not None:
+                callback(response, time.time() - start_time)
+            else:
+                return response
         else:
             raise ValueError, "Message destination '{}' was not recognized. Has it been added to ai_communication.py definition dict, or mispelled ?".format(dest)
 
@@ -71,14 +92,15 @@ class AICommunication():
             return TaskResult(2, "ai_communication.py could not send message to topic '{}': {}".format(dest, e))
 
     def _sub_msg(self, dest, msg_class):
-        rospy.logwarn("waiting for message on topic '{}'...".format(dest))
+        rospy.loginfo("waiting for message on topic '{}'...".format(dest))
         self._sub_msg_success = False
         rospy.Subscriber(dest, msg_class, self._sub_msg_callback)
+        timeout = 30 #seconds
 
         s = time.time()
-        while not self._sub_msg_success and (time.time() - s < 30): #TODO customizable timeout
+        while not self._sub_msg_success and (time.time() - s < timeout): #TODO customizable timeout
             time.sleep(0.02)
-        return TaskResult(0, "") if self._sub_msg_success else TaskResult(1, "Didn't receive any message in {} seconds.".format(15*60))
+        return TaskResult(0, "") if self._sub_msg_success else TaskResult(1, "Didn't receive any message in {} seconds.".format(timeout))
     def _sub_msg_callback(self, msg):
         self._sub_msg_success = True
 

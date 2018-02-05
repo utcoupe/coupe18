@@ -38,7 +38,7 @@ void loop() {
     hmi_event_msg.event = hmi_event_msg.EVENT_JACK_FIRED;
     hmi_event_msg.chosen_strategy_id = 0; 
     hmi_event_msg.chosen_team_id     = 0;
-    hmi_event_pub.publish(&hmi_event_msg); 
+    hmi_event_pub.publish(&hmi_event_msg);
 
     // spin Once to sync publishes and subscriptions with ros.h
     nh.spinOnce();

@@ -50,7 +50,7 @@ ordre alphabétique : plus visuel)
 - Créer des serveurs de `topics`/`services`/`actions` nommés de la forme `/namespace/package/server_name` s'ils peuvent être accédés par des paquets 
 extérieurs (ATTENTION : avec un `/` au début pour créer un nom absolu), `server_name` s'ils sont internes.
 
-- Nommer les variables dans les fichiers de définition `.msg`/`.srv`/`.action` en format `var_name`.
+- Nommer les fichiers de définition `.msg`/`.srv`/`.action` en PascalCase (e.g. `GetValues.srv`) et les variables dedans en minuscules (format `var_name`).
 
 ### Python
 
@@ -62,27 +62,23 @@ extérieurs (ATTENTION : avec un `/` au début pour créer un nom absolu), `serv
 
 - Lors de la description d'une position d'une forme (cercle, ligne, rectangle, point...), donner la position par rapport au centre de la forme (sauf précision explicite et nécessaire). Par exemple, donner la position du centre d'un rectangle et non d'un coin.
 
-# TODO à check + old stuff
+# Webclient
 
-Nécessité d'installer les dépendances JS avec le webclient v2 ?
+Pour installer les dépendances du webclient :
 ```
-npm install
-```
-
-### Lancer le projet 2017
-
-Note : mode legacy, peut être non fonctionnel !
-
-Pour lancer le serveur de communication par websocket :
-```
-npm run utcoupe
+cd webclient
+npm install --only=prod
 ```
 
-Pour lancer un serveur statique pour héberger le webclient :
+Pour lancer le webclient :
 ```
-npm run serve
+npm start
 ```
 
-Ensuite, aller sur l'adresse affiché par cette dernière commande et le webclient devrait être lancé.
+S'assurer que le noeud ROS `rosbridge_server` est bien lancé.
 
-/!\ Vérifiez que le webclient arrive à se connecter au serveur dans l'onglet Réseau /!\ Si ce n'est pas le cas, l'adresse du serveur est sans doute erronée : modifier le fichier `config.js` à la racine du projet.
+Le webclient peut être lancé depuis le robot, ou depuis un ordinateur connecté à la Raspberry.
+
+Si le serveur est lancé sur le robot, se rendre sur `http://<ip_de_la_raspi>:8080`.
+
+Sinon, se rendre sur [http://localhost:8080](http://localhost:8080) et vérifier que le client se connecte bien à l'IP du robot dans les paramètres.

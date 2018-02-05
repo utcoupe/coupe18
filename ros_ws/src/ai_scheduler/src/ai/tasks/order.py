@@ -12,7 +12,6 @@ class Order(Task):
             self.Name = self.Ref
 
         self.Duration = float(xml.attrib["duration"]) if "duration" in xml.attrib else 0.0  # Manually estimated time to execute this action
-        #self.Reward   = int(xml.attrib["reward"]) if "reward" in xml.attrib else 0 #TODO delete line :)
         #self.Ratio = self.Reward / self.Duration # TODO Implement ?
 
         self.Message = Message(xml.find("message"))
@@ -29,11 +28,13 @@ class Order(Task):
             for b in p.getBoundParams():
                 if b.bind == bind:
                     return b
-
         return False
 
     def getDuration(self):
         return self.Duration
+
+    def resetStatus(self, refresh_parent=False): # wipes all progress of this list and all descendent tasks.
+        self.setStatus(TaskStatus.FREE, refresh_parent) #TODO on all types of tasks, reset to needsprevious if it was like that at init
 
     def execute(self, communicator):
         self.setStatus(TaskStatus.WAITINGFORRESPONSE)
@@ -43,9 +44,6 @@ class Order(Task):
 
 
     def callback(self, res, time_taken):
-        # if not hasattr(res, "response_code"): # TODO wtf? remove?
-        #     self.setStatus(TaskStatus.SUCCESS)
-        #     return
         self.TimeTaken = time_taken
         try: #TODO do a better way # For TaskRestul responses
             if res.result == res.RESULT_SUCCESS:
@@ -80,7 +78,9 @@ class Order(Task):
                                         " , {0:.1f}⌛".format(self.TimeTaken) if self.getStatus() in [TaskStatus.SUCCESS,
                                         TaskStatus.ERROR, TaskStatus.PAUSED, TaskStatus.CRITICAL] else ""))
         c.endstyle()
-        c.addtext("{}{}".format(self.Name, " [{}⚡]".format(self.Reward) if self.Reward else ""))
+        c.addtext("{}".format(self.Name))
+        c.endstyle();c.setstyle(Colors.GRAY)
+        c.addtext("{}".format(" [{}⚡]".format(self.Reward) if self.Reward else ""))
         return c.getText()
 
 

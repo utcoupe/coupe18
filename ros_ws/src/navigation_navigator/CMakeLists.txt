@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
     actionlib_msgs
     navigation_pathfinder
     drivers_ard_asserv
+    memory_map
 )
 
 ################################################
@@ -31,6 +32,7 @@ add_service_files(
 add_action_files(
     FILES
     DoGoto.action
+    DoGotoWaypoint.action
 )
 
 ## Generate added messages and services with any dependencies listed here
