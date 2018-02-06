@@ -167,6 +167,8 @@ class AsservSimu(AsservAbstract):
     def _callback_timer_speed_send(self, event):
         self._node.send_robot_speed(RobotSpeed(0, 0, self._current_linear_speed, 0, 0))
 
-    def _start_trajectory(self, goal_id, x, y, a=0, direction="forward"):
+    def _start_trajectory(self, goal_id, x, y, a=0, direction=1): #direction=1 forward, 0 backward
         # TODO use direction ?
+        self._current_pose.theta = math.atan2(y - self._current_pose.y, x - self._current_pose.x)
+        self._current_pose.theta += math.pi if direction == 0 else 0 # simulate a backward movement
         self._goals_list.append((goal_id, Pose2D(x, y, a)))
