@@ -137,11 +137,13 @@ class NavigatorNode(object):
             path.pop(0) # The last point will be given end Position
             self._currentPath = path[:]
             self._updateStatus()
+            lastPoint = startPos
             for point in path:
                 cb = partial(self._callbackAsservForDoGotoAction, handledGoal, False)
-                self._asservClient.doGoto(point, False, cb)
+                self._asservClient.doGoto(point, self._getDirection(handledGoal.get_goal().direction, point, lastPoint), False, cb)
+                lastPoint = point
             cb = partial(self._callbackAsservForDoGotoAction, handledGoal, True)
-            self._asservClient.doGoto(endPos, hasAngle, cb)
+            self._asservClient.doGoto(endPos, self._getDirection(handledGoal.get_goal().direction, endPos, lastPoint), hasAngle, cb)
         except Exception, e:
             rospy.logdebug("Navigation failed: " + e.message)
             result = DoGotoResult(False)
