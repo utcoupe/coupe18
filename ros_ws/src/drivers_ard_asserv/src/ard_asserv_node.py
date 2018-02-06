@@ -215,7 +215,9 @@ class Asserv:
         """
         rospy.logdebug("[ASSERV] Received a request (dogoto action).")
         #TODO manage direction
-        if self._process_goto_order(self._goal_id_counter, goal_handled.get_goal().mode, goal_handled.get_goal().position.x, goal_handled.get_goal().position.y, goal_handled.get_goal().position.theta, 1):
+        if self._process_goto_order(self._goal_id_counter, goal_handled.get_goal().mode, 
+                                    goal_handled.get_goal().position.x, goal_handled.get_goal().position.y, goal_handled.get_goal().position.theta,
+                                    goal_handled.get_goal().direction):
             goal_handled.set_accepted()
             self._goals_dictionary[self._goal_id_counter] = goal_handled
             self._goal_id_counter += 1
