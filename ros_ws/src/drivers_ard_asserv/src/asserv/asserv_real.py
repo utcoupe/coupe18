@@ -120,7 +120,8 @@ class AsservReal(AsservAbstract):
 
     def set_pid(self, p, i, d):
         # TODO manage lef and right
-        self._send_serial_data(self._orders_dictionary['PIDALL'], [str(p), str(i), str(d)])
+        self._send_serial_data(self._orders_dictionary['PIDALL'], [str(int(round(p * 1000))), str(int(round(i * 1000))), str(int(round(d * 1000)))])
+        # rospy.loginfo("Set pid sending : P = {}, I = {}, D = {}.".format(str(int(round(p * 1000))), str(int(round(i * 1000))), str(int(round(d * 1000)))))
         return True
 
     def set_pos(self, x, y, a):
@@ -175,7 +176,7 @@ class AsservReal(AsservAbstract):
         elif data.find("~") != -1:
             rospy.logdebug("[ASSERV] Received status data.")
             receied_data_list = data.split(";")
-            # rospy.loginfo("data sharp : " + receied_data_list[10])
+            # rospy.loginfo("P = {}, I = {}, D = {} ".format(float(receied_data_list[11]) / 1000.0, float(receied_data_list[12]) / 1000.0, float(receied_data_list[13]) / 1000.0))
             robot_position = Pose2D(float(receied_data_list[2]) / 1000.0, float(receied_data_list[3]) / 1000.0, float(receied_data_list[4]) / 1000.0)
             self._robot_raw_position = robot_position
             self._node.send_robot_position(robot_position)
