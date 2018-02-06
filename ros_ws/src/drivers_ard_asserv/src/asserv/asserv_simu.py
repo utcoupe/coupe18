@@ -56,12 +56,12 @@ class AsservSimu(AsservAbstract):
 
     def goto(self, goal_id, x, y, direction):
         rospy.loginfo("[ASSERV] Accepting goal (x = " + str(x) + ", y = " + str(y) + ").")
-        self._start_trajectory(goal_id, x, y)
+        self._start_trajectory(goal_id, x, y, 0, direction)
         return True
 
     def gotoa(self, goal_id, x, y, a, direction):
         rospy.loginfo("[ASSERV] Accepting goal (x = " + str(x) + ", y = " + str(y) + ", a = " + str(a) + ").")
-        self._start_trajectory(goal_id, x, y, a)
+        self._start_trajectory(goal_id, x, y, a, direction)
         return True
 
     def rot(self, goal_id, a, no_modulo):
@@ -167,6 +167,8 @@ class AsservSimu(AsservAbstract):
     def _callback_timer_speed_send(self, event):
         self._node.send_robot_speed(RobotSpeed(0, 0, self._current_linear_speed, 0, 0))
 
-    def _start_trajectory(self, goal_id, x, y, a=0, direction="forward"):
+    def _start_trajectory(self, goal_id, x, y, a=0, direction=1): #direction=1 forward, 0 backward
         # TODO use direction ?
+        self._current_pose.theta = math.atan2(y - self._current_pose.y, x - self._current_pose.x)
+        self._current_pose.theta += math.pi if direction == 0 else 0 # simulate a backward movement
         self._goals_list.append((goal_id, Pose2D(x, y, a)))
