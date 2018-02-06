@@ -8,7 +8,7 @@
 
 #define BAUDRATE 57600
 #define SERIAL_TYPE SERIAL_8N1
-#define ARDUINO_ID "gr_asserv"
+#define ARDUINO_ID "ard_asserv"
 #define DEBUG_TARGET_SPEED 0
 #define DEBUG_MAINLOOP 0
 //todo add an enum with the different debug levels available

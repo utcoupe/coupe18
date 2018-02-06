@@ -8,7 +8,7 @@
 
 #define BAUDRATE 57600
 #define SERIAL_TYPE SERIAL_8N1
-#define ARDUINO_ID "pr_asserv"
+#define ARDUINO_ID "ard_asserv"
 #define DEBUG_TARGET_SPEED 0
 #define DEBUG_MAINLOOP 0
 //todo add an enum with the different debug levels available
@@ -34,7 +34,7 @@
 
 #define ENCODER_EVAL 2
 
-#define USE_SHARP 1
+#define USE_SHARP 0
 #define EMERGENCY_STOP_DISTANCE 0.3 // m
 
 #define HZ 100
@@ -63,9 +63,9 @@
 
 #define CONE_ALIGNEMENT (M_PI/2.0) 
 
-#define PID_P 0.004 //0.25
-#define PID_I 0.001 //130
-#define PID_D 0.005 //13
+#define PID_P 0.26 //0.25
+#define PID_I 1000.0 //130
+#define PID_D 0.5 //13
 #define PID_BIAS 0
 
 // Control feed-forward, pwm = a*spd + b

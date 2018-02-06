@@ -50,7 +50,7 @@ class Asserv:
         self._act_goto.start()
         rospy.wait_for_service(GET_PORT_SERVICE_NAME, GET_PORT_SERVICE_TIMEOUT)
         self._src_client_get_port = rospy.ServiceProxy(GET_PORT_SERVICE_NAME, GetPort)
-        arduino_port = self._src_client_get_port("gr_asserv").port
+        arduino_port = self._src_client_get_port("ard_asserv").port
         rospy.loginfo("Service return value : " + arduino_port)
         if arduino_port == "":
             rospy.loginfo("[ASSERV] Creation of the simu asserv.")
