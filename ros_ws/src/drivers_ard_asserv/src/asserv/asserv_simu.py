@@ -56,12 +56,12 @@ class AsservSimu(AsservAbstract):
 
     def goto(self, goal_id, x, y, direction):
         rospy.loginfo("[ASSERV] Accepting goal (x = " + str(x) + ", y = " + str(y) + ").")
-        self._start_trajectory(goal_id, x, y)
+        self._start_trajectory(goal_id, x, y, 0, direction)
         return True
 
     def gotoa(self, goal_id, x, y, a, direction):
         rospy.loginfo("[ASSERV] Accepting goal (x = " + str(x) + ", y = " + str(y) + ", a = " + str(a) + ").")
-        self._start_trajectory(goal_id, x, y, a)
+        self._start_trajectory(goal_id, x, y, a, direction)
         return True
 
     def rot(self, goal_id, a, no_modulo):
