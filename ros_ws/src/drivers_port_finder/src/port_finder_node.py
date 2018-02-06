@@ -16,7 +16,7 @@ __date__ = 18/01/2017
 NODE_NAME = "port_finder"
 ARDUINO_LIST = ("mega", "nano", "uno", "leo")
 #TODO put it in xml file
-ARDUINO_NODE_LIST = ("gr_asserv",)
+ARDUINO_NODE_LIST = ("ard_asserv",)
 SERIAL_READ_SIZE = 50
 
 
