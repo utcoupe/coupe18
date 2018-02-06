@@ -8,6 +8,7 @@
 #include "pathfinder/pathfinder.h"
 #include "pathfinder/point.h"
 #include "pathfinder/BarriersSubscribers/processing_belt_interpreter_subscriber.h"
+#include "pathfinder/BarriersSubscribers/processing_lidar_objects_subscriber.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -24,8 +25,10 @@ const string                MAP_FILE_NAME           = string(getenv ("UTCOUPE_WO
 const size_t                SIZE_MAX_QUEUE          = 10;
 const double                SAFETY_MARGIN           = 0.15;
 const string                BELT_INTERPRETER_TOPIC  = "/processing/belt_interpreter/rects_filtered";
+const string                LIDAR_OBJECTS_TOPIC     = "/processing/lidar_objects/obstacles";
 
 unique_ptr<BeltInterpreterSubscriber> constructBeltInterpreterSubscriber(ros::NodeHandle& nodeHandle);
+unique_ptr<LidarObjectsSubscriber> constructLidarObjectsSubscriber(ros::NodeHandle& nodeHandle);
 
 int main (int argc, char* argv[])
 {
@@ -38,6 +41,7 @@ int main (int argc, char* argv[])
     
     auto dynBarriersMng = make_shared<DynamicBarriersManager>();
     dynBarriersMng->addBarrierSubscriber(constructBeltInterpreterSubscriber(nodeHandle));
+    dynBarriersMng->addBarrierSubscriber(constructLidarObjectsSubscriber(nodeHandle));
     
     Pathfinder pathfinder(MAP_FILE_NAME, TABLE_SIZE, dynBarriersMng, true);
     ros::ServiceServer findPathServer = nodeHandle.advertiseService(FINDPATH_SERVICE_NAME, &Pathfinder::findPathCallback, &pathfinder);
@@ -61,3 +65,11 @@ unique_ptr<BeltInterpreterSubscriber> constructBeltInterpreterSubscriber(ros::No
     subscriber->subscribe(nodeHandle, SIZE_MAX_QUEUE, BELT_INTERPRETER_TOPIC);
     return subscriber;
 }
+
+unique_ptr<LidarObjectsSubscriber> constructLidarObjectsSubscriber(ros::NodeHandle& nodeHandle)
+{
+    unique_ptr<LidarObjectsSubscriber> subscriber(new LidarObjectsSubscriber(SAFETY_MARGIN));
+    subscriber->subscribe(nodeHandle, SIZE_MAX_QUEUE, LIDAR_OBJECTS_TOPIC);
+    return subscriber;
+}
+

@@ -32,18 +32,18 @@ void Processing::BeltInterpreterSubscriber::subscribe(ros::NodeHandle& nodeHandl
 
 void BeltInterpreterSubscriber::rectsFilteredTopicCallback(const processing_belt_interpreter::BeltFiltered::ConstPtr& msg)
 {
+    lock_guard<mutex> lock(g_mutex);
     lastRectangles.clear();
     addRects(msg->map_rects);
     addRects(msg->unknown_rects);
 }
 
-void Processing::BeltInterpreterSubscriber::addRects(const vector<Rectangle>& rects)
+void BeltInterpreterSubscriber::addRects(const vector<Rectangle>& rects)
 {
-    lock_guard<mutex> lock(g_mutex);
     lastRectangles.insert(lastRectangles.end(), rects.begin(), rects.end());
 }
 
-bool Processing::BeltInterpreterSubscriber::isInsideRect(const geometry_msgs::Pose2D& pos, const Rectangle& rect) const
+bool BeltInterpreterSubscriber::isInsideRect(const geometry_msgs::Pose2D& pos, const Rectangle& rect) const
 {
     if (pos.x + _safetyMargin < rect.x || pos.x - _safetyMargin > (rect.x + rect.w))
         return false;
