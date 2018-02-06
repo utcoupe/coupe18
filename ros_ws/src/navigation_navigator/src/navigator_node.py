@@ -2,13 +2,14 @@
 # -*-coding:Utf-8 -*
 
 from functools import partial
+import math
 
 import rospy
 import actionlib
 
 from geometry_msgs.msg import Pose2D
 from navigation_navigator.srv import Goto
-from navigation_navigator.msg import Status, DoGotoResult, DoGotoAction, DoGotoWaypointResult, DoGotoWaypointAction
+from navigation_navigator.msg import Status, DoGotoResult, DoGotoGoal, DoGotoAction, DoGotoWaypointResult, DoGotoWaypointAction
 
 from pathfinder import PathfinderClient
 from asserv import AsservClient
@@ -173,6 +174,19 @@ class NavigatorNode(object):
             statusMsg.currentPath = self._currentPath
         self._statusPublisher.publish(statusMsg)
 
+    def _getDirection(self, askedDirection, newPos, lastPos):
+        if askedDirection != DoGotoGoal.AUTOMATIC:
+            return askedDirection
+        if abs(lastPos.theta - self._getAngle(lastPos, newPos)) > (math.pi / 4):
+            return DoGotoGoal.BACKWARD
+        else:
+            return DoGotoGoal.FORWARD
+    
+    def _getAngle(self, v1, v2):
+        prodScal = v1.x*v2.x + v1.y*v2.y
+        normeV1 = math.sqrt(pow(v1.x, 2) + pow(v1.y, 2))
+        normeV2 = math.sqrt(pow(v2.x, 2) + pow(v2.y, 2))
+        return math.acos(prodScal / (normeV1 * normeV2))
 
     def startNode(self):
         """
