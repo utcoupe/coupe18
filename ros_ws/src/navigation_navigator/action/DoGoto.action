@@ -2,6 +2,10 @@
 uint8 GOTO = 0
 uint8 GOTOA = 1
 uint8 mode
+uint8 AUTOMATIC = 0
+uint8 FORWARD = 1
+uint8 BACKWARD = 2
+uint8 direction
 geometry_msgs/Pose2D target_pos
 bool disable_collisions
 ---
