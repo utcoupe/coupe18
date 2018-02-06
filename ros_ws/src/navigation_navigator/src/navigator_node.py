@@ -179,7 +179,7 @@ class NavigatorNode(object):
     def _getDirection(self, askedDirection, newPos, lastPos):
         if askedDirection != DoGotoGoal.AUTOMATIC:
             return askedDirection
-        if abs(lastPos.theta - self._getAngle(lastPos, newPos)) > (math.pi / 4):
+        if abs(lastPos.theta - self._getAngle(lastPos, newPos)) > (math.pi / 2):
             return DoGotoGoal.BACKWARD
         else:
             return DoGotoGoal.FORWARD
