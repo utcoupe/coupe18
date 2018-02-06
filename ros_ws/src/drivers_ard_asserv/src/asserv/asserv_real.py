@@ -14,7 +14,7 @@ __author__ = "Thomas Fuhrmann"
 __date__ = 16/12/2017
 
 ASSERV_ERROR_POSITION = 0.005  # in meters
-ASSERV_ERROR_ANGLE = 0.015  # in radians
+ASSERV_ERROR_ANGLE = 0.03  # in radians
 
 
 class AsservReal(AsservAbstract):
