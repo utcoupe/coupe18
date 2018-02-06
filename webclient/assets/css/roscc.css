@@ -88,3 +88,14 @@ html, body {
 .sub-btn {
   margin-left: 20px;
 }
+
+.topic-container {
+  display: grid;
+  grid-gap: 20px;
+  margin: 0px;
+  height: auto;
+}
+
+.panel-body {
+  margin-bottom: -15px;
+}

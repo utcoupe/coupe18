@@ -1,35 +1,18 @@
-<div uib-accordion-group class="panel-default" ng-class="{'panel-success': $ctrl.toggle}" is-open="$ctrl.topic.isOpen">
-  <uib-accordion-heading>
-    {{ $ctrl.topic.abbr }}
+<div class="topic-container" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
 
-    <button class="btn btn-default btn-sm pull-right sub-btn" ng-click="$event.stopPropagation();$event.preventDefault();$ctrl.toggleSubscription(!$ctrl.toggle);" ng-model="$ctrl.toggle" uib-btn-checkbox>{{ $ctrl.toggle ? 'Unsubscribe' : 'Subscribe' }}</button>
-    <div style="float: right">  <small style="font-size: 12px;">({{ $ctrl.topic.type }})</small></div>
+  <div class="form-group">
+    <label>X</label>
+    <div class="input-group">
+      <input type="number" class="form-control" ng-model="$ctrl.message.x" ng-readonly="$ctrl.isSubscribing">
+      <span class="input-group-addon">m</span>
+    </div>
+  </div>
+  <div class="form-group">
 
-    <div style="clear: both;"></div>
-  </uib-accordion-heading>
-
-  <div class="panel-body">
-    <div class="row">
-      <div class="col-sm-6">
-        <form class="form-horizontal form-margin">
-          <div class="form-group">
-            <label>X</label>
-            <div class="input-group">
-              <input type="number" class="form-control" ng-model="$ctrl.message.x" ng-readonly="$ctrl.isSubscribing">
-              <span class="input-group-addon">m</span>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Y</label>
-            <div class="input-group">
-              <input type="number" class="form-control" ng-model="$ctrl.message.y" ng-readonly="$ctrl.isSubscribing">
-              <span class="input-group-addon">m</span>
-            </div>
-          </div>
-        </form>
-      </div>
-
+    <label>Y</label>
+    <div class="input-group">
+      <input type="number" class="form-control" ng-model="$ctrl.message.y" ng-readonly="$ctrl.isSubscribing">
+      <span class="input-group-addon">m</span>
     </div>
   </div>
 </div>
