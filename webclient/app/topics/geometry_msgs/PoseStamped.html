@@ -1,70 +1,52 @@
-<div uib-accordion-group class="panel-default" ng-class="{'panel-success': $ctrl.toggle}" is-open="$ctrl.topic.isOpen">
-  <uib-accordion-heading>
-    {{ $ctrl.topic.abbr }}
-
-    <button class="btn btn-default btn-sm pull-right sub-btn" ng-click="$event.stopPropagation();$event.preventDefault();$ctrl.toggleSubscription(!$ctrl.toggle);" ng-model="$ctrl.toggle" uib-btn-checkbox>{{ $ctrl.toggle ? 'Unsubscribe' : 'Subscribe' }}</button>
-    <div style="float: right">  <small style="font-size: 12px;">({{ $ctrl.topic.type }})</small></div>
-
-    <div style="clear: both;"></div>
-  </uib-accordion-heading>
-
-  <div class="panel-body">
-    <div class="row">
-      <div class="col-sm-6">
-        <form class="form-horizontal form-margin">
-          <div class="form-group">
-            <label>X</label>
-            <div class="input-group">
-              <input type="number" class="form-control" ng-model="$ctrl.message.pose.position.x" ng-readonly="$ctrl.isSubscribing">
-              <span class="input-group-addon">m</span>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Y</label>
-            <div class="input-group">
-              <input type="number" class="form-control" ng-model="$ctrl.message.pose.position.y" ng-readonly="$ctrl.isSubscribing">
-              <span class="input-group-addon">m</span>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Z</label>
-            <div class="input-group">
-              <input type="number" class="form-control" ng-model="$ctrl.message.pose.position.z" ng-readonly="$ctrl.isSubscribing">
-              <span class="input-group-addon">m</span>
-            </div>
-          </div>
-        </form>
-      </div>
-
-      <div class="col-sm-6">
-        <form class="form-horizontal form-margin">
-          <div class="form-group">
-            <label>Roll</label>
-            <div class="input-group">
-              <input type="number" class="form-control" ng-value="$ctrl.Quaternions.getRoll($ctrl.message.pose.orientation)" ng-readonly="true">
-              <span class="input-group-addon">°</span>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Pitch</label>
-            <div class="input-group">
-              <input type="number" class="form-control" ng-value="$ctrl.Quaternions.getPitch($ctrl.message.pose.orientation)" ng-readonly="true">
-              <span class="input-group-addon">°</span>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Yaw</label>
-            <div class="input-group">
-              <input type="number" class="form-control" ng-value="$ctrl.Quaternions.getYaw($ctrl.message.pose.orientation)" ng-readonly="true">
-              <span class="input-group-addon">°</span>
-            </div>
-          </div>
-        </form>
-      </div>
+<div class="topic-container" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+  <div class="form-group">
+    <label>X</label>
+    <div class="input-group">
+      <input type="number" class="form-control" ng-model="$ctrl.message.pose.position.x" ng-readonly="$ctrl.isSubscribing">
+      <span class="input-group-addon">m</span>
     </div>
   </div>
+  <div class="form-group">
+
+    <label>Y</label>
+    <div class="input-group">
+      <input type="number" class="form-control" ng-model="$ctrl.message.pose.position.y" ng-readonly="$ctrl.isSubscribing">
+      <span class="input-group-addon">m</span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Z</label>
+    <div class="input-group">
+      <input type="number" class="form-control" ng-model="$ctrl.message.pose.position.z" ng-readonly="$ctrl.isSubscribing">
+      <span class="input-group-addon">m</span>
+    </div>
+  </div>
+</div>
+<div class="topic-container" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+  <!-- TODO: check if these ng-value work -->
+  <div class="form-group">
+    <label>Q0</label>
+    <div class="input-group">
+      <input type="number" class="form-control" ng-value="$ctrl.Quaternions.getRoll($ctrl.message.pose.orientation)" ng-readonly="true">
+      <span class="input-group-addon">°</span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Pitch</label>
+    <div class="input-group">
+      <input type="number" class="form-control" ng-value="$ctrl.Quaternions.getPitch($ctrl.message.pose.orientation)" ng-readonly="true">
+      <span class="input-group-addon">°</span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Yaw</label>
+    <div class="input-group">
+      <input type="number" class="form-control" ng-value="$ctrl.Quaternions.getYaw($ctrl.message.pose.orientation)" ng-readonly="true">
+      <span class="input-group-addon">°</span>
+    </div>
+  </div>
+
 </div>

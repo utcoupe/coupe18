@@ -7,6 +7,7 @@ class TopicController {
     this.ros = Ros;
     this.isSubscribing = false;
     this.toggle = true;
+    this.isOpen = true;
   }
 
   $onInit() {
@@ -20,16 +21,18 @@ class TopicController {
     this.fileName = `${path}default.html`;
 
     this.$scope.$watchGroup(['$ctrl.topic.type', '$ctrl.topic.active'], () => {
+      this.isSubscribing = false;
+      this.toggle = false;
+
       if(!this.topic.active) {
-        this.fileName = `${path}disabled.html`;
-        this.isSubscribing = false;
-        this.toggle = false;
+        this.fileName = '';
+        this.topic.isOpen = false;
         return;
       }
 
       else if (!this.topic.type) {
         this.fileName = `${path}default.html`;
-        this.toggleSubscription(false);
+        //this.toggleSubscription(false);
         return;
       }
 
@@ -37,7 +40,7 @@ class TopicController {
       this.$http.get(fileName).then((result) => {
         if (result.data) {
           this.fileName = fileName;
-          this.toggleSubscription(false);
+          //this.toggleSubscription(false);
         }
       }, () => {});
     });
@@ -48,7 +51,10 @@ class TopicController {
       return;
     if (!data) {
       this.roslibTopic.subscribe((message) => {
-        this.message = message;
+        if(!this.fileName.includes('default.html'))
+          this.message = message;
+        else
+          this.message = JSON.stringify(message);
       });
     } else {
       this.roslibTopic.unsubscribe();
@@ -57,8 +63,8 @@ class TopicController {
 
   }
 
-  publishMessage(input, isJSON) {
-    const data = isJSON ? angular.fromJson(input) : input;
+  publishMessage(input) {
+    const data = !this.fileName.includes('default.html') ? angular.fromJson(input) : input;
     const message = new ROSLIB.Message(data);
     this.roslibTopic.publish(message);
   }
@@ -67,6 +73,6 @@ class TopicController {
 
 angular.module('roscc').component('ccTopic', {
   bindings: { topic: '=' },
-  template: '<ng-include src="$ctrl.fileName"></ng-include>',
-  controller: TopicController,
+  template: `<ng-include src="'./app/topics/meta.html'"></ng-include>`,
+  controller: TopicController
 });
