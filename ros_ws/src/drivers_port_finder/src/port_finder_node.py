@@ -153,7 +153,7 @@ class PortFinder:
                         read_data = com_line.read(SERIAL_READ_SIZE)
                         com_line.close()
                         # Received a null character, close and open again the port
-                        if read_data[0] == '\x00':
+                        if len(read_data) != 0 and read_data[0] == '\x00':
                             read_data = ""
                         loop_counter += 1
                 except serial.SerialException:
