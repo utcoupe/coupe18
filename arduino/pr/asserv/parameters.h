@@ -32,7 +32,7 @@
  * 
  * OPTIONS : '1' - '2 - '4' */
 
-#define ENCODER_EVAL 2
+#define ENCODER_EVAL 1
 
 #define USE_SHARP 0
 #define EMERGENCY_STOP_DISTANCE 0.3 // m
@@ -41,7 +41,7 @@
 #define DT (1.0/HZ)
 #define AUTO_STATUS_HZ 10 // must be a divider a HZ or 0 to disable
 
-#define SPD_MAX 1000 //mm/s
+#define SPD_MAX 1000 //mm/s 1000
 #define ACC_MAX 1500 //mm/s2
 #define RATIO_ROT_SPD_MAX 0.6
 #define K_DISTANCE_REDUCTION 20 // réduction de la vitesse linéaire quand on tourne
@@ -53,9 +53,9 @@
 
 #define ENC_RESOLUTION 1024 //resolution du codeur
 
-#define ENC_LEFT_RADIUS 31.38 //REGLE PAR TEST - rayon de la roue codeuse
-#define ENC_RIGHT_RADIUS 31.24 //REGLE PAR TEST - rayon de la roue codeuse
-#define ENTRAXE_ENC 202.27 //REGLE PAR TES - Distance entre chaque roue codeuse en mm
+#define ENC_LEFT_RADIUS 31.38 //REGLE PAR TEST - rayon de la roue codeuse (31.38 origin 31.15 good)
+#define ENC_RIGHT_RADIUS 31.38 //REGLE PAR TEST - rayon de la roue codeuse (31.24)
+#define ENTRAXE_ENC 200.8 //REGLE PAR TES - Distance entre chaque roue codeuse en mm (202.37)
 
 #define ERROR_ANGLE 0.030 //erreur en angle(radians) maximale pour considérer l'objectif comme atteint
 #define ERROR_POS 5 // erreur en position (mm)  maximale pour considérer l'objectif comme atteint
@@ -86,7 +86,7 @@
 #define PID_D_RATIO (1/1000.0)
 
 #define TIME_BETWEEN_ORDERS 0 // s
-#define KEEP_LAST_GOAL 0
+#define KEEP_LAST_GOAL 1
 
 //DEFINES ARDUINO
 #define SERIAL_MAIN Serial
