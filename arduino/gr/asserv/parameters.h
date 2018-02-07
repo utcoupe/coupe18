@@ -61,11 +61,11 @@
 #define ERROR_POS 5 // erreur en position (mm)  maximale pour considérer l'objectif comme atteint
 #define SPD_TO_STOP 10
 
-#define CONE_ALIGNEMENT 100 // NEVER
+#define CONE_ALIGNEMENT (M_PI/2.0) // NEVER
 
-#define PID_P 0.014 //1.5
-#define PID_I 0.003 //30
-#define PID_D 0.002 //5
+#define PID_P 1.5 //1.5
+#define PID_I 30 //30
+#define PID_D 0 //5
 #define PID_BIAS 0
 
 // Control feed-forward, pwm = a*spd + b
@@ -86,7 +86,7 @@
 #define PID_D_RATIO (1/1000.0)
 
 #define TIME_BETWEEN_ORDERS 0 // s
-#define KEEP_LAST_GOAL 0
+#define KEEP_LAST_GOAL 1
 
 //DEFINES ARDUINO
 #define SERIAL_MAIN Serial
