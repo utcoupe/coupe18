@@ -53,7 +53,7 @@ class Asserv:
         arduino_port = self._src_client_get_port("ard_asserv").port
         rospy.loginfo("Service return value : " + arduino_port)
         if arduino_port == "":
-            rospy.loginfo("[ASSERV] Creation of the simu asserv.")
+            rospy.logwarn("[ASSERV] Creation of the simu asserv.")
             self._asserv_instance = asserv.AsservSimu(self)
         else:
             rospy.loginfo("[ASSERV] Creation of the real asserv.")
