@@ -176,11 +176,13 @@ class AsservReal(AsservAbstract):
         elif data.find("~") != -1:
             rospy.logdebug("[ASSERV] Received status data.")
             receied_data_list = data.split(";")
-            # rospy.loginfo("P = {}, I = {}, D = {} ".format(float(receied_data_list[11]) / 1000.0, float(receied_data_list[12]) / 1000.0, float(receied_data_list[13]) / 1000.0))
-            robot_position = Pose2D(float(receied_data_list[2]) / 1000.0, float(receied_data_list[3]) / 1000.0, float(receied_data_list[4]) / 1000.0)
-            self._robot_raw_position = robot_position
-            self._node.send_robot_position(robot_position)
-            self._node.send_robot_speed(RobotSpeed(float(receied_data_list[5]), float(receied_data_list[6]), float(receied_data_list[7]) / 1000.0, float(receied_data_list[8]), float(receied_data_list[9])))
+            try:
+                robot_position = Pose2D(float(receied_data_list[2]) / 1000.0, float(receied_data_list[3]) / 1000.0, float(receied_data_list[4]) / 1000.0)
+                self._robot_raw_position = robot_position
+                self._node.send_robot_position(robot_position)
+                self._node.send_robot_speed(RobotSpeed(float(receied_data_list[5]), float(receied_data_list[6]), float(receied_data_list[7]) / 1000.0, float(receied_data_list[8]), float(receied_data_list[9])))
+            except:
+                rospy.logwarn("[ASSERV] Received bad position from the robot, drop it...")
         # Received order ack
         elif data.find(";") >= 1 and data.find(";") <= 3:
             # Special order ack, the first one concern the Arduino activation
