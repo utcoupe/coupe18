@@ -42,7 +42,7 @@ class Status():
 
 
 class GameStatusNode():
-    INIT_TIMEOUT = 20 # seconds to wait for the nodes to sned their init response before timeout.
+    INIT_TIMEOUT = 40 # seconds to wait for the nodes to send their init response before timeout.
 
     def __init__(self):
         rospy.init_node("game_status", log_level=rospy.DEBUG)
