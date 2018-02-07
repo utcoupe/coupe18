@@ -18,7 +18,7 @@ ARDUINO_LIST = ("mega", "nano", "uno", "leo")
 #TODO put it in xml file
 ARDUINO_NODE_LIST = ("ard_asserv",)
 SERIAL_READ_SIZE = 50
-ARDUINO_LOOP_MAX_TRY = 3
+ARDUINO_LOOP_MAX_TRY = 2
 
 
 class PortFinder:
@@ -148,8 +148,8 @@ class PortFinder:
                 arduino_node_flag = False
                 loop_counter = 0
                 try:
-                    while (read_data == "") or (loop_counter > ARDUINO_LOOP_MAX_TRY):
-                        com_line = serial.Serial(element[1], 57600, timeout=5)
+                    while (read_data == "") and (loop_counter < ARDUINO_LOOP_MAX_TRY):
+                        com_line = serial.Serial(element[1], 57600, timeout=2)
                         read_data = com_line.read(SERIAL_READ_SIZE)
                         com_line.close()
                         # Received a null character, close and open again the port
