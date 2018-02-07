@@ -23,16 +23,12 @@
  */
 void asservLoop();
 void asservStatus();
+void asservSerialRead();
 
 // Run the loop for asserv at 100 Hz
 Timer asservLoopTimer = Timer(10, &asservLoop);
 Timer asservStatusTimer = Timer(100, &asservStatus);
-
-//TODO make it proper with others
-// Flag to know if a computer is connected to the arduino
-static unsigned char flagConnected = 0;
-
-//todo debug level as a parameter
+// Timer asservSerialReadTimer = Timer(5, &asservSerialRead);
 
 /**
  * Read a \n ending string from serial port.
@@ -41,11 +37,13 @@ static unsigned char flagConnected = 0;
  */
 void serialRead() {
     String receivedString;
-    receivedString = Serial.readStringUntil('\n');
-    // SerialSender::SerialSend(SERIAL_INFO, receivedString);
-    receivedString.replace("\n", "");
-    if (receivedString != "") {
-        parseAndExecuteOrder(receivedString);
+    if (Serial.available() > 0) {
+        receivedString = Serial.readStringUntil('\n');
+        // SerialSender::SerialSend(SERIAL_INFO, receivedString);
+        receivedString.replace("\n", "");
+        if (receivedString != "") {
+            parseAndExecuteOrder(receivedString);
+        }
     }
 }
 
@@ -73,6 +71,7 @@ void setup() {
 
     asservLoopTimer.Start();
     asservStatusTimer.Start();
+    // asservSerialReadTimer.Start();
 }
 
 /**
@@ -80,15 +79,18 @@ void setup() {
  * If it is the time to execute asserv, execute it.
  */
 void loop() {
-    serialRead();
     if (!flagArduinoConnected) {
         SerialSender::SerialSend(SERIAL_INFO, "%s", ARDUINO_ID);
-        delay(1000);
+        serialRead();
     } else {
         asservLoopTimer.Update();
         asservStatusTimer.Update();
+        // asservSerialReadTimer.Update();
     }
     SerialSender::SerialSendTask();
+    if (!flagArduinoConnected) {
+        delay(1000);
+    }
 }
 
 void asservLoop(){
@@ -109,5 +111,10 @@ void asservLoop(){
 }
 
 void asservStatus() {
+    serialRead();
     ProtocolAutoSendStatus();
 }
+
+// void asservSerialRead() {
+//     serialRead();
+// }
