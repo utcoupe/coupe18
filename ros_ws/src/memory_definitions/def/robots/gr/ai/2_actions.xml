@@ -58,6 +58,7 @@
 
 			<orderref ref="asserv_goto_waypoint" name="accost button">
 				<waypoint_name>way_button_accost</waypoint_name>
+				<direction>0</direction>
 			</orderref>
 
 			<orderref ref="actuator_set" name="activate button with servo">
@@ -80,7 +81,6 @@
 
 			<orderref ref="asserv_goto_waypoint" name="go back to approach">
 				<waypoint_name>way_button_approach</waypoint_name>
-				<direction>0</direction>
 			</orderref>
 		</actions>
 	</action>
@@ -170,18 +170,18 @@
 					<position>500</position>
 				</orderref>
 
-				<orderref ref="delay">
+				<!-- <orderref ref="delay">
 					<duration>1</duration>
-				</orderref>
+				</orderref> -->
 
 				<orderref ref="actuator_ax12_set_pos">
 					<motor_id>6</motor_id>
 					<position>850</position>
 				</orderref>
 
-				<orderref ref="delay">
+				<!-- <orderref ref="delay">
 					<duration>1</duration>
-				</orderref>
+				</orderref> -->
 			</actionlist>
 
 			<orderref ref="actuator_set" name="activate button with servo">

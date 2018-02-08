@@ -3,7 +3,7 @@
     <act name="canon" id="0" type="pwm" family="arduino">
         <timeout value="500"/> <!-- Default timeout -->
         <positions default="0">
-            <preset name="ON" value="100" />
+            <preset name="ON" value="55" />
             <preset name="OFF" value="0" />
         </positions>
     </act>

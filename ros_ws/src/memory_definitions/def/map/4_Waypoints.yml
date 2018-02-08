@@ -19,14 +19,14 @@ waypoints:
             frame_id: /map
             x: 1.13
             y: 1.65
-            a: 1.57079
+            a: -1.57079
             type: fixed
     way_button_accost:
         position:
             frame_id: /map
             x: 1.13
-            y: 1.895
-            a: 1.57079
+            y: 1.875
+            a: -1.57079
             type: fixed
 
     way_uni_distrib_approach:
@@ -48,21 +48,21 @@ waypoints:
             frame_id: /map
             x: 2.390
             y: 0.400
-            a: 1.57079
+            a: -1.57079
             type: fixed
     way_multi_distrib_accost:
         position:
             frame_id: /map
             x: 2.390
             y: 0.105
-            a: 1.57079
+            a: -1.57079
             type: fixed
 
     way_fire:
         position:
             frame_id: /map
             x: 0.600
-            y: 1.400
+            y: 1.500
             a: -0.7854
             type: fixed
 
