@@ -47,43 +47,39 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="approach button">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="approach button">
 				<waypoint_name>way_button_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="close servo">
+			<orderref ref="actuator_set" name="close servo">
 				<name>servo_button</name>
 				<preset>CLOSE</preset>
 			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="accost button">
-				<mode>1</mode>
 				<waypoint_name>way_button_accost</waypoint_name>
+				<direction>0</direction>
 			</orderref>
 
-			<actionlist repeat="2">
-				<orderref ref="actuator_servo_set_pos" name="activate button with servo">
-					<name>servo_button</name>
-					<preset>OPEN</preset>
-				</orderref>
+			<orderref ref="actuator_set" name="activate button with servo">
+				<name>servo_button</name>
+				<preset>OPEN</preset>
+			</orderref>
 
-				<orderref ref="delay">
-					<duration>1</duration>
-				</orderref>
+			<orderref ref="delay">
+				<duration>1</duration>
+			</orderref>
 
-				<orderref ref="actuator_servo_set_pos" name="close servo">
-					<name>servo_button</name>
-					<preset>CLOSE</preset>
-				</orderref>
+			<orderref ref="actuator_set" name="close servo">
+				<name>servo_button</name>
+				<preset>CLOSE</preset>
+			</orderref>
 
-				<orderref ref="delay">
-					<duration>1</duration>
-				</orderref>
-			</actionlist>
+			<orderref ref="delay">
+				<duration>1</duration>
+			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="go back to approach">
-				<mode>1</mode>
 				<waypoint_name>way_button_approach</waypoint_name>
 			</orderref>
 		</actions>
@@ -94,21 +90,19 @@
 		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<orderref ref="asserv_goto_waypoint" name="approach distributor">>
-				<mode>1</mode>
 				<waypoint_name>way_uni_distrib_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+			<orderref ref="actuator_set" name="activate button with servo">
 				<name>servo_lock</name>
 				<preset>LEFT</preset>
 			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="accost distributor">
-				<mode>1</mode>
 				<waypoint_name>way_uni_distrib_accost</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+			<orderref ref="actuator_set" name="activate button with servo">
 				<name>servo_lock</name>
 				<preset>RIGHT</preset>
 			</orderref>
@@ -118,8 +112,8 @@
 			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="go back to approach">>
-				<mode>1</mode>
 				<waypoint_name>way_uni_distrib_approach</waypoint_name>
+				<direction>0</direction>
 			</orderref>
 		</actions>
 	</action>
@@ -129,21 +123,19 @@
 		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<orderref ref="asserv_goto_waypoint" name="approach distributor">>
-				<mode>1</mode>
 				<waypoint_name>way_multi_distrib_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+			<orderref ref="actuator_set" name="activate button with servo">
 				<name>servo_lock</name>
 				<preset>LEFT</preset>
 			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="accost distributor">
-				<mode>1</mode>
 				<waypoint_name>way_multi_distrib_accost</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+			<orderref ref="actuator_set" name="activate button with servo">
 				<name>servo_lock</name>
 				<preset>RIGHT</preset>
 			</orderref>
@@ -152,9 +144,9 @@
 				<duration>2</duration>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="go back to approach">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="go back to approach">
 				<waypoint_name>way_multi_distrib_approach</waypoint_name>
+				<direction>0</direction>
 			</orderref>
 		</actions>
 	</action>
@@ -163,23 +155,38 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="goto fire position">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="goto fire position">
 				<waypoint_name>way_fire</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
-				<name>servo_button</name>
-				<preset>OPEN</preset>
+			<orderref ref="actuator_set" name="activate button with servo">
+				<name>canon</name>
+				<preset>ON</preset>
 			</orderref>
 
-			<orderref ref="delay">
-				<duration>1</duration>
-			</orderref>
+			<actionlist repeat="10">
+				<orderref ref="actuator_ax12_set_pos">
+					<motor_id>6</motor_id>
+					<position>500</position>
+				</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="close servo">
-				<name>servo_button</name>
-				<preset>CLOSE</preset>
+				<!-- <orderref ref="delay">
+					<duration>1</duration>
+				</orderref> -->
+
+				<orderref ref="actuator_ax12_set_pos">
+					<motor_id>6</motor_id>
+					<position>850</position>
+				</orderref>
+
+				<!-- <orderref ref="delay">
+					<duration>1</duration>
+				</orderref> -->
+			</actionlist>
+
+			<orderref ref="actuator_set" name="activate button with servo">
+				<name>canon</name>
+				<preset>OFF</preset>
 			</orderref>
 		</actions>
 	</action>
@@ -188,12 +195,11 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="goto fire position">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="goto fire position">
 				<waypoint_name>way_fire</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+			<orderref ref="actuator_set" name="activate button with servo">
 				<name>servo_button</name>
 				<preset>OPEN</preset>
 			</orderref>
@@ -202,7 +208,7 @@
 				<duration>1</duration>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="close servo">
+			<orderref ref="actuator_set" name="close servo">
 				<name>servo_button</name>
 				<preset>CLOSE</preset>
 			</orderref>
@@ -213,17 +219,15 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="approach station">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="approach station">
 				<waypoint_name>way_station_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="accost station">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="accost station">
 				<waypoint_name>way_station_accost</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+			<orderref ref="actuator_set" name="activate button with servo">
 				<name>servo_button</name>
 				<preset>OPEN</preset>
 			</orderref>
@@ -232,13 +236,12 @@
 				<duration>1</duration>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="close servo">
+			<orderref ref="actuator_set" name="close servo">
 				<name>servo_button</name>
 				<preset>CLOSE</preset>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="approach station">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="approach station">
 				<waypoint_name>way_station_approach</waypoint_name>
 			</orderref>
 		</actions>
@@ -248,17 +251,15 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="approach bee">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="approach bee">
 				<waypoint_name>way_bee_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="accost bee">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="accost bee">
 				<waypoint_name>way_bee_accost</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+			<orderref ref="actuator_set" name="activate button with servo">
 				<name>servo_button</name>
 				<preset>OPEN</preset>
 			</orderref>
@@ -267,14 +268,14 @@
 				<duration>1</duration>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="close servo">
+			<orderref ref="actuator_set" name="close servo">
 				<name>servo_button</name>
 				<preset>CLOSE</preset>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="approach bee">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="approach bee">
 				<waypoint_name>way_bee_approach</waypoint_name>
+				<direction>0</direction>
 			</orderref>
 		</actions>
 	</action>
@@ -283,13 +284,11 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="approach spawn">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="approach spawn">
 				<waypoint_name>way_spawn_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="goto spawn">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="goto spawn">
 				<waypoint_name>way_spawn</waypoint_name>
 			</orderref>
 		</actions>
