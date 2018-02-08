@@ -95,7 +95,6 @@ class CollisionsSubscriptions(object):
             except:
                 rospy.logdebug("Frame /map does not exist, cannot fetch belt rects.")
         if len(new_belt) > 0:
-            rospy.logerr("Updating belt on collisions")
             ObstaclesStack.updateBeltPoints(new_belt)
 
     def on_robot_speed(self, msg):

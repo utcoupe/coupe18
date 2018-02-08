@@ -17,16 +17,16 @@ waypoints:
     way_button_approach:
         position:
             frame_id: /map
-            x: 1.13
+            x: 1.12
             y: 1.65
-            a: -1.57079
+            a: 1.57079
             type: fixed
     way_button_accost:
         position:
             frame_id: /map
-            x: 1.13
-            y: 1.875
-            a: -1.57079
+            x: 1.12
+            y: 1.895
+            a: 1.57079
             type: fixed
 
     way_uni_distrib_approach:
