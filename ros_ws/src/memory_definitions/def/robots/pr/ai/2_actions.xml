@@ -51,32 +51,9 @@
 				<waypoint_name>way_button_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_set" name="close servo">
-				<name>servo_button</name>
-				<preset>CLOSE</preset>
-			</orderref>
-
 			<orderref ref="asserv_goto_waypoint" name="accost button">
 				<waypoint_name>way_button_accost</waypoint_name>
 				<direction>0</direction>
-			</orderref>
-
-			<orderref ref="actuator_set" name="activate button with servo">
-				<name>servo_button</name>
-				<preset>OPEN</preset>
-			</orderref>
-
-			<orderref ref="delay">
-				<duration>1</duration>
-			</orderref>
-
-			<orderref ref="actuator_set" name="close servo">
-				<name>servo_button</name>
-				<preset>CLOSE</preset>
-			</orderref>
-
-			<orderref ref="delay">
-				<duration>1</duration>
 			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="go back to approach">

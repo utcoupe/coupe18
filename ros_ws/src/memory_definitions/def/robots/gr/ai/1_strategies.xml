@@ -10,6 +10,7 @@
 			<actionref ref="game_start"/>
 
 			<actionlist name="Main actions">
+				<actionref ref="activate_button"/>
 				<actionref ref="push_grape_1"/>
 			</actionlist>
 		</actions>
