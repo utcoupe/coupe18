@@ -36,7 +36,7 @@ class CollisionsClient(object):
         rospy.loginfo("Collisions found")
 
         try:
-            rospy.Subscriber(self.WARNER_TOPIC, PredictedCollision, self._warnerCallback)
+            rospy.Subscriber(self.WARNER_TOPIC, PredictedCollision, self._warnerCallback, queue_size=1)
             self._activateCollisionsSrv = rospy.ServiceProxy(self.ACTIVATE_COLLISIONS_SERVICE_NAME, ActivateCollisions)
         except rospy.ServiceException, e:
             str_error = "Error when trying to connect to "
