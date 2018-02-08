@@ -12,17 +12,17 @@
 
 			<actionref ref="game_start"/>
 
-			<actionlist name="Main actions" needsprevious="true">
+			<actionlist name="Main actions">
 				<actionref ref="activate_button"/>
 
 				<actionlist name="Do unicolor distributor">
 					<actionref ref="load_unicolor_distributor"/>
-					<actionref ref="fire_full_clean_balls" needsprevious="true"/>
+					<actionref ref="fire_full_clean_balls"/>
 				</actionlist>
 
 				<actionlist name="Do multicolor distributor">
 					<actionref ref="load_multicolor_distributor"/>
-					<actionlist name="Unload multi balls" needsprevious="true">
+					<actionlist name="Unload multi balls">
 						<actionref ref="unload_dirty_balls"/>
 						<actionref ref="fire_half_clean_balls"/>
 					</actionlist>

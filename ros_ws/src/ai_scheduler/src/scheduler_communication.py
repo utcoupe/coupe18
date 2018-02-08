@@ -125,5 +125,5 @@ class AICommunication():
         except:
             res = TaskResult()
             res.result = res.RESULT_FAIL
-            res.verbose_reason = "wait_for_service request timeout exceeded."
+            res.verbose_reason = "wait_for_server request timeout exceeded."
             return res

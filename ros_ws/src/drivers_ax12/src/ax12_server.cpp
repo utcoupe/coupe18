@@ -226,7 +226,7 @@ std::string Ax12Server::fetch_port(const std::string& service_name)
 
     std::string port;
 
-    if(!ros::service::waitForService(service_name, 10000))
+    if(!ros::service::waitForService(service_name, 15000))
     {
         ROS_ERROR("Failed to contact drivers_port_finder (service not up)");
     }

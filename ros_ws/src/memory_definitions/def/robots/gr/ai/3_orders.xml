@@ -64,6 +64,7 @@
 	<order ref="asserv_goto_pos">
 		<message dest="/navigation/navigator/goto_action">
 			<param name="target_pos" type="pose2d"/>
+			<param name="direction" type="int" optional="true">1</param>
 		</message>
 	</order>
 
@@ -72,6 +73,7 @@
 			<param name="mode" type="int"/> <!-- 0 = GOTO, 1 = GOTOA -->
 			<param name="waypoint_name" type="string"/>
 			<param name="disable_collisions" type="bool" optional="true">0</param>
+			<param name="direction" type="int" optional="true">1</param>
 		</message>
 	</order>
 
