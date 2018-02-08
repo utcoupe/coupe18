@@ -16,7 +16,7 @@ using namespace std;
 
 const string                FINDPATH_SERVICE_NAME   = "/navigation/pathfinder/find_path";
 const pair<double, double>  TABLE_SIZE              = {3.0, 2.0}; // Scale corresponding to messages received by the node
-const string                MAP_FILE_NAME           = string(getenv ("UTCOUPE_WORKSPACE")) + "/ros_ws/src/navigation_pathfinder/def/map.bmp";
+const string                MAP_FILE_NAME           = string(getenv ("UTCOUPE_WORKSPACE")) + "/ros_ws/src/memory_map/src/occupancy/img/layer_pathfinder.bmp";//"/ros_ws/src/navigation_pathfinder/def/map.bmp";
 
 int main (int argc, char* argv[])
 {
