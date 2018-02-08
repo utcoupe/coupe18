@@ -13,6 +13,7 @@ import ai_game_status.srv
 import ai_timer.srv
 import drivers_ard_hmi.msg
 import drivers_ard_asserv.srv
+import drivers_ax12.msg
 
 class RequestTypes(object):
     PUB_MSG = 0
@@ -38,6 +39,7 @@ class RequestTypes(object):
             "/movement/actuators/dispatch":      (RequestTypes.ACTION,  movement_actuators.msg.dispatchAction, movement_actuators.msg.dispatchGoal),
 
             "/drivers/ard_asserv/set_pos":       (RequestTypes.SERVICE, drivers_ard_asserv.srv.SetPos),
+            "/drivers/ax12/goal":                (RequestTypes.ACTION,  drivers_ax12.msg.Ax12CommandAction, drivers_ax12.msg.Ax12CommandGoal),
 
             "/feedback/ard_hmi/ros_event":       (RequestTypes.PUB_MSG, drivers_ard_hmi.msg.ROSEvent),
             "/feedback/ard_hmi/hmi_event":       (RequestTypes.SUB_MSG, drivers_ard_hmi.msg.HMIEvent),

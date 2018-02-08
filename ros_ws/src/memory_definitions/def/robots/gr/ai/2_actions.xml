@@ -62,25 +62,23 @@
 				<waypoint_name>way_button_accost</waypoint_name>
 			</orderref>
 
-			<actionlist repeat="2">
-				<orderref ref="actuator_servo_set_pos" name="activate button with servo">
-					<name>servo_button</name>
-					<preset>OPEN</preset>
-				</orderref>
+			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+				<name>servo_button</name>
+				<preset>OPEN</preset>
+			</orderref>
 
-				<orderref ref="delay">
-					<duration>1</duration>
-				</orderref>
+			<orderref ref="delay">
+				<duration>1</duration>
+			</orderref>
 
-				<orderref ref="actuator_servo_set_pos" name="close servo">
-					<name>servo_button</name>
-					<preset>CLOSE</preset>
-				</orderref>
+			<orderref ref="actuator_servo_set_pos" name="close servo">
+				<name>servo_button</name>
+				<preset>CLOSE</preset>
+			</orderref>
 
-				<orderref ref="delay">
-					<duration>1</duration>
-				</orderref>
-			</actionlist>
+			<orderref ref="delay">
+				<duration>1</duration>
+			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="go back to approach">
 				<mode>1</mode>
@@ -168,19 +166,25 @@
 				<waypoint_name>way_fire</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
-				<name>servo_button</name>
-				<preset>OPEN</preset>
-			</orderref>
+			<actionlist repeat="10">
+				<actionref ref="/drivers/ax12/goal">
+					<motor_id>6</motor_id>
+					<position>500</position>
+				</actionref>
 
-			<orderref ref="delay">
-				<duration>1</duration>
-			</orderref>
+				<orderref ref="delay">
+					<duration>1</duration>
+				</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="close servo">
-				<name>servo_button</name>
-				<preset>CLOSE</preset>
-			</orderref>
+				<actionref ref="/drivers/ax12/goal">
+					<motor_id>6</motor_id>
+					<position>850</position>
+				</actionref>
+
+				<orderref ref="delay">
+					<duration>1</duration>
+				</orderref>
+			</actionlist>
 		</actions>
 	</action>
 
