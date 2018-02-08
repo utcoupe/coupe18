@@ -5,33 +5,12 @@
 	</teams>
 
 	<!-- STRATEGY real game actions ! -->
-	<strategy name="button_then_distrib">
+	<strategy name="push_grape_1">
 		<actions name="In-Game Actions">
-			<orderref ref="delay" name="5 points bee loaded" reward="5"/>
-			<orderref ref="delay" name="5 points home installed" reward="5"/>
-
 			<actionref ref="game_start"/>
 
 			<actionlist name="Main actions">
-				<actionref ref="activate_button"/>
-
-				<actionlist name="Do unicolor distributor">
-					<actionref ref="load_unicolor_distributor"/>
-					<actionref ref="fire_full_clean_balls"/>
-				</actionlist>
-
-				<actionlist name="Do multicolor distributor">
-					<actionref ref="load_multicolor_distributor"/>
-					<actionlist name="Unload multi balls">
-						<actionref ref="unload_dirty_balls"/>
-						<actionref ref="fire_half_clean_balls"/>
-					</actionlist>
-				</actionlist>
-
-				<actionref ref="activate_bee"/>
-
-				<orderref ref="delay" name="10 points no game over" reward="10"/>
-				<actionref ref="goto_spawn"/>
+				<actionref ref="push_grape_1"/>
 			</actionlist>
 		</actions>
 		<actions_onfinish name="After-Game Actions">

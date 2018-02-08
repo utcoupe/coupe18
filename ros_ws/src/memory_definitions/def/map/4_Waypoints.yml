@@ -95,3 +95,23 @@ waypoints:
             y: 0.15
             a: 1.57079
             type: fixed
+
+
+
+
+
+
+    way_grape_1_arm:
+        position:
+            frame_id: /map
+            x: 0.85
+            y: 0.16
+            a: 1.57079
+            type: fixed
+    way_grape_1_pushed:
+        position:
+            frame_id: /map
+            x: 0.85
+            y: 0.15
+            a: 1.57079
+            type: fixed
