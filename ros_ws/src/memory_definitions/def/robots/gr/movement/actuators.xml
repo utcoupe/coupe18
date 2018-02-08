@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actuators> 
+    <act name="canon" id="0" type="pwm" family="arduino">
+        <timeout value="500"/> <!-- Default timeout -->
+        <positions default="0">
+            <preset name="ON" value="100" />
+            <preset name="OFF" value="0" />
+        </positions>
+    </act>
+
     <act name="servo_button" id="3" type="servo" family="arduino">
         <timeout value="500"/> <!-- Default timeout -->
         <positions default="0">

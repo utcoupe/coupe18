@@ -51,7 +51,7 @@
 				<waypoint_name>way_button_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="close servo">
+			<orderref ref="actuator_set" name="close servo">
 				<name>servo_button</name>
 				<preset>CLOSE</preset>
 			</orderref>
@@ -60,7 +60,7 @@
 				<waypoint_name>way_button_accost</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+			<orderref ref="actuator_set" name="activate button with servo">
 				<name>servo_button</name>
 				<preset>OPEN</preset>
 			</orderref>
@@ -69,7 +69,7 @@
 				<duration>1</duration>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="close servo">
+			<orderref ref="actuator_set" name="close servo">
 				<name>servo_button</name>
 				<preset>CLOSE</preset>
 			</orderref>
@@ -93,7 +93,7 @@
 				<waypoint_name>way_uni_distrib_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+			<orderref ref="actuator_set" name="activate button with servo">
 				<name>servo_lock</name>
 				<preset>LEFT</preset>
 			</orderref>
@@ -102,7 +102,7 @@
 				<waypoint_name>way_uni_distrib_accost</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+			<orderref ref="actuator_set" name="activate button with servo">
 				<name>servo_lock</name>
 				<preset>RIGHT</preset>
 			</orderref>
@@ -126,7 +126,7 @@
 				<waypoint_name>way_multi_distrib_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+			<orderref ref="actuator_set" name="activate button with servo">
 				<name>servo_lock</name>
 				<preset>LEFT</preset>
 			</orderref>
@@ -135,7 +135,7 @@
 				<waypoint_name>way_multi_distrib_accost</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+			<orderref ref="actuator_set" name="activate button with servo">
 				<name>servo_lock</name>
 				<preset>RIGHT</preset>
 			</orderref>
@@ -159,6 +159,11 @@
 				<waypoint_name>way_fire</waypoint_name>
 			</orderref>
 
+			<orderref ref="actuator_set" name="activate button with servo">
+				<name>canon</name>
+				<preset>ON</preset>
+			</orderref>
+
 			<actionlist repeat="10">
 				<orderref ref="actuator_ax12_set_pos">
 					<motor_id>6</motor_id>
@@ -178,6 +183,11 @@
 					<duration>1</duration>
 				</orderref>
 			</actionlist>
+
+			<orderref ref="actuator_set" name="activate button with servo">
+				<name>canon</name>
+				<preset>OFF</preset>
+			</orderref>
 		</actions>
 	</action>
 
@@ -189,7 +199,7 @@
 				<waypoint_name>way_fire</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+			<orderref ref="actuator_set" name="activate button with servo">
 				<name>servo_button</name>
 				<preset>OPEN</preset>
 			</orderref>
@@ -198,7 +208,7 @@
 				<duration>1</duration>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="close servo">
+			<orderref ref="actuator_set" name="close servo">
 				<name>servo_button</name>
 				<preset>CLOSE</preset>
 			</orderref>
@@ -217,7 +227,7 @@
 				<waypoint_name>way_station_accost</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+			<orderref ref="actuator_set" name="activate button with servo">
 				<name>servo_button</name>
 				<preset>OPEN</preset>
 			</orderref>
@@ -226,7 +236,7 @@
 				<duration>1</duration>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="close servo">
+			<orderref ref="actuator_set" name="close servo">
 				<name>servo_button</name>
 				<preset>CLOSE</preset>
 			</orderref>
@@ -249,7 +259,7 @@
 				<waypoint_name>way_bee_accost</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
+			<orderref ref="actuator_set" name="activate button with servo">
 				<name>servo_button</name>
 				<preset>OPEN</preset>
 			</orderref>
@@ -258,7 +268,7 @@
 				<duration>1</duration>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="close servo">
+			<orderref ref="actuator_set" name="close servo">
 				<name>servo_button</name>
 				<preset>CLOSE</preset>
 			</orderref>
