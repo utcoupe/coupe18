@@ -1,4 +1,4 @@
-from math import atan2, pi
+from math import atan2, pi, sqrt, asin
 
 class Shape(object):
     """Class to test collisions with shapes returned by the map"""
@@ -6,7 +6,7 @@ class Shape(object):
     def __init__(self):
         super(Shape, self).__init__()
 
-    def contains(self, x, y):
+    def contains_point(self, x, y):
         pass
 
 
@@ -17,7 +17,7 @@ class Circle(Shape):
         self.y = y
         self.r = r
 
-    def contains(self, x, y):
+    def contains_point(self, x, y):
         return (x - self.x)**2 + (y - self.y)**2 <= self.r**2
 
     def __repr__(self):
