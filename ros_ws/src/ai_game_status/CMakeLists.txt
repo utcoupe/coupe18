@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(ai_game_status)
 
+add_compile_options(-std=c++14)
+
 find_package(catkin REQUIRED COMPONENTS
     rospy
     roscpp
