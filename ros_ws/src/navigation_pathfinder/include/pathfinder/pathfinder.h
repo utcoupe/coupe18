@@ -1,11 +1,6 @@
 #ifndef PATHFINDER_H
 #define PATHFINDER_H
 
-#include <chrono>
-#include <sstream>
-#include <utility>
-#include <vector>
-
 #include <ros/console.h>
 
 #include "navigation_pathfinder/FindPath.h"
@@ -14,6 +9,10 @@
 #include "pathfinder/map_storage.h"
 #include "pathfinder/point.h"
 #include "pathfinder/pos_convertor.h"
+#include "pathfinder/dynamic_barriers_manager.h"
+
+#include <vector>
+#include <memory>
 
 
 /**
@@ -31,11 +30,13 @@ public:
      * Initialize the pathfinder by loading given image file containing static barriers positions, and the size of a rectangle containing all input positions (here the table).
      * @param mapFileName The name of the image file to load.
      * @param tableSize The reference size in the outside referential.
+     * @param dynBarriersMng The dynamic barriers manager already initialized.
      * @param invertedY Tells if 'y' needs to be inverted between the inside and outside referential (direct/indirect bases).
      * @param render Tells if an image must be generated to debug if a path was found.
      * @param renderFile The image file name that will be generated to debug.
      */
-    Pathfinder(const std::string& mapFileName, const std::pair< double, double >& tableSize, bool invertedY = true, bool render = false, const std::string& renderFile = "tmp.bmp");
+    Pathfinder(const std::string& mapFileName, const std::pair< double, double >& tableSize, std::shared_ptr<DynamicBarriersManager> dynBarriersMng,
+               bool invertedY = true, bool render = false, const std::string& renderFile = "tmp.bmp");
     
     /**
      * Try to find a path between the two given positions. The coordinates are directly used in inside referential. It returns false if no paths where found.
@@ -65,7 +66,7 @@ private:
     typedef std::vector<std::vector<bool> > Vect2DBool;
     
     /** Convertor object between inside and outside referentials **/
-    PosConvertor _convertor;
+    std::shared_ptr<PosConvertor> _convertor;
     
     /** Manager for loading and saving image files **/
     MapStorage _mapStorage;
@@ -73,7 +74,7 @@ private:
     /** Contains the positions of static barriers. **/
     Vect2DBool _allowedPositions;
     /** Contains the positions of dynamic barriers. **/
-    Vect2DBool _dynBarrierPositions;
+    std::shared_ptr<DynamicBarriersManager> _dynBarriersMng;
     
     /** Tells if the map and the path must be saved after computing. **/
     bool _renderAfterComputing;
