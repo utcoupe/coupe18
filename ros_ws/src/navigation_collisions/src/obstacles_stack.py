@@ -6,7 +6,7 @@ class Map(object):
 
 
 class ObstaclesStack():
-    OBSTACLES_LIFESPAN = 1.0 # max time in seconds before being considered too old
+    OBSTACLES_LIFESPAN = 0.3 # max time in seconds before being considered too old
 
     BeltPoints = []
     LidarObjects = []
