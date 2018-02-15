@@ -4,6 +4,8 @@
 #include "navigation_pathfinder/FindPath.h"
 #include "navigation_pathfinder/PathfinderNodeConfig.h"
 
+#include "ai_game_status/init_service.h"
+
 #include "pathfinder/map_storage.h"
 #include "pathfinder/pathfinder.h"
 #include "pathfinder/point.h"
@@ -18,7 +20,10 @@
 using namespace std;
 using namespace Processing;
 
-const string                FINDPATH_SERVICE_NAME   = "/navigation/pathfinder/find_path";
+const string                NAMESPACE_NAME          = "navigation";
+const string                NODE_NAME               = "pathfinder";
+
+const string                FINDPATH_SERVICE_NAME   = "/" + NAMESPACE_NAME + "/" + NODE_NAME + "/find_path";
 const pair<double, double>  TABLE_SIZE              = {3.0, 2.0}; // Scale corresponding to messages received by the node
 const string                MAP_FILE_NAME           = string(getenv ("UTCOUPE_WORKSPACE")) + "/ros_ws/src/memory_map/src/occupancy/img/layer_pathfinder.bmp";//"/ros_ws/src/navigation_pathfinder/def/map.bmp";
 
@@ -52,7 +57,8 @@ int main (int argc, char* argv[])
     f = boost::bind(&Pathfinder::reconfigureCallback, &pathfinder, _1, _2);
     server.setCallback(f);
     
-    ROS_INFO("Pathfinder ready to find paths!");
+    StatusServices gameStatusSrv(NAMESPACE_NAME, NODE_NAME);
+    gameStatusSrv.setReady(true);
     
     ros::spin();
     
