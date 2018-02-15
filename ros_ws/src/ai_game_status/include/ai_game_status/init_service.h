@@ -15,7 +15,7 @@ public:
     typedef std::function<bool()> ArmCallback_t;
     typedef std::function<void(const ai_game_status::GameStatus::ConstPtr&)> StatusCallback_t;
     
-    StatusServices(const std::string& namespaceName, const std::string& packageName, ArmCallback_t armCallback, StatusCallback_t statusCallback);
+    StatusServices(const std::string& namespaceName, const std::string& packageName, ArmCallback_t armCallback = nullptr, StatusCallback_t statusCallback = nullptr);
     
     void setReady(bool success);
 
