@@ -69,9 +69,6 @@ class NavigatorNode(object):
         self._currentStatus = NavigatorStatuses.NAV_IDLE
         self._currentPath = {}
 
-        # Tell ai/game_status the node initialized successfuly.
-        StatusServices(NODE_NAMESPACE, NODE_NAME).ready(True)
-
     def _printPath (self, path):
         """
         Print the path in the debug log from ROS.
@@ -204,12 +201,16 @@ class NavigatorNode(object):
         # Create action servers and topic publisher
         self._actionSrv_Dogoto = actionlib.ActionServer(FULL_NODE_NAME + "/goto_action", DoGotoAction, self._handleDoGotoRequest, auto_start=False)
         self._actionSrv_doGotoWaypoint = actionlib.ActionServer(FULL_NODE_NAME + "/gotowaypoint_action", DoGotoWaypointAction, self._handleDoGotoWaypointRequest, auto_start=False)
-        self._statusPublisher = rospy.Publisher(FULL_NODE_NAME + "/status", Status, queue_size=10)
+        self._statusPublisher = rospy.Publisher(FULL_NODE_NAME + "/status", Status, queue_size=1)
         # Launch the node
         self._actionSrv_Dogoto.start()
         self._actionSrv_doGotoWaypoint.start()
         rospy.loginfo ("Ready to navigate!")
         self._updateStatus()
+
+        # Tell ai/game_status the node initialized successfuly.
+        StatusServices(NODE_NAMESPACE, NODE_NAME).ready(True)
+
         rospy.spin ()
 
 if __name__ == "__main__":
