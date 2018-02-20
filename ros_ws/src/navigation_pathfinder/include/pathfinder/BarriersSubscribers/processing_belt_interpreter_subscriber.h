@@ -13,8 +13,8 @@ namespace Processing {
     public:
         BeltInterpreterSubscriber(const double& safetyMargin);
         
-        bool hasBarrier(const geometry_msgs::Pose2D& pos);
-        void subscribe(ros::NodeHandle& nodeHandle, std::size_t sizeMaxQueue, std::string topic);
+        bool hasBarrier(const geometry_msgs::Pose2D& pos) override;
+        void subscribe(ros::NodeHandle& nodeHandle, std::size_t sizeMaxQueue, std::string topic) override;
         
     private:
         typedef processing_belt_interpreter::RectangleStamped Rectangle;
