@@ -12,7 +12,7 @@ public:
     /**
      * @brief Initialize the convertor. Do nothing yet.
      */
-    PosConvertor() {}
+    PosConvertor() = default;
     
     /**
      * @brief Converts a coodinate from ROS system to pathfinding system using the scales.

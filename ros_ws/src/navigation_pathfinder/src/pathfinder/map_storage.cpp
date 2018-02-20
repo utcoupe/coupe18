@@ -14,7 +14,7 @@ MapStorage::Vect2DBool MapStorage::loadAllowedPositionsFromFile(const string& fi
     Vect2DBool allowedPos;
     for (unsigned int line = 0; line < image.getSize().y; line++)
     {
-        allowedPos.push_back(vector<bool>());
+        allowedPos.emplace_back();
         for (unsigned int column = 0; column < image.getSize().x; column++)
             allowedPos[line].push_back(image.getPixel(column, line) == ALLOWED_POS_COLOR);
     }

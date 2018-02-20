@@ -17,7 +17,7 @@ public:
     typedef std::vector<std::vector<bool> > Vect2DBool;
     //typedef std::vector<std::vector<unsigned short> > DynamicBarriers;
     
-    MapStorage() {}
+    MapStorage() = default;
     
     Vect2DBool loadAllowedPositionsFromFile(const std::string& fileName);
     void saveMapToFile(const std::string& fileName, const Vect2DBool& allowedPos, std::shared_ptr<DynamicBarriersManager> dynBarriersMng, const std::vector<Point>& path, const std::vector<Point>& smoothPath);
