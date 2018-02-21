@@ -9,10 +9,10 @@ from processing_lidar_objects.msg import Obstacles
 from processing_belt_interpreter.msg import BeltRects
 from ai_game_status import StatusServices
 from shapes import *
-from geometry_msgs.msg import PointStamped
+from geometry_msgs.msg import PointStamped, PoseStamped
 import itertools
 from numpy import linspace
-
+from math import atan2
 
 class ObjectsClassifier(object):
     def __init__(self):
@@ -152,7 +152,6 @@ class ObjectsClassifier(object):
                 pointst.point.x = x
                 pointst.point.y = y
                 pointst.header = rect.header
-                pointst.header.stamp = rect.header.stamp
 
                 try:
                     pst_map = self._tl.transformPoint("/map", pointst)
@@ -164,6 +163,22 @@ class ObjectsClassifier(object):
 
                 if self.is_point_static(pst_map):
                     static_points_nbr += 1
+
+            posest = PoseStamped()
+            posest.pose.position.x = rect.x
+            posest.pose.position.y = rect.y
+            posest.header = rect.header
+
+            pst_map = self._tl.transformPose("/map", posest)
+
+            rect.x = pst_map.pose.position.x
+            rect.y = pst_map.pose.position.y
+            rect.header = pst_map.header
+
+            q = pst_map.pose.orientation
+            siny = 2.0 * (q.w * q.z + q.x * q.y)
+            cosy = 1.0 - 2.0 * (q.y * q.y + q.z * q.z)
+            rect.a = atan2(siny, cosy)
 
             if float(static_points_nbr) / float(total_points_nbr) \
                     > self.POINTS_PC_THRESHOLD:  # static
