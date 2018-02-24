@@ -17,8 +17,8 @@
 			<team name="green">
 				<orderref ref="set_robot_pos">
 					<position>
-						<x>0.216</x>
-						<y>1.477</y>
+						<x>0.228</x>
+						<y>1.448</y>
 						<theta>-1.57079</theta>
 					</position>
 				</orderref>
@@ -26,8 +26,8 @@
 			<team name="orange">
 				<orderref ref="set_robot_pos">
 					<position>
-						<x>2.784</x>
-						<y>1.477</y>
+						<x>2.772</x>
+						<y>1.448</y>
 						<theta>-1.57079</theta>
 					</position>
 				</orderref>
@@ -144,22 +144,14 @@
 			<actionlist repeat="10">
 				<orderref ref="actuator_ax12_set_pos">
 					<motor_id>6</motor_id>
-					<position>500</position>
+					<position>450</position>
 				</orderref>
-
-				<!-- <orderref ref="delay">
-					<duration>1</duration>
-				</orderref> -->
 
 				<orderref ref="actuator_ax12_set_pos">
 					<motor_id>6</motor_id>
 					<position>850</position>
 				</orderref>
-
-				<!-- <orderref ref="delay">
-					<duration>1</duration>
-				</orderref> -->
-			</actionlist>
+                        </actionlist>
 
 			<orderref ref="actuator_set" name="activate button with servo">
 				<name>canon</name>
@@ -168,29 +160,6 @@
 		</actions>
 	</action>
 
-	<action ref="fire_half_clean_balls" name="Fire clean balls to water tower" reward="20">
-		<params></params>
-		<conditions></conditions>
-		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="goto fire position">
-				<waypoint_name>way_fire</waypoint_name>
-			</orderref>
-
-			<orderref ref="actuator_set" name="activate button with servo">
-				<name>servo_button</name>
-				<preset>OPEN</preset>
-			</orderref>
-
-			<orderref ref="delay">
-				<duration>1</duration>
-			</orderref>
-
-			<orderref ref="actuator_set" name="close servo">
-				<name>servo_button</name>
-				<preset>CLOSE</preset>
-			</orderref>
-		</actions>
-	</action>
 
 	<action ref="unload_dirty_balls" name="Unload dirty balls to station" reward="40">
 		<params></params>
@@ -205,18 +174,26 @@
 			</orderref>
 
 			<orderref ref="actuator_set" name="activate button with servo">
-				<name>servo_button</name>
-				<preset>OPEN</preset>
-			</orderref>
+                                <name>canon</name>
+                                <preset>MID</preset>
+                        </orderref>
 
-			<orderref ref="delay">
-				<duration>1</duration>
-			</orderref>
+                        <actionlist repeat="10">
+                                <orderref ref="actuator_ax12_set_pos">
+                                        <motor_id>6</motor_id>
+                                        <position>450</position>
+                                </orderref>
 
-			<orderref ref="actuator_set" name="close servo">
-				<name>servo_button</name>
-				<preset>CLOSE</preset>
-			</orderref>
+                                <orderref ref="actuator_ax12_set_pos">
+                                        <motor_id>6</motor_id>
+                                        <position>850</position>
+                                </orderref>
+                        </actionlist>
+
+                        <orderref ref="actuator_set" name="activate button with servo">
+                                <name>canon</name>
+                                <preset>OFF</preset>
+                        </orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="approach station">
 				<waypoint_name>way_station_approach</waypoint_name>

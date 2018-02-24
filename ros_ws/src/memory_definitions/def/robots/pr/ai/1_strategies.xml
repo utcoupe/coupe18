@@ -22,7 +22,6 @@
 					<actionref ref="load_multicolor_distributor"/>
 					<actionlist name="Unload multi balls">
 						<actionref ref="unload_dirty_balls"/>
-						<actionref ref="fire_half_clean_balls"/>
 					</actionlist>
 				</actionlist>
 
