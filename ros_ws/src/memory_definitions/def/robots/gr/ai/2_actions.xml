@@ -17,18 +17,18 @@
 			<team name="green">
 				<orderref ref="set_robot_pos">
 					<position>
-						<x>0.124</x>
-						<y>1.65</y>
-						<theta>0</theta>
+						<x>0.100</x>
+						<y>1.785</y>
+						<theta>3.141592</theta>
 					</position>
 				</orderref>
 			</team>
 			<team name="orange">
 				<orderref ref="set_robot_pos">
 					<position>
-						<x>2.876</x>
-						<y>1.65</y>
-						<theta>3.141592</theta>
+						<x>2.9</x>
+						<y>1.785</y>
+						<theta>0.0</theta>
 					</position>
 				</orderref>
 			</team>
@@ -43,12 +43,37 @@
 		</actions>
 	</action>
 
+	<action ref="activate_button" name="Go and activate Home Button" reward="25">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="asserv_goto_waypoint" name="approach button">
+				<waypoint_name>way_button_approach</waypoint_name>
+				<direction>0</direction>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint" name="accost button">
+				<waypoint_name>way_button_accost</waypoint_name>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint" name="go back to approach">
+				<waypoint_name>way_button_approach</waypoint_name>
+				<direction>0</direction>
+			</orderref>
+		</actions>
+	</action>
+
 	<action ref="push_grape_1" name="Simply push grape 1 cubes to the zone" reward="25">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<orderref ref="asserv_goto_waypoint" name="go behind the cubes">
-				<waypoint_name>way_grape_1_arm</waypoint_name>
+				<waypoint_name>way_grape_1_approach</waypoint_name>
+				<direction>0</direction>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint" name="go behind the cubes">
+				<waypoint_name>way_grape_1_accost</waypoint_name>
 			</orderref>
 
 			<orderref ref="delay">
@@ -57,11 +82,11 @@
 
 			<orderref ref="asserv_goto_waypoint" name="push them to the zone">
 				<waypoint_name>way_grape_1_pushed</waypoint_name>
+				<direction>0</direction>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="go back to approach">
-				<waypoint_name>way_grape_1_arm</waypoint_name>
-				<direction>0</direction>
+			<orderref ref="asserv_goto_waypoint" name="push them to the zone">
+				<waypoint_name>way_grape_1_released</waypoint_name>
 			</orderref>
 		</actions>
 	</action>
