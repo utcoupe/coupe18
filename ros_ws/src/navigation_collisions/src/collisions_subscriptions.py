@@ -12,7 +12,7 @@ from geometry_msgs.msg import PointStamped
 from memory_map.srv import MapGet
 from navigation_navigator.msg import Status
 from drivers_ard_asserv.msg import RobotSpeed
-from processing_belt_interpreter.msg import BeltFiltered
+from processing_belt_interpreter.msg import BeltRects
 from processing_lidar_objects.msg import Obstacles
 
 class CollisionsSubscriptions(object):
@@ -30,7 +30,7 @@ class CollisionsSubscriptions(object):
 
         # Subscribing to dependencies
         rospy.Subscriber("/navigation/navigator/status", Status, self._on_nav_status)
-        rospy.Subscriber("/processing/belt_interpreter/rects_filtered", BeltFiltered, self._on_belt)
+        rospy.Subscriber("/processing/belt_interpreter/rects_filtered", BeltRects, self._on_belt)
         rospy.Subscriber("/processing/lidar_objects/obstacles", Obstacles, self._on_lidar)
         rospy.Subscriber("/drivers/ard_asserv/speed", RobotSpeed, self.on_robot_speed)
 
@@ -81,7 +81,7 @@ class CollisionsSubscriptions(object):
 
     def _on_belt(self, msg):
         new_belt = []
-        for rect in msg.unknown_rects:
+        for rect in msg.rects:
             transform = self._tf2_pos_buffer.lookup_transform("map", rect.header.frame_id, # dest frame, source frame
                                                               rospy.Time.now(),            # get the tf at first available time
                                                               rospy.Duration(5.0))         # timeout
