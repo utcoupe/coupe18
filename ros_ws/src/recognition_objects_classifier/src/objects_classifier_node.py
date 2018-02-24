@@ -14,6 +14,7 @@ import itertools
 from numpy import linspace
 from math import atan2
 
+
 class ObjectsClassifier(object):
     def __init__(self):
         super(ObjectsClassifier, self).__init__()
@@ -47,18 +48,16 @@ class ObjectsClassifier(object):
 
         rospy.loginfo("Objects classifier is initializing...")
 
-        self._pub = rospy.Publisher(self.PUB_TOPIC, ClassifiedObjects, queue_size=1)
-        self._belt_sub = rospy.Subscriber(self.BELT_TOPIC, BeltRects, self.belt_callback)
-        self._lidar_sub = rospy.Subscriber(self.LIDAR_TOPIC, Obstacles, self.lidar_callback)
-        self._tl = tf.TransformListener()
-        self._static_shapes, self._map_width, self._map_height = self.fetch_map_objects()
-
         self._rects = {'map': [], 'unknown': []}
         self._circles = {'map': [], 'unknown': []}
         self._segments = {'map': [], 'unknown': []}
         self._to_process = {'rects': [], 'circles': [], 'segments': []}
 
-
+        self._pub = rospy.Publisher(self.PUB_TOPIC, ClassifiedObjects, queue_size=1)
+        self._belt_sub = rospy.Subscriber(self.BELT_TOPIC, BeltRects, self.belt_callback)
+        self._lidar_sub = rospy.Subscriber(self.LIDAR_TOPIC, Obstacles, self.lidar_callback)
+        self._tl = tf.TransformListener()
+        self._static_shapes, self._map_width, self._map_height = self.fetch_map_objects()
 
         self._static_shapes, self._map_width, self._map_width = self.fetch_map_objects()
 
@@ -80,13 +79,15 @@ class ObjectsClassifier(object):
             self._pub.publish(self._rects['map'], self._circles['map'], self._segments['map'],
                               self._rects['unknown'], self._circles['unknown'], self._segments['unknown'])
 
+
+
             self.PUB_RATE.sleep()
 
     def process_data(self):
         self.clear_objects()
         self.process_segments()
         self.process_circles()
-        self.process_segments()
+        self.process_rects()
 
     def clear_objects(self):
         self._segments['map'] = []
@@ -132,11 +133,12 @@ class ObjectsClassifier(object):
 
     def process_rects(self):
         for rect in self._to_process['rects']:
+
             static_points_nbr = 0
             total_points_nbr = 0
 
-            num_samples_width = int(rect.width / self.RESOLUTION_LARGE)
-            num_samples_height = int(rect.height / self.RESOLUTION_LONG)
+            num_samples_width = int(rect.w / self.RESOLUTION_LARGE)
+            num_samples_height = int(rect.h / self.RESOLUTION_LONG)
 
             if num_samples_width < 2:
                 num_samples_width = 2
@@ -145,13 +147,22 @@ class ObjectsClassifier(object):
                 num_samples_height = 2
 
             for x, y in itertools.product(
-                    linspace(rect.x - rect.width / 2, rect.x + rect.width / 2, num_samples_width),
-                    linspace(- rect.height / 2, rect.height / 2, num_samples_height)):
+                    linspace(rect.x - rect.w / 2, rect.x + rect.w / 2, num_samples_width),
+                    linspace(- rect.h / 2, rect.h / 2, num_samples_height)):
 
                 pointst = PointStamped()
                 pointst.point.x = x
                 pointst.point.y = y
                 pointst.header = rect.header
+
+                last_comm = self._tl.getLatestCommonTime(rect.header.frame_id, "/map")
+                diff = rect.header.stamp - last_comm
+
+                if diff < rospy.Duration(1) and diff > rospy.Duration(0):
+                    rospy.logwarn("Would require extrapolation, setting stamp to last transform's stamp (diff : {})".format(diff))
+                    pointst.header.stamp = last_comm
+                    rect.header.stamp = last_comm
+
 
                 try:
                     pst_map = self._tl.transformPoint("/map", pointst)
@@ -161,15 +172,18 @@ class ObjectsClassifier(object):
 
                 total_points_nbr += 1
 
-                if self.is_point_static(pst_map):
+                if self.is_point_static(pst_map.point.x, pst_map.point.y):
                     static_points_nbr += 1
 
             posest = PoseStamped()
             posest.pose.position.x = rect.x
             posest.pose.position.y = rect.y
             posest.header = rect.header
-
-            pst_map = self._tl.transformPose("/map", posest)
+            try:
+                pst_map = self._tl.transformPose("/map", posest)
+            except Exception as e:
+                rospy.logwarn("Problem transforming pose, skipping data... : {}".format(e))
+                continue
 
             rect.x = pst_map.pose.position.x
             rect.y = pst_map.pose.position.y
@@ -179,6 +193,7 @@ class ObjectsClassifier(object):
             siny = 2.0 * (q.w * q.z + q.x * q.y)
             cosy = 1.0 - 2.0 * (q.y * q.y + q.z * q.z)
             rect.a = atan2(siny, cosy)
+
 
             if float(static_points_nbr) / float(total_points_nbr) \
                     > self.POINTS_PC_THRESHOLD:  # static
@@ -250,7 +265,7 @@ class ObjectsClassifier(object):
                 raise rospy.ROSInitException(msg)
             else:
                 dims = json.loads(response.response)
-                return shape, float(dims["width"]), float(dims["height"])
+                return shapes, float(dims["width"]), float(dims["height"])
 
         except rospy.ServiceException as exc:
             msg = "Exception when fetching objects from map. Shutting down.\n {}".format(str(exc))
