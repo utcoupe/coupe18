@@ -13,6 +13,7 @@ import ai_game_status.srv
 import ai_timer.srv
 import drivers_ard_hmi.msg
 import drivers_ard_asserv.srv
+import drivers_ax12.msg
 
 class RequestTypes(object):
     PUB_MSG = 0
@@ -38,6 +39,7 @@ class RequestTypes(object):
             "/movement/actuators/dispatch":      (RequestTypes.ACTION,  movement_actuators.msg.dispatchAction, movement_actuators.msg.dispatchGoal),
 
             "/drivers/ard_asserv/set_pos":       (RequestTypes.SERVICE, drivers_ard_asserv.srv.SetPos),
+            "/drivers/ax12":                (RequestTypes.ACTION, drivers_ax12.msg.Ax12CommandAction, drivers_ax12.msg.Ax12CommandGoal),
 
             "/feedback/ard_hmi/ros_event":       (RequestTypes.PUB_MSG, drivers_ard_hmi.msg.ROSEvent),
             "/feedback/ard_hmi/hmi_event":       (RequestTypes.SUB_MSG, drivers_ard_hmi.msg.HMIEvent),
@@ -118,12 +120,16 @@ class AICommunication():
     def _send_blocking_action(self, dest, action_class, goal_class, params):
         client = actionlib.SimpleActionClient(dest, action_class)
         try: # Handle a timeout in case one node doesn't respond
+            rospy.logdebug("    Waiting for action server...")
             client.wait_for_server(timeout = rospy.Duration(2.0))
+            rospy.logdebug("    Sending goal...")
             client.send_goal(goal_class(**params))
+            rospy.logdebug("    Waiting for result...")
             client.wait_for_result()
+            rospy.logdebug("    Got result!")
             return client.get_result()
         except:
             res = TaskResult()
             res.result = res.RESULT_FAIL
-            res.verbose_reason = "wait_for_service request timeout exceeded."
+            res.verbose_reason = "wait_for_server request timeout exceeded."
             return res

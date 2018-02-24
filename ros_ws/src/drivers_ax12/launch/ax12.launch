@@ -1,0 +1,16 @@
+<launch>
+	<arg name="robot" default="gr"/>
+
+    <param name="robot"  value="$(arg robot)"/>
+
+	<group ns="memory">
+		<node pkg="memory_definitions"    name="definitions" type="definitions_node.py" output="screen" />
+		<node pkg="memory_map"            name="map"         type="map_node.py"         output="screen" />
+	</group>
+
+    <group ns="drivers">
+		<node pkg="drivers_port_finder"   name="port_finder"  type="port_finder_node.py" output="screen"/>
+		<!--node pkg="drivers_ax12"    name="ax12"  type="ax12_node" output="screen"/-->
+	</group>
+
+</launch>

@@ -19,8 +19,8 @@ ros::NodeHandle nh;
 // ---- SENSORS DEPARTMENT ----
 
 #define NUM_BELT_SENSORS 2
-const int pins_belt_sensors_shut[NUM_BELT_SENSORS]     = {2, 3};
-const uint8_t belt_sensors_addresses[NUM_BELT_SENSORS] = {22, 25};
+const int pins_belt_sensors_shut[NUM_BELT_SENSORS]     = {40, 42};
+const uint8_t belt_sensors_addresses[NUM_BELT_SENSORS] = {22, 24};
 const String belt_sensors_names[NUM_BELT_SENSORS]      = {"sensor1", "sensor2"};
 VL53L0X belt_sensors[NUM_BELT_SENSORS];
 
@@ -66,19 +66,19 @@ void loop_sensors() {
 
 // ---- ACTUATORS DEPARTMENT ----
 
-#define NUM_DIGITAL_ACTUATORS 2
-const int pins_digital_actuators[NUM_DIGITAL_ACTUATORS]     = {13};
+#define NUM_DIGITAL_ACTUATORS 1
+const int pins_digital_actuators[NUM_DIGITAL_ACTUATORS]     = {12};
 bool digital_actuators_states[NUM_DIGITAL_ACTUATORS]        = {true};
 // Names : main_led, power_relay
 
-#define NUM_PWM_ACTUATORS 2
-const int pins_pwm_actuators_pwm[NUM_PWM_ACTUATORS]         = {6, 7};
-uint8_t pwm_actuators_states[NUM_PWM_ACTUATORS]             = {0, 255};
+#define NUM_PWM_ACTUATORS 1
+const int pins_pwm_actuators_pwm[NUM_PWM_ACTUATORS]         = {8};
+uint8_t pwm_actuators_states[NUM_PWM_ACTUATORS]             = {0};
 // Names : motor_canon1, motor_canon2
 
-#define NUM_SERVO_ACTUATORS 1
-const int pins_servo_actuators_pwm[NUM_SERVO_ACTUATORS]     = {D6};
-int16_t servo_actuators_states[NUM_SERVO_ACTUATORS]         = {90};
+#define NUM_SERVO_ACTUATORS 3
+const int pins_servo_actuators_pwm[NUM_SERVO_ACTUATORS]     = {9,  10, 11};
+int16_t servo_actuators_states[NUM_SERVO_ACTUATORS]         = {10, 10, 10};
 Servo servo_actuators_objects[NUM_SERVO_ACTUATORS];
 // Names : servo_main_door
 
@@ -98,6 +98,7 @@ void send_move_response(int order_nb, bool success) {
 
 void on_move(const drivers_ard_others::Move& msg){
     bool success = true;
+
     switch(msg.type) {
         case msg.TYPE_DIGITAL:
             if(msg.id >= 0 && msg.id <= NUM_DIGITAL_ACTUATORS) {
@@ -124,6 +125,7 @@ void on_move(const drivers_ard_others::Move& msg){
                 nh.logerror("MOVE failed : invalid id.");
                 success = false;
             }
+            break;
         case msg.TYPE_SERVO:
             if(msg.id >= 0 && msg.id <= NUM_SERVO_ACTUATORS) {
                 if(msg.dest_value >= 0 && msg.dest_value <= 180)
@@ -170,12 +172,12 @@ void loop_digital_actuators() {
 // PWM actuators
 void init_pwm_actuators() {
     for(int i = 0; i < NUM_PWM_ACTUATORS; i++)
-        pinMode(pins_digital_actuators[i], OUTPUT);
+        pinMode(pins_pwm_actuators_pwm[i], OUTPUT);
 }
 
 void loop_pwm_actuators() {
     for(int i = 0; i < NUM_PWM_ACTUATORS; i++)
-        analogWrite(pins_digital_actuators[i], pwm_actuators_states[i]);
+        analogWrite(pins_pwm_actuators_pwm[i], pwm_actuators_states[i]);
 
     pwm_states_msg.states_length = NUM_PWM_ACTUATORS;
     pwm_states_msg.states = pwm_actuators_states;
@@ -229,7 +231,7 @@ void setup() {
     Wire.begin();
 
     // Components init
-    //init_sensors();
+    init_sensors();
     init_actuators();
 
     nh.loginfo("Node '/arduinos/others' initialized correctly.");
@@ -237,7 +239,7 @@ void setup() {
 
 void loop() {
     // Components loop
-    //loop_sensors();
+    loop_sensors();
     loop_actuators();
 
     // ROS loop

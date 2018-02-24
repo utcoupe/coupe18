@@ -13,8 +13,9 @@ import protocol_parser
 __author__ = "Thomas Fuhrmann"
 __date__ = 16/12/2017
 
-ASSERV_ERROR_POSITION = 0.005  # in meters
-ASSERV_ERROR_ANGLE = 0.015  # in radians
+ASSERV_ERROR_POSITION = 0.01  # in meters
+ASSERV_ERROR_ANGLE = 0.05  # in radians
+POSITION_REACHED_CHECK_DELAY = 1  # in seconds
 
 
 class AsservReal(AsservAbstract):
@@ -31,6 +32,8 @@ class AsservReal(AsservAbstract):
         self._order_id = 0
         # This dictionary stores the order_id with th goal_id to retrieve which goal has been completed
         self._orders_id_dictionary = {}
+        # This list stores the last received ack ID from Arduino (a list to avoid zapping an ack). This list is used by the timer callback which check that position has been reached
+        self._last_received_id_dictionary = {}
         # Store the current position of robot, this one is the raw value returned by the asserv
         self._robot_raw_position = Pose2D(0, 0, 0)
         # Timer for the send of serial data to avoid that sending are buffered in the internal OS buffer (make the arduino crash)
@@ -120,7 +123,8 @@ class AsservReal(AsservAbstract):
 
     def set_pid(self, p, i, d):
         # TODO manage lef and right
-        self._send_serial_data(self._orders_dictionary['PIDALL'], [str(p), str(i), str(d)])
+        self._send_serial_data(self._orders_dictionary['PIDALL'], [str(int(round(p * 1000))), str(int(round(i * 1000))), str(int(round(d * 1000)))])
+        # rospy.loginfo("Set pid sending : P = {}, I = {}, D = {}.".format(str(int(round(p * 1000))), str(int(round(i * 1000))), str(int(round(d * 1000)))))
         return True
 
     def set_pos(self, x, y, a):
@@ -175,11 +179,13 @@ class AsservReal(AsservAbstract):
         elif data.find("~") != -1:
             rospy.logdebug("[ASSERV] Received status data.")
             receied_data_list = data.split(";")
-            # rospy.loginfo("data sharp : " + receied_data_list[10])
-            robot_position = Pose2D(float(receied_data_list[2]) / 1000.0, float(receied_data_list[3]) / 1000.0, float(receied_data_list[4]) / 1000.0)
-            self._robot_raw_position = robot_position
-            self._node.send_robot_position(robot_position)
-            self._node.send_robot_speed(RobotSpeed(float(receied_data_list[5]), float(receied_data_list[6]), float(receied_data_list[7]) / 1000.0, float(receied_data_list[8]), float(receied_data_list[9])))
+            try:
+                robot_position = Pose2D(float(receied_data_list[2]) / 1000.0, float(receied_data_list[3]) / 1000.0, float(receied_data_list[4]) / 1000.0)
+                self._robot_raw_position = robot_position
+                self._node.send_robot_position(robot_position)
+                self._node.send_robot_speed(RobotSpeed(float(receied_data_list[5]), float(receied_data_list[6]), float(receied_data_list[7]) / 1000.0, float(receied_data_list[8]), float(receied_data_list[9])))
+            except:
+                rospy.logwarn("[ASSERV] Received bad position from the robot, drop it...")
         # Received order ack
         elif data.find(";") >= 1 and data.find(";") <= 3:
             # Special order ack, the first one concern the Arduino activation
@@ -197,25 +203,9 @@ class AsservReal(AsservAbstract):
                 # TODO manage status
                 if ack_id in self._orders_id_dictionary:
                     rospy.logdebug("[ASSERV] Found key %d in order_id dictionary !", ack_id)
-                    result = True
-                    # Check if the robot is arrived, otherwise this will tell that the robot is blocked (default behaviour of the asserv)
-                    # TODO where and how to do this ?
-                    # TODO check angle
-                    reached = False
-                    if len(self._orders_id_dictionary[ack_id]) == 2:
-                        reached = self._check_reached_angle(self._orders_id_dictionary[ack_id][1])
-                    elif len(self._orders_id_dictionary[ack_id]) == 3:
-                        reached = self._check_reached_position(self._orders_id_dictionary[ack_id][1], self._orders_id_dictionary[ack_id][2])
-                    elif len(self._orders_id_dictionary[ack_id]) == 4:
-                        reached = self._check_reached_position(self._orders_id_dictionary[ack_id][1], self._orders_id_dictionary[ack_id][2])
-                        reached &= self._check_reached_angle(self._orders_id_dictionary[ack_id][3])
-                    else:
-                        rospy.logwarn("Goal id ack but not corresponding goal data...")
-                    if not reached:
-                        rospy.logdebug("Goal has not been reached !")
-                        result = False
-                    self._node.goal_reached(self._orders_id_dictionary[ack_id][0], result)
+                    self._last_received_id_dictionary[ack_id] = self._orders_id_dictionary[ack_id]
                     del self._orders_id_dictionary[ack_id]
+                    self._check_reached_timer = rospy.Timer(rospy.Duration(POSITION_REACHED_CHECK_DELAY), self._callback_timer_check_reached, oneshot=True)
                 else:
                     # Do nothing, some IDs are returned but do not correspond to a value in the dictionary.
                     rospy.logdebug("Received ack id ({}) but dropping it.".format(ack_id))
@@ -246,10 +236,36 @@ class AsservReal(AsservAbstract):
             self._sending_queue.task_done()
 
     def _check_reached_angle(self, a):
+        rospy.loginfo("Check reached angle, own angle = {}, check angle  = {}".format(self._robot_raw_position.theta, a))
         return (self._robot_raw_position.theta > a - ASSERV_ERROR_ANGLE) and (self._robot_raw_position.theta < a + ASSERV_ERROR_ANGLE)
 
     def _check_reached_position(self, x, y):
+        rospy.loginfo("Check reached position, own pos = {}, {}, check pos  = {}, {}".format(self._robot_raw_position.x, self._robot_raw_position.y, x, y))
         return ((self._robot_raw_position.x > x - ASSERV_ERROR_POSITION) and
                 (self._robot_raw_position.x < x + ASSERV_ERROR_POSITION) and
                 (self._robot_raw_position.y > y - ASSERV_ERROR_POSITION) and
                 (self._robot_raw_position.y < y + ASSERV_ERROR_POSITION))
+
+    def _callback_timer_check_reached(self, event):
+        rospy.logdebug("In check reached timer callback")
+        result = True
+        reached = False
+        if len(self._last_received_id_dictionary) > 0:
+            received_id = self._last_received_id_dictionary.popitem()
+            goal_data = received_id[1]
+            # Check if the robot is arrived, otherwise this will tell that the robot is blocked (default behaviour of the asserv)
+            if len(goal_data) == 2:
+                reached = self._check_reached_angle(goal_data[1])
+            elif len(goal_data) == 3:
+                reached = self._check_reached_position(goal_data[1], goal_data[2])
+            elif len(goal_data) == 4:
+                reached = self._check_reached_position(goal_data[1], goal_data[2])
+                reached &= self._check_reached_angle(goal_data[3])
+            else:
+                rospy.logwarn("Goal id ack but not corresponding goal data...")
+            if not reached:
+                rospy.logdebug("Goal has not been reached !")
+                result = False
+            self._node.goal_reached(goal_data[0], result)
+        else:
+            rospy.logwarn("Check reached dict empty...")

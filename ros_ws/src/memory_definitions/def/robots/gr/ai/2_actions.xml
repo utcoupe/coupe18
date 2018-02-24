@@ -6,7 +6,7 @@
 			<actionlist repeat="3">
 				<orderref ref="ask_for_jack"/>
 			</actionlist>
-			<orderref ref="wait_for_jack" needsprevious="true"/>
+			<orderref ref="wait_for_jack"/>
 		</actions>
 	</action>
 
@@ -17,29 +17,29 @@
 			<team name="green">
 				<orderref ref="set_robot_pos">
 					<position>
-						<x>0.2</x>
-						<y>1.65</y>
-						<theta>0</theta>
+						<x>0.100</x>
+						<y>1.785</y>
+						<theta>3.141592</theta>
 					</position>
 				</orderref>
 			</team>
 			<team name="orange">
 				<orderref ref="set_robot_pos">
 					<position>
-						<x>2.8</x>
-						<y>1.65</y>
-						<theta>3.141592</theta>
+						<x>2.9</x>
+						<y>1.785</y>
+						<theta>0.0</theta>
 					</position>
 				</orderref>
 			</team>
 
-			<actionref ref="jack" needsprevious="true"/>
+			<actionref ref="jack"/>
 
-			<orderref ref="timer_start" needsprevious="true">
+			<orderref ref="timer_start">
 				<duration>97</duration>
 			</orderref>
 
-			<orderref ref="set_game_status_ingame" needsprevious="true"/>
+			<orderref ref="set_game_status_ingame"/>
 		</actions>
 	</action>
 
@@ -47,250 +47,46 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="approach button">>
-				<mode>1</mode>
+			<orderref ref="asserv_goto_waypoint" name="approach button">
 				<waypoint_name>way_button_approach</waypoint_name>
-			</orderref>
-
-			<orderref ref="actuator_servo_set_pos" name="close servo">
-				<name>servo_button</name>
-				<preset>CLOSE</preset>
+				<direction>0</direction>
 			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="accost button">
-				<mode>1</mode>
 				<waypoint_name>way_button_accost</waypoint_name>
 			</orderref>
 
-			<actionlist repeat="2">
-				<orderref ref="actuator_servo_set_pos" name="activate button with servo">
-					<name>servo_button</name>
-					<preset>OPEN</preset>
-				</orderref>
-
-				<orderref ref="delay">
-					<duration>1</duration>
-				</orderref>
-
-				<orderref ref="actuator_servo_set_pos" name="close servo">
-					<name>servo_button</name>
-					<preset>CLOSE</preset>
-				</orderref>
-
-				<orderref ref="delay">
-					<duration>1</duration>
-				</orderref>
-			</actionlist>
-
 			<orderref ref="asserv_goto_waypoint" name="go back to approach">
-				<mode>1</mode>
 				<waypoint_name>way_button_approach</waypoint_name>
+				<direction>0</direction>
 			</orderref>
 		</actions>
 	</action>
 
-	<action ref="load_unicolor_distributor" name="Load unicolor distributor">
+	<action ref="push_grape_1" name="Simply push grape 1 cubes to the zone" reward="25">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="approach distributor">>
-				<mode>1</mode>
-				<waypoint_name>way_uni_distrib_approach</waypoint_name>
+			<orderref ref="asserv_goto_waypoint" name="go behind the cubes">
+				<waypoint_name>way_grape_1_approach</waypoint_name>
+				<direction>0</direction>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="accost distributor" needsprevious="true">
-				<mode>1</mode>
-				<waypoint_name>way_uni_distrib_accost</waypoint_name>
-			</orderref>
-
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
-				<name>servo_button</name>
-				<preset>OPEN</preset>
+			<orderref ref="asserv_goto_waypoint" name="go behind the cubes">
+				<waypoint_name>way_grape_1_accost</waypoint_name>
 			</orderref>
 
 			<orderref ref="delay">
 				<duration>1</duration>
 			</orderref>
 
-			<orderref ref="actuator_servo_set_pos" name="close servo">
-				<name>servo_button</name>
-				<preset>CLOSE</preset>
+			<orderref ref="asserv_goto_waypoint" name="push them to the zone">
+				<waypoint_name>way_grape_1_pushed</waypoint_name>
+				<direction>0</direction>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="go back to approach">>
-				<mode>1</mode>
-				<waypoint_name>way_uni_distrib_approach</waypoint_name>
-			</orderref>
-		</actions>
-	</action>
-
-	<action ref="load_multicolor_distributor" name="Load multicolor distributor">
-		<params></params>
-		<conditions></conditions>
-		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="approach distributor">>
-				<mode>1</mode>
-				<waypoint_name>way_multi_distrib_approach</waypoint_name>
-			</orderref>
-
-			<orderref ref="asserv_goto_waypoint" name="accost distributor" needsprevious="true">
-				<mode>1</mode>
-				<waypoint_name>way_multi_distrib_accost</waypoint_name>
-			</orderref>
-
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
-				<name>servo_button</name>
-				<preset>OPEN</preset>
-			</orderref>
-
-			<orderref ref="delay">
-				<duration>1</duration>
-			</orderref>
-
-			<orderref ref="actuator_servo_set_pos" name="close servo">
-				<name>servo_button</name>
-				<preset>CLOSE</preset>
-			</orderref>
-
-			<orderref ref="asserv_goto_waypoint" name="go back to approach">>
-				<mode>1</mode>
-				<waypoint_name>way_multi_distrib_approach</waypoint_name>
-			</orderref>
-		</actions>
-	</action>
-
-	<action ref="fire_full_clean_balls" name="Fire clean balls to water tower" reward="40">
-		<params></params>
-		<conditions></conditions>
-		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="goto fire position">>
-				<mode>1</mode>
-				<waypoint_name>way_fire</waypoint_name>
-			</orderref>
-
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
-				<name>servo_button</name>
-				<preset>OPEN</preset>
-			</orderref>
-
-			<orderref ref="delay">
-				<duration>1</duration>
-			</orderref>
-
-			<orderref ref="actuator_servo_set_pos" name="close servo">
-				<name>servo_button</name>
-				<preset>CLOSE</preset>
-			</orderref>
-		</actions>
-	</action>
-
-	<action ref="fire_half_clean_balls" name="Fire clean balls to water tower" reward="20">
-		<params></params>
-		<conditions></conditions>
-		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="goto fire position">>
-				<mode>1</mode>
-				<waypoint_name>way_fire</waypoint_name>
-			</orderref>
-
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
-				<name>servo_button</name>
-				<preset>OPEN</preset>
-			</orderref>
-
-			<orderref ref="delay">
-				<duration>1</duration>
-			</orderref>
-
-			<orderref ref="actuator_servo_set_pos" name="close servo">
-				<name>servo_button</name>
-				<preset>CLOSE</preset>
-			</orderref>
-		</actions>
-	</action>
-
-	<action ref="unload_dirty_balls" name="Unload dirty balls to station" reward="40">
-		<params></params>
-		<conditions></conditions>
-		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="approach station">>
-				<mode>1</mode>
-				<waypoint_name>way_station_approach</waypoint_name>
-			</orderref>
-
-			<orderref ref="asserv_goto_waypoint" name="accost station">>
-				<mode>1</mode>
-				<waypoint_name>way_station_accost</waypoint_name>
-			</orderref>
-
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
-				<name>servo_button</name>
-				<preset>OPEN</preset>
-			</orderref>
-
-			<orderref ref="delay">
-				<duration>1</duration>
-			</orderref>
-
-			<orderref ref="actuator_servo_set_pos" name="close servo">
-				<name>servo_button</name>
-				<preset>CLOSE</preset>
-			</orderref>
-
-			<orderref ref="asserv_goto_waypoint" name="approach station">>
-				<mode>1</mode>
-				<waypoint_name>way_station_approach</waypoint_name>
-			</orderref>
-		</actions>
-	</action>
-
-	<action ref="activate_bee" name="Activate bee" reward="50">
-		<params></params>
-		<conditions></conditions>
-		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="approach bee">>
-				<mode>1</mode>
-				<waypoint_name>way_bee_approach</waypoint_name>
-			</orderref>
-
-			<orderref ref="asserv_goto_waypoint" name="accost bee">>
-				<mode>1</mode>
-				<waypoint_name>way_bee_accost</waypoint_name>
-			</orderref>
-
-			<orderref ref="actuator_servo_set_pos" name="activate button with servo">
-				<name>servo_button</name>
-				<preset>OPEN</preset>
-			</orderref>
-
-			<orderref ref="delay">
-				<duration>1</duration>
-			</orderref>
-
-			<orderref ref="actuator_servo_set_pos" name="close servo">
-				<name>servo_button</name>
-				<preset>CLOSE</preset>
-			</orderref>
-
-			<orderref ref="asserv_goto_waypoint" name="approach bee">>
-				<mode>1</mode>
-				<waypoint_name>way_bee_approach</waypoint_name>
-			</orderref>
-		</actions>
-	</action>
-
-	<action ref="goto_spawn" name="Go to spawn">
-		<params></params>
-		<conditions></conditions>
-		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="approach spawn">>
-				<mode>1</mode>
-				<waypoint_name>way_spawn_approach</waypoint_name>
-			</orderref>
-
-			<orderref ref="asserv_goto_waypoint" name="goto spawn">>
-				<mode>1</mode>
-				<waypoint_name>way_spawn</waypoint_name>
+			<orderref ref="asserv_goto_waypoint" name="push them to the zone">
+				<waypoint_name>way_grape_1_released</waypoint_name>
 			</orderref>
 		</actions>
 	</action>

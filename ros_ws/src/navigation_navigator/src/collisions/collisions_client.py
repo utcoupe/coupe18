@@ -24,11 +24,12 @@ class CollisionsClient(object):
         self._connectToServers()
 
     def _warnerCallback (self, message):
-        if message.danger_level <= message.LEVEL_DANGER:
+        if (message.danger_level <= message.LEVEL_DANGER):
             self._last_collision = True
-            self._collision_active = True
-            rospy.loginfo("Obstacle detected, stopping the robot")
-            self._callbackStop()
+            if not self._collision_active:
+                self._collision_active = True
+                rospy.loginfo("Obstacle detected, stopping the robot")
+                self._callbackStop()
 
     def _connectToServers (self):
         rospy.loginfo("Waiting for \"" + self.ACTIVATE_COLLISIONS_SERVICE_NAME + "\"")
@@ -36,7 +37,7 @@ class CollisionsClient(object):
         rospy.loginfo("Collisions found")
 
         try:
-            rospy.Subscriber(self.WARNER_TOPIC, PredictedCollision, self._warnerCallback)
+            rospy.Subscriber(self.WARNER_TOPIC, PredictedCollision, self._warnerCallback, queue_size=1)
             self._activateCollisionsSrv = rospy.ServiceProxy(self.ACTIVATE_COLLISIONS_SERVICE_NAME, ActivateCollisions)
         except rospy.ServiceException, e:
             str_error = "Error when trying to connect to "

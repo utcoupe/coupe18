@@ -16,7 +16,7 @@
 #include "ax12_driver.h"
 
 
-const double MAX_STOP_TIME = 5; //number of seconds to wait not moving before confirming the goal is not reached
+const double MAX_STOP_TIME = 1; //number of seconds to wait not moving before confirming the goal is not reached
 const double MAIN_FREQUENCY = 30;
 const uint8_t POSITION_MARGIN = 4;
 const std::string PORT_FINDER_SERVICE = "/drivers/port_finder/get_port";

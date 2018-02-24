@@ -1,29 +1,29 @@
 #include "pathfinder/pathfinder.h"
 
+#include <chrono>
+#include <sstream>
+#include <utility>
+#include <limits>
+
 using namespace std;
 
-Pathfinder::Pathfinder(const string& mapFileName, const std::pair< double, double >& tableSize, bool invertedY, bool render, const string& renderFile)
+Pathfinder::Pathfinder(const string& mapFileName, const std::pair< double, double >& tableSize, shared_ptr<DynamicBarriersManager> dynBarriersMng,
+                       bool invertedY, bool render, const string& renderFile)
 {
     _renderAfterComputing = render;
     _renderFile = renderFile;
+    _dynBarriersMng = dynBarriersMng;
     
     _allowedPositions = _mapStorage.loadAllowedPositionsFromFile(mapFileName);
     if (_allowedPositions.size() == 0)
         ROS_FATAL("Allowed positions empty. Cannot define a scale.");
     else
     {
-        _convertor.setSizes(tableSize, make_pair<double,double>(_allowedPositions.front().size(), _allowedPositions.size()));
-        _convertor.setInvertedY(invertedY);
+        _convertor = make_shared<PosConvertor>();
+        _convertor->setSizes(tableSize, make_pair<double,double>(_allowedPositions.front().size(), _allowedPositions.size()));
+        _convertor->setInvertedY(invertedY);
+        _dynBarriersMng->setConvertor(_convertor);
     }
-    
-    _dynBarrierPositions = Vect2DBool(
-        _allowedPositions.size(), vector<bool>(_allowedPositions.front().size(), false)
-    );
-    
-    // TODO remove test
-    /*for (unsigned int line = 60; line < 80; line++)
-        for (unsigned int column = 60; column < 90; column++)
-            _dynBarrierPositions[line][column] = true;*/
 }
 
 
@@ -38,9 +38,7 @@ bool Pathfinder::findPath(const Point& startPos, const Point& endPos, Path& path
         return false;
     }
     
-    // Chronometers
-    chrono::time_point<chrono::system_clock> startTime, endTime;
-    startTime = chrono::system_clock::now();
+    auto startTime = chrono::high_resolution_clock::now();
     
     // Creates a map filled with -1
     auto mapDist = Vect2DShort(
@@ -55,28 +53,27 @@ bool Pathfinder::findPath(const Point& startPos, const Point& endPos, Path& path
     Path rawPath = retrievePath(mapDist, startPos, endPos);
     path = smoothPath(rawPath);
     
-    endTime = chrono::system_clock::now();
-    ROS_DEBUG_STREAM("DONE, path contains " << path.size());
+    auto endTime = chrono::high_resolution_clock::now();
+    ROS_DEBUG_STREAM("DONE, path contains " << path.size() << " waypoints");
     ROS_DEBUG_STREAM("Path: " << pathMapToStr(path));
-    chrono::duration<double> elapsedSeconds = endTime - startTime;
-    ROS_DEBUG_STREAM("Computing time: " << elapsedSeconds.count());
+    chrono::duration<double, std::milli> elapsedSeconds = endTime - startTime;
+    ROS_DEBUG_STREAM("Computing time: " << elapsedSeconds.count() << "ms");
     
     
     if (_renderAfterComputing)
-        _mapStorage.saveMapToFile(_renderFile, _allowedPositions, _dynBarrierPositions, rawPath, path);
+        _mapStorage.saveMapToFile(_renderFile, _allowedPositions, _dynBarriersMng, rawPath, path);
     
     return true;
 }
 
 bool Pathfinder::findPathCallback(navigation_pathfinder::FindPath::Request& req, navigation_pathfinder::FindPath::Response& rep)
 {
-    Point startPos, endPos;
     Path path;
     
     ROS_DEBUG_STREAM("FindPath: I heard (" << req.posStart.x << "," << req.posStart.y << "), (" << req.posEnd.x << ", " << req.posEnd.y << ")");
     
-    startPos = pose2DToPoint(req.posStart);
-    endPos = pose2DToPoint(req.posEnd);
+    auto startPos = pose2DToPoint(req.posStart);
+    auto endPos = pose2DToPoint(req.posEnd);
     
     bool no_error = findPath(startPos, endPos, path);
     if (!no_error)
@@ -99,10 +96,11 @@ bool Pathfinder::findPathCallback(navigation_pathfinder::FindPath::Request& req,
 
 void Pathfinder::reconfigureCallback(navigation_pathfinder::PathfinderNodeConfig& config, uint32_t level)
 {
-    ROS_INFO_STREAM ("Reconfigure request : " << config.render << " " << config.renderFile);
+    ROS_INFO_STREAM ("Reconfigure request : " << config.render << " " << config.renderFile << " " << config.safetyMargin);
     _renderAfterComputing = config.render;
     _renderFile = config.renderFile;
     // TODO detect env var and home
+    _dynBarriersMng->updateSafetyMargin(config.safetyMargin);
 }
 
 
@@ -156,7 +154,7 @@ Pathfinder::Path Pathfinder::retrievePath(const Vect2DShort& distMap, const Poin
     while (lastPos != endPos)
     {
         Point bestNextPos;
-        short bestDist = 1<<14; // 2^14, will be enought tall
+        short bestDist = numeric_limits<short>::max();
         for (const Point& dir : directions())
         {
             Point nextPos = lastPos + dir;
@@ -202,7 +200,7 @@ bool Pathfinder::isValid(const Point& pos)
         return false;
     if (pos.getX() < 0 || pos.getX() >= _allowedPositions.front().size())
         return false;
-    if (!_allowedPositions[pos.getY()][pos.getX()] || _dynBarrierPositions[pos.getY()][pos.getX()])
+    if (!_allowedPositions[pos.getY()][pos.getX()] || _dynBarriersMng->hasBarriers(pos))
         return false;
     return true;
 }
@@ -270,13 +268,13 @@ std::vector< Point > Pathfinder::directions() const
 
 Point Pathfinder::pose2DToPoint(const geometry_msgs::Pose2D& pos) const
 {
-    auto convertedPos = _convertor.fromRosToMapPos(pair<double, double>(pos.x, pos.y));
+    auto convertedPos = _convertor->fromRosToMapPos(pair<double, double>(pos.x, pos.y));
     return Point(convertedPos.first, convertedPos.second);
 }
 
 geometry_msgs::Pose2D Pathfinder::pointToPose2D(const Point& pos) const
 {
-    auto convertedPos = _convertor.fromMapToRosPos(pair<double, double>(pos.getX(), pos.getY()));
+    auto convertedPos = _convertor->fromMapToRosPos(pair<double, double>(pos.getX(), pos.getY()));
     geometry_msgs::Pose2D newPos;
     newPos.x = convertedPos.first;
     newPos.y = convertedPos.second;

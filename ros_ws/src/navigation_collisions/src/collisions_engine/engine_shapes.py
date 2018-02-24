@@ -6,8 +6,25 @@ from engine_shapes_attrib import Point, Position
 class MapObstacle(object):
     def __init__(self, position, velocity = None):
         self.position = position
-        self.pelocity = velocity
+        self.velocity = velocity
         self.spawn_time = time.time()
+
+
+class SegmentObstacle(MapObstacle):
+    def __init__(self, first_point, last_point, velocity = None):
+        self.first = first_point
+        self.last = last_point
+        self.length = math.sqrt((self.last.x - self.first.x) ** 2 + (self.last.y - self.first.y) ** 2)
+        center_pos = Position((self.first.x + self.last.x) / 2.0,
+                              (self.first.y + self.last.y) / 2.0,
+                              math.atan2(self.last.y - self.first.y, self.last.x - self.first.x))
+        super(SegmentObstacle, self).__init__(center_pos, velocity)
+
+    def segment(self):
+        return (self.first, self.last)
+
+    def __repr__(self):
+        return "segment"
 
 
 class CircleObstacle(MapObstacle):
@@ -37,7 +54,7 @@ class RectObstacle(MapObstacle):
 
     def segments(self):
         c = self.corners()
-        return [(c[i], c[(i + 1) % 4]) for i in range(len(c))]
+        return [SegmentObstacle(c[i], c[(i + 1) % 4]) for i in range(len(c))]
 
     def __repr__(self):
         return "rect"

@@ -16,8 +16,9 @@ __date__ = 18/01/2017
 NODE_NAME = "port_finder"
 ARDUINO_LIST = ("mega", "nano", "uno", "leo")
 #TODO put it in xml file
-ARDUINO_NODE_LIST = ("gr_asserv",)
+ARDUINO_NODE_LIST = ("ard_asserv",)
 SERIAL_READ_SIZE = 50
+ARDUINO_LOOP_MAX_TRY = 2
 
 
 class PortFinder:
@@ -145,10 +146,17 @@ class PortFinder:
                 read_data = ""
                 serial_port_disconnected = False
                 arduino_node_flag = False
+                loop_counter = 0
                 try:
-                    com_line = serial.Serial(element[1], 57600, timeout=5)
-                    read_data = com_line.read(SERIAL_READ_SIZE)
-                    com_line.close()
+                    while (read_data == "") and (loop_counter < ARDUINO_LOOP_MAX_TRY):
+                        com_line = serial.Serial(element[1], 57600, timeout=2)
+                        read_data = com_line.read(SERIAL_READ_SIZE)
+                        com_line.close()
+                        # Received a null character, close and open again the port
+                        if len(read_data) != 0 and read_data[0] == '\x00':
+                            read_data = ""
+                        rospy.loginfo("Try number {} for {}, data = {}".format(loop_counter, element[1], read_data))
+                        loop_counter += 1
                 except serial.SerialException:
                     rospy.logerr("Try to open port {} but it fails...".format(element[1]))
                     serial_port_disconnected = True

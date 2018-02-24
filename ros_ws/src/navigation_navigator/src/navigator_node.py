@@ -2,13 +2,14 @@
 # -*-coding:Utf-8 -*
 
 from functools import partial
+import math
 
 import rospy
 import actionlib
 
 from geometry_msgs.msg import Pose2D
 from navigation_navigator.srv import Goto
-from navigation_navigator.msg import Status, DoGotoResult, DoGotoAction, DoGotoWaypointResult, DoGotoWaypointAction
+from navigation_navigator.msg import Status, DoGotoResult, DoGotoGoal, DoGotoAction, DoGotoWaypointResult, DoGotoWaypointAction
 
 from pathfinder import PathfinderClient
 from asserv import AsservClient
@@ -67,9 +68,6 @@ class NavigatorNode(object):
 
         self._currentStatus = NavigatorStatuses.NAV_IDLE
         self._currentPath = {}
-
-        # Tell ai/game_status the node initialized successfuly.
-        StatusServices(NODE_NAMESPACE, NODE_NAME).ready(True)
 
     def _printPath (self, path):
         """
@@ -136,11 +134,13 @@ class NavigatorNode(object):
             path.pop(0) # The last point will be given end Position
             self._currentPath = path[:]
             self._updateStatus()
+            lastPoint = startPos
             for point in path:
                 cb = partial(self._callbackAsservForDoGotoAction, handledGoal, False)
-                self._asservClient.doGoto(point, False, cb)
+                self._asservClient.doGoto(point, self._getDirection(handledGoal.get_goal().direction, point, lastPoint), False, cb)
+                lastPoint = point
             cb = partial(self._callbackAsservForDoGotoAction, handledGoal, True)
-            self._asservClient.doGoto(endPos, hasAngle, cb)
+            self._asservClient.doGoto(endPos, self._getDirection(handledGoal.get_goal().direction, endPos, lastPoint), hasAngle, cb)
         except Exception, e:
             rospy.logdebug("Navigation failed: " + e.message)
             result = DoGotoResult(False)
@@ -173,6 +173,19 @@ class NavigatorNode(object):
             statusMsg.currentPath = self._currentPath
         self._statusPublisher.publish(statusMsg)
 
+    def _getDirection(self, askedDirection, newPos, lastPos):
+        if askedDirection != DoGotoGoal.AUTOMATIC:
+            return askedDirection
+        if abs(lastPos.theta - self._getAngle(lastPos, newPos)) > (math.pi / 2):
+            return DoGotoGoal.BACKWARD
+        else:
+            return DoGotoGoal.FORWARD
+    
+    def _getAngle(self, v1, v2):
+        prodScal = v1.x*v2.x + v1.y*v2.y
+        normeV1 = math.sqrt(pow(v1.x, 2) + pow(v1.y, 2))
+        normeV2 = math.sqrt(pow(v2.x, 2) + pow(v2.y, 2))
+        return math.acos(prodScal / (normeV1 * normeV2))
 
     def startNode(self):
         """
@@ -188,12 +201,16 @@ class NavigatorNode(object):
         # Create action servers and topic publisher
         self._actionSrv_Dogoto = actionlib.ActionServer(FULL_NODE_NAME + "/goto_action", DoGotoAction, self._handleDoGotoRequest, auto_start=False)
         self._actionSrv_doGotoWaypoint = actionlib.ActionServer(FULL_NODE_NAME + "/gotowaypoint_action", DoGotoWaypointAction, self._handleDoGotoWaypointRequest, auto_start=False)
-        self._statusPublisher = rospy.Publisher(FULL_NODE_NAME + "/status", Status, queue_size=10)
+        self._statusPublisher = rospy.Publisher(FULL_NODE_NAME + "/status", Status, queue_size=1)
         # Launch the node
         self._actionSrv_Dogoto.start()
         self._actionSrv_doGotoWaypoint.start()
         rospy.loginfo ("Ready to navigate!")
         self._updateStatus()
+
+        # Tell ai/game_status the node initialized successfuly.
+        StatusServices(NODE_NAMESPACE, NODE_NAME).ready(True)
+
         rospy.spin ()
 
 if __name__ == "__main__":
