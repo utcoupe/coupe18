@@ -30,12 +30,11 @@ void Processing::BeltInterpreterSubscriber::subscribe(ros::NodeHandle& nodeHandl
 }
 
 
-void BeltInterpreterSubscriber::rectsFilteredTopicCallback(const processing_belt_interpreter::BeltFiltered::ConstPtr& msg)
+void BeltInterpreterSubscriber::rectsFilteredTopicCallback(const processing_belt_interpreter::BeltRects::ConstPtr& msg)
 {
     lock_guard<mutex> lock(g_mutex);
     lastRectangles.clear();
-    addRects(msg->map_rects);
-    addRects(msg->unknown_rects);
+    addRects(msg->rects);
 }
 
 void BeltInterpreterSubscriber::addRects(const vector<Rectangle>& rects)

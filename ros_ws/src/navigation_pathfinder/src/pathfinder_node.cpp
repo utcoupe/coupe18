@@ -29,7 +29,7 @@ const string                MAP_FILE_NAME           = string(getenv ("UTCOUPE_WO
 
 const size_t                SIZE_MAX_QUEUE          = 10;
 const double                SAFETY_MARGIN           = 0.15;
-const string                BELT_INTERPRETER_TOPIC  = "/processing/belt_interpreter/rects_filtered";
+const string                BELT_INTERPRETER_TOPIC  = "/processing/belt_interpreter/rects";
 const string                LIDAR_OBJECTS_TOPIC     = "/processing/lidar_objects/obstacles";
 
 template<typename T>
