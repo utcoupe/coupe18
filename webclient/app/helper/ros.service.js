@@ -107,11 +107,13 @@ class RosService {
       topics: [],
       nodes: [],
       parameters: [],
-      services: []
+      services: [],
+      actions: []
     };
 
     //populate expected topics/services
     angular.forEach(this.$rootScope.domains, (d) => {
+
       angular.forEach(d.topics, (t) => {
         let name = '/'+d.name+'/'+t;
         let newT = {
@@ -135,6 +137,18 @@ class RosService {
         };
         this.data.services.push(newS);
       });
+
+      angular.forEach(d.actions, (a) => {
+        let name = '/'+d.name+'/'+a;
+        let newA = {
+          name: name,
+          abbr: a,
+          active: false,
+          expected: true,
+          isOpen: true
+        };
+        this.data.actions.push(newA);
+      });
     });
   }
 
@@ -144,6 +158,9 @@ class RosService {
       angular.forEach(topics.topics, (name) => {
         let topic = _.findWhere(this.data.topics, { name });
 
+        if(!topic && (name.match("(/feedback|/goal|/status|/cancel|/result)$"))) {
+          return;
+        }
         if(topic) { //to update
           topic.active = true;
         } else { //to add
@@ -220,6 +237,47 @@ class RosService {
         }
       }
     }); // end getServices
+
+
+    this.ros.getActionServers((actions) => {
+      angular.forEach(actions, (name) => {
+        let action = _.findWhere(this.data.actions, { name });
+
+        if(action) { //to update
+          action.active = true;
+        } else { //to add
+          action = {
+            name: name,
+            active: true,
+            isOpen: true
+          };
+          this.data.actions.push(action);
+        }
+        if(!action.fetched) {
+          this.ros.getTopicType(name+'/goal', (type) => {
+            action.type = type.slice(0, -4);
+            action.fetched = true;
+          });
+        }
+      });
+
+      for(let i = this.data.actions.length - 1; i >= 0; i--) { //angular foreach not working for this
+        let a = this.data.actions[i];
+        let found = false;
+        for(let y = 0; y < actions.length; y++) {
+          if(actions[y] == a.name)
+            found = true;
+        }
+
+        if(!found) {
+          if(!a.expected) {
+            this.data.actions.splice(i, 1);
+          } else {
+            a.active = false;
+          }
+        }
+      }
+    }); // end getActionServerss
 
     this.ros.getParams((params) => { //TODO : update like topics
       angular.forEach(params, (name) => {
