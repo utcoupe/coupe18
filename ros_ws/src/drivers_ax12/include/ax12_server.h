@@ -12,6 +12,7 @@
 #include <drivers_ax12/SetAx12Param.h>
 #include <drivers_port_finder/GetPort.h>
 #include <memory_definitions/GetDefinition.h>
+#include <ai_game_status/init_service.h>
 
 #include "ax12_driver.h"
 

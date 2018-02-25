@@ -377,6 +377,7 @@ Ax12Server::Ax12Server(std::string action_name, std::string service_name) :
 
     timer_ = nh_.createTimer(ros::Duration(1.0/MAIN_FREQUENCY), &Ax12Server::main_loop, this);
 
+    StatusServices("drivers", "ax12").setReady(true);
 }
 
 Ax12Server::~Ax12Server()
