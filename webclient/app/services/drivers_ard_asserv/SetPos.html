@@ -1,57 +1,37 @@
-<div uib-accordion-group
-ng-class="{'panel-default' : $ctrl.flashState == -1,
-           'panel-info' : $ctrl.flashState == 0,
-           'panel-success' : $ctrl.flashState == 1,
-           'panel-danger' : $ctrl.flashState == 2}"
-class="panel-default" is-open="$ctrl.service.isOpen">
-  <uib-accordion-heading>
-    {{ $ctrl.service.abbr }}
-    <div style="float: right">  <small style="font-size: 12px;">({{ $ctrl.service.type }})</small></div>
-    <div style="clear: both;"></div>
-  </uib-accordion-heading>
 
+<div ng-show="false" ng-init="x = 0; y = 0; a = 0;"></div>
 
-  <div ng-show="false" ng-init="x = 0; y = 0; a = 0;"></div>
-
-
-  <form class="form-margin">
-    <div class="row">
-
-      <div class="form-group col-lg-4">
-        <label>X</label>
-        <div class="input-group">
-          <input type="number" class="form-control" ng-model="x">
-          <span class="input-group-addon">m</span>
-        </div>
-      </div>
-
-      <div class="form-group col-lg-4">
-        <label>Y</label>
-        <div class="input-group">
-          <input type="number" class="form-control" ng-model="y">
-          <span class="input-group-addon">m</span>
-        </div>
-      </div>
-
-      <div class="form-group col-lg-4">
-        <label>Angle</label>
-        <div class="input-group">
-          <input type="number" class="form-control" ng-model="a">
-          <span class="input-group-addon">deg</span>
-        </div>
-      </div>
+<div class="service-container col-autofit">
+  <div class="form-group">
+    <label>X</label>
+    <div class="input-group">
+      <input type="number" class="form-control" ng-model="x">
+      <span class="input-group-addon">m</span>
     </div>
+  </div>
 
-    <div class="row">
-      <button class="btn btn-default btn-md pull-right" type="button" ng-click="$ctrl.callService({
-        position: {
-          x,
-          y,
-          theta: a * 3.14159 / 180
-        }
-      })">
-        Set position & angle
-      </button>
+  <div class="form-group">
+    <label>Y</label>
+    <div class="input-group">
+      <input type="number" class="form-control" ng-model="y">
+      <span class="input-group-addon">m</span>
     </div>
-  </form>
+  </div>
+
+  <div class="form-group">
+    <label>Angle</label>
+    <div class="input-group">
+      <input type="number" class="form-control" ng-model="a">
+      <span class="input-group-addon">deg</span>
+    </div>
+  </div>
 </div>
+<button class="btn btn-default btn-md pull-right" type="button" ng-click="$ctrl.callService({
+  position: {
+    x,
+    y,
+    theta: a * 3.14159 / 180
+  }
+})">
+  Set position & angle
+</button>

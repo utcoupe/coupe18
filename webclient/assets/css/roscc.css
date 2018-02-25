@@ -96,6 +96,18 @@ html, body {
   height: auto;
 }
 
-.panel-body {
+.service-container {
+  display: grid;
+  grid-gap: 20px;
+  grid-row-gap: 0;
+  margin: 0px;
+  height: auto;
+}
+
+.topic-accord .panel-body {
   margin-bottom: -15px;
+}
+
+.col-autofit {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 }
