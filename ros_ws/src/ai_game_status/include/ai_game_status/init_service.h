@@ -12,8 +12,8 @@
 class StatusServices
 {
 public:
-    typedef std::function<bool()> ArmCallback_t;
-    typedef std::function<void(const ai_game_status::GameStatus::ConstPtr&)> StatusCallback_t;
+    using ArmCallback_t = std::function<bool ()>;
+    using StatusCallback_t = std::function<void (const ai_game_status::GameStatus::ConstPtr &)>;
     
     StatusServices(const std::string& namespaceName, const std::string& packageName, ArmCallback_t armCallback = nullptr, StatusCallback_t statusCallback = nullptr);
     
