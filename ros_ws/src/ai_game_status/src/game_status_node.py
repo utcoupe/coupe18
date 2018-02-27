@@ -32,12 +32,14 @@ class Status():
         "/recognition/enemy_tracker": None,
         # "/recognition/cube_finder": None,
         # "/recognition/cp_recognizer": None,
+        "/recognition/objects_classifier": None,
 
         "/processing/belt_interpreter": None,
         # "/processing/lidar_objects": None,
 
         "/drivers/ard_asserv": None,
-        "/drivers/port_finder": None
+        "/drivers/port_finder": None,
+        "/drivers/ax12": None
     }
 
 
