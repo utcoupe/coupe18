@@ -343,6 +343,10 @@ class RosService {
     return this.Domains.getDataForDomain(this.data.services, domain, false);
   }
 
+  getActionsForDomain(domain) {
+    return this.Domains.getDataForDomain(this.data.actions, domain, false);
+  }
+
   getGlobalParameters() {
     return this.Domains.getGlobalParameters(this.data.parameters);
   }

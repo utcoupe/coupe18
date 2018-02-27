@@ -89,19 +89,13 @@ html, body {
   margin-left: 20px;
 }
 
-.topic-container {
+.topic-container, .service-container, .action-container {
   display: grid;
   grid-gap: 20px;
   margin: 0px;
   height: auto;
-}
-
-.service-container {
-  display: grid;
-  grid-gap: 20px;
   grid-row-gap: 0;
-  margin: 0px;
-  height: auto;
+
 }
 
 .topic-accord .panel-body {

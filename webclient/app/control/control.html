@@ -78,6 +78,12 @@
                 <div style="height:7px;"></div>
               </div>
 
+              <!-- Actions -->
+              <div ng-repeat="action in $ctrl.ros.getActionsForDomain(domain)">
+                <cc-action action="action"></cc-action>
+                <div style="height:7px;"></div>
+              </div>
+
             </uib-accordion>
             <!-- Parameters -->
             <cc-parameter parameter="parameter" ng-repeat="parameter in $ctrl.Domains.getDataForDomain($ctrl.ros.data.parameters, domain, $ctrl.setting.advanced)"></cc-parameter>
