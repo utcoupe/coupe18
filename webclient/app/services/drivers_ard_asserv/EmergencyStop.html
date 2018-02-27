@@ -1,29 +1,14 @@
-<div uib-accordion-group
-ng-class="{'panel-default' : $ctrl.flashState == -1,
-           'panel-info' : $ctrl.flashState == 0,
-           'panel-success' : $ctrl.flashState == 1,
-           'panel-danger' : $ctrl.flashState == 2}"
-ng-init="$ctrl.service.isOpen = true"
-class="panel-default" is-open="$ctrl.service.isOpen">
-  <uib-accordion-heading>
-    {{ $ctrl.service.abbr }}
-    <div style="float: right">  <small style="font-size: 12px;">({{ $ctrl.service.type }})</small></div>
-    <div style="clear: both;"></div>
-  </uib-accordion-heading>
-    <form class="form-margin">
-      <center>
-        <button type="button" class="btn btn-danger btn-lg"
-                ng-click="$ctrl.callService({'enable': true})">
-          <span style="font-size: x-large;">
-            <span class="glyphicon glyphicon-warning-sign"></span>
-            &ensp;<strong>EMERGENCY STOP</strong>&ensp;
-            <span class="glyphicon glyphicon-warning-sign"></span>
-          </span>
-        </button>
-        <button type="button pull-right"
-                ng-click="$ctrl.callService({'enable': false})"
-                class="btn btn-default btn-md">Start again</button>
-      </center>
-    </form>
 
+<div class="service-container col-autofit">
+  <button type="button" class="btn btn-danger btn-lg"
+          ng-click="$ctrl.callService({'enable': true})">
+    <span style="font-size: x-large;">
+      <span class="glyphicon glyphicon-warning-sign"></span>
+      &ensp;<strong>EMERGENCY STOP</strong>&ensp;
+      <span class="glyphicon glyphicon-warning-sign"></span>
+    </span>
+  </button>
+  <button type="button pull-right"
+          ng-click="$ctrl.callService({'enable': false})"
+          class="btn btn-default btn-md">Start again</button>
 </div>

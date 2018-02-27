@@ -26,47 +26,56 @@ function run($rootScope) {
                  'ard_asserv/speed',
                  'ard_asserv/pwm',
                  'ard_asserv/management',
-                 'ard_asserv/parameters']
+                 'ard_asserv/parameters'],
+      actions: ['ard_asserv/goto_action']
     },
     {
       name: 'ai',
-      topics: ['oui1', 'non1'],
-      services: ['s1', 's2']
+      topics: [],
+      services: [],
+      actions: []
     },
     {
       name: "recognition",
-      topics: ['oui1', 'non1'],
-      services: ['gzfd']
+      topics: [],
+      services: [],
+      actions: []
     },
     {
       name: "processing",
-      topics: ['oui1', 'non1'],
-      services: ['etr']
+      topics: [],
+      services: [],
+      actions: []
     },
     {
       name: "sensors",
-      topics: ['oui1', 'non1'],
-      services: ['trezz']
+      topics: [],
+      services: [],
+      actions: []
     },
     {
       name: "movement",
-      topics: ['oui1', 'non1'],
-      services: []
+      topics: [],
+      services: [],
+      actions: []
     },
     {
       name: "memory",
-      topics: ['oui1', 'non1'],
-      services: []
+      topics: [],
+      services: [],
+      actions: []
     },
     {
       name: "feedback",
-      topics: ['oui1', 'non1'],
-      services: []
+      topics: [],
+      services: [],
+      actions: []
     },
     {
       name: "navigation",
-      topics: ['oui1', 'non1'],
-      services: []
+      topics: [],
+      services: [],
+      actions: []
     }
   ];
 }
