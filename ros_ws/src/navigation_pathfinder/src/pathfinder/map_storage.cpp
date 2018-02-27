@@ -1,5 +1,7 @@
 #include "pathfinder/map_storage.h"
 
+#include <cmath>
+
 using namespace std;
 
 MapStorage::Vect2DBool MapStorage::loadAllowedPositionsFromFile(const string& fileName)
@@ -20,7 +22,7 @@ MapStorage::Vect2DBool MapStorage::loadAllowedPositionsFromFile(const string& fi
     return allowedPos;
 }
 
-void MapStorage::saveMapToFile(const string& fileName, const Vect2DBool& allowedPos, const Vect2DBool& barriersPos, const vector<Point>& path, const vector<Point>& smoothPath)
+void MapStorage::saveMapToFile(const string& fileName, const Vect2DBool& allowedPos, shared_ptr<DynamicBarriersManager> dynBarriersMng, const vector<Point>& path, const vector<Point>& smoothPath)
 {
     ROS_DEBUG_STREAM("MapStorage: saving to " << fileName);
     sf::Image image;
@@ -32,7 +34,7 @@ void MapStorage::saveMapToFile(const string& fileName, const Vect2DBool& allowed
         {
             if (!allowedPos[line][column])
                 image.setPixel(column, line, NOT_ALLOWED_POS_COLOR);
-            else if (barriersPos[line][column])
+            else if (dynBarriersMng->hasBarriers(Point(column, line)))
                 image.setPixel(column, line, DYN_BARRIER_COLOR);
             else
                 image.setPixel(column, line, ALLOWED_POS_COLOR);

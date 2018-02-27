@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   drivers_port_finder
+  ai_game_status
 )
 
 add_action_files(
@@ -35,7 +36,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES drivers_ax12
-  CATKIN_DEPENDS actionlib actionlib_msgs roscpp std_msgs drivers_port_finder
+  CATKIN_DEPENDS actionlib actionlib_msgs roscpp std_msgs drivers_port_finder ai_game_status
   #DEPENDS system_lib
 )
 

@@ -3,14 +3,14 @@ terrain:
         type: rect
         width: 3.0
         height: 2.0
-    marker:
+    _marker:
         ns: table
         id: 0
         type: mesh
         scale: [0.001, 0.001, 0.001]
         z: 0.0
         orientation: [1.57079632679, 0, 0]
-        color: [0.8, 0.8, 0.8, 1.0]
+        color: light_gray
         mesh_path: "package://memory_definitions/def/map/robotcities2018_map.stl"
     walls:
         layer_ground:
@@ -75,78 +75,7 @@ terrain:
                     width: 1.212
                     height: 0.250
 
-
         layer_belt:
-            beacon_top_left:
-                position:
-                    frame_id: /map
-                    x: -0.05
-                    y: 1.95
-                    type: fixed
-                shape:
-                    type: rect
-                    width: 0.1
-                    height: 0.1
-            beacon_top_right:
-                position:
-                    frame_id: /map
-                    x: 3.05
-                    y: 1.95
-                    type: fixed
-                shape:
-                    type: rect
-                    width: 0.1
-                    height: 0.1
-            beacon_mid_left:
-                position:
-                    frame_id: /map
-                    x: -0.05
-                    y: 1
-                    type: fixed
-                shape:
-                    type: rect
-                    width: 0.1
-                    height: 0.1
-            beacon_mid_right:
-                position:
-                    frame_id: /map
-                    x: 3.05
-                    y: 1
-                    type: fixed
-                shape:
-                    type: rect
-                    width: 0.1
-                    height: 0.1
-            beacon_bot_left:
-                position:
-                    frame_id: /map
-                    x: -0.05
-                    y: 0.05
-                    type: fixed
-                shape:
-                    type: rect
-                    width: 0.1
-                    height: 0.1
-            beacon_bot_right:
-                position:
-                    frame_id: /map
-                    x: 3.05
-                    y: 0.05
-                    type: fixed
-                shape:
-                    type: rect
-                    width: 0.1
-                    height: 0.1
-            beacon_central:
-                position:
-                    frame_id: /map
-                    x: 1.5
-                    y: 2.06
-                    type: fixed
-                shape:
-                    type: rect
-                    width: 0.1
-                    height: 0.12
             castle_green:
                 position:
                     frame_id: /map
@@ -207,7 +136,6 @@ terrain:
                     type: rect
                     width: 0.05
                     height: 0.1
-
 
         layer_pathfinder:
             _include: 

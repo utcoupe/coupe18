@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
     navigation_pathfinder
     drivers_ard_asserv
     memory_map
+    ai_game_status
 )
 
 ################################################

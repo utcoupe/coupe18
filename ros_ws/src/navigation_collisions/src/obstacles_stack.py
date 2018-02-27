@@ -6,7 +6,7 @@ class Map(object):
 
 
 class ObstaclesStack():
-    OBSTACLES_LIFESPAN = 1.0 # max time in seconds before being considered too old
+    OBSTACLES_LIFESPAN = 0.3  # max time in seconds before being considered too old
 
     BeltPoints = []
     LidarObjects = []
@@ -18,7 +18,6 @@ class ObstaclesStack():
 
     @staticmethod
     def updateBeltPoints(new_obstacles):
-        rospy.loginfo("setting belt")
         ObstaclesStack.BeltPoints = new_obstacles
 
     @staticmethod
@@ -38,8 +37,8 @@ class ObstaclesStack():
 
         for obstacle in ObstaclesStack.LidarObjects:
             if current_time - obstacle.spawn_time > ObstaclesStack.OBSTACLES_LIFESPAN:
-                ObstaclesStack.BeltPoints.remove(obstacle)
+                ObstaclesStack.LidarObjects.remove(obstacle)
 
         for obstacle in ObstaclesStack.Enemies:
             if current_time - obstacle.spawn_time > ObstaclesStack.OBSTACLES_LIFESPAN:
-                ObstaclesStack.BeltPoints.remove(obstacle)
+                ObstaclesStack.Enemies.remove(obstacle)

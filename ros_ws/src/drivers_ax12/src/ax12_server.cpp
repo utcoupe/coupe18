@@ -164,10 +164,9 @@ void Ax12Server::main_loop(const ros::TimerEvent&)
 
     uint8_t motor_id;
     int16_t curr_position;
+    int16_t curr_speed;
     int16_t moving;
     int32_t goal_position;
-
-    ROS_DEBUG("Entered feedback loop");
 
     for(auto it = joint_goals_.begin(); it != joint_goals_.end();)
     {
@@ -176,7 +175,10 @@ void Ax12Server::main_loop(const ros::TimerEvent&)
 
         driver_.read_register(motor_id, PRESENT_POSITION, curr_position);
         driver_.read_register(motor_id, MOVING, moving);
-        if(moving)
+        driver_.read_register(motor_id, PRESENT_SPEED, curr_speed);
+
+        // motor is moving
+        if(curr_speed % 1024 > 1)
         {
             ROS_DEBUG("Motor is moving, publishing feedback");
             feedback_.position = curr_position;
@@ -187,7 +189,8 @@ void Ax12Server::main_loop(const ros::TimerEvent&)
 
         goal_position = it->getGoal()->position;
 
-        if(curr_position >= (goal_position - POSITION_MARGIN) && curr_position <= (goal_position + POSITION_MARGIN))
+        // motor said he arrived and position is correct
+        if(!moving && curr_position >= (goal_position - POSITION_MARGIN) && curr_position <= (goal_position + POSITION_MARGIN))
         {
             ROS_DEBUG("Motor has reached the goal position");
             result_.success = true;
@@ -196,7 +199,17 @@ void Ax12Server::main_loop(const ros::TimerEvent&)
             ROS_INFO("AX-12 position goal succeeded for motor ID %d", motor_id);
 
         }
-        else if(ros::Time::now().toSec() - it->getGoalID().stamp.toSec() > MAX_STOP_TIME)
+        // motor said he arrived but position is not correct
+        else if(!moving)
+        {
+            ROS_DEBUG("Motor has not reached the goal position");
+            result_.success = false;
+            it->setAborted(result_);
+            it = joint_goals_.erase(it);
+            ROS_ERROR("AX-12 position goal aborted for motor ID %d", motor_id);
+        }
+        //motor said he is not arrived but no speed -> stuck -> timeout
+        else if(moving && ros::Time::now().toSec() - it->getGoalID().stamp.toSec() > MAX_STOP_TIME)
         {
             ROS_DEBUG("Timeout reached for motor");
             result_.success = false;
@@ -226,7 +239,7 @@ std::string Ax12Server::fetch_port(const std::string& service_name)
 
     std::string port;
 
-    if(!ros::service::waitForService(service_name, 10000))
+    if(!ros::service::waitForService(service_name, 15000))
     {
         ROS_ERROR("Failed to contact drivers_port_finder (service not up)");
     }
@@ -364,6 +377,7 @@ Ax12Server::Ax12Server(std::string action_name, std::string service_name) :
 
     timer_ = nh_.createTimer(ros::Duration(1.0/MAIN_FREQUENCY), &Ax12Server::main_loop, this);
 
+    StatusServices("drivers", "ax12").setReady(true);
 }
 
 Ax12Server::~Ax12Server()

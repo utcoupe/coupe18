@@ -4,7 +4,7 @@ import tf2_ros, tf
 
 from obstacles_stack import Map, ObstaclesStack
 from collisions_robot import Robot
-from collisions_engine import Point, Position, RectObstacle, CircleObstacle
+from collisions_engine import Point, Position, Velocity, SegmentObstacle, RectObstacle, CircleObstacle
 from status_services import StatusServices
 
 from geometry_msgs.msg import PointStamped
@@ -12,14 +12,15 @@ from geometry_msgs.msg import PointStamped
 from memory_map.srv import MapGet
 from navigation_navigator.msg import Status
 from drivers_ard_asserv.msg import RobotSpeed
-from processing_belt_interpreter.msg import BeltFiltered
+from processing_belt_interpreter.msg import BeltRects
+from processing_lidar_objects.msg import Obstacles
 
 class CollisionsSubscriptions(object):
     def __init__(self):
         # Preparing to get the robot's position, belt frame_id transform.
         self._tf2_pos_buffer = tf2_ros.Buffer(cache_time=rospy.Duration(5.0))
         self._tf2_pos_listener = tf2_ros.TransformListener(self._tf2_pos_buffer)
-        self._tranform_listener = tf.TransformListener()
+        self._transform_listener = tf.TransformListener()
 
         # Callback buffers
         self._nav_status = 0 #STATUS_IDLE
@@ -29,7 +30,8 @@ class CollisionsSubscriptions(object):
 
         # Subscribing to dependencies
         rospy.Subscriber("/navigation/navigator/status", Status, self._on_nav_status)
-        rospy.Subscriber("/processing/belt_interpreter/rects_filtered", BeltFiltered, self._on_belt)
+        rospy.Subscriber("/processing/belt_interpreter/rects_filtered", BeltRects, self._on_belt)
+        rospy.Subscriber("/processing/lidar_objects/obstacles", Obstacles, self._on_lidar)
         rospy.Subscriber("/drivers/ard_asserv/speed", RobotSpeed, self.on_robot_speed)
 
         self.game_status = StatusServices("navigation", "collisions", None, self._on_game_status)
@@ -79,7 +81,7 @@ class CollisionsSubscriptions(object):
 
     def _on_belt(self, msg):
         new_belt = []
-        for rect in msg.unknown_rects:
+        for rect in msg.rects:
             transform = self._tf2_pos_buffer.lookup_transform("map", rect.header.frame_id, # dest frame, source frame
                                                               rospy.Time.now(),            # get the tf at first available time
                                                               rospy.Duration(5.0))         # timeout
@@ -88,15 +90,33 @@ class CollisionsSubscriptions(object):
             center.point.y = rect.y
             center.header = rect.header
             try:
-                center_map = self._tranform_listener.transformPoint("map", center)
+                center_map = self._transform_listener.transformPoint("map", center)
                 new_belt.append(RectObstacle(Position(center_map.point.x, center_map.point.y,
                                                       self._quaternion_to_euler_angle(transform.transform.rotation)[2]),
                                                       rect.w, rect.h))
             except:
                 rospy.logdebug("Frame /map does not exist, cannot fetch belt rects.")
         if len(new_belt) > 0:
-            rospy.logerr("Updating belt on collisions")
             ObstaclesStack.updateBeltPoints(new_belt)
+
+    def _on_lidar(self, msg):
+        new_lidar = []
+        if msg.header.frame_id != "map":
+            rospy.logwarn("Lidar obstacles not in /map tf frame, skipping.")
+            return
+        for segment in msg.segments:
+            new_lidar.append(SegmentObstacle(Position(segment.first_point.x, segment.first_point.y),
+                                             Position(segment.last_point.x,  segment.last_point.y)))
+        for circle in msg.circles:
+            vel_d = math.sqrt(circle.velocity.y ** 2 + circle.velocity.x ** 2)
+            vel_a = math.atan2(circle.velocity.y, circle.velocity.x)
+            new_lidar.append(CircleObstacle(Position(circle.center.x, circle.center.y, angle = vel_a),
+                                            circle.radius, velocity = Velocity(circle.radius * 2, circle.radius * math.sqrt(3.0) / 2.0, 
+                                            vel_d, 0.0)))
+
+        if len(new_lidar) > 0:
+            ObstaclesStack.updateLidarObjects(new_lidar)
+
 
     def on_robot_speed(self, msg):
         self._vel_linear = msg.linear_speed

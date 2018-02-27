@@ -9,6 +9,9 @@ find_package(catkin REQUIRED COMPONENTS
     genmsg
     geometry_msgs
     dynamic_reconfigure
+    processing_belt_interpreter
+    processing_lidar_objects
+    ai_game_status
 )
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH}) # Please note the use of CMAKE_CURRENT_SOURCE_DIR
@@ -29,6 +32,8 @@ generate_messages(
     DEPENDENCIES
     std_msgs
     geometry_msgs
+    processing_belt_interpreter
+    processing_lidar_objects
 )
 
 ################################################

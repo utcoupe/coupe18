@@ -1,7 +1,7 @@
 #!/usr/bin/python2.7
 # -*-coding:Utf-8 -*
 
-from processing_belt_interpreter.msg import BeltFiltered, RectangleStamped
+from processing_belt_interpreter.msg import BeltRects, RectangleStamped
 from libtools import Rect
 from enemy_tracker_tracker import EnemiesData
 import enemy_tracker_properties
@@ -15,7 +15,7 @@ class EnemyTrackerNode():
     def __init__(self):
         self._node = rospy.init_node('enemy_tracker')
         self._namespace = '/recognition/enemy_tracker/'
-        self._belt_sub = rospy.Subscriber('/processing/belt_interpreter/points', BeltFiltered, self.importPoint)
+        self._belt_sub = rospy.Subscriber('/processing/belt_interpreter/points', BeltRects, self.importPoint)
         self.configure(None)
         self.rect = []
         self.data = []

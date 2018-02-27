@@ -70,9 +70,10 @@ void ComputeEmergencyOnPin(int pin, emergency_status_t *status) {
 //			}
 //			break;
 //	}
-    if (analog > 185) {
-        status->phase = FIRST_STOP;
-    } else {
-        status->phase = NO_EMERGENCY;
-    }
+    // if (analog > 185) {
+    //     status->phase = FIRST_STOP;
+    // } else {
+    //     status->phase = NO_EMERGENCY;
+    // }
+	status->phase = FIRST_STOP;
 }

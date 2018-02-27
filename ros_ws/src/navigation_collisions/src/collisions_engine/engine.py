@@ -19,13 +19,21 @@ class CollisionsResolver(object):
         collisions = []
         for robot_shape in robot_shapes:
             for obstacle_shape in obstacles_shapes:
+                intersecting = False
                 if CollisionsResolver.intersect(robot_shape, obstacle_shape):
                     collisions.append(obstacle_shape)
+                    intersecting = True
+
+                if obstacle_shape.velocity is not None and not intersecting: # if the obstacle has a velocity, check its velocity zone too.
+                    for vel_shape in obstacle_shape.velocity.get_shapes(obstacle_shape.position):
+                        if CollisionsResolver.intersect(robot_shape, vel_shape):
+                            collisions.append(vel_shape)
         return collisions
 
     @staticmethod
     def intersect(obs1, obs2):
-        def _segments_intersect(s1, s2):
+        def _segments_intersect(segment1, segment2):
+            s1, s2 = (segment1.first, segment1.last), (segment2.first, segment2.last)
             # https://stackoverflow.com/questions/3838329/how-can-i-check-if-two-segments-intersect
             ccw = lambda a, b, c: (c.y-a.y) * (b.x-a.x) > (b.y-a.y) * (c.x-a.x)
             return ccw(s1[0],s2[0],s2[1]) != ccw(s1[1],s2[0],s2[1]) and ccw(s1[0],s1[1],s2[0]) != ccw(s1[0],s1[1],s2[1])
@@ -38,6 +46,18 @@ class CollisionsResolver(object):
                     if _segments_intersect(s1, s2):
                         return True
             return False
+
+        def _segment_intersects_rect(segment, rect):
+            if _point_in_rect(segment.position, rect):
+                return True # Checks if the segment center is inside the rect.
+            for rect_s in rect.segments(): # If not, check if segments intersect.
+                if _segments_intersect(segment, rect_s):
+                    return True
+            return False
+
+        def _segment_intersects_circle(segment, circle):
+            new_rect = RectObstacle(segment.position, circle.radius * 2, segment.length + 2 * circle.radius)
+            return _rect_intersects_circle(new_rect, circle)
 
         def _point_in_rect(point, rect): # Calculs persos #PS22
             phi = math.atan2(point.y - rect.position.y, point.x - rect.position.x)
@@ -64,12 +84,22 @@ class CollisionsResolver(object):
             return _rects_intersect(obs1, obs2)
         elif types[0] == 'circle' and types[1] == 'circle':
             return _circles_intersect(obs1, obs2)
+        elif types[0] == 'segment' and types[1] == 'segment':
+            return _segments_intersect(obs1, obs2)
         elif types[0] == 'point' and types[1] == 'point':
             return False
         elif "rect" in types and "circle" in types:
             if types[0] == "rect":
                 return _rect_intersects_circle(obs1, obs2)
             return _rect_intersects_circle(obs2, obs1)
+        elif "segment" in types and "rect" in types:
+            if types[0] == "segment":
+                return _segment_intersects_rect(obs1, obs2)
+            return _segment_intersects_rect(obs2, obs1)
+        elif "segment" in types and "circle" in types:
+            if types[0] == "segment":
+                return _segment_intersects_circle(obs1, obs2)
+            return _segment_intersects_circle(obs2, obs1)
         elif "rect" in types and "point" in types:
             if types[0] == "rect":
                 return _point_in_rect(obs1, obs2)

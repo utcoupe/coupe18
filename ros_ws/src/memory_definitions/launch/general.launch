@@ -21,8 +21,9 @@
 
     <group ns="drivers">
 		<node pkg="drivers_ard_asserv"    name="ard_asserv"  type="ard_asserv_node.py" output="screen"/>
-		<node pkg="drivers_port_finder"   name="port_finder"  type="port_finder_node.py" output="screen"/>
+		<node pkg="drivers_port_finder"   name="port_finder" type="port_finder_node.py" output="screen"/>
 		<node pkg="drivers_teraranger"    name="teraranger"  type="teraranger_node.py" output="screen"/>
+		<node pkg="drivers_ax12"          name="ax12"        type="ax12_node" output="screen"/>
 	</group>
 
     <group ns="processing">
@@ -43,4 +44,5 @@
         <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
     </group>
 
+	<include file="$(find memory_definitions)/def/robots/$(arg robot)/specific.launch"/>
 </launch>

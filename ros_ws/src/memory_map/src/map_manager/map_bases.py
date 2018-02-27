@@ -32,12 +32,16 @@ class DictManager(MapElement):
     def toList(self):
         return self.Dict.values()
 
-    def toDict(self, recursive = False):
+    def toDict(self, hide_private = False, recursive = False):
         if recursive:
             d = {}
             for item in self.Dict:
-                if isinstance(self.Dict[item], DictManager): d[item] = self.Dict[item].toDict(recursive = True)
-                else: d[item] = self.Dict[item]
+                if isinstance(self.Dict[item], DictManager):
+                    if (hide_private and item[0] != "_") or not hide_private:
+                        d[item] = self.Dict[item].toDict(hide_private, recursive = True)
+                else:
+                    if (hide_private and item[0] != "_") or not hide_private:
+                        d[item] = self.Dict[item]
             return d
         else:
             for k in self.Dict.values():
@@ -70,7 +74,7 @@ class DictManager(MapElement):
                 return self
                 # rospy.logerr("    GET Request failed : Asked to get a DictManager object with key operator '^' but '{}' points to a '{}' object.".format(keyname, type(self.Dict[keyname])))
             elif keyname == '*':
-                return self.toDict(recursive = True)
+                return self.toDict(hide_private = True, recursive = True)
             else:
                 rospy.logerr("    GET Request failed : Unrecognized last key dict operator '{}'.".format(keyname))
         else:

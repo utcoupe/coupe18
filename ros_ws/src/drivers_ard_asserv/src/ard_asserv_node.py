@@ -14,7 +14,7 @@ __date__ = 21/10/2017
 
 NODE_NAME = "ard_asserv"
 GET_PORT_SERVICE_NAME = "/drivers/port_finder/get_port"
-GET_PORT_SERVICE_TIMEOUT = 10  # in seconds
+GET_PORT_SERVICE_TIMEOUT = 15  # in seconds
 
 
 class Asserv:
@@ -48,12 +48,16 @@ class Asserv:
         self._srv_management = rospy.Service("/drivers/" + NODE_NAME + "/management", Management, self._callback_management)
         self._act_goto = actionlib.ActionServer("/drivers/" + NODE_NAME + "/goto_action", DoGotoAction, self._callback_action_goto, auto_start=False)
         self._act_goto.start()
-        rospy.wait_for_service(GET_PORT_SERVICE_NAME, GET_PORT_SERVICE_TIMEOUT)
-        self._src_client_get_port = rospy.ServiceProxy(GET_PORT_SERVICE_NAME, GetPort)
-        arduino_port = self._src_client_get_port("gr_asserv").port
+        try:
+            rospy.wait_for_service(GET_PORT_SERVICE_NAME, GET_PORT_SERVICE_TIMEOUT)
+            self._src_client_get_port = rospy.ServiceProxy(GET_PORT_SERVICE_NAME, GetPort)
+            arduino_port = self._src_client_get_port("ard_asserv").port
+        except rospy.ROSException as exc:
+            rospy.loginfo("Port_finder has not been launched...")
+            arduino_port = ""
         rospy.loginfo("Service return value : " + arduino_port)
         if arduino_port == "":
-            rospy.loginfo("[ASSERV] Creation of the simu asserv.")
+            rospy.logwarn("[ASSERV] Creation of the simu asserv.")
             self._asserv_instance = asserv.AsservSimu(self)
         else:
             rospy.loginfo("[ASSERV] Creation of the real asserv.")
@@ -215,7 +219,9 @@ class Asserv:
         """
         rospy.logdebug("[ASSERV] Received a request (dogoto action).")
         #TODO manage direction
-        if self._process_goto_order(self._goal_id_counter, goal_handled.get_goal().mode, goal_handled.get_goal().position.x, goal_handled.get_goal().position.y, goal_handled.get_goal().position.theta, 1):
+        if self._process_goto_order(self._goal_id_counter, goal_handled.get_goal().mode,
+                                    goal_handled.get_goal().position.x, goal_handled.get_goal().position.y, goal_handled.get_goal().position.theta,
+                                    goal_handled.get_goal().direction):
             goal_handled.set_accepted()
             self._goals_dictionary[self._goal_id_counter] = goal_handled
             self._goal_id_counter += 1
