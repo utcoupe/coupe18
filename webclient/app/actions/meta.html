@@ -13,4 +13,7 @@ ng-class="{'panel-danger' : !$ctrl.action.active || $ctrl.goal.status.status == 
   </uib-accordion-heading>
 
   <ng-include ng-if="$ctrl.action.active" src="$ctrl.fileName"></ng-include>
+  <button class="btn btn-default btn-md pull-right" type="button" ng-click="$ctrl.sendGoal($ctrl.message)" >
+    Send goal
+  </button>
 </div>
