@@ -22,7 +22,7 @@ class AsservController {
     this.charts = []
 
     for(let i = 0; i < 8; i++) {
-      let c = new SmoothieChart({labels:{fontSize:20}, responsive: true,  tooltip:true});
+      let c = new SmoothieChart({grid:{verticalSections:4}, labels:{fontSize:20}, responsive: true,  tooltip:true});
       let ts = new TimeSeries();
 
       c.addTimeSeries(ts, { maxValueScale:1.32, minValueScale:1.32, strokeStyle: 'rgba(255, 0, 0, 1)', fillStyle: 'rgba(255, 0, 0, 0.2)', lineWidth: 4 });
@@ -33,7 +33,7 @@ class AsservController {
 
 
     }
-  
+
 
   }
 

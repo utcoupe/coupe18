@@ -164,7 +164,7 @@ var AsservController = function () {
     this.charts = [];
 
     for (var i = 0; i < 8; i++) {
-      var c = new SmoothieChart({ labels: { fontSize: 20 }, responsive: true, tooltip: true });
+      var c = new SmoothieChart({ grid: { verticalSections: 4 }, labels: { fontSize: 20 }, responsive: true, tooltip: true });
       var ts = new TimeSeries();
 
       c.addTimeSeries(ts, { maxValueScale: 1.32, minValueScale: 1.32, strokeStyle: 'rgba(255, 0, 0, 1)', fillStyle: 'rgba(255, 0, 0, 0.2)', lineWidth: 4 });
@@ -172,14 +172,6 @@ var AsservController = function () {
 
       this.charts.push({ chart: c, data: ts });
     }
-    // this.charts[0].options.title.text = 'PWM speed left'
-    // this.charts[1].options.title.text = 'PWM speed right'
-    // this.charts[2].options.title.text = 'X position'
-    // this.charts[3].options.title.text = 'Orientation'
-    // this.charts[4].options.title.text = 'Y position'
-    // this.charts[5].options.title.text = 'Wheel speed left'
-    // this.charts[7].options.title.text = 'Wheel speed right'
-    // this.charts[6].options.title.text = 'Linear speed'
   }
 
   _createClass(AsservController, [{
@@ -1671,6 +1663,34 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var NavbarController = function () {
+  function NavbarController($location, Ros) {
+    _classCallCheck(this, NavbarController);
+
+    this.$location = $location;
+    this.ros = Ros;
+  }
+
+  _createClass(NavbarController, [{
+    key: 'isPath',
+    value: function isPath(path) {
+      return this.$location.path() === path;
+    }
+  }]);
+
+  return NavbarController;
+}();
+
+angular.module('roscc').component('ccNavbar', {
+  templateUrl: 'app/navbar/navbar.html',
+  controller: NavbarController
+});
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var ParameterController = function () {
   function ParameterController($timeout, Ros) {
     _classCallCheck(this, ParameterController);
@@ -1700,34 +1720,6 @@ angular.module('roscc').component('ccParameter', {
   bindings: { parameter: '=' },
   templateUrl: 'app/parameters/parameters.html',
   controller: ParameterController
-});
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var NavbarController = function () {
-  function NavbarController($location, Ros) {
-    _classCallCheck(this, NavbarController);
-
-    this.$location = $location;
-    this.ros = Ros;
-  }
-
-  _createClass(NavbarController, [{
-    key: 'isPath',
-    value: function isPath(path) {
-      return this.$location.path() === path;
-    }
-  }]);
-
-  return NavbarController;
-}();
-
-angular.module('roscc').component('ccNavbar', {
-  templateUrl: 'app/navbar/navbar.html',
-  controller: NavbarController
 });
 'use strict';
 
