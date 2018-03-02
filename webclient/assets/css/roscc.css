@@ -109,7 +109,7 @@ html, body {
 
 div.smoothie-chart-tooltip {
   background: #fff;
-  padding: 1em;
+  padding: 0.5em;
   margin-top: 20px;
   font-family: consolas;
   color: black;

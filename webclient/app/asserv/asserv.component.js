@@ -33,14 +33,7 @@ class AsservController {
 
 
     }
-    // this.charts[0].options.title.text = 'PWM speed left'
-    // this.charts[1].options.title.text = 'PWM speed right'
-    // this.charts[2].options.title.text = 'X position'
-    // this.charts[3].options.title.text = 'Orientation'
-    // this.charts[4].options.title.text = 'Y position'
-    // this.charts[5].options.title.text = 'Wheel speed left'
-    // this.charts[7].options.title.text = 'Wheel speed right'
-    // this.charts[6].options.title.text = 'Linear speed'
+  
 
   }
 
