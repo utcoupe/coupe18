@@ -1,7 +1,7 @@
 class AsservController {
-  constructor (Ros) {
+  constructor (Ros, $interval) {
     this.ros = Ros.ros;
-
+    this.$interval = $interval;
 
 
     Ros.listen('/drivers/ard_asserv/pose2d', function (e) {
@@ -19,66 +19,30 @@ class AsservController {
 
     }.bind(this))
 
-    // topics to listen to
-    this.topics = [
-      '/asserv/x',
-      '/asserv/x',
-      '/asserv/x',
-      '/asserv/x',
-      '/asserv/x',
-      '/asserv/x',
-      '/asserv/x',
-      '/asserv/x'
-    ];
+    this.charts = []
 
-    this.options = {
-      scales: {
-        xAxes: [{
-          ticks: {
-            display: false
-          },
-          gridLines: {
-            display: false
-          }
-        }]
-      },
-      animation: false,
-      title: {
-        display: true,
-        text: 'Custom Chart Title',
-        fontSize: 20
-      }
-    };
+    for(let i = 0; i < 8; i++) {
+      let c = new SmoothieChart({grid:{verticalSections:4}, labels:{fontSize:20}, responsive: true,  tooltip:true});
+      let ts = new TimeSeries();
 
-    this.datasetOverride = {
-      label: 'Sinus',
-      borderColor: 'rgb(75, 192, 192)',
-      borderWidth: 2,
-      pointRadius: 0,
-      fill: false
-    };
+      c.addTimeSeries(ts, { maxValueScale:1.32, minValueScale:1.32, strokeStyle: 'rgba(255, 0, 0, 1)', fillStyle: 'rgba(255, 0, 0, 0.2)', lineWidth: 4 });
+      c.streamTo(document.getElementById("line"+(i+1)), 10);
 
-    this.charts = [];
+      this.charts.push({chart: c, data: ts});
 
-    for (let i = 0; i < 8; i++) {
 
-      this.charts.push({
-        data: [0],
-        labels: [0],
-        options: JSON.parse(JSON.stringify(this.options)),
-        datasetOverride: this.datasetOverride
-      })
+
     }
 
-    this.charts[0].options.title.text = 'PWM speed left'
-    this.charts[1].options.title.text = 'PWM speed right'
-    this.charts[2].options.title.text = 'X position'
-    this.charts[3].options.title.text = 'Orientation'
-    this.charts[4].options.title.text = 'Y position'
-    this.charts[5].options.title.text = 'Wheel speed left'
-    this.charts[7].options.title.text = 'Wheel speed right'
-    this.charts[6].options.title.text = 'Linear speed'
 
+  }
+
+  pushDataToChart(i, e) {
+    this.charts[i].data.append(new Date().getTime(), e)
+  }
+
+
+  $onInit ($interval) {
     var canvas = document.getElementsByTagName('canvas')
     for (let c of canvas) { fitToContainer(c) }
 
@@ -90,26 +54,7 @@ class AsservController {
       canvas.width = canvas.offsetWidth
       canvas.height = canvas.offsetHeight
     }
-  }
 
-  pushDataToChart(i, e) {
-    this.charts[i].data.push(e);
-    this.charts[i].labels.push(this.charts[i].labels[this.charts[i].labels.length - 1] + 0.1);
-  }
-
-
-  $onInit () {
-    var canvas = document.querySelector('canvas')
-    fitToContainer(canvas)
-
-    function fitToContainer (canvas) {
-      // Make it visually fill the positioned parent
-      canvas.style.width = '100%'
-      canvas.style.height = '100%'
-      // ...then set the internal size to match
-      canvas.width = canvas.offsetWidth
-      canvas.height = canvas.offsetHeight
-    }
   }
 }
 
