@@ -27,6 +27,11 @@ void Ax12Server::init_driver(const std::string& port)
 
     ROS_INFO("Found %d AX-12 motors connected with a scan range of %d", driver_.get_motor_count(), driver_.SCAN_RANGE);
 
+    for(uint8_t i = 0; i < driver_.get_motor_count(); i++)
+    {
+        ROS_INFO("Found motor with ID %d", driver_.get_motor_ids()[i]);
+    }
+
     driver_.toggle_torque(true);
 
 }
@@ -178,7 +183,7 @@ void Ax12Server::main_loop(const ros::TimerEvent&)
         driver_.read_register(motor_id, PRESENT_SPEED, curr_speed);
 
         // motor is moving
-        if(curr_speed % 1024 > 1)
+        if(curr_speed % 1024 >= 1)
         {
             ROS_DEBUG("Motor is moving, publishing feedback");
             feedback_.position = curr_position;
