@@ -141,10 +141,11 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var AsservController = function () {
-  function AsservController(Ros) {
+  function AsservController(Ros, $interval) {
     _classCallCheck(this, AsservController);
 
     this.ros = Ros.ros;
+    this.$interval = $interval;
 
     Ros.listen('/drivers/ard_asserv/pose2d', function (e) {
       this.pushDataToChart(2, e.x);
@@ -160,103 +161,51 @@ var AsservController = function () {
       this.pushDataToChart(6, e.linear_speed);
     }.bind(this));
 
-    // topics to listen to
-    this.topics = ['/asserv/x', '/asserv/x', '/asserv/x', '/asserv/x', '/asserv/x', '/asserv/x', '/asserv/x', '/asserv/x'];
-
-    this.options = {
-      scales: {
-        xAxes: [{
-          ticks: {
-            display: false
-          },
-          gridLines: {
-            display: false
-          }
-        }]
-      },
-      animation: false,
-      title: {
-        display: true,
-        text: 'Custom Chart Title',
-        fontSize: 20
-      }
-    };
-
-    this.datasetOverride = {
-      label: 'Sinus',
-      borderColor: 'rgb(75, 192, 192)',
-      borderWidth: 2,
-      pointRadius: 0,
-      fill: false
-    };
-
     this.charts = [];
 
     for (var i = 0; i < 8; i++) {
+      var c = new SmoothieChart({ grid: { verticalSections: 4 }, labels: { fontSize: 20 }, responsive: true, tooltip: true });
+      var ts = new TimeSeries();
 
-      this.charts.push({
-        data: [0],
-        labels: [0],
-        options: JSON.parse(JSON.stringify(this.options)),
-        datasetOverride: this.datasetOverride
-      });
-    }
+      c.addTimeSeries(ts, { maxValueScale: 1.32, minValueScale: 1.32, strokeStyle: 'rgba(255, 0, 0, 1)', fillStyle: 'rgba(255, 0, 0, 0.2)', lineWidth: 4 });
+      c.streamTo(document.getElementById("line" + (i + 1)), 10);
 
-    this.charts[0].options.title.text = 'PWM speed left';
-    this.charts[1].options.title.text = 'PWM speed right';
-    this.charts[2].options.title.text = 'X position';
-    this.charts[3].options.title.text = 'Orientation';
-    this.charts[4].options.title.text = 'Y position';
-    this.charts[5].options.title.text = 'Wheel speed left';
-    this.charts[7].options.title.text = 'Wheel speed right';
-    this.charts[6].options.title.text = 'Linear speed';
-
-    var canvas = document.getElementsByTagName('canvas');
-    var _iteratorNormalCompletion = true;
-    var _didIteratorError = false;
-    var _iteratorError = undefined;
-
-    try {
-      for (var _iterator = canvas[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-        var c = _step.value;
-        fitToContainer(c);
-      }
-    } catch (err) {
-      _didIteratorError = true;
-      _iteratorError = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion && _iterator.return) {
-          _iterator.return();
-        }
-      } finally {
-        if (_didIteratorError) {
-          throw _iteratorError;
-        }
-      }
-    }
-
-    function fitToContainer(canvas) {
-      // Make it visually fill the positioned parent
-      canvas.style.width = '100%';
-      canvas.style.height = '100%';
-      // ...then set the internal size to match
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
+      this.charts.push({ chart: c, data: ts });
     }
   }
 
   _createClass(AsservController, [{
     key: 'pushDataToChart',
     value: function pushDataToChart(i, e) {
-      this.charts[i].data.push(e);
-      this.charts[i].labels.push(this.charts[i].labels[this.charts[i].labels.length - 1] + 0.1);
+      this.charts[i].data.append(new Date().getTime(), e);
     }
   }, {
     key: '$onInit',
-    value: function $onInit() {
-      var canvas = document.querySelector('canvas');
-      fitToContainer(canvas);
+    value: function $onInit($interval) {
+      var canvas = document.getElementsByTagName('canvas');
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = canvas[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var c = _step.value;
+          fitToContainer(c);
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
 
       function fitToContainer(canvas) {
         // Make it visually fill the positioned parent
@@ -275,116 +224,6 @@ var AsservController = function () {
 angular.module('roscc').component('ccAsserv', {
   templateUrl: 'app/asserv/asserv.html',
   controller: AsservController
-});
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var DiagnosticController = function () {
-  function DiagnosticController($rootScope, $timeout, $interval, Settings, Domains, Ros, Console) {
-    var _this = this;
-
-    _classCallCheck(this, DiagnosticController);
-
-    this.$timeout = $timeout;
-    this.Domains = Domains;
-    this.domains = $rootScope.domains;
-    this.logs = Console.logs;
-
-    this.ros = Ros;
-    this.setting = Settings.get();
-
-    if ($rootScope.isConnected) {
-      this.$timeout(function () {
-        _this.onConnected();
-      }, 1000);
-    } else {
-      $rootScope.$watch('isConnected', function (newValue) {
-        var _this2 = this;
-
-        if (newValue) this.$timeout(function () {
-          _this2.onConnected();
-        }, 1000);
-      }.bind(this));
-    }
-  }
-
-  // The active domain shows further information in the center view
-
-
-  _createClass(DiagnosticController, [{
-    key: 'setActiveDomain',
-    value: function setActiveDomain(domain) {
-      this.activeDomain = domain;
-    }
-  }, {
-    key: 'onConnected',
-    value: function onConnected() {
-      if (!this.activeDomain) {
-        var _iteratorNormalCompletion = true;
-        var _didIteratorError = false;
-        var _iteratorError = undefined;
-
-        try {
-          for (var _iterator = this.domains[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var d = _step.value;
-
-            if (this.ros.getDomains().includes(d.name)) {
-              this.setActiveDomain(d.name);
-            }
-          }
-        } catch (err) {
-          _didIteratorError = true;
-          _iteratorError = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion && _iterator.return) {
-              _iterator.return();
-            }
-          } finally {
-            if (_didIteratorError) {
-              throw _iteratorError;
-            }
-          }
-        }
-      }
-    }
-  }, {
-    key: 'refresh',
-    value: function refresh() {
-      this.ros.loadData();
-    }
-  }, {
-    key: 'isDomainActive',
-    value: function isDomainActive(domain) {
-      return _.some(this.ros.getTopicsForDomain(domain), function (t) {
-        return t.active == true;
-      });
-    }
-  }, {
-    key: 'collapseAll',
-    value: function collapseAll(domain) {
-      this.ros.getTopicsForDomain(domain).map(function (item) {
-        item.isOpen = false;
-      });
-    }
-  }, {
-    key: 'expandAll',
-    value: function expandAll(domain) {
-      this.ros.getTopicsForDomain(domain).map(function (item) {
-        if (item.type) item.isOpen = true;
-      });
-    }
-  }]);
-
-  return DiagnosticController;
-}();
-
-angular.module('roscc').component('ccDiagnostic', {
-  templateUrl: 'app/diagnostic/diagnostic.html',
-  controller: DiagnosticController
 });
 'use strict';
 
@@ -497,6 +336,116 @@ var ControlController = function () {
 angular.module('roscc').component('ccControl', {
   templateUrl: 'app/control/control.html',
   controller: ControlController
+});
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var DiagnosticController = function () {
+  function DiagnosticController($rootScope, $timeout, $interval, Settings, Domains, Ros, Console) {
+    var _this = this;
+
+    _classCallCheck(this, DiagnosticController);
+
+    this.$timeout = $timeout;
+    this.Domains = Domains;
+    this.domains = $rootScope.domains;
+    this.logs = Console.logs;
+
+    this.ros = Ros;
+    this.setting = Settings.get();
+
+    if ($rootScope.isConnected) {
+      this.$timeout(function () {
+        _this.onConnected();
+      }, 1000);
+    } else {
+      $rootScope.$watch('isConnected', function (newValue) {
+        var _this2 = this;
+
+        if (newValue) this.$timeout(function () {
+          _this2.onConnected();
+        }, 1000);
+      }.bind(this));
+    }
+  }
+
+  // The active domain shows further information in the center view
+
+
+  _createClass(DiagnosticController, [{
+    key: 'setActiveDomain',
+    value: function setActiveDomain(domain) {
+      this.activeDomain = domain;
+    }
+  }, {
+    key: 'onConnected',
+    value: function onConnected() {
+      if (!this.activeDomain) {
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = this.domains[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var d = _step.value;
+
+            if (this.ros.getDomains().includes(d.name)) {
+              this.setActiveDomain(d.name);
+            }
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+      }
+    }
+  }, {
+    key: 'refresh',
+    value: function refresh() {
+      this.ros.loadData();
+    }
+  }, {
+    key: 'isDomainActive',
+    value: function isDomainActive(domain) {
+      return _.some(this.ros.getTopicsForDomain(domain), function (t) {
+        return t.active == true;
+      });
+    }
+  }, {
+    key: 'collapseAll',
+    value: function collapseAll(domain) {
+      this.ros.getTopicsForDomain(domain).map(function (item) {
+        item.isOpen = false;
+      });
+    }
+  }, {
+    key: 'expandAll',
+    value: function expandAll(domain) {
+      this.ros.getTopicsForDomain(domain).map(function (item) {
+        if (item.type) item.isOpen = true;
+      });
+    }
+  }]);
+
+  return DiagnosticController;
+}();
+
+angular.module('roscc').component('ccDiagnostic', {
+  templateUrl: 'app/diagnostic/diagnostic.html',
+  controller: DiagnosticController
 });
 'use strict';
 
