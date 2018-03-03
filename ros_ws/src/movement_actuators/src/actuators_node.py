@@ -9,6 +9,7 @@ import actionlib
 import movement_actuators.msg
 import actuators_properties
 import drivers_ard_others.msg
+import drivers_ax12.msg
 from ai_game_status import StatusServices
 
 
@@ -28,6 +29,7 @@ class ActuatorsNode():
         self._action_server = actionlib.SimpleActionServer( self._action_name, movement_actuators.msg.dispatchAction, execute_cb=self.dispatch, auto_start=False)
         self._arduino_move = rospy.Publisher( '/drivers/ard_others/move', drivers_ard_others.msg.Move, queue_size=30)  # TODO check the queue_size
         self._arduino_response = rospy.Subscriber( '/drivers/ard_others/move_response', drivers_ard_others.msg.MoveResponse, self.ard_callback)
+        self._ax12_client = actionlib.SimpleActionClient('/drivers/ax12', drivers_ax12.msg.Ax12CommandAction)
         self._action_server.start()
 
         # Tell ai/game_status the node initialized successfuly.
@@ -67,11 +69,11 @@ class ActuatorsNode():
         else:
             timeout = command.timeout
         #-----Time to send !
-        if actuator.family == 'arduino':
+        if actuator.family.lower() == 'arduino':
             self._result.success = self.sendToArduino( actuator.id, actuator.type, command.order, param, timeout )
             self._action_server.set_succeeded(self._result)
             return
-        elif actuator.family == 'ax12':
+        elif actuator.family.lower() == 'ax12':
             self._result.success = self.sendToAx12( actuator.id, command.order, param, timeout)
             self._action_server.set_succeeded(self._result)
             return
@@ -108,8 +110,27 @@ class ActuatorsNode():
         return success
 
     def sendToAx12(self, id, order, param, timeout):
-        rospy.logwarn('Ax12 control is not implemented yet.')
-        return False
+        goal = drivers_ax12.msg.Ax12CommandGoal()
+        goal.motor_id = int(id)
+        if order.lower() == "joint":
+            goal.mode = drivers_ax12.msg.Ax12CommandGoal.JOINT
+            goal.speed = 0
+            goal.position = int(param)
+        elif order.lower() == "wheel":
+            goal.mode = drivers_ax12.msg.Ax12CommandGoal.WHEEL
+            goal.speed = int(param)
+        else:
+            rospy.logerr("Bad order: {}, expected joint or wheel".format(order))
+            return False
+
+        self._ax12_client.send_goal(goal)
+        if self._ax12_client.wait_for_result(rospy.Duration(int(timeout))):
+            success = self._ax12_client.get_result().success
+        else:
+            rospy.loginfo('Timeout reached')
+            success = False
+
+        return success
     
     def generateId(self, event):
         with self._lock:
