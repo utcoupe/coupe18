@@ -11,8 +11,6 @@
 #include "protocol.h"
 #include "control.h"
 #include "pins.h"
-#include "emergency.h"
-
 #include "sender.h"
 #include <Timer.h>
 
@@ -91,7 +89,6 @@ void loop() {
 
 void asservLoop() {
 	//Action asserv
-	ComputeEmergency();
 	ComputeIsBlocked();
 	ControlCompute();
 

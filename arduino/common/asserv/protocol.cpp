@@ -17,7 +17,6 @@ extern "C" {
     #include "robotstate.h"
     #include "control.h"
     #include "goals.h"
-    #include "emergency.h"
 }
 
 unsigned char flagArduinoConnected = 0;
@@ -269,7 +268,6 @@ void parseAndExecuteOrder(const String& order) {
         {
             int enable;
             sscanf(receivedOrderPtr, "%i", &enable);
-//            EmergencySetStatus(enable);
             if (enable == 0) {
                 ControlUnsetStop(EMERGENCY_BIT);
             } else {

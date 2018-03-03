@@ -11,7 +11,6 @@
 #include "compat.h"
 #include "motor.h"
 #include "local_math.h"
-#include "emergency.h"
 #include <math.h>
 
 #define ANG_REACHED (0x1)
@@ -86,26 +85,6 @@ void ControlCompute(void) {
 #endif
 	goal_t* current_goal = FifoCurrentGoal();
 	RobotStateUpdate();
-
-	// clear emergency everytime, it will be reset if necessary
-//	ControlUnsetStop(EMERGENCY_BIT);
-//	ControlUnsetStop(SLOWGO_BIT);
-	
-//	if (abs(control.speeds.linear_speed) > 1) {
-//		int direction;
-//		if (control.speeds.linear_speed > 0) {
-//			direction = EM_FORWARD;
-//		} else {
-//			direction = EM_BACKWARD;
-//		}
-
-//		if (emergency_status[direction].phase == FIRST_STOP) {
-//			ControlSetStop(EMERGENCY_BIT);
-//		} else if (emergency_status[direction].phase == SLOW_GO) {
-//			ControlSetStop(SLOWGO_BIT);
-//		}
-//	}
-
 
 	if (control.status_bits & EMERGENCY_BIT || control.status_bits & PAUSE_BIT || control.status_bits & TIME_ORDER_BIT) {
 		stopRobot();
