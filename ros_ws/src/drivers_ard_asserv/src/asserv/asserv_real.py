@@ -63,7 +63,6 @@ class AsservReal(AsservAbstract):
         # Force the arduino to halt
         self._halt()
 
-
     def goto(self, goal_id, x, y, direction):
         self._send_serial_data(self._orders_dictionary['GOTO'], [str(int(round(x * 1000))), str(int(round(y * 1000))), str(direction)])
         # TODO make it proper
