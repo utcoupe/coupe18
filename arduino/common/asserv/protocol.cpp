@@ -269,7 +269,12 @@ void parseAndExecuteOrder(const String& order) {
         {
             int enable;
             sscanf(receivedOrderPtr, "%i", &enable);
-            EmergencySetStatus(enable);
+//            EmergencySetStatus(enable);
+            if (enable == 0) {
+                ControlUnsetStop(EMERGENCY_BIT);
+            } else {
+                ControlSetStop(EMERGENCY_BIT);
+            }
             SerialSender::SerialSend(SERIAL_INFO, "%d;", order_id);
             break;
         }
