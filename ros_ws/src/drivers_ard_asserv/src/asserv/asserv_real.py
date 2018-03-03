@@ -60,6 +60,9 @@ class AsservReal(AsservAbstract):
                 except KeyboardInterrupt:
                     break
             rospy.sleep(0.01)
+        # Force the arduino to halt
+        self._halt()
+
 
     def goto(self, goal_id, x, y, direction):
         self._send_serial_data(self._orders_dictionary['GOTO'], [str(int(round(x * 1000))), str(int(round(y * 1000))), str(direction)])
@@ -269,3 +272,12 @@ class AsservReal(AsservAbstract):
             self._node.goal_reached(goal_data[0], result)
         else:
             rospy.logwarn("Check reached dict empty...")
+
+    def _halt(self):
+        """
+        This function is kind of a hack, it forces to send the HALT order to the arduino to halt the processing.
+        The reason is that some Arduino does not stop when serial communication is shutdown and this make the port_finder not work properly.
+        """
+        self._send_serial_data(self._orders_dictionary['HALT'], [])
+        self._callback_timer_serial_send(rospy.timer.TimerEvent(rospy.Time(), rospy.Time(), rospy.Time(), rospy.Time(), 0.0))
+        rospy.logwarn("Send halt to arduino")
