@@ -25,4 +25,6 @@ inline void set_pwm_right(int pwm){
 	set_pwm(MOTOR_RIGHT, pwm);
 }
 
+void get_breaking_speed_factor(float *angular_speed, float *linear_speed);
+
 #endif

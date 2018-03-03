@@ -297,25 +297,34 @@ float calcSpeed(float init_spd, float dd, float max_spd, float final_speed) {
 void stopRobot(void) {
 	int sign;
 	float speed;
+    float angular_speed_factor;
+    float linear_speed_factor;
+    get_breaking_speed_factor(&angular_speed_factor, &linear_speed_factor);
 
-//	sign = sign(control.speeds.angular_speed);
-//	speed = abs(control.speeds.angular_speed);
-//	speed -= control.max_acc * DT;
-//	speed = max(0, speed);
-//	control.speeds.angular_speed = speed;
-//
-//	sign = sign(control.speeds.linear_speed);
-//	speed = abs(control.speeds.linear_speed);
-//	speed -= control.max_acc * DT;
-//	speed = max(0, speed);
-//	control.speeds.linear_speed = sign*speed;
-//
-//	if (abs(wheels_spd.left) + abs(wheels_spd.right) < SPD_TO_STOP) {
-//		allStop();
-//	} else {
-//		applyPID();
-//	}
-    allStop();
+    speed = abs(control.speeds.angular_speed);
+    if (angular_speed_factor != 0.0) {
+        speed -= control.max_acc * DT * angular_speed_factor;
+    } else {
+        speed = 0.0;
+    }
+    speed = max(0, speed);
+    control.speeds.angular_speed = speed;
+
+    sign = sign(control.speeds.linear_speed);
+    speed = abs(control.speeds.linear_speed);
+    if (linear_speed_factor != 0.0) {
+        speed -= control.max_acc * DT * linear_speed_factor;
+    } else {
+        speed = 0.0;
+    }
+    speed = max(0, speed);
+    control.speeds.linear_speed = sign*speed;
+
+	if (abs(wheels_spd.left) + abs(wheels_spd.right) < SPD_TO_STOP) {
+		allStop();
+	} else {
+		applyPID();
+	}
 }
 
 void allStop(void) {

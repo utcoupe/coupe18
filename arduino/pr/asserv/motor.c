@@ -27,3 +27,7 @@ void set_pwm(int side, int pwm) {
 	BrushlessMotorSetPwm(side, pwm);
 }
 
+void get_breaking_speed_factor(float *angular_speed, float *linear_speed) {
+    *angular_speed = (float)3.0;
+    *linear_speed = (float)3.0;
+}
