@@ -11,6 +11,7 @@
 #include "pathfinder/point.h"
 #include "pathfinder/BarriersSubscribers/processing_belt_interpreter_subscriber.h"
 #include "pathfinder/BarriersSubscribers/processing_lidar_objects_subscriber.h"
+#include "pathfinder/BarriersSubscribers/memory_map_subscriber.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -31,6 +32,7 @@ const size_t                SIZE_MAX_QUEUE          = 10;
 const double                SAFETY_MARGIN           = 0.15;
 const string                BELT_INTERPRETER_TOPIC  = "/processing/belt_interpreter/rects_filtered";
 const string                LIDAR_OBJECTS_TOPIC     = "/processing/lidar_objects/obstacles";
+const string                
 
 template<typename T>
 unique_ptr<T> constructSubscriber(ros::NodeHandle& nodeHandle, const string& topic);

@@ -15,6 +15,8 @@ public:
     virtual bool hasBarrier(const geometry_msgs::Pose2D& pos) = 0;
     virtual void subscribe(ros::NodeHandle& nodeHandle, std::size_t sizeMaxQueue, std::string topic) = 0;
     void setSafetyMargin(const double& safetyMargin) { _safetyMargin = safetyMargin; }
+    
+    virtual void fetchOccupancyData() {};
 
 protected:
     std::mutex g_mutex;
