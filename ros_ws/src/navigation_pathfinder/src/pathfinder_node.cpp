@@ -20,6 +20,7 @@
 
 using namespace std;
 using namespace Processing;
+using namespace Memory;
 
 const string                NAMESPACE_NAME          = "navigation";
 const string                NODE_NAME               = "pathfinder";
@@ -32,7 +33,7 @@ const size_t                SIZE_MAX_QUEUE          = 10;
 const double                SAFETY_MARGIN           = 0.15;
 const string                BELT_INTERPRETER_TOPIC  = "/processing/belt_interpreter/rects_filtered";
 const string                LIDAR_OBJECTS_TOPIC     = "/processing/lidar_objects/obstacles";
-const string                
+const string                MAP_GET_OBJECTS_SERVER  = "/memory/map/get_objects";
 
 template<typename T>
 unique_ptr<T> constructSubscriber(ros::NodeHandle& nodeHandle, const string& topic);
@@ -49,6 +50,7 @@ int main (int argc, char* argv[])
     auto dynBarriersMng = make_shared<DynamicBarriersManager>();
     dynBarriersMng->addBarrierSubscriber(constructSubscriber<BeltInterpreterSubscriber>(nodeHandle, BELT_INTERPRETER_TOPIC));
     dynBarriersMng->addBarrierSubscriber(constructSubscriber<LidarObjectsSubscriber>(nodeHandle, LIDAR_OBJECTS_TOPIC));
+    dynBarriersMng->addBarrierSubscriber(constructSubscriber<MapSubscriber>(nodeHandle, MAP_GET_OBJECTS_SERVER));
     
     Pathfinder pathfinder(MAP_FILE_NAME, TABLE_SIZE, dynBarriersMng, true);
     ros::ServiceServer findPathServer = nodeHandle.advertiseService(FINDPATH_SERVICE_NAME, &Pathfinder::findPathCallback, &pathfinder);

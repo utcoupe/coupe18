@@ -20,6 +20,7 @@ public:
     void addBarrierSubscriber(std::unique_ptr<AbstractBarriersSubscriber>&& subscriber);
     void setConvertor(std::shared_ptr<PosConvertor> convertor);
     void updateSafetyMargin(const double& newMargin);
+    void fetchOccupancyDatas();
     
 private:
     std::vector< std::unique_ptr<AbstractBarriersSubscriber> > subscribers;

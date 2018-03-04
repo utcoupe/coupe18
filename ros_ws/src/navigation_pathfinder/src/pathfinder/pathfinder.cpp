@@ -38,6 +38,8 @@ bool Pathfinder::findPath(const Point& startPos, const Point& endPos, Path& path
         return false;
     }
     
+    _dynBarriersMng->fetchOccupancyDatas();
+    
     auto startTime = chrono::high_resolution_clock::now();
     
     // Creates a map filled with -1

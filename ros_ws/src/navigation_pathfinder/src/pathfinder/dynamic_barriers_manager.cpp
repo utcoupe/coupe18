@@ -42,6 +42,11 @@ void DynamicBarriersManager::updateSafetyMargin(const double& newMargin)
         subscriber->setSafetyMargin(newMargin);
 }
 
+void DynamicBarriersManager::fetchOccupancyDatas()
+{
+    for (const auto& subscriber : subscribers)
+        subscriber->fetchOccupancyData();
+}
 
 geometry_msgs::Pose2D DynamicBarriersManager::pointToPose2D(const Point& pos) const
 {

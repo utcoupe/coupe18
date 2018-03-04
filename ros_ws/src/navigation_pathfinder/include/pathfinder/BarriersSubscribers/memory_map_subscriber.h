@@ -19,9 +19,11 @@ namespace Memory {
         void fetchOccupancyData() override;
         
     private:
-        nlohmann::json lastReceivedJson;
-        
+        std::vector<nlohmann::json> lastReceivedJsons;
         ros::ServiceClient srvGetMapObjects;
+        
+        bool isInsideRectangle(const geometry_msgs::Pose2D& pos, const nlohmann::json jsonRect) const;
+        bool isInsideCircle(const geometry_msgs::Pose2D& pos, const nlohmann::json jsonCircle) const;
     };
 }
 
