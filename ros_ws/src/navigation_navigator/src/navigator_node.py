@@ -132,7 +132,8 @@ class NavigatorNode(object):
             self._printPath (path)
             # then sends the path point per point to the arduino_asserv
             path.pop(0) # The last point will be given end Position
-            self._currentPath = path[:]
+            self._currentPath = path[:] # _currentPath is the path send to collision
+            self._currentPath.append(endPos)
             self._updateStatus()
             lastPoint = startPos
             for point in path:
@@ -185,7 +186,15 @@ class NavigatorNode(object):
         prodScal = v1.x*v2.x + v1.y*v2.y
         normeV1 = math.sqrt(pow(v1.x, 2) + pow(v1.y, 2))
         normeV2 = math.sqrt(pow(v2.x, 2) + pow(v2.y, 2))
-        return math.acos(prodScal / (normeV1 * normeV2))
+        cosV1V2 = prodScal / (normeV1 * normeV2)
+
+        # fix float precision
+        if cosV1V2 > 1.0:
+            cosV1V2 = 1.0
+        elif cosV1V2 < -1.0:
+            cosV1V2 = -1.0
+
+        return math.acos(cosV1V2)
 
     def startNode(self):
         """
