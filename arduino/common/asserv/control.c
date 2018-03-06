@@ -83,12 +83,20 @@ void ControlCompute(void) {
 	long now;
 	now = timeMicros();
 #endif
+
+//    if (control.status_bits & EMERGENCY_BIT) {
+//        apply_break(255);
+//    } else {
+//        apply_break(0);
+//    }
+
 	goal_t* current_goal = FifoCurrentGoal();
 	RobotStateUpdate();
 
 	if (control.status_bits & EMERGENCY_BIT || control.status_bits & PAUSE_BIT || control.status_bits & TIME_ORDER_BIT) {
 		stopRobot();
 	} else {
+//        apply_break(0);
 		switch (current_goal->type) {
 			case TYPE_ANG:
 				goalAngle(current_goal);
@@ -117,6 +125,7 @@ void ControlCompute(void) {
         lastReachedID = control.last_finished_id;
 		FifoNextGoal();
 		ControlPrepareNewGoal();
+
 #if TIME_BETWEEN_ORDERS
 		time_reached = now;
 	}
@@ -276,6 +285,7 @@ void stopRobot(void) {
 	float speed;
     float angular_speed_factor;
     float linear_speed_factor;
+//    apply_break(255);
     get_breaking_speed_factor(&angular_speed_factor, &linear_speed_factor);
 
     speed = abs(control.speeds.angular_speed);

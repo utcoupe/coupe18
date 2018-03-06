@@ -57,7 +57,7 @@ void BrushlessMotorSetPwm(int motor_side, int pwm) {
 			else {
 				digitalWrite(MOTOR1_EN,HIGH);
 			}
-		    	break;
+            break;
 		}
 		case MOTOR_RIGHT:{
 			analogWrite(MOTOR2_SPD, pwm);
@@ -70,4 +70,15 @@ void BrushlessMotorSetPwm(int motor_side, int pwm) {
 			break;
 		}
 	}
+}
+
+// does not work nor change anything...
+void BrushlessMotorBreak(int pwm) {
+    if (pwm > 200) {
+        digitalWrite(MOTOR1_BRK, LOW);
+        digitalWrite(MOTOR2_BRK, LOW);
+    } else {
+        digitalWrite(MOTOR1_BRK, HIGH);
+        digitalWrite(MOTOR2_BRK, HIGH);
+    }
 }

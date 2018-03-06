@@ -88,7 +88,7 @@
 #define PID_D_RATIO (1/1000.0)
 
 #define TIME_BETWEEN_ORDERS 0 // s
-#define KEEP_LAST_GOAL 1
+#define KEEP_LAST_GOAL 0
 
 //DEFINES ARDUINO
 #define SERIAL_MAIN Serial
