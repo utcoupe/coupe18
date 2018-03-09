@@ -28,7 +28,7 @@ const string                NODE_NAME               = "pathfinder";
 
 const string                FINDPATH_SERVICE_NAME   = "/" + NAMESPACE_NAME + "/" + NODE_NAME + "/find_path";
 const pair<double, double>  TABLE_SIZE              = {3.0, 2.0}; // Scale corresponding to messages received by the node
-const string                MAP_FILE_NAME           = string(getenv ("UTCOUPE_WORKSPACE")) + "/ros_ws/src/memory_map/src/occupancy/img/layer_pathfinder.bmp";//"/ros_ws/src/navigation_pathfinder/def/map.bmp";
+const string                MAP_FILE_NAME           = string(getenv ("UTCOUPE_WORKSPACE")) + "/ros_ws/src/memory_map/src/occupancy/img/layer_pathfinder.bmp"; //"/ros_ws/src/navigation_pathfinder/def/map.bmp";
 
 const size_t                SIZE_MAX_QUEUE          = 10;
 const double                SAFETY_MARGIN           = 0.15;

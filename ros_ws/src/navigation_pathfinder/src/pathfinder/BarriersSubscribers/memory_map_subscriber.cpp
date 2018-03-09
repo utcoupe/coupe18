@@ -50,7 +50,12 @@ void MapSubscriber::fetchOccupancyData(const uint& widthGrid, const uint& height
     for (auto&& object : srv.response.objects)
     {
         _lastReceivedJsons.push_back(json::parse(object));
-        ROS_DEBUG_STREAM("Received from map: " << _lastReceivedJsons.back().dump(4));
+//         ROS_DEBUG_STREAM("Received from map: " << _lastReceivedJsons.back().dump(4));
+        string shapeType = _lastReceivedJsons.back()["shape"]["type"];
+        if (shapeType == "rect")
+            drawRectangle(_lastReceivedJsons.back());
+        else if (shapeType == "circle")
+            drawCircle(_lastReceivedJsons.back());
     }
 }
 
@@ -63,12 +68,15 @@ void Memory::MapSubscriber::drawRectangle(const nlohmann::json jsonRect)
     h = jsonRect["shape"]["height"];
     
     auto pos = _convertor->fromRosToMapPos(make_pair(x, y));
-    // TODO convert distances
+    w = _convertor->fromRosToMapDistance(w);
+    h = _convertor->fromRosToMapDistance(h);
     
-    uint yMin = max(pos.second - (h/2) - _safetyMargin, 0.0);
-    uint yMax = min((double)_occupancyGrid.size(), pos.second + (h/2) + _safetyMargin + 0.5);
-    uint xMin = max(pos.first - (w/2) - _safetyMargin, 0.0);
-    uint xMax = min((double)_occupancyGrid.front().size(), pos.first + (w/2) + _safetyMargin + 0.5);
+    auto safeMarg = _convertor->fromRosToMapDistance(_safetyMargin);
+    
+    uint yMin = max(pos.second - (h/2) - safeMarg, 0.0);
+    uint yMax = min((double)_occupancyGrid.size(), pos.second + (h/2) + safeMarg + 0.5);
+    uint xMin = max(pos.first - (w/2) - safeMarg, 0.0);
+    uint xMax = min((double)_occupancyGrid.front().size(), pos.first + (w/2) + safeMarg + 0.5);
     
     for (uint row = yMin; row < yMax; row++)
         for (uint column = xMin; column < xMax; column++)
@@ -83,15 +91,18 @@ void Memory::MapSubscriber::drawCircle(const nlohmann::json jsonCircle)
     r = jsonCircle["shape"]["radius"];
     
     auto pos = _convertor->fromRosToMapPos(make_pair(x, y));
+    r = _convertor->fromRosToMapDistance(r);
     
-    uint yMin = max(y - r - _safetyMargin, 0.0);
-    uint yMax = min((double)_occupancyGrid.size(), y + r + _safetyMargin + 0.5);
-    uint xMin = max(x - r - _safetyMargin, 0.0);
-    uint xMax = min((double)_occupancyGrid.front().size(), x + r + _safetyMargin + 0.5);
+    auto safeMarg = _convertor->fromRosToMapDistance(_safetyMargin);
+    
+    uint yMin = max(pos.second - r - safeMarg, 0.0);
+    uint yMax = min((double)_occupancyGrid.size(), pos.second + r + safeMarg + 0.5);
+    uint xMin = max(pos.first - r - safeMarg, 0.0);
+    uint xMax = min((double)_occupancyGrid.front().size(), pos.first + r + safeMarg + 0.5);
     
     for (uint row = yMin; row < yMax; row++)
         for (uint column = xMin; column < xMax; column++)
-            if (getNorme2Distance(column, row, x, y) <= r)
+            if (getNorme2Distance(column, row, pos.first, pos.second) <= r)
                 _occupancyGrid[row][column] = true;
 }
 
