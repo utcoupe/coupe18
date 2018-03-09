@@ -7,8 +7,8 @@
 
 using namespace std;
 
-Pathfinder::Pathfinder(const string& mapFileName, const std::pair< double, double >& tableSize, shared_ptr<DynamicBarriersManager> dynBarriersMng,
-                       bool invertedY, bool render, const string& renderFile)
+Pathfinder::Pathfinder(const string& mapFileName, shared_ptr<PosConvertor> convertor, const std::pair< double, double >& tableSize,
+                       shared_ptr<DynamicBarriersManager> dynBarriersMng, bool render, const string& renderFile)
 {
     _renderAfterComputing = render;
     _renderFile = renderFile;
@@ -16,12 +16,11 @@ Pathfinder::Pathfinder(const string& mapFileName, const std::pair< double, doubl
     
     _allowedPositions = _mapStorage.loadAllowedPositionsFromFile(mapFileName);
     if (_allowedPositions.size() == 0)
-        ROS_FATAL("Allowed positions empty. Cannot define a scale.");
+        ROS_FATAL("Allowed positions empty. Cannot define a scale. Please restart the node, it may crash soon.");
     else
     {
-        _convertor = make_shared<PosConvertor>();
+        _convertor = convertor;
         _convertor->setSizes(tableSize, make_pair<double,double>(_allowedPositions.front().size(), _allowedPositions.size()));
-        _convertor->setInvertedY(invertedY);
         _dynBarriersMng->setConvertor(_convertor);
     }
 }
@@ -38,7 +37,7 @@ bool Pathfinder::findPath(const Point& startPos, const Point& endPos, Path& path
         return false;
     }
     
-    _dynBarriersMng->fetchOccupancyDatas();
+    _dynBarriersMng->fetchOccupancyDatas(_allowedPositions.front().size(), _allowedPositions.size());
     
     auto startTime = chrono::high_resolution_clock::now();
     

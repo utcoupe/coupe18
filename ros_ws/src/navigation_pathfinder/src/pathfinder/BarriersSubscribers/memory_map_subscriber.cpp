@@ -22,39 +22,39 @@ MapSubscriber::MapSubscriber(const double& safetyMargin)
 
 bool MapSubscriber::hasBarrier(const geometry_msgs::Pose2D& pos)
 {
-    for (const json& receivedJson : lastReceivedJsons)
-    {
-        if (receivedJson["shape"]["type"] == "rect" && isInsideRectangle(pos, receivedJson))
-            return true;
-        else if (receivedJson["shape"]["type"] == "circle" && isInsideCircle(pos, receivedJson))
-            return true;
-    }
-    return false;
+    return _occupancyGrid[pos.y][pos.x];
 }
 
 void MapSubscriber::subscribe(ros::NodeHandle& nodeHandle, [[maybe_unused]] std::size_t sizeMaxQueue, std::string topic)
 {
-    srvGetMapObjects = nodeHandle.serviceClient<memory_map::MapGetObjects>(topic);
+    _srvGetMapObjects = nodeHandle.serviceClient<memory_map::MapGetObjects>(topic);
 }
 
-void MapSubscriber::fetchOccupancyData()
+void MapSubscriber::fetchOccupancyData(const uint& widthGrid, const uint& heightGrid)
 {
     memory_map::MapGetObjects srv;
     srv.request.collisions_only = true;
-    if (!srvGetMapObjects.call(srv) || !srv.response.success)
+    if (!_srvGetMapObjects.call(srv) || !srv.response.success)
     {
         ROS_ERROR("Error when trying to call memory_map/MapGetObjects");
         return;
     }
-    lastReceivedJsons.clear();
+    _lastReceivedJsons.clear();
+    
+    if (_occupancyGrid.size() != heightGrid || (heightGrid != 0 && _occupancyGrid.front().size() != widthGrid))
+        _occupancyGrid = vector< vector<bool> > (
+            heightGrid,
+            vector<bool>(widthGrid, false)
+        );
+    
     for (auto&& object : srv.response.objects)
     {
-        lastReceivedJsons.push_back(json::parse(object));
-        ROS_DEBUG_STREAM("Received from map: " << lastReceivedJsons.back().dump(4));
+        _lastReceivedJsons.push_back(json::parse(object));
+        ROS_DEBUG_STREAM("Received from map: " << _lastReceivedJsons.back().dump(4));
     }
 }
 
-bool Memory::MapSubscriber::isInsideRectangle(const geometry_msgs::Pose2D& pos, const nlohmann::json jsonRect) const
+void Memory::MapSubscriber::drawRectangle(const nlohmann::json jsonRect)
 {
     double x, y, w, h;
     x = jsonRect["position"]["x"];
@@ -62,22 +62,36 @@ bool Memory::MapSubscriber::isInsideRectangle(const geometry_msgs::Pose2D& pos, 
     w = jsonRect["shape"]["width"];
     h = jsonRect["shape"]["height"];
     
-    if (pos.x + (w/2) < x || pos.x - (w/2) > x)
-        return false;
-    if (pos.y + (h/2) < y || pos.y - (h/2) > y)
-        return false;
-    return true;
+    auto pos = _convertor->fromRosToMapPos(make_pair(x, y));
+    // TODO convert distances
+    
+    uint yMin = max(pos.second - (h/2) - _safetyMargin, 0.0);
+    uint yMax = min((double)_occupancyGrid.size(), pos.second + (h/2) + _safetyMargin + 0.5);
+    uint xMin = max(pos.first - (w/2) - _safetyMargin, 0.0);
+    uint xMax = min((double)_occupancyGrid.front().size(), pos.first + (w/2) + _safetyMargin + 0.5);
+    
+    for (uint row = yMin; row < yMax; row++)
+        for (uint column = xMin; column < xMax; column++)
+            _occupancyGrid[row][column] = true;
 }
 
-bool Memory::MapSubscriber::isInsideCircle(const geometry_msgs::Pose2D& pos, const nlohmann::json jsonCircle) const
+void Memory::MapSubscriber::drawCircle(const nlohmann::json jsonCircle)
 {
     double x, y, r;
     x = jsonCircle["position"]["x"];
     y = jsonCircle["position"]["y"];
     r = jsonCircle["shape"]["radius"];
     
-    if (getNorme2Distance(pos.x, pos.y, x, y) > r)
-        return false;
-    return true;
+    auto pos = _convertor->fromRosToMapPos(make_pair(x, y));
+    
+    uint yMin = max(y - r - _safetyMargin, 0.0);
+    uint yMax = min((double)_occupancyGrid.size(), y + r + _safetyMargin + 0.5);
+    uint xMin = max(x - r - _safetyMargin, 0.0);
+    uint xMax = min((double)_occupancyGrid.front().size(), x + r + _safetyMargin + 0.5);
+    
+    for (uint row = yMin; row < yMax; row++)
+        for (uint column = xMin; column < xMax; column++)
+            if (getNorme2Distance(column, row, x, y) <= r)
+                _occupancyGrid[row][column] = true;
 }
 

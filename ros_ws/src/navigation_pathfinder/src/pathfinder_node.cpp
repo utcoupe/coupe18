@@ -12,6 +12,7 @@
 #include "pathfinder/BarriersSubscribers/processing_belt_interpreter_subscriber.h"
 #include "pathfinder/BarriersSubscribers/processing_lidar_objects_subscriber.h"
 #include "pathfinder/BarriersSubscribers/memory_map_subscriber.h"
+#include "pathfinder/pos_convertor.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -47,12 +48,17 @@ int main (int argc, char* argv[])
 //     ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
     ros::NodeHandle nodeHandle;
     
+    auto convertor = make_shared<PosConvertor>();
+    convertor->setInvertedY(true);
+    
     auto dynBarriersMng = make_shared<DynamicBarriersManager>();
     dynBarriersMng->addBarrierSubscriber(constructSubscriber<BeltInterpreterSubscriber>(nodeHandle, BELT_INTERPRETER_TOPIC));
     dynBarriersMng->addBarrierSubscriber(constructSubscriber<LidarObjectsSubscriber>(nodeHandle, LIDAR_OBJECTS_TOPIC));
-    dynBarriersMng->addBarrierSubscriber(constructSubscriber<MapSubscriber>(nodeHandle, MAP_GET_OBJECTS_SERVER));
+    auto mapSubscriber = constructSubscriber<MapSubscriber>(nodeHandle, MAP_GET_OBJECTS_SERVER);
+    mapSubscriber->setConvertor(convertor);
+    dynBarriersMng->addBarrierSubscriber(std::move(mapSubscriber));
     
-    Pathfinder pathfinder(MAP_FILE_NAME, TABLE_SIZE, dynBarriersMng, true);
+    Pathfinder pathfinder(MAP_FILE_NAME, convertor, TABLE_SIZE, dynBarriersMng);
     ros::ServiceServer findPathServer = nodeHandle.advertiseService(FINDPATH_SERVICE_NAME, &Pathfinder::findPathCallback, &pathfinder);
     
     dynamic_reconfigure::Server<navigation_pathfinder::PathfinderNodeConfig> server;
