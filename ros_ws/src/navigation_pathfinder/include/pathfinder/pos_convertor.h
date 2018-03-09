@@ -28,6 +28,10 @@ public:
      */
     std::pair<double,double> fromMapToRosPos (const std::pair<double,double>& mapPos) const;
     
+    double fromMapToRosDistance (const double& dist) const;
+    
+    double fromRosToMapDistance (const double& dist) const;
+    
     // Getters & Setters
     void setSizes (std::pair<double,double> sizeRos, std::pair<double,double> sizeMap);
     
