@@ -170,7 +170,7 @@ class PortFinder:
                                 teraranger_flag = True
                             else:
                                 read_data = ""
-                        rospy.loginfo("Try number {} for {}, data = {}".format(loop_counter, element[1], read_data))
+                        rospy.logdebug("Try number {} for {}, data = {}".format(loop_counter, element[1], read_data))
                         # Always skip the first try, this is because sometimes serial data are present, sometimes not
                         # Do not remove this because it's the ugly way found to start a serial line with an other baudrate and keep a "correct" detection
                         if loop_counter == 0:
