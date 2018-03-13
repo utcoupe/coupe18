@@ -7,6 +7,13 @@
 		</message>
 	</order>
 
+	<order ref="map_set" duration="0" name="Map element set">
+		<message dest="/memory/map/set">
+			<param name="mode" type="int" optional="true">1</param> <!-- default to REPLACE mode -->
+			<param name="request_path" type="string"/>
+		</message>
+	</order>
+
 	<!-- Actuators -->
 	<order ref="ask_for_jack" duration="1">
 		<message dest="/feedback/ard_hmi/ros_event">

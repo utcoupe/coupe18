@@ -72,12 +72,12 @@
 				<direction>0</direction>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="go behind the cubes">
-				<waypoint_name>way_grape_1_accost</waypoint_name>
+			<orderref ref="map_set" name="disable grape collisions">
+				<request_path>/objects/container_grape_1/collisions=0</request_path>
 			</orderref>
 
-			<orderref ref="delay">
-				<duration>1</duration>
+			<orderref ref="asserv_goto_waypoint" name="go behind the cubes">
+				<waypoint_name>way_grape_1_accost</waypoint_name>
 			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="push them to the zone">
@@ -89,22 +89,29 @@
 				<waypoint_name>way_grape_1_released</waypoint_name>
 			</orderref>
 
+			<orderref ref="map_set" name="enable grape collisions back">
+				<request_path>/objects/container_grape_1/collisions=1</request_path>
+			</orderref>
 
 
+		</actions>
+	</action>
 
-
-
+	<action ref="push_grape_2" name="Simply push grape 2 cubes to the zone" reward="25">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
 			<orderref ref="asserv_goto_waypoint" name="go behind the cubes">
                                 <waypoint_name>way_grape_2_approach</waypoint_name>
                         </orderref>
 
+			<orderref ref="map_set" name="disable grape collisions">
+				<request_path>/objects/container_grape_2/collisions=0</request_path>
+			</orderref>
+
                         <orderref ref="asserv_goto_waypoint" name="go behind the cubes">
                                 <waypoint_name>way_grape_2_accost</waypoint_name>
 				<direction>0</direction>
-                        </orderref>
-
-                        <orderref ref="delay">
-                                <duration>0</duration>
                         </orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="push them to the zone">
@@ -116,6 +123,16 @@
                                 <waypoint_name>way_grape_2_released</waypoint_name>
                         </orderref>
 
+			<orderref ref="map_set" name="enable grape collisions back">
+				<request_path>/objects/container_grape_2/collisions=1</request_path>
+			</orderref>
+		</actions>
+	</action>
+
+	<action ref="activate_bee" name="activate bee">
+		<params></params>
+		<conditions></conditions>
+		<actions>
 			<orderref ref="asserv_goto_waypoint" name="goto bee approach">
                                 <waypoint_name>way_bee_approach</waypoint_name>
                         </orderref>
