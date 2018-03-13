@@ -41,7 +41,7 @@ class PortFinder:
         self._parse_dmesg()
         self._associate_port()
         self._identify_arduino()
-        rospy.logdebug("Node ready, found : " + str(self._associated_port_list))
+        rospy.loginfo("Port_finder ready, found : " + str(self._associated_port_list))
         self._srv_goto = rospy.Service("/drivers/" + NODE_NAME + "/get_port", GetPort, self._callback_get_port)
 
         # Tell ai/game_status the node initialized successfuly.
@@ -139,7 +139,7 @@ class PortFinder:
     def _associate_port(self):
         for element in self._connected_component_list:
             self._associated_port_list.append((element[3], "/dev/" + element[2]))
-        rospy.loginfo(self._associated_port_list)
+        # rospy.loginfo(self._associated_port_list)
 
     def _identify_arduino(self):
         rosserial_port_list = []
@@ -179,6 +179,7 @@ class PortFinder:
                         loop_counter += 1
                 except serial.SerialException:
                     rospy.logerr("Try to open port {} but it fails...".format(element[1]))
+                    del self._associated_port_list[counter]
                     serial_port_disconnected = True
                 if not serial_port_disconnected:
                     if teraranger_flag:
