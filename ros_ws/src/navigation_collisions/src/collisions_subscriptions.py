@@ -30,7 +30,7 @@ class CollisionsSubscriptions(object):
 
         # Subscribing to dependencies
         rospy.Subscriber("/navigation/navigator/status", Status, self._on_nav_status)
-        rospy.Subscriber("/processing/belt_interpreter/rects_filtered", BeltRects, self._on_belt)
+        rospy.Subscriber("/processing/belt_interpreter/rects", BeltRects, self._on_belt)
         rospy.Subscriber("/processing/lidar_objects/obstacles", Obstacles, self._on_lidar)
         rospy.Subscriber("/drivers/ard_asserv/speed", RobotSpeed, self.on_robot_speed)
 
