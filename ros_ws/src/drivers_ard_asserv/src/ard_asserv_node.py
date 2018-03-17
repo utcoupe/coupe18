@@ -8,6 +8,7 @@ from drivers_ard_asserv.msg import *
 from drivers_port_finder.srv import *
 import asserv
 from ai_game_status import StatusServices
+from ai_game_status.msg import GameStatus
 
 __author__ = "Thomas Fuhrmann"
 __date__ = 21/10/2017
@@ -35,6 +36,8 @@ class Asserv:
         self._goal_id_counter = 0
         # Instance of the asserv object (simu or real)
         self._asserv_instance = None
+        # Flag to know if the system has been halted (end of game)
+        self._is_halted = False
         # Init ROS stuff
         rospy.init_node(NODE_NAME, anonymous=False, log_level=rospy.INFO)
         self._pub_robot_pose = rospy.Publisher("/drivers/" + NODE_NAME + "/pose2d", Pose2D, queue_size=5)
@@ -47,6 +50,7 @@ class Asserv:
         self._srv_params = rospy.Service("/drivers/" + NODE_NAME + "/parameters", Parameters, self._callback_asserv_param)
         self._srv_management = rospy.Service("/drivers/" + NODE_NAME + "/management", Management, self._callback_management)
         self._act_goto = actionlib.ActionServer("/drivers/" + NODE_NAME + "/goto_action", DoGotoAction, self._callback_action_goto, auto_start=False)
+        self._sub_game_status = rospy.Subscriber("/ai/game_status/status", GameStatus, self._callback_game_status)
         self._act_goto.start()
         try:
             rospy.wait_for_service(GET_PORT_SERVICE_NAME, GET_PORT_SERVICE_TIMEOUT)
@@ -218,15 +222,18 @@ class Asserv:
         @type goal_handled:     ServerGoalHandle
         """
         rospy.logdebug("[ASSERV] Received a request (dogoto action).")
-        #TODO manage direction
-        if self._process_goto_order(self._goal_id_counter, goal_handled.get_goal().mode,
-                                    goal_handled.get_goal().position.x, goal_handled.get_goal().position.y, goal_handled.get_goal().position.theta,
-                                    goal_handled.get_goal().direction):
-            goal_handled.set_accepted()
-            self._goals_dictionary[self._goal_id_counter] = goal_handled
-            self._goal_id_counter += 1
+        if not self._is_halted:
+            if self._process_goto_order(self._goal_id_counter, goal_handled.get_goal().mode,
+                                        goal_handled.get_goal().position.x, goal_handled.get_goal().position.y, goal_handled.get_goal().position.theta,
+                                        goal_handled.get_goal().direction):
+                goal_handled.set_accepted()
+                self._goals_dictionary[self._goal_id_counter] = goal_handled
+                self._goal_id_counter += 1
+            else:
+                rospy.logerr("[ASSERV] Action GOTO has failed... Mode probably does not exist.")
         else:
-            rospy.logerr("[ASSERV] Action GOTO has failed... Mode probably does not exist.")
+            goal_handled.set_rejected()
+            rospy.logwarn("[ASSERV] Action GOTO can not be accepted, asserv has been halted.")
 
     def _process_goto_order(self, goal_id, mode, x, y, a, direction):
         """
@@ -259,6 +266,18 @@ class Asserv:
             to_return = False
             rospy.logerr("[ASSERV] GOTO mode %d does not exists...", mode)
         return to_return
+
+    def _callback_game_status(self, msg):
+        if not self._is_halted and msg.game_status == GameStatus.STATUS_HALT:
+            self._is_halted = True
+            # Halt the system, emergency stop + clean all goals
+            self._asserv_instance.set_emergency_stop(True)
+            management_msg = ManagementRequest()
+            management_msg.mode = ManagementRequest.CLEANG
+            self._callback_management(management_msg)
+        elif self._is_halted and msg.game_status != GameStatus.STATUS_HALT:
+            self._is_halted = False
+            self._asserv_instance.set_emergency_stop(False)
 
 
 if __name__ == "__main__":
