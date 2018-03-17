@@ -28,7 +28,6 @@ class Teraranger:
         except rospy.ROSException:
             rospy.logerr("Port_finder service does not exist, can't fetch the teraranger port...")
         if teraranger_port != "":
-            rospy.logwarn("Teraranger port : " + teraranger_port)
             node_subprocess = subprocess.Popen(["rosrun", "teraranger", "one", "_portname:=" + teraranger_port, "__ns:=/"])
         else:
             rospy.logerr("Teraranger port has not been found, start the node but can't send real data...")
