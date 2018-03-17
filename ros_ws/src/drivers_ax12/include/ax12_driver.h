@@ -29,6 +29,7 @@ public:
     bool joint_mode(uint8_t motor_id, uint16_t min_angle=1, uint16_t max_angle=1023);
     bool wheel_mode(uint8_t motor_id);
     uint8_t get_motor_count();
+    uint8_t* get_motor_ids();
 
 
     Ax12Driver() : motor_count(0) {}

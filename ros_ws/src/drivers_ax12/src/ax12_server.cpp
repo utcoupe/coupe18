@@ -27,6 +27,12 @@ void Ax12Server::init_driver(const std::string& port)
 
     ROS_INFO("Found %d AX-12 motors connected with a scan range of %d", driver_.get_motor_count(), driver_.SCAN_RANGE);
 
+    uint8_t* ids = driver_.get_motor_ids();
+
+    for(uint8_t i = 0; i < driver_.get_motor_count(); i++) {
+        ROS_INFO("Motor with id %d found.", ids[i]);
+    }
+
     driver_.toggle_torque(true);
 
 
