@@ -9,13 +9,16 @@ from drivers_port_finder.srv import *
 import asserv
 from ai_game_status import StatusServices
 from ai_game_status.msg import GameStatus
+from memory_map.srv import FillWaypoint
+from memory_map.msg import Waypoint
 
 __author__ = "Thomas Fuhrmann"
 __date__ = 21/10/2017
 
 NODE_NAME = "ard_asserv"
 GET_PORT_SERVICE_NAME = "/drivers/port_finder/get_port"
-GET_PORT_SERVICE_TIMEOUT = 15  # in seconds
+GET_MAP_SERVICE_NAME = "/memory/map/fill_waypoint"
+GET_PORT_SERVICE_TIMEOUT = 1  # in seconds
 
 
 class Asserv:
@@ -52,20 +55,27 @@ class Asserv:
         self._act_goto = actionlib.ActionServer("/drivers/" + NODE_NAME + "/goto_action", DoGotoAction, self._callback_action_goto, auto_start=False)
         self._sub_game_status = rospy.Subscriber("/ai/game_status/status", GameStatus, self._callback_game_status)
         self._act_goto.start()
+        self._srv_client_map_fill_waypoints = None
         try:
             rospy.wait_for_service(GET_PORT_SERVICE_NAME, GET_PORT_SERVICE_TIMEOUT)
-            self._src_client_get_port = rospy.ServiceProxy(GET_PORT_SERVICE_NAME, GetPort)
-            arduino_port = self._src_client_get_port("ard_asserv").port
+            srv_client_get_port = rospy.ServiceProxy(GET_PORT_SERVICE_NAME, GetPort)
+            arduino_port = srv_client_get_port("ard_asserv").port
         except rospy.ROSException as exc:
             rospy.loginfo("Port_finder has not been launched...")
             arduino_port = ""
-        rospy.loginfo("Service return value : " + arduino_port)
+        rospy.loginfo("Port_finder returns value : " + arduino_port)
         if arduino_port == "":
             rospy.logwarn("[ASSERV] Creation of the simu asserv.")
             self._asserv_instance = asserv.AsservSimu(self)
         else:
             rospy.loginfo("[ASSERV] Creation of the real asserv.")
             self._asserv_instance = asserv.AsservReal(self, arduino_port)
+        try:
+            rospy.wait_for_service(GET_MAP_SERVICE_NAME, GET_PORT_SERVICE_TIMEOUT)
+            self._srv_client_map_fill_waypoints = rospy.ServiceProxy(GET_MAP_SERVICE_NAME, FillWaypoint)
+            rospy.logdebug("Memory_map has been found.")
+        except rospy.ROSException as exc:
+            rospy.logwarn("Memory_map has not been launched...")
 
         # Tell ai/game_status the node initialized successfuly.
         StatusServices("drivers", "ard_asserv").ready(True)
@@ -119,8 +129,18 @@ class Asserv:
         @return:        True if request has been processed, false otherwise
         @rtype:         SetPosResponse
         """
-        rospy.logdebug("[ASSERV] Received a request (set_pos service).")
-        ret_value = self._asserv_instance.set_pos(request.position.x, request.position.y, request.position.theta)
+        set_position = Pose2D(0, 0, 0)
+        if request.position_waypoint == "":
+            rospy.logdebug("[ASSERV] Received a request (set_pos service).")
+            set_position = request.position
+        else:
+            rospy.logdebug("[ASSERV] Received a request (set_pos service), using waypoint")
+            if self._srv_client_map_fill_waypoints is not None:
+                wpt = Waypoint(name=request.position_waypoint)
+                set_position = self._srv_client_map_fill_waypoints.call(wpt).filled_waypoint.pose
+            else:
+                rospy.logwarn("[ASSERV] Received a waypoint request but memory_map seems not to be launched...")
+        ret_value = self._asserv_instance.set_pos(set_position.x, set_position.y, set_position.theta)
         return SetPosResponse(ret_value)
 
     def _callback_pwm(self, request):
