@@ -31,6 +31,7 @@ public:
     uint8_t get_motor_count();
     uint8_t* get_motor_ids();
 
+
     Ax12Driver() : motor_count(0) {}
 
 };
