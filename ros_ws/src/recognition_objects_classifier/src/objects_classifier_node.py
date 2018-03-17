@@ -33,6 +33,8 @@ class ObjectsClassifier(object):
         self.RESOLUTION_LONG = 0.05
         self.RESOLUTION_LARGE = 0.05
 
+        self.TIME_THRESHOLD = 1 # if incoming data is older than X secs, ignore it
+
         self.PUB_TOPIC = "/recognition/objects_classifier/objects"
         self.BELT_TOPIC = "/processing/belt_interpreter/rects"
         self.LIDAR_TOPIC = "/processing/lidar_objects/obstacles"
@@ -68,7 +70,7 @@ class ObjectsClassifier(object):
 
 
     def belt_callback(self, data):
-        self._to_process['rects'] = data.rects
+        self._to_process['rects'] = filter(lambda r: rospy.Time.now().secs - r.header.stamp.secs < self.TIME_THRESHOLD, data.rects)
 
     def lidar_callback(self, data):
 
