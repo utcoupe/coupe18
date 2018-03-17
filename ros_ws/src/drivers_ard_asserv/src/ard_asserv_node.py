@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-from geometry_msgs.msg import Pose2D
+from geometry_msgs.msg import Pose2D, TransformStamped
 import actionlib
 from drivers_ard_asserv.srv import *
 from drivers_ard_asserv.msg import *
@@ -11,6 +11,8 @@ from ai_game_status import StatusServices
 from ai_game_status.msg import GameStatus
 from memory_map.srv import FillWaypoint
 from memory_map.msg import Waypoint
+import tf
+import tf2_ros
 
 __author__ = "Thomas Fuhrmann"
 __date__ = 21/10/2017
@@ -54,6 +56,7 @@ class Asserv:
         self._srv_management = rospy.Service("/drivers/" + NODE_NAME + "/management", Management, self._callback_management)
         self._act_goto = actionlib.ActionServer("/drivers/" + NODE_NAME + "/goto_action", DoGotoAction, self._callback_action_goto, auto_start=False)
         self._sub_game_status = rospy.Subscriber("/ai/game_status/status", GameStatus, self._callback_game_status)
+        self._pub_tf_odom = tf2_ros.TransformBroadcaster()
         self._act_goto.start()
         self._srv_client_map_fill_waypoints = None
         try:
@@ -98,6 +101,20 @@ class Asserv:
     # robot_pose is a Pose2d structure
     def send_robot_position(self, robot_pose):
         self._pub_robot_pose.publish(robot_pose)
+        # Send the position using tf
+        t = TransformStamped()
+        t.header.stamp = rospy.Time.now()
+        t.header.frame_id = "map"
+        t.child_frame_id = "odom"
+        t.transform.translation.x = robot_pose.x
+        t.transform.translation.y = robot_pose.y
+        t.transform.translation.z = 0.0
+        q = tf.transformations.quaternion_from_euler(0, 0, robot_pose.theta)
+        t.transform.rotation.x = q[0]
+        t.transform.rotation.y = q[1]
+        t.transform.rotation.z = q[2]
+        t.transform.rotation.w = q[3]
+        self._pub_tf_odom.sendTransform(t)
 
     # robot_speed is a RobotSpeed structure
     def send_robot_speed(self, robot_speed):

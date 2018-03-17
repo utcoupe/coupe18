@@ -18,6 +18,8 @@ find_package(catkin REQUIRED COMPONENTS
     drivers_port_finder
     ai_game_status
     memory_map
+    tf
+    tf2_ros
 )
 
 ## Generate messages
