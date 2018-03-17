@@ -79,13 +79,13 @@ class CollisionsSubscriptions(object):
     def _on_classifier(self, msg):
         new_belt = []
         for rect in msg.unknown_rects:
-            if rect.header.frame_id != "map":
+            if rect.header.frame_id != "/map":
                 rospy.logwarn("Belt rect not in /map tf frame, skipping.")
                 continue
 
-            new_belt.append(RectObstacle(Position(rect.rect.x, rect.rect.y,
-                                                  rect.rect.a,
-                                                  rect.rect.w, rect.rect.h)))
+            new_belt.append(RectObstacle(Position(rect.x, rect.y,\
+                                                  rect.a),\
+                                                  rect.w, rect.h))
 
         if len(new_belt) > 0:
             ObstaclesStack.updateBeltPoints(new_belt)
@@ -94,14 +94,14 @@ class CollisionsSubscriptions(object):
         new_lidar = []
 
         for segment in msg.unknown_segments:
-            if segment.header.frame_id != "map":
+            if segment.header.frame_id != "/map":
                 rospy.logwarn("Lidar segment not in /map tf frame, skipping.")
                 continue
 
             new_lidar.append(SegmentObstacle(Position(segment.segment.first_point.x, segment.segment.first_point.y),
                                              Position(segment.segment.last_point.x,  segment.segment.last_point.y)))
         for circle in msg.unknown_circles:
-            if circle.header.frame_id != "map":
+            if circle.header.frame_id != "/map":
                 rospy.logwarn("Lidar circle not in /map tf frame, skipping.")
                 continue
             vel_d = math.sqrt(circle.velocity.y ** 2 + circle.velocity.x ** 2)

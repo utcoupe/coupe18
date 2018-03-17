@@ -65,7 +65,6 @@ class MarkersPublisher():
 
             self.ids.append(m.id)
             self.marker_pub.publish(m)
-            rospy.loginfo(self.ids)
 
 
 
