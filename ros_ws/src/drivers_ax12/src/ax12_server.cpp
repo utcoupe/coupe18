@@ -27,12 +27,15 @@ void Ax12Server::init_driver(const std::string& port)
 
     ROS_INFO("Found %d AX-12 motors connected with a scan range of %d", driver_.get_motor_count(), driver_.SCAN_RANGE);
 
-    for(uint8_t i = 0; i < driver_.get_motor_count(); i++)
-    {
-        ROS_INFO("Found motor with ID %d", driver_.get_motor_ids()[i]);
+    uint8_t* ids = driver_.get_motor_ids();
+
+    for(uint8_t i = 0; i < driver_.get_motor_count(); i++) {
+        ROS_INFO("Motor with id %d found.", ids[i]);
     }
 
     driver_.toggle_torque(true);
+
+
 
 }
 
@@ -46,6 +49,13 @@ void Ax12Server::execute_goal_cb(GoalHandle goal_handle)
 
     auto goal = goal_handle.getGoal();
     uint8_t motor_id = goal->motor_id;
+
+    if(is_halted)
+    {
+        ROS_ERROR("AX-12 action server received a goal, but game_status said that the system is halted !");
+        goal_handle.setRejected();
+        return;
+    }
 
     if(!goal_handle.isValid())
     {
@@ -362,13 +372,29 @@ bool Ax12Server::execute_set_service_cb(drivers_ax12::SetAx12Param::Request &req
     return true;
 }
 
+void Ax12Server::game_status_cb(const ai_game_status::GameStatusConstPtr& status)
+{
+    if(!is_halted && status->game_status == status->STATUS_HALT)
+    {
+        is_halted = true;
+        driver_.toggle_torque(false);
+    }
+    else if(is_halted && status->game_status != status->STATUS_HALT)
+    {
+        is_halted = false;
+        driver_.toggle_torque(true);
+    }
+}
+
 Ax12Server::Ax12Server(std::string action_name, std::string service_name) :
         as_(nh_, action_name, boost::bind(&Ax12Server::execute_goal_cb, this, _1), false),
         set_param_service(nh_.advertiseService(service_name, &Ax12Server::execute_set_service_cb, this)),
+        game_status_sub_(nh_.subscribe(GAME_STATUS_TOPIC, 1, &Ax12Server::game_status_cb, this)),
         driver_(),
         joint_goals_(),
         feedback_(),
-        result_()
+        result_(),
+        is_halted(false)
 {
     std::string port;
 
