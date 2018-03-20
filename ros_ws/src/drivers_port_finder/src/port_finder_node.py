@@ -138,7 +138,11 @@ class PortFinder:
 
     def _associate_port(self):
         for element in self._connected_component_list:
-            self._associated_port_list.append((element[3], "/dev/" + element[2]))
+            associated_element = (element[3], "/dev/" + element[2])
+            if associated_element not in self._associated_port_list:
+                self._associated_port_list.append(associated_element)
+            else:
+                rospy.logdebug("Port_finder double found : " + str(associated_element))
 
     def _identify_arduino(self):
         # Temporary list used to store identified components
