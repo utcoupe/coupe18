@@ -11,39 +11,48 @@ function run($rootScope) {
   $rootScope.domains = [{
     name: 'drivers',
     topics: ['ard_asserv/pose2d', 'ard_asserv/speed'],
-    services: ['ard_asserv/emergency_stop', 'ard_asserv/goto', 'ard_asserv/set_pos', 'ard_asserv/speed', 'ard_asserv/pwm', 'ard_asserv/management', 'ard_asserv/parameters']
+    services: ['ard_asserv/emergency_stop', 'ard_asserv/goto', 'ard_asserv/set_pos', 'ard_asserv/speed', 'ard_asserv/pwm', 'ard_asserv/management', 'ard_asserv/parameters'],
+    actions: ['ard_asserv/goto_action']
   }, {
     name: 'ai',
-    topics: ['oui1', 'non1'],
-    services: ['s1', 's2']
+    topics: [],
+    services: [],
+    actions: []
   }, {
     name: "recognition",
-    topics: ['oui1', 'non1'],
-    services: ['gzfd']
+    topics: [],
+    services: [],
+    actions: []
   }, {
     name: "processing",
-    topics: ['oui1', 'non1'],
-    services: ['etr']
+    topics: [],
+    services: [],
+    actions: []
   }, {
     name: "sensors",
-    topics: ['oui1', 'non1'],
-    services: ['trezz']
+    topics: [],
+    services: [],
+    actions: []
   }, {
     name: "movement",
-    topics: ['oui1', 'non1'],
-    services: []
+    topics: [],
+    services: [],
+    actions: []
   }, {
     name: "memory",
-    topics: ['oui1', 'non1'],
-    services: []
+    topics: [],
+    services: [],
+    actions: []
   }, {
     name: "feedback",
-    topics: ['oui1', 'non1'],
-    services: []
+    topics: [],
+    services: [],
+    actions: []
   }, {
     name: "navigation",
-    topics: ['oui1', 'non1'],
-    services: []
+    topics: [],
+    services: [],
+    actions: []
   }];
 }
 
@@ -54,11 +63,89 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var ServiceController = function () {
+  function ServiceController($scope, $http, $timeout, Ros) {
+    _classCallCheck(this, ServiceController);
+
+    this.$scope = $scope;
+    this.$http = $http;
+    this.ros = Ros;
+    this.$timeout = $timeout;
+    this.status = -1;
+  }
+
+  _createClass(ServiceController, [{
+    key: '$onInit',
+    value: function $onInit() {
+      var _this = this;
+
+      this.$scope.$watchGroup(['$ctrl.action.type', '$ctrl.action.active'], function () {
+        _this.setFileName();
+        _this.client = new ROSLIB.ActionClient({
+          ros: _this.ros.ros,
+          serverName: _this.action.name,
+          actionName: _this.action.type
+        });
+      }, function () {});
+    }
+  }, {
+    key: 'sendGoal',
+    value: function sendGoal(goalmsg) {
+
+      var goal = new ROSLIB.Goal({
+        actionClient: this.client,
+        goalMessage: goalmsg
+      });
+      this.goal = goal;
+      goal.send();
+    }
+  }, {
+    key: 'setFileName',
+    value: function setFileName() {
+      var _this2 = this;
+
+      var path = 'app/actions/';
+
+      this.fileName = path + 'default.html';
+
+      if (!this.action.active) {
+        this.fileName = '';
+        this.action.isOpen = false;
+        return;
+      } else if (!this.action.type) {
+        this.fileName = path + 'default.html';
+        return;
+      }
+
+      var fileName = '' + path + this.action.type + '.html';
+      this.$http.get(fileName).then(function (result) {
+        if (result.data) {
+          _this2.fileName = fileName;
+        }
+      }, function () {});
+    }
+  }]);
+
+  return ServiceController;
+}();
+
+angular.module('roscc').component('ccAction', {
+  bindings: { action: '=' },
+  template: '<ng-include src="\'./app/actions/meta.html\'"></ng-include>',
+  controller: ServiceController
+});
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var AsservController = function () {
-  function AsservController(Ros) {
+  function AsservController(Ros, $interval) {
     _classCallCheck(this, AsservController);
 
     this.ros = Ros.ros;
+    this.$interval = $interval;
 
     Ros.listen('/drivers/ard_asserv/pose2d', function (e) {
       this.pushDataToChart(2, e.x);
@@ -69,108 +156,56 @@ var AsservController = function () {
     Ros.listen('/drivers/ard_asserv/speed', function (e) {
       this.pushDataToChart(0, e.pwm_speed_left);
       this.pushDataToChart(1, e.pwm_speed_right);
-      this.pushDataToChart(5, e.wheel_speed_right);
+      this.pushDataToChart(5, e.wheel_speed_left);
       this.pushDataToChart(7, e.wheel_speed_right);
       this.pushDataToChart(6, e.linear_speed);
     }.bind(this));
 
-    // topics to listen to
-    this.topics = ['/asserv/x', '/asserv/x', '/asserv/x', '/asserv/x', '/asserv/x', '/asserv/x', '/asserv/x', '/asserv/x'];
-
-    this.options = {
-      scales: {
-        xAxes: [{
-          ticks: {
-            display: false
-          },
-          gridLines: {
-            display: false
-          }
-        }]
-      },
-      animation: false,
-      title: {
-        display: true,
-        text: 'Custom Chart Title',
-        fontSize: 20
-      }
-    };
-
-    this.datasetOverride = {
-      label: 'Sinus',
-      borderColor: 'rgb(75, 192, 192)',
-      borderWidth: 2,
-      pointRadius: 0,
-      fill: false
-    };
-
     this.charts = [];
 
     for (var i = 0; i < 8; i++) {
+      var c = new SmoothieChart({ grid: { verticalSections: 4 }, labels: { fontSize: 20 }, responsive: true, tooltip: true });
+      var ts = new TimeSeries();
 
-      this.charts.push({
-        data: [0],
-        labels: [0],
-        options: JSON.parse(JSON.stringify(this.options)),
-        datasetOverride: this.datasetOverride
-      });
-    }
+      c.addTimeSeries(ts, { maxValueScale: 1.32, minValueScale: 1.32, strokeStyle: 'rgba(255, 0, 0, 1)', fillStyle: 'rgba(255, 0, 0, 0.2)', lineWidth: 4 });
+      c.streamTo(document.getElementById("line" + (i + 1)), 10);
 
-    this.charts[0].options.title.text = 'PWM speed left';
-    this.charts[1].options.title.text = 'PWM speed right';
-    this.charts[2].options.title.text = 'X position';
-    this.charts[3].options.title.text = 'Orientation';
-    this.charts[4].options.title.text = 'Y position';
-    this.charts[5].options.title.text = 'Wheel speed left';
-    this.charts[7].options.title.text = 'Wheel speed right';
-    this.charts[6].options.title.text = 'Linear speed';
-
-    var canvas = document.getElementsByTagName('canvas');
-    var _iteratorNormalCompletion = true;
-    var _didIteratorError = false;
-    var _iteratorError = undefined;
-
-    try {
-      for (var _iterator = canvas[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-        var c = _step.value;
-        fitToContainer(c);
-      }
-    } catch (err) {
-      _didIteratorError = true;
-      _iteratorError = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion && _iterator.return) {
-          _iterator.return();
-        }
-      } finally {
-        if (_didIteratorError) {
-          throw _iteratorError;
-        }
-      }
-    }
-
-    function fitToContainer(canvas) {
-      // Make it visually fill the positioned parent
-      canvas.style.width = '100%';
-      canvas.style.height = '100%';
-      // ...then set the internal size to match
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
+      this.charts.push({ chart: c, data: ts });
     }
   }
 
   _createClass(AsservController, [{
     key: 'pushDataToChart',
     value: function pushDataToChart(i, e) {
-      this.charts[i].data.push(e);
-      this.charts[i].labels.push(this.charts[i].labels[this.charts[i].labels.length - 1] + 0.1);
+      this.charts[i].data.append(new Date().getTime(), e);
     }
   }, {
     key: '$onInit',
-    value: function $onInit() {
-      var canvas = document.querySelector('canvas');
-      fitToContainer(canvas);
+    value: function $onInit($interval) {
+      var canvas = document.getElementsByTagName('canvas');
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = canvas[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var c = _step.value;
+          fitToContainer(c);
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
 
       function fitToContainer(canvas) {
         // Make it visually fill the positioned parent
@@ -723,11 +758,13 @@ var RosService = function () {
         topics: [],
         nodes: [],
         parameters: [],
-        services: []
+        services: [],
+        actions: []
       };
 
       //populate expected topics/services
       angular.forEach(this.$rootScope.domains, function (d) {
+
         angular.forEach(d.topics, function (t) {
           var name = '/' + d.name + '/' + t;
           var newT = {
@@ -751,6 +788,18 @@ var RosService = function () {
           };
           _this3.data.services.push(newS);
         });
+
+        angular.forEach(d.actions, function (a) {
+          var name = '/' + d.name + '/' + a;
+          var newA = {
+            name: name,
+            abbr: a,
+            active: false,
+            expected: true,
+            isOpen: true
+          };
+          _this3.data.actions.push(newA);
+        });
       });
     }
 
@@ -766,6 +815,9 @@ var RosService = function () {
         angular.forEach(topics.topics, function (name) {
           var topic = _.findWhere(_this4.data.topics, { name: name });
 
+          if (!topic && name.match("(/feedback|/goal|/status|/cancel|/result)$")) {
+            return;
+          }
           if (topic) {
             //to update
             topic.active = true;
@@ -846,6 +898,49 @@ var RosService = function () {
         }
       }); // end getServices
 
+
+      this.ros.getActionServers(function (actions) {
+        angular.forEach(actions, function (name) {
+          var action = _.findWhere(_this4.data.actions, { name: name });
+
+          if (action) {
+            //to update
+            action.active = true;
+          } else {
+            //to add
+            action = {
+              name: name,
+              active: true,
+              isOpen: true
+            };
+            _this4.data.actions.push(action);
+          }
+          if (!action.fetched) {
+            _this4.ros.getTopicType(name + '/goal', function (type) {
+              action.type = type.slice(0, -4);
+              action.fetched = true;
+            });
+          }
+        });
+
+        for (var i = _this4.data.actions.length - 1; i >= 0; i--) {
+          //angular foreach not working for this
+          var a = _this4.data.actions[i];
+          var found = false;
+          for (var y = 0; y < actions.length; y++) {
+            if (actions[y] == a.name) found = true;
+          }
+
+          if (!found) {
+            if (!a.expected) {
+              _this4.data.actions.splice(i, 1);
+            } else {
+              a.active = false;
+            }
+          }
+        }
+      }); // end getActionServerss
+
       this.ros.getParams(function (params) {
         //TODO : update like topics
         angular.forEach(params, function (name) {
@@ -916,6 +1011,11 @@ var RosService = function () {
       return this.Domains.getDataForDomain(this.data.services, domain, false);
     }
   }, {
+    key: 'getActionsForDomain',
+    value: function getActionsForDomain(domain) {
+      return this.Domains.getDataForDomain(this.data.actions, domain, false);
+    }
+  }, {
     key: 'getGlobalParameters',
     value: function getGlobalParameters() {
       return this.Domains.getGlobalParameters(this.data.parameters);
@@ -926,34 +1026,6 @@ var RosService = function () {
 }();
 
 angular.module('roscc').service('Ros', RosService);
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var NavbarController = function () {
-  function NavbarController($location, Ros) {
-    _classCallCheck(this, NavbarController);
-
-    this.$location = $location;
-    this.ros = Ros;
-  }
-
-  _createClass(NavbarController, [{
-    key: 'isPath',
-    value: function isPath(path) {
-      return this.$location.path() === path;
-    }
-  }]);
-
-  return NavbarController;
-}();
-
-angular.module('roscc').component('ccNavbar', {
-  templateUrl: 'app/navbar/navbar.html',
-  controller: NavbarController
-});
 "use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1591,6 +1663,34 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var NavbarController = function () {
+  function NavbarController($location, Ros) {
+    _classCallCheck(this, NavbarController);
+
+    this.$location = $location;
+    this.ros = Ros;
+  }
+
+  _createClass(NavbarController, [{
+    key: 'isPath',
+    value: function isPath(path) {
+      return this.$location.path() === path;
+    }
+  }]);
+
+  return NavbarController;
+}();
+
+angular.module('roscc').component('ccNavbar', {
+  templateUrl: 'app/navbar/navbar.html',
+  controller: NavbarController
+});
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var ParameterController = function () {
   function ParameterController($timeout, Ros) {
     _classCallCheck(this, ParameterController);
@@ -1657,7 +1757,8 @@ var ServiceController = function () {
       this.fileName = path + 'default.html';
 
       if (!this.service.active) {
-        this.fileName = path + 'disabled.html';
+        this.fileName = '';
+        this.service.isOpen = false;
         return;
       } else if (!this.service.type) {
         this.fileName = path + 'default.html';
@@ -1718,7 +1819,7 @@ var ServiceController = function () {
 
 angular.module('roscc').component('ccService', {
   bindings: { service: '=' },
-  template: '<ng-include src="$ctrl.fileName"></ng-include>',
+  template: '<ng-include src="\'./app/services/meta.html\'"></ng-include>',
   controller: ServiceController
 });
 'use strict';

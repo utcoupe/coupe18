@@ -1,22 +1,6 @@
-<div uib-accordion-group
-ng-class="{'panel-default' : $ctrl.flashState == -1,
-           'panel-info' : $ctrl.flashState == 0,
-           'panel-success' : $ctrl.flashState == 1,
-           'panel-danger' : $ctrl.flashState == 2}" is-open="$ctrl.service.isOpen">
-  <uib-accordion-heading>
-    {{ $ctrl.service.abbr }}
-    <div style="float: right">  <small style="font-size: 12px;">({{ $ctrl.service.type }})</small></div>
-    <div style="clear: both;"></div>
-  </uib-accordion-heading>
-
-  <div class="panel-body">
-    <div class="row">
-      <div class="col-sm-12">
-        <button class="btn btn-default" ng-class="{'btn-danger': enabled}" ng-model="enabled" ng-click="$ctrl.callService({data: enabled})" uib-btn-checkbox>
-          <span ng-show="enabled">Enabled</span>
-          <span ng-show="!enabled">Disabled</span>
-        </button>
-      </div>
-    </div>
-  </div>
+<div class="service-container col-autofit">
+  <button class="btn btn-default" ng-class="{'btn-danger': enabled}" ng-model="enabled" ng-click="$ctrl.callService({data: enabled})" uib-btn-checkbox>
+    <span ng-show="enabled">Enabled</span>
+    <span ng-show="!enabled">Disabled</span>
+  </button>
 </div>

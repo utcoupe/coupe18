@@ -22,7 +22,8 @@ class ServiceController {
 
 
     if(!this.service.active) {
-      this.fileName = `${path}disabled.html`;
+      this.fileName = '';
+      this.service.isOpen = false;
       return;
     }
     else if (!this.service.type) {
@@ -80,6 +81,6 @@ class ServiceController {
 
 angular.module('roscc').component('ccService', {
   bindings: { service: '=' },
-  template: '<ng-include src="$ctrl.fileName"></ng-include>',
+  template: `<ng-include src="'./app/services/meta.html'"></ng-include>`,
   controller: ServiceController,
 });

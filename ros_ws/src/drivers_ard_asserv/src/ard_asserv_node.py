@@ -48,9 +48,13 @@ class Asserv:
         self._srv_management = rospy.Service("/drivers/" + NODE_NAME + "/management", Management, self._callback_management)
         self._act_goto = actionlib.ActionServer("/drivers/" + NODE_NAME + "/goto_action", DoGotoAction, self._callback_action_goto, auto_start=False)
         self._act_goto.start()
-        rospy.wait_for_service(GET_PORT_SERVICE_NAME, GET_PORT_SERVICE_TIMEOUT)
-        self._src_client_get_port = rospy.ServiceProxy(GET_PORT_SERVICE_NAME, GetPort)
-        arduino_port = self._src_client_get_port("ard_asserv").port
+        try:
+            rospy.wait_for_service(GET_PORT_SERVICE_NAME, GET_PORT_SERVICE_TIMEOUT)
+            self._src_client_get_port = rospy.ServiceProxy(GET_PORT_SERVICE_NAME, GetPort)
+            arduino_port = self._src_client_get_port("ard_asserv").port
+        except rospy.ROSException as exc:
+            rospy.loginfo("Port_finder has not been launched...")
+            arduino_port = ""
         rospy.loginfo("Service return value : " + arduino_port)
         if arduino_port == "":
             rospy.logwarn("[ASSERV] Creation of the simu asserv.")

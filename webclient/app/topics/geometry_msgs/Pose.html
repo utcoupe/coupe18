@@ -1,4 +1,4 @@
-<div class="topic-container" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+<div class="topic-container col-autofit">
   <div class="form-group">
     <label>X</label>
     <div class="input-group">
@@ -45,7 +45,7 @@
     <label>Yaw</label>
     <div class="input-group">
       <input type="number" class="form-control" ng-value="$ctrl.Quaternions.getYaw($ctrl.message.orientation)" ng-readonly="true">
-      <span class="input-group-addon">°</span>
+      <span class="input-group-addon">rad</span>
     </div>
   </div>
 
