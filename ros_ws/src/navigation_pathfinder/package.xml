@@ -16,6 +16,7 @@
     <depend>processing_lidar_objects</depend>
     <depend>ai_game_status</depend>
     <depend>memory_map</depend>
+    <depend>recognition_objects_classifier</depend>
     <exec_depend>message_runtime</exec_depend>
     <export>
     </export>

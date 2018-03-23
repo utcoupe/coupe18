@@ -12,6 +12,7 @@
 #include "pathfinder/BarriersSubscribers/processing_belt_interpreter_subscriber.h"
 #include "pathfinder/BarriersSubscribers/processing_lidar_objects_subscriber.h"
 #include "pathfinder/BarriersSubscribers/memory_map_subscriber.h"
+#include "pathfinder/BarriersSubscribers/recognition_objects_classifier_subscriber.h"
 #include "pathfinder/pos_convertor.h"
 
 #include <cstdlib>
@@ -52,8 +53,8 @@ int main (int argc, char* argv[])
     convertor->setInvertedY(true);
     
     auto dynBarriersMng = make_shared<DynamicBarriersManager>();
-    dynBarriersMng->addBarrierSubscriber(constructSubscriber<BeltInterpreterSubscriber>(nodeHandle, BELT_INTERPRETER_TOPIC));
-    dynBarriersMng->addBarrierSubscriber(constructSubscriber<LidarObjectsSubscriber>(nodeHandle, LIDAR_OBJECTS_TOPIC));
+//     dynBarriersMng->addBarrierSubscriber(constructSubscriber<BeltInterpreterSubscriber>(nodeHandle, BELT_INTERPRETER_TOPIC));
+//     dynBarriersMng->addBarrierSubscriber(constructSubscriber<LidarObjectsSubscriber>(nodeHandle, LIDAR_OBJECTS_TOPIC));
     auto mapSubscriber = constructSubscriber<MapSubscriber>(nodeHandle, MAP_GET_OBJECTS_SERVER);
     mapSubscriber->setConvertor(convertor);
     dynBarriersMng->addBarrierSubscriber(std::move(mapSubscriber));

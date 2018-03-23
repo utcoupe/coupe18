@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
     processing_lidar_objects
     ai_game_status
     memory_map
+    recognition_objects_classifier
 )
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH}) # Please note the use of CMAKE_CURRENT_SOURCE_DIR
