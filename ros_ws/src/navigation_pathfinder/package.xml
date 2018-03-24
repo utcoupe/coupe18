@@ -12,8 +12,6 @@
     <depend>message_generation</depend>
     <depend>geometry_msgs</depend>
     <depend>dynamic_reconfigure</depend>
-    <depend>processing_belt_interpreter</depend>
-    <depend>processing_lidar_objects</depend>
     <depend>ai_game_status</depend>
     <depend>memory_map</depend>
     <depend>recognition_objects_classifier</depend>

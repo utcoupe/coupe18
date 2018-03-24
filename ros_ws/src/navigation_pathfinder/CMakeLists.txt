@@ -9,8 +9,6 @@ find_package(catkin REQUIRED COMPONENTS
     genmsg
     geometry_msgs
     dynamic_reconfigure
-    processing_belt_interpreter
-    processing_lidar_objects
     ai_game_status
     memory_map
     recognition_objects_classifier

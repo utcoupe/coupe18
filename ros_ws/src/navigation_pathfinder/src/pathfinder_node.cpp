@@ -9,8 +9,6 @@
 #include "pathfinder/map_storage.h"
 #include "pathfinder/pathfinder.h"
 #include "pathfinder/point.h"
-#include "pathfinder/BarriersSubscribers/processing_belt_interpreter_subscriber.h"
-#include "pathfinder/BarriersSubscribers/processing_lidar_objects_subscriber.h"
 #include "pathfinder/BarriersSubscribers/memory_map_subscriber.h"
 #include "pathfinder/BarriersSubscribers/recognition_objects_classifier_subscriber.h"
 #include "pathfinder/pos_convertor.h"
@@ -18,7 +16,6 @@
 #include <memory>
 
 using namespace std;
-using namespace Processing;
 using namespace Memory;
 using namespace Recognition;
 
@@ -31,8 +28,6 @@ const string                MAP_FILE_NAME               = string(getenv ("UTCOUP
 
 const size_t                SIZE_MAX_QUEUE              = 10;
 const double                SAFETY_MARGIN               = 0.15;
-const string                BELT_INTERPRETER_TOPIC      = "/processing/belt_interpreter/rects";
-const string                LIDAR_OBJECTS_TOPIC         = "/processing/lidar_objects/obstacles";
 const string                MAP_GET_OBJECTS_SERVER      = "/memory/map/get_objects";
 const string                OBJECTS_CLASSIFIER_TOPIC    = "/recognition/objects_classifier/objects";
 
@@ -52,8 +47,6 @@ int main (int argc, char* argv[])
     convertor->setInvertedY(true);
     
     auto dynBarriersMng = make_shared<DynamicBarriersManager>();
-//     dynBarriersMng->addBarrierSubscriber(constructSubscriber<BeltInterpreterSubscriber>(nodeHandle, BELT_INTERPRETER_TOPIC));
-//     dynBarriersMng->addBarrierSubscriber(constructSubscriber<LidarObjectsSubscriber>(nodeHandle, LIDAR_OBJECTS_TOPIC));
     auto mapSubscriber = constructSubscriber<MapSubscriber>(nodeHandle, MAP_GET_OBJECTS_SERVER);
     mapSubscriber->setConvertor(convertor);
     dynBarriersMng->addBarrierSubscriber(std::move(mapSubscriber));

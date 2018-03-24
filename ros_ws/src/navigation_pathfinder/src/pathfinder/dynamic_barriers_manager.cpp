@@ -1,8 +1,5 @@
 #include "pathfinder/dynamic_barriers_manager.h"
 
-#include "pathfinder/BarriersSubscribers/processing_belt_interpreter_subscriber.h"
-#include "pathfinder/BarriersSubscribers/processing_lidar_objects_subscriber.h"
-
 #include <utility>
 
 using namespace std;
