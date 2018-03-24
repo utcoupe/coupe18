@@ -13,6 +13,7 @@ from geometry_msgs.msg import PointStamped, PoseStamped
 import itertools
 from numpy import linspace
 from math import atan2
+from markers_publisher import MarkersPublisher
 
 
 class ObjectsClassifier(object):
@@ -31,6 +32,8 @@ class ObjectsClassifier(object):
         # resolution along the long and large side for rectangles (meters)
         self.RESOLUTION_LONG = 0.05
         self.RESOLUTION_LARGE = 0.05
+
+        self.TIME_THRESHOLD = 1 # if incoming data is older than X secs, ignore it
 
         self.PUB_TOPIC = "/recognition/objects_classifier/objects"
         self.BELT_TOPIC = "/processing/belt_interpreter/rects"
@@ -53,6 +56,7 @@ class ObjectsClassifier(object):
         self._segments = {'map': [], 'unknown': []}
         self._to_process = {'rects': [], 'circles': [], 'segments': []}
 
+        self._markers_pub = MarkersPublisher()
         self._pub = rospy.Publisher(self.PUB_TOPIC, ClassifiedObjects, queue_size=1)
         self._belt_sub = rospy.Subscriber(self.BELT_TOPIC, BeltRects, self.belt_callback)
         self._lidar_sub = rospy.Subscriber(self.LIDAR_TOPIC, Obstacles, self.lidar_callback)
@@ -66,7 +70,7 @@ class ObjectsClassifier(object):
 
 
     def belt_callback(self, data):
-        self._to_process['rects'] = data.rects
+        self._to_process['rects'] = filter(lambda r: rospy.Time.now().secs - r.header.stamp.secs < self.TIME_THRESHOLD, data.rects)
 
     def lidar_callback(self, data):
 
@@ -80,7 +84,8 @@ class ObjectsClassifier(object):
                               self._rects['unknown'], self._circles['unknown'], self._segments['unknown'])
 
 
-
+            self._markers_pub.clear_markers()
+            self._markers_pub.publish_rects(self._rects['map'], self._rects['unknown'])
             self.PUB_RATE.sleep()
 
     def process_data(self):
@@ -88,6 +93,8 @@ class ObjectsClassifier(object):
         self.process_segments()
         self.process_circles()
         self.process_rects()
+
+
 
     def clear_objects(self):
         self._segments['map'] = []

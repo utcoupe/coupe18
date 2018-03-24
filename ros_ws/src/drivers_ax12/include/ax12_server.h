@@ -13,6 +13,7 @@
 #include <drivers_port_finder/GetPort.h>
 #include <memory_definitions/GetDefinition.h>
 #include <ai_game_status/init_service.h>
+#include <ai_game_status/GameStatus.h>
 
 #include "ax12_driver.h"
 
@@ -22,6 +23,7 @@ const double MAIN_FREQUENCY = 30;
 const uint8_t POSITION_MARGIN = 4;
 const std::string PORT_FINDER_SERVICE = "/drivers/port_finder/get_port";
 const std::string DEFAULT_PORT = "/dev/ttyACM0";
+const std::string GAME_STATUS_TOPIC = "/ai/game_status/status";
 
 
 typedef actionlib::ServerGoalHandle<drivers_ax12::Ax12CommandAction> GoalHandle;
@@ -34,6 +36,7 @@ protected:
     ros::NodeHandle nh_;
     actionlib::ActionServer<drivers_ax12::Ax12CommandAction> as_;
     ros::ServiceServer set_param_service;
+    ros::Subscriber game_status_sub_;
     std::list<GoalHandle> joint_goals_;
 
     // create messages that are used to published feedback/result
@@ -43,9 +46,12 @@ protected:
     Ax12Driver driver_;
     ros::Timer timer_;
 
+    bool is_halted;
+
 public:
     void execute_goal_cb(GoalHandle goal_handle);
     bool execute_set_service_cb(drivers_ax12::SetAx12Param::Request &req, drivers_ax12::SetAx12Param::Response &res);
+    void game_status_cb(const ai_game_status::GameStatusConstPtr& status);
     std::string fetch_port(const std::string& service_name);
     void init_driver(const std::string& port);
     void main_loop(const ros::TimerEvent&);

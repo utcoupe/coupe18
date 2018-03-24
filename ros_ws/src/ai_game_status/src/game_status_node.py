@@ -23,7 +23,7 @@ class Status():
         "/memory/definitions": None,
 
         "/navigation/navigator": None,
-        # "/navigation/pathfinder": None,
+        "/navigation/pathfinder": None,
         "/navigation/collisions": None,
 
         "/movement/actuators": None,

@@ -113,3 +113,8 @@ uint8_t Ax12Driver::get_motor_count()
 {
     return motor_count;
 }
+
+uint8_t* Ax12Driver::get_motor_ids()
+{
+    return motor_ids;
+}

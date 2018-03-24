@@ -32,6 +32,7 @@ class RequestTypes(object):
             "/ai/timer/delay":                   (RequestTypes.SERVICE, ai_timer.srv.Delay),
 
             "/memory/map/get":                   (RequestTypes.SERVICE, memory_map.srv.MapGet),
+            "/memory/map/set":                   (RequestTypes.SERVICE, memory_map.srv.MapSet),
             "/memory/map/transfer":              (RequestTypes.SERVICE, memory_map.srv.MapTransfer),
 
             "/navigation/navigator/goto_action": (RequestTypes.ACTION,  navigation_navigator.msg.DoGotoAction, navigation_navigator.msg.DoGotoGoal),

@@ -9,7 +9,9 @@ import actionlib
 import movement_actuators.msg
 import actuators_properties
 import drivers_ard_others.msg
+import drivers_ax12.msg
 from ai_game_status import StatusServices
+from ai_game_status.msg import GameStatus
 
 
 def current_milli_time(): return int(round(time.time() * 1000))
@@ -20,6 +22,8 @@ class ActuatorsNode():
     _result = movement_actuators.msg.dispatchResult()
 
     def __init__(self):
+        self.is_halted = False
+
         self._node = rospy.init_node('actuators')
         self._namespace = '/movement/actuators/'
         self._action_name = '{}dispatch'.format(self._namespace)
@@ -28,12 +32,21 @@ class ActuatorsNode():
         self._action_server = actionlib.SimpleActionServer( self._action_name, movement_actuators.msg.dispatchAction, execute_cb=self.dispatch, auto_start=False)
         self._arduino_move = rospy.Publisher( '/drivers/ard_others/move', drivers_ard_others.msg.Move, queue_size=30)  # TODO check the queue_size
         self._arduino_response = rospy.Subscriber( '/drivers/ard_others/move_response', drivers_ard_others.msg.MoveResponse, self.ard_callback)
+        self._ax12_client = actionlib.SimpleActionClient('/drivers/ax12', drivers_ax12.msg.Ax12CommandAction)
+        self._game_status_sub = rospy.Subscriber('/ai/game_status/status', GameStatus, self.game_status_callback)
         self._action_server.start()
+
 
         # Tell ai/game_status the node initialized successfuly.
         StatusServices("movement", "actuators").ready(True)
 
     def dispatch(self, command):
+
+        if self.is_halted:
+            rospy.logerr("Received dispatch command but game_status is halted")
+            self._action_server.set_aborted(False)
+            return
+
         #-----Actuator check
         try:
             actuator = actuators_properties.getActuatorsList()[command.name]
@@ -67,11 +80,11 @@ class ActuatorsNode():
         else:
             timeout = command.timeout
         #-----Time to send !
-        if actuator.family == 'arduino':
+        if actuator.family.lower() == 'arduino':
             self._result.success = self.sendToArduino( actuator.id, actuator.type, command.order, param, timeout )
             self._action_server.set_succeeded(self._result)
             return
-        elif actuator.family == 'ax12':
+        elif actuator.family.lower() == 'ax12':
             self._result.success = self.sendToAx12( actuator.id, command.order, param, timeout)
             self._action_server.set_succeeded(self._result)
             return
@@ -108,8 +121,27 @@ class ActuatorsNode():
         return success
 
     def sendToAx12(self, id, order, param, timeout):
-        rospy.logwarn('Ax12 control is not implemented yet.')
-        return False
+        goal = drivers_ax12.msg.Ax12CommandGoal()
+        goal.motor_id = int(id)
+        if order.lower() == "joint":
+            goal.mode = drivers_ax12.msg.Ax12CommandGoal.JOINT
+            goal.speed = 0
+            goal.position = int(param)
+        elif order.lower() == "wheel":
+            goal.mode = drivers_ax12.msg.Ax12CommandGoal.WHEEL
+            goal.speed = int(param)
+        else:
+            rospy.logerr("Bad order: {}, expected joint or wheel".format(order))
+            return False
+
+        self._ax12_client.send_goal(goal)
+        if self._ax12_client.wait_for_result(rospy.Duration(int(timeout))):
+            success = self._ax12_client.get_result().success
+        else:
+            rospy.loginfo('Timeout reached')
+            success = False
+
+        return success
     
     def generateId(self, event):
         with self._lock:
@@ -127,6 +159,13 @@ class ActuatorsNode():
                 event.set()
             else:
                 rospy.logwarn('Unknow id received : {}'.format(msg.order_nb))
+
+    def game_status_callback(self, msg):
+        if not self.is_halted and msg.game_status == GameStatus.STATUS_HALT:
+            self.is_halted = True
+
+        elif self.is_halted and msg.game_status != GameStatus.STATUS_HALT:
+            self.is_halted = False
 
 if __name__ == '__main__':
     actuators_properties.initActuatorsList()

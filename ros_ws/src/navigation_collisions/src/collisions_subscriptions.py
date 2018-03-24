@@ -7,13 +7,11 @@ from collisions_robot import Robot
 from collisions_engine import Point, Position, Velocity, SegmentObstacle, RectObstacle, CircleObstacle
 from status_services import StatusServices
 
-from geometry_msgs.msg import PointStamped
-
 from memory_map.srv import MapGet
 from navigation_navigator.msg import Status
 from drivers_ard_asserv.msg import RobotSpeed
-from processing_belt_interpreter.msg import BeltRects
-from processing_lidar_objects.msg import Obstacles
+
+from recognition_objects_classifier.msg import ClassifiedObjects
 
 class CollisionsSubscriptions(object):
     def __init__(self):
@@ -30,8 +28,7 @@ class CollisionsSubscriptions(object):
 
         # Subscribing to dependencies
         rospy.Subscriber("/navigation/navigator/status", Status, self._on_nav_status)
-        rospy.Subscriber("/processing/belt_interpreter/rects_filtered", BeltRects, self._on_belt)
-        rospy.Subscriber("/processing/lidar_objects/obstacles", Obstacles, self._on_lidar)
+        rospy.Subscriber("/recognition/objects_classifier/objects", ClassifiedObjects, self._on_classifier)
         rospy.Subscriber("/drivers/ard_asserv/speed", RobotSpeed, self.on_robot_speed)
 
         self.game_status = StatusServices("navigation", "collisions", None, self._on_game_status)
@@ -79,44 +76,42 @@ class CollisionsSubscriptions(object):
         self._nav_status = msg.status
         self._robot_path_waypoints = [Point(point.x, point.y) for point in msg.currentPath]
 
-    def _on_belt(self, msg):
+    def _on_classifier(self, msg):
         new_belt = []
-        for rect in msg.rects:
-            transform = self._tf2_pos_buffer.lookup_transform("map", rect.header.frame_id, # dest frame, source frame
-                                                              rospy.Time.now(),            # get the tf at first available time
-                                                              rospy.Duration(5.0))         # timeout
-            center = PointStamped()
-            center.point.x = rect.x
-            center.point.y = rect.y
-            center.header = rect.header
-            try:
-                center_map = self._transform_listener.transformPoint("map", center)
-                new_belt.append(RectObstacle(Position(center_map.point.x, center_map.point.y,
-                                                      self._quaternion_to_euler_angle(transform.transform.rotation)[2]),
-                                                      rect.w, rect.h))
-            except:
-                rospy.logdebug("Frame /map does not exist, cannot fetch belt rects.")
+        for rect in msg.unknown_rects:
+            if rect.header.frame_id != "/map":
+                rospy.logwarn("Belt rect not in /map tf frame, skipping.")
+                continue
+
+            new_belt.append(RectObstacle(Position(rect.x, rect.y,\
+                                                  rect.a),\
+                                                  rect.w, rect.h))
+
         if len(new_belt) > 0:
             ObstaclesStack.updateBeltPoints(new_belt)
 
-    def _on_lidar(self, msg):
+
         new_lidar = []
-        if msg.header.frame_id != "map":
-            rospy.logwarn("Lidar obstacles not in /map tf frame, skipping.")
-            return
-        for segment in msg.segments:
-            new_lidar.append(SegmentObstacle(Position(segment.first_point.x, segment.first_point.y),
-                                             Position(segment.last_point.x,  segment.last_point.y)))
-        for circle in msg.circles:
+
+        for segment in msg.unknown_segments:
+            if segment.header.frame_id != "/map":
+                rospy.logwarn("Lidar segment not in /map tf frame, skipping.")
+                continue
+
+            new_lidar.append(SegmentObstacle(Position(segment.segment.first_point.x, segment.segment.first_point.y),
+                                             Position(segment.segment.last_point.x,  segment.segment.last_point.y)))
+        for circle in msg.unknown_circles:
+            if circle.header.frame_id != "/map":
+                rospy.logwarn("Lidar circle not in /map tf frame, skipping.")
+                continue
             vel_d = math.sqrt(circle.velocity.y ** 2 + circle.velocity.x ** 2)
             vel_a = math.atan2(circle.velocity.y, circle.velocity.x)
             new_lidar.append(CircleObstacle(Position(circle.center.x, circle.center.y, angle = vel_a),
-                                            circle.radius, velocity = Velocity(circle.radius * 2, circle.radius * math.sqrt(3.0) / 2.0, 
+                                            circle.radius, velocity = Velocity(circle.radius * 2, circle.radius * math.sqrt(3.0) / 2.0,
                                             vel_d, 0.0)))
 
         if len(new_lidar) > 0:
             ObstaclesStack.updateLidarObjects(new_lidar)
-
 
     def on_robot_speed(self, msg):
         self._vel_linear = msg.linear_speed
