@@ -20,19 +20,21 @@
 using namespace std;
 using namespace Processing;
 using namespace Memory;
+using namespace Recognition;
 
-const string                NAMESPACE_NAME          = "navigation";
-const string                NODE_NAME               = "pathfinder";
+const string                NAMESPACE_NAME              = "navigation";
+const string                NODE_NAME                   = "pathfinder";
 
-const string                FINDPATH_SERVICE_NAME   = "/" + NAMESPACE_NAME + "/" + NODE_NAME + "/find_path";
-const pair<double, double>  TABLE_SIZE              = {3.0, 2.0}; // Scale corresponding to messages received by the node
-const string                MAP_FILE_NAME           = string(getenv ("UTCOUPE_WORKSPACE")) + "/ros_ws/src/memory_map/src/occupancy/img/layer_pathfinder.bmp"; //"/ros_ws/src/navigation_pathfinder/def/map.bmp";
+const string                FINDPATH_SERVICE_NAME       = "/" + NAMESPACE_NAME + "/" + NODE_NAME + "/find_path";
+const pair<double, double>  TABLE_SIZE                  = {3.0, 2.0}; // Scale corresponding to messages received by the node
+const string                MAP_FILE_NAME               = string(getenv ("UTCOUPE_WORKSPACE")) + "/ros_ws/src/memory_map/src/occupancy/img/layer_pathfinder.bmp"; //"/ros_ws/src/navigation_pathfinder/def/map.bmp";
 
-const size_t                SIZE_MAX_QUEUE          = 10;
-const double                SAFETY_MARGIN           = 0.15;
-const string                BELT_INTERPRETER_TOPIC  = "/processing/belt_interpreter/rects";
-const string                LIDAR_OBJECTS_TOPIC     = "/processing/lidar_objects/obstacles";
-const string                MAP_GET_OBJECTS_SERVER  = "/memory/map/get_objects";
+const size_t                SIZE_MAX_QUEUE              = 10;
+const double                SAFETY_MARGIN               = 0.15;
+const string                BELT_INTERPRETER_TOPIC      = "/processing/belt_interpreter/rects";
+const string                LIDAR_OBJECTS_TOPIC         = "/processing/lidar_objects/obstacles";
+const string                MAP_GET_OBJECTS_SERVER      = "/memory/map/get_objects";
+const string                OBJECTS_CLASSIFIER_TOPIC    = "/recognition/objects_classifier/objects";
 
 template<typename T>
 unique_ptr<T> constructSubscriber(ros::NodeHandle& nodeHandle, const string& topic);
@@ -55,6 +57,7 @@ int main (int argc, char* argv[])
     auto mapSubscriber = constructSubscriber<MapSubscriber>(nodeHandle, MAP_GET_OBJECTS_SERVER);
     mapSubscriber->setConvertor(convertor);
     dynBarriersMng->addBarrierSubscriber(std::move(mapSubscriber));
+    dynBarriersMng->addBarrierSubscriber(constructSubscriber<ObjectsClassifierSubscriber>(nodeHandle, OBJECTS_CLASSIFIER_TOPIC));
     
     Pathfinder pathfinder(MAP_FILE_NAME, convertor, TABLE_SIZE, dynBarriersMng);
     ros::ServiceServer findPathServer = nodeHandle.advertiseService(FINDPATH_SERVICE_NAME, &Pathfinder::findPathCallback, &pathfinder);
