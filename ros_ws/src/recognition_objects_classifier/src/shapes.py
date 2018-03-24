@@ -1,4 +1,4 @@
-from math import atan2, pi, sqrt, asin
+    from math import atan2, pi, sqrt, asin
 
 class Shape(object):
     """Class to test collisions with shapes returned by the map"""
