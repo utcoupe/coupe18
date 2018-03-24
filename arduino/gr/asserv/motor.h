@@ -14,6 +14,4 @@ void set_pwm_left(int pwm);
 
 void set_pwm_right(int pwm);
 
-void get_breaking_speed_factor(float *angular_speed, float *linear_speed);
-
 #endif

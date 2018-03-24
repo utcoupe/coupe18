@@ -60,8 +60,3 @@ void set_pwm_right(int pwm){
 	
 	motor_right.setSpeed(abs(pwm));
 }
-
-void get_breaking_speed_factor(float *angular_speed, float *linear_speed) {
-    *angular_speed = (float)0.0;
-    *linear_speed = (float)0.0;
-}

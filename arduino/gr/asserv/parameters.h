@@ -67,6 +67,10 @@
 #define PID_I 30 //30
 #define PID_D 5 //5
 #define PID_BIAS 0
+#define PID_I_MAX 150
+#define PID_OUT_MAX 255
+
+#define BRK_COEFF 0.0
 
 // Control feed-forward, pwm = a*spd + b
 #define SPD_TO_PWM_A 0.2

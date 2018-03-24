@@ -71,14 +71,3 @@ void BrushlessMotorSetPwm(int motor_side, int pwm) {
 		}
 	}
 }
-
-// does not work nor change anything...
-void BrushlessMotorBreak(int pwm) {
-    if (pwm > 200) {
-        digitalWrite(MOTOR1_BRK, LOW);
-        digitalWrite(MOTOR2_BRK, LOW);
-    } else {
-        digitalWrite(MOTOR1_BRK, HIGH);
-        digitalWrite(MOTOR2_BRK, HIGH);
-    }
-}

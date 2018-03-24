@@ -20,6 +20,5 @@
 void BrushlessMotorsInit();
 int BrushlessMotorsReady();
 void BrushlessMotorSetPwm(int motor_side, int pwm);
-void BrushlessMotorBreak(int pwm);
 
 #endif
