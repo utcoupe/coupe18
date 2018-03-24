@@ -84,19 +84,12 @@ void ControlCompute(void) {
 	now = timeMicros();
 #endif
 
-//    if (control.status_bits & EMERGENCY_BIT) {
-//        apply_break(255);
-//    } else {
-//        apply_break(0);
-//    }
-
 	goal_t* current_goal = FifoCurrentGoal();
 	RobotStateUpdate();
 
 	if (control.status_bits & EMERGENCY_BIT || control.status_bits & PAUSE_BIT || control.status_bits & TIME_ORDER_BIT) {
 		stopRobot();
 	} else {
-//        apply_break(0);
 		switch (current_goal->type) {
 			case TYPE_ANG:
 				goalAngle(current_goal);
@@ -283,14 +276,10 @@ float calcSpeed(float init_spd, float dd, float max_spd, float final_speed) {
 void stopRobot(void) {
 	int sign;
 	float speed;
-    float angular_speed_factor;
-    float linear_speed_factor;
-//    apply_break(255);
-    get_breaking_speed_factor(&angular_speed_factor, &linear_speed_factor);
 
     speed = abs(control.speeds.angular_speed);
-    if (angular_speed_factor != 0.0) {
-        speed -= control.max_acc * DT * angular_speed_factor;
+    if (BRK_COEFF != 0.0) {
+        speed -= control.max_acc * DT * BRK_COEFF;
     } else {
         speed = 0.0;
     }
@@ -299,8 +288,8 @@ void stopRobot(void) {
 
     sign = sign(control.speeds.linear_speed);
     speed = abs(control.speeds.linear_speed);
-    if (linear_speed_factor != 0.0) {
-        speed -= control.max_acc * DT * linear_speed_factor;
+    if (BRK_COEFF != 0.0) {
+        speed -= control.max_acc * DT * BRK_COEFF;
     } else {
         speed = 0.0;
     }

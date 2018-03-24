@@ -271,6 +271,9 @@ void parseAndExecuteOrder(const String& order) {
             if (enable == 0) {
                 ControlUnsetStop(EMERGENCY_BIT);
             } else {
+                // Reset the PID to remove the error sum
+                PIDReset(&PID_left);
+                PIDReset(&PID_right);
                 ControlSetStop(EMERGENCY_BIT);
             }
             SerialSender::SerialSend(SERIAL_INFO, "%d;", order_id);
