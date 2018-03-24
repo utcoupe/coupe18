@@ -15,9 +15,6 @@
 #include "pathfinder/BarriersSubscribers/recognition_objects_classifier_subscriber.h"
 #include "pathfinder/pos_convertor.h"
 
-#include <cstdlib>
-#include <iostream>
-#include <vector>
 #include <memory>
 
 using namespace std;
