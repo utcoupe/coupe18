@@ -46,6 +46,10 @@ void MapSubscriber::fetchOccupancyData(const uint& widthGrid, const uint& height
             heightGrid,
             vector<bool>(widthGrid, false)
         );
+    else
+        for (unsigned row = 0; row < _occupancyGrid.size(); row++)
+            for (unsigned column = 0; column < _occupancyGrid.front().size(); column++)
+                _occupancyGrid[row][column] = false;
     
     for (auto&& object : srv.response.objects)
     {
