@@ -20,6 +20,7 @@ AF_DCMotor motor_right(2, MOTOR12_64KHZ);
 
 extern "C" void set_pwm_right(int pwm);
 extern "C" void set_pwm_left(int pwm);
+extern "C" void get_breaking_speed_factor(float *angular_speed, float *linear_speed);;
 
 void set_pwm_left(int pwm){
 	pwm = -pwm;//les moteurs sont faces à face, pour avancer il faut qu'il tournent dans un sens différent

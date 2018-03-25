@@ -57,8 +57,10 @@ float PIDCompute(PID_t *pid, float error) {
 	bias = pid->bias;
 	P_part = pid->P * error;
 	I_part = pid->I * pid->error_sum;
+    if (I_part > PID_I_MAX) I_part = PID_I_MAX;
 	D_part = pid->D * error_D;
 	pid->output = bias + P_part + I_part + D_part;
+    if (pid->output > PID_OUT_MAX) pid->output = PID_OUT_MAX;
 
 	return pid->output;
 }

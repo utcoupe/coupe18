@@ -57,7 +57,7 @@ void BrushlessMotorSetPwm(int motor_side, int pwm) {
 			else {
 				digitalWrite(MOTOR1_EN,HIGH);
 			}
-		    	break;
+            break;
 		}
 		case MOTOR_RIGHT:{
 			analogWrite(MOTOR2_SPD, pwm);

@@ -17,13 +17,13 @@ extern "C" {
     #include "robotstate.h"
     #include "control.h"
     #include "goals.h"
-    #include "emergency.h"
 }
 
+unsigned char flagArduinoConnected = 0;
+
 void autoSendStatus() {
-    //todo auto_send ?
     SerialSender::SerialSend(SERIAL_INFO, "%c;%i;%i;%i;%i;%i;%i;%i;%i;%i;", AUTO_SEND, control.last_finished_id, (int)current_pos.x, (int)current_pos.y,(int)(current_pos.angle*FLOAT_PRECISION),
-                             (int)control.speeds.pwm_left, (int)control.speeds.pwm_right, (int)(control.speeds.linear_speed), (int)wheels_spd.left, (int)wheels_spd.right);
+                             control.speeds.pwm_left, control.speeds.pwm_right, (int)(control.speeds.linear_speed), (int)wheels_spd.left, (int)wheels_spd.right);
 #if DEBUG_TARGET_SPEED
 //    index += sprintf(message+index, ";%i;%i;%i;%i",
 //			(int)wheels_spd.left,
@@ -36,12 +36,6 @@ void autoSendStatus() {
 
 void ProtocolAutoSendStatus() {
     autoSendStatus();
-// #if AUTO_STATUS_HZ
-//     static int i=0;
-//     if (++i % (HZ / AUTO_STATUS_HZ) == 0) {
-//         autoSendStatus();
-//     }
-// #endif
 }
 
 uint8_t getLog10(const uint16_t number) {
@@ -51,8 +45,6 @@ uint8_t getLog10(const uint16_t number) {
     if(number>=10) return 2;
     return 1;
 }
-
-unsigned char flagArduinoConnected = 0;
 
 //order is order;id_servo;params
 void parseAndExecuteOrder(const String& order) {
@@ -276,7 +268,14 @@ void parseAndExecuteOrder(const String& order) {
         {
             int enable;
             sscanf(receivedOrderPtr, "%i", &enable);
-            EmergencySetStatus(enable);
+            if (enable == 0) {
+                ControlUnsetStop(EMERGENCY_BIT);
+            } else {
+                // Reset the PID to remove the error sum
+                PIDReset(&PID_left);
+                PIDReset(&PID_right);
+                ControlSetStop(EMERGENCY_BIT);
+            }
             SerialSender::SerialSend(SERIAL_INFO, "%d;", order_id);
             break;
         }
