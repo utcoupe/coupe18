@@ -102,6 +102,8 @@ function env_setup() {
 	if ! grep "utcoupe" /etc/hosts > /dev/null; then
 	    sudo sh -c "echo '#UTCoupe raspberry pi Ethernet IP when connected on the UTC network\n172.18.159.254	utcoupe_rpi31\n172.18.161.161	utcoupe_rpi32\n172.18.161.162	utcoupe_rpi33' >> /etc/hosts"
 	fi
+	# Update the submodules
+	git submodules update --init --recursive
 }
 
 ### Then install the UTCoupe ROS workspace
