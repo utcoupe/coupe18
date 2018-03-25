@@ -1,7 +1,7 @@
 
 #include "shapes.h"
 
-bool Circle::contains_point(float x, float y)
+bool Circle::contains_point(float x, float y) const
 {
     float diff_x = x - x_;
     float diff_y = y - y;
@@ -9,7 +9,7 @@ bool Circle::contains_point(float x, float y)
     return dist_sqr < radius_*radius_;
 }
 
-bool Rectangle::contains_point(float x, float y)
+bool Rectangle::contains_point(float x, float y) const
 {
     return x >= x_ - width_ / 2
            and x <= x_ + width_ / 2
