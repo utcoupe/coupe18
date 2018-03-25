@@ -27,6 +27,25 @@ pair<double,double> PosConvertor::fromMapToRosPos (const pair<double,double>& ma
     return make_pair(x, y);
 }
 
+double PosConvertor::fromMapToRosDistance(const double& dist) const
+{
+    double xCoef = _sizeMap.first/_sizeRos.first;
+    double yCoef = _sizeMap.second/_sizeRos.second;
+    // We assume that the scale on x and y is the same, we take the linear average to have a better precision.
+    double coef = (xCoef + yCoef)/2;
+    return dist/coef;
+}
+
+double PosConvertor::fromRosToMapDistance(const double& dist) const
+{
+    double xCoef = _sizeMap.first/_sizeRos.first;
+    double yCoef = _sizeMap.second/_sizeRos.second;
+    // We assume that the scale on x and y is the same, we take the linear average to have a better precision.
+    double coef = (xCoef + yCoef)/2;
+    return dist*coef;
+}
+
+
 void PosConvertor::setSizes(std::pair<double, double> sizeRos, std::pair<double, double> sizeMap)
 {
     _sizeRos = sizeRos;

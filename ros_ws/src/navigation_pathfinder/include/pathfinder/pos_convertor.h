@@ -12,7 +12,7 @@ public:
     /**
      * @brief Initialize the convertor. Do nothing yet.
      */
-    PosConvertor() {}
+    PosConvertor() = default;
     
     /**
      * @brief Converts a coodinate from ROS system to pathfinding system using the scales.
@@ -27,6 +27,10 @@ public:
      * @return The coordinate in ROS system
      */
     std::pair<double,double> fromMapToRosPos (const std::pair<double,double>& mapPos) const;
+    
+    double fromMapToRosDistance (const double& dist) const;
+    
+    double fromRosToMapDistance (const double& dist) const;
     
     // Getters & Setters
     void setSizes (std::pair<double,double> sizeRos, std::pair<double,double> sizeMap);
