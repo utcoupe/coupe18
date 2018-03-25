@@ -19,6 +19,8 @@ find_package(SFML 2 REQUIRED COMPONENTS
     graphics
 )
 
+set(NLOHMANN_JSON_HEADER_LOCATION "$ENV{UTCOUPE_WORKSPACE}/libs/json/single_include/")
+
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
@@ -56,6 +58,7 @@ catkin_package(
 
 include_directories(
     include
+    ${NLOHMANN_JSON_HEADER_LOCATION}
     ${catkin_INCLUDE_DIRS}
 )
 
