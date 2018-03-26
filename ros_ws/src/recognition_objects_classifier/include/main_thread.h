@@ -5,7 +5,6 @@
 #include "processing_belt_interpreter/BeltRects.h"
 #include "processing_thread.h"
 #include "ros/ros.h"
-#include "shapes.h"
 #include <vector>
 
 
@@ -16,8 +15,6 @@ struct Point {
     bool is_map;
 };
 
-const std::string MAP_GET_SERVICE = "/memory/map/get";
-const std::string MAP_OBJECTS = "/terrain/walls/layer_belt/*";
 const std::string PUB_TOPIC = "/recognition/objects_classifier/objects";
 
 const float PUB_FREQ = 10.0;
@@ -39,7 +36,6 @@ class MainThread
 protected:
     Point points_[SENSORS_NBR * MAX_POINTS];
     std::vector<std::unique_ptr<ProcessingThread>> threads_;
-    std::vector<std::shared_ptr<const Shape>> map_shapes_;
 
     std::vector<processing_belt_interpreter::RectangleStamped> map_rects_;
     std::vector<processing_belt_interpreter::RectangleStamped> unknown_rects_;
@@ -52,7 +48,6 @@ protected:
     // protects the published lists
     std::mutex lists_mutex_;
 
-    void fetch_map_objects();
     void pub_loop(const ros::TimerEvent&);
 
 public:

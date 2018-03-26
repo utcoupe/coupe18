@@ -4,26 +4,6 @@
 #include "recognition_objects_classifier/ClassifiedObjects.h"
 #include <memory>
 
-void MainThread::fetch_map_objects()
-{
-    ros::ServiceClient client = nh_.serviceClient<memory_map::MapGet>(MAP_GET_SERVICE);
-
-    client.waitForExistence();
-
-    memory_map::MapGet srv;
-
-    srv.request.request_path = MAP_OBJECTS;
-
-    if(client.call(srv) && srv.response.success)
-    {
-
-    }
-    else
-    {
-        ROS_ERROR("Failed to contact memory_map, static objects not fetched");
-    }
-}
-
 void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects)
 {
 
