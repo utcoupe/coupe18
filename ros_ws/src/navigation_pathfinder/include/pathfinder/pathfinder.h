@@ -29,14 +29,13 @@ public:
     /**
      * Initialize the pathfinder by loading given image file containing static barriers positions, and the size of a rectangle containing all input positions (here the table).
      * @param mapFileName The name of the image file to load.
+     * @param convertor The convertor shared with other parts of the programm.
      * @param tableSize The reference size in the outside referential.
      * @param dynBarriersMng The dynamic barriers manager already initialized.
-     * @param invertedY Tells if 'y' needs to be inverted between the inside and outside referential (direct/indirect bases).
      * @param render Tells if an image must be generated to debug if a path was found.
      * @param renderFile The image file name that will be generated to debug.
      */
-    Pathfinder(const std::string& mapFileName, const std::pair< double, double >& tableSize, std::shared_ptr<DynamicBarriersManager> dynBarriersMng,
-               bool invertedY = true, bool render = false, const std::string& renderFile = "tmp.bmp");
+    Pathfinder(const std::string& mapFileName, std::shared_ptr<PosConvertor> convertor, const std::pair< double, double >& tableSize, std::shared_ptr<DynamicBarriersManager> dynBarriersMng, bool render = false, const std::string& renderFile = "tmp.bmp");
     
     /**
      * Try to find a path between the two given positions. The coordinates are directly used in inside referential. It returns false if no paths where found.

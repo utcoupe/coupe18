@@ -1,19 +1,25 @@
 #!/usr/bin/env python
 
 import rospy
-from geometry_msgs.msg import Pose2D
+from geometry_msgs.msg import Pose2D, TransformStamped
 import actionlib
 from drivers_ard_asserv.srv import *
 from drivers_ard_asserv.msg import *
 from drivers_port_finder.srv import *
 import asserv
 from ai_game_status import StatusServices
+from ai_game_status.msg import GameStatus
+from memory_map.srv import FillWaypoint
+from memory_map.msg import Waypoint
+import tf
+import tf2_ros
 
 __author__ = "Thomas Fuhrmann"
 __date__ = 21/10/2017
 
 NODE_NAME = "ard_asserv"
 GET_PORT_SERVICE_NAME = "/drivers/port_finder/get_port"
+GET_MAP_SERVICE_NAME = "/memory/map/fill_waypoint"
 GET_PORT_SERVICE_TIMEOUT = 15  # in seconds
 
 
@@ -35,6 +41,8 @@ class Asserv:
         self._goal_id_counter = 0
         # Instance of the asserv object (simu or real)
         self._asserv_instance = None
+        # Flag to know if the system has been halted (end of game)
+        self._is_halted = False
         # Init ROS stuff
         rospy.init_node(NODE_NAME, anonymous=False, log_level=rospy.INFO)
         self._pub_robot_pose = rospy.Publisher("/drivers/" + NODE_NAME + "/pose2d", Pose2D, queue_size=5)
@@ -47,21 +55,30 @@ class Asserv:
         self._srv_params = rospy.Service("/drivers/" + NODE_NAME + "/parameters", Parameters, self._callback_asserv_param)
         self._srv_management = rospy.Service("/drivers/" + NODE_NAME + "/management", Management, self._callback_management)
         self._act_goto = actionlib.ActionServer("/drivers/" + NODE_NAME + "/goto_action", DoGotoAction, self._callback_action_goto, auto_start=False)
+        self._sub_game_status = rospy.Subscriber("/ai/game_status/status", GameStatus, self._callback_game_status)
+        self._pub_tf_odom = tf2_ros.TransformBroadcaster()
         self._act_goto.start()
+        self._srv_client_map_fill_waypoints = None
         try:
             rospy.wait_for_service(GET_PORT_SERVICE_NAME, GET_PORT_SERVICE_TIMEOUT)
-            self._src_client_get_port = rospy.ServiceProxy(GET_PORT_SERVICE_NAME, GetPort)
-            arduino_port = self._src_client_get_port("ard_asserv").port
+            srv_client_get_port = rospy.ServiceProxy(GET_PORT_SERVICE_NAME, GetPort)
+            arduino_port = srv_client_get_port("ard_asserv").port
         except rospy.ROSException as exc:
             rospy.loginfo("Port_finder has not been launched...")
             arduino_port = ""
-        rospy.loginfo("Service return value : " + arduino_port)
+        rospy.loginfo("Port_finder returns value : " + arduino_port)
         if arduino_port == "":
             rospy.logwarn("[ASSERV] Creation of the simu asserv.")
             self._asserv_instance = asserv.AsservSimu(self)
         else:
             rospy.loginfo("[ASSERV] Creation of the real asserv.")
             self._asserv_instance = asserv.AsservReal(self, arduino_port)
+        try:
+            rospy.wait_for_service(GET_MAP_SERVICE_NAME, GET_PORT_SERVICE_TIMEOUT)
+            self._srv_client_map_fill_waypoints = rospy.ServiceProxy(GET_MAP_SERVICE_NAME, FillWaypoint)
+            rospy.logdebug("Memory_map has been found.")
+        except rospy.ROSException as exc:
+            rospy.logwarn("Memory_map has not been launched...")
 
         # Tell ai/game_status the node initialized successfuly.
         StatusServices("drivers", "ard_asserv").ready(True)
@@ -84,6 +101,20 @@ class Asserv:
     # robot_pose is a Pose2d structure
     def send_robot_position(self, robot_pose):
         self._pub_robot_pose.publish(robot_pose)
+        # Send the position using tf
+        t = TransformStamped()
+        t.header.stamp = rospy.Time.now()
+        t.header.frame_id = "map"
+        t.child_frame_id = "odom"
+        t.transform.translation.x = robot_pose.x
+        t.transform.translation.y = robot_pose.y
+        t.transform.translation.z = 0.0
+        q = tf.transformations.quaternion_from_euler(0, 0, robot_pose.theta)
+        t.transform.rotation.x = q[0]
+        t.transform.rotation.y = q[1]
+        t.transform.rotation.z = q[2]
+        t.transform.rotation.w = q[3]
+        self._pub_tf_odom.sendTransform(t)
 
     # robot_speed is a RobotSpeed structure
     def send_robot_speed(self, robot_speed):
@@ -115,8 +146,18 @@ class Asserv:
         @return:        True if request has been processed, false otherwise
         @rtype:         SetPosResponse
         """
-        rospy.logdebug("[ASSERV] Received a request (set_pos service).")
-        ret_value = self._asserv_instance.set_pos(request.position.x, request.position.y, request.position.theta)
+        set_position = Pose2D(0, 0, 0)
+        if request.position_waypoint == "":
+            rospy.logdebug("[ASSERV] Received a request (set_pos service).")
+            set_position = request.position
+        else:
+            rospy.logdebug("[ASSERV] Received a request (set_pos service), using waypoint")
+            if self._srv_client_map_fill_waypoints is not None:
+                wpt = Waypoint(name=request.position_waypoint)
+                set_position = self._srv_client_map_fill_waypoints.call(wpt).filled_waypoint.pose
+            else:
+                rospy.logwarn("[ASSERV] Received a waypoint request but memory_map seems not to be launched...")
+        ret_value = self._asserv_instance.set_pos(set_position.x, set_position.y, set_position.theta)
         return SetPosResponse(ret_value)
 
     def _callback_pwm(self, request):
@@ -218,15 +259,18 @@ class Asserv:
         @type goal_handled:     ServerGoalHandle
         """
         rospy.logdebug("[ASSERV] Received a request (dogoto action).")
-        #TODO manage direction
-        if self._process_goto_order(self._goal_id_counter, goal_handled.get_goal().mode,
-                                    goal_handled.get_goal().position.x, goal_handled.get_goal().position.y, goal_handled.get_goal().position.theta,
-                                    goal_handled.get_goal().direction):
-            goal_handled.set_accepted()
-            self._goals_dictionary[self._goal_id_counter] = goal_handled
-            self._goal_id_counter += 1
+        if not self._is_halted:
+            if self._process_goto_order(self._goal_id_counter, goal_handled.get_goal().mode,
+                                        goal_handled.get_goal().position.x, goal_handled.get_goal().position.y, goal_handled.get_goal().position.theta,
+                                        goal_handled.get_goal().direction):
+                goal_handled.set_accepted()
+                self._goals_dictionary[self._goal_id_counter] = goal_handled
+                self._goal_id_counter += 1
+            else:
+                rospy.logerr("[ASSERV] Action GOTO has failed... Mode probably does not exist.")
         else:
-            rospy.logerr("[ASSERV] Action GOTO has failed... Mode probably does not exist.")
+            goal_handled.set_rejected()
+            rospy.logwarn("[ASSERV] Action GOTO can not be accepted, asserv has been halted.")
 
     def _process_goto_order(self, goal_id, mode, x, y, a, direction):
         """
@@ -259,6 +303,18 @@ class Asserv:
             to_return = False
             rospy.logerr("[ASSERV] GOTO mode %d does not exists...", mode)
         return to_return
+
+    def _callback_game_status(self, msg):
+        if not self._is_halted and msg.game_status == GameStatus.STATUS_HALT:
+            self._is_halted = True
+            # Halt the system, emergency stop + clean all goals
+            self._asserv_instance.set_emergency_stop(True)
+            management_msg = ManagementRequest()
+            management_msg.mode = ManagementRequest.CLEANG
+            self._callback_management(management_msg)
+        elif self._is_halted and msg.game_status != GameStatus.STATUS_HALT:
+            self._is_halted = False
+            self._asserv_instance.set_emergency_stop(False)
 
 
 if __name__ == "__main__":

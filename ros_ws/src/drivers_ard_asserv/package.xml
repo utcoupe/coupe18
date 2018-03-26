@@ -16,6 +16,10 @@
     <depend>actionlib</depend>
     <depend>actionlib_msgs</depend>
     <depend>drivers_port_finder</depend>
+    <depend>ai_game_status</depend>
+    <depend>memory_map</depend>
+    <depend>tf</depend>
+    <depend>tf2_ros</depend>
     <exec_depend>message_runtime</exec_depend>
     <export>
     </export>

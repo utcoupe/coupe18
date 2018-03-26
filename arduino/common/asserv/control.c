@@ -11,7 +11,6 @@
 #include "compat.h"
 #include "motor.h"
 #include "local_math.h"
-#include "emergency.h"
 #include <math.h>
 
 #define ANG_REACHED (0x1)
@@ -84,32 +83,11 @@ void ControlCompute(void) {
 	long now;
 	now = timeMicros();
 #endif
+
 	goal_t* current_goal = FifoCurrentGoal();
 	RobotStateUpdate();
 
-	// clear emergency everytime, it will be reset if necessary
-	ControlUnsetStop(EMERGENCY_BIT);
-	ControlUnsetStop(SLOWGO_BIT);
-	
-	if (abs(control.speeds.linear_speed) > 1) {
-		int direction;
-		if (control.speeds.linear_speed > 0) {
-			direction = EM_FORWARD;
-		} else {
-			direction = EM_BACKWARD;
-		}
-
-		if (emergency_status[direction].phase == FIRST_STOP) {
-			ControlSetStop(EMERGENCY_BIT);
-		} else if (emergency_status[direction].phase == SLOW_GO) {
-			ControlSetStop(SLOWGO_BIT);
-		}
-	}
-
-
-	if (control.status_bits & EMERGENCY_BIT || 
-		control.status_bits & PAUSE_BIT ||
-		control.status_bits & TIME_ORDER_BIT) {
+	if (control.status_bits & EMERGENCY_BIT || control.status_bits & PAUSE_BIT || control.status_bits & TIME_ORDER_BIT) {
 		stopRobot();
 	} else {
 		switch (current_goal->type) {
@@ -140,6 +118,7 @@ void ControlCompute(void) {
         lastReachedID = control.last_finished_id;
 		FifoNextGoal();
 		ControlPrepareNewGoal();
+
 #if TIME_BETWEEN_ORDERS
 		time_reached = now;
 	}
@@ -298,24 +277,30 @@ void stopRobot(void) {
 	int sign;
 	float speed;
 
-//	sign = sign(control.speeds.angular_speed);
-//	speed = abs(control.speeds.angular_speed);
-//	speed -= control.max_acc * DT;
-//	speed = max(0, speed);
-//	control.speeds.angular_speed = speed;
-//
-//	sign = sign(control.speeds.linear_speed);
-//	speed = abs(control.speeds.linear_speed);
-//	speed -= control.max_acc * DT;
-//	speed = max(0, speed);
-//	control.speeds.linear_speed = sign*speed;
-//
-//	if (abs(wheels_spd.left) + abs(wheels_spd.right) < SPD_TO_STOP) {
-//		allStop();
-//	} else {
-//		applyPID();
-//	}
-    allStop();
+    speed = abs(control.speeds.angular_speed);
+    if (BRK_COEFF != 0.0) {
+        speed -= control.max_acc * DT * BRK_COEFF;
+    } else {
+        speed = 0.0;
+    }
+    speed = max(0, speed);
+    control.speeds.angular_speed = speed;
+
+    sign = sign(control.speeds.linear_speed);
+    speed = abs(control.speeds.linear_speed);
+    if (BRK_COEFF != 0.0) {
+        speed -= control.max_acc * DT * BRK_COEFF;
+    } else {
+        speed = 0.0;
+    }
+    speed = max(0, speed);
+    control.speeds.linear_speed = sign*speed;
+
+	if (abs(wheels_spd.left) + abs(wheels_spd.right) < SPD_TO_STOP) {
+		allStop();
+	} else {
+		applyPID();
+	}
 }
 
 void allStop(void) {

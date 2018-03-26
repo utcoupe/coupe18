@@ -18,12 +18,12 @@ void set_pwm(int side, int pwm) {
 		pwm = -pwm;
 	}
 
-	pwm = pwm/2.0 + 127;
+	pwm = (int)(pwm/2.0) + 127;
 
 	if(pwm > 255)
 		pwm = 255;
 	else if(pwm < 0)
 		pwm = 0;
+
 	BrushlessMotorSetPwm(side, pwm);
 }
-

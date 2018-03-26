@@ -159,6 +159,8 @@ class AsservReal(AsservAbstract):
                     self._reception_queue.put(received_data.replace('\r\n', ''))
             except KeyboardInterrupt:
                 break
+            except serial.SerialException as ex:
+                rospy.logwarn("[ASSERV] Serial read problem : " + ex)
             rospy.sleep(0.01)
 
     def _process_received_data(self, data):

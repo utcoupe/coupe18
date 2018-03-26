@@ -1,8 +1,5 @@
 #include "pathfinder/dynamic_barriers_manager.h"
 
-#include "pathfinder/BarriersSubscribers/processing_belt_interpreter_subscriber.h"
-#include "pathfinder/BarriersSubscribers/processing_lidar_objects_subscriber.h"
-
 #include <utility>
 
 using namespace std;
@@ -15,14 +12,26 @@ DynamicBarriersManager::DynamicBarriersManager()
 bool DynamicBarriersManager::hasBarriers(const geometry_msgs::Pose2D& pos)
 {
     for (const auto& subscriber : subscribers)
-        if (subscriber->hasBarrier(pos))
+        if (subscriber->needConversionBefore() && subscriber->hasBarrier(pos))
             return true;
     return false;
 }
 
 bool DynamicBarriersManager::hasBarriers(const Point& pos)
 {
-    return hasBarriers(pointToPose2D(pos));
+    auto pose2dConvert = pointToPose2D(pos);
+    geometry_msgs::Pose2D pose2d;
+    pose2d.x = pos.getX();
+    pose2d.y = pos.getY();
+    
+    for (const auto& subscriber : subscribers)
+    {
+        if (subscriber->needConversionBefore() && subscriber->hasBarrier(pose2dConvert))
+            return true;
+        else if (!subscriber->needConversionBefore() && subscriber->hasBarrier(pose2d))
+            return true;
+    }
+    return false;
 }
 
 
@@ -42,6 +51,11 @@ void DynamicBarriersManager::updateSafetyMargin(const double& newMargin)
         subscriber->setSafetyMargin(newMargin);
 }
 
+void DynamicBarriersManager::fetchOccupancyDatas(const uint& widthGrid, const uint& heightGrid) const
+{
+    for (const auto& subscriber : subscribers)
+        subscriber->fetchOccupancyData(widthGrid, heightGrid);
+}
 
 geometry_msgs::Pose2D DynamicBarriersManager::pointToPose2D(const Point& pos) const
 {

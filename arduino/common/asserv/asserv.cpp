@@ -11,8 +11,6 @@
 #include "protocol.h"
 #include "control.h"
 #include "pins.h"
-#include "emergency.h"
-
 #include "sender.h"
 #include <Timer.h>
 
@@ -23,12 +21,10 @@
  */
 void asservLoop();
 void asservStatus();
-void asservSerialRead();
 
 // Run the loop for asserv at 100 Hz
 Timer asservLoopTimer = Timer(10, &asservLoop);
 Timer asservStatusTimer = Timer(100, &asservStatus);
-// Timer asservSerialReadTimer = Timer(5, &asservSerialRead);
 
 /**
  * Read a \n ending string from serial port.
@@ -71,7 +67,6 @@ void setup() {
 
     asservLoopTimer.Start();
     asservStatusTimer.Start();
-    // asservSerialReadTimer.Start();
 }
 
 /**
@@ -85,7 +80,6 @@ void loop() {
     } else {
         asservLoopTimer.Update();
         asservStatusTimer.Update();
-        // asservSerialReadTimer.Update();
     }
     SerialSender::SerialSendTask();
     if (!flagArduinoConnected) {
@@ -93,10 +87,8 @@ void loop() {
     }
 }
 
-void asservLoop(){
-
+void asservLoop() {
 	//Action asserv
-	ComputeEmergency();
 	ComputeIsBlocked();
 	ControlCompute();
 
@@ -106,15 +98,9 @@ void asservLoop(){
         SerialSender::SerialSend(SERIAL_INFO, "%d;", (int)lastReachedID);
         lastReachedID = 0;
     }
-
-    //ProtocolAutoSendStatus();
 }
 
 void asservStatus() {
     serialRead();
     ProtocolAutoSendStatus();
 }
-
-// void asservSerialRead() {
-//     serialRead();
-// }

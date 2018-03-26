@@ -92,7 +92,7 @@ class AsservSimu(AsservAbstract):
     def clean_goals(self):
         self._goals_list = []
         # TODO check to make it proper
-        self._current_goal = Pose2D(0, 0, 0)
+        self._current_goal = (-1, Pose2D(0, 0, 0))
         self._currently_moving = False
         return True
 

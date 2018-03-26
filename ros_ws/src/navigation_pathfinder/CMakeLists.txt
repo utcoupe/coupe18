@@ -9,15 +9,17 @@ find_package(catkin REQUIRED COMPONENTS
     genmsg
     geometry_msgs
     dynamic_reconfigure
-    processing_belt_interpreter
-    processing_lidar_objects
     ai_game_status
+    memory_map
+    recognition_objects_classifier
 )
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH}) # Please note the use of CMAKE_CURRENT_SOURCE_DIR
 find_package(SFML 2 REQUIRED COMPONENTS
     graphics
 )
+
+set(NLOHMANN_JSON_HEADER_LOCATION "$ENV{UTCOUPE_WORKSPACE}/libs/json/single_include/")
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -32,8 +34,6 @@ generate_messages(
     DEPENDENCIES
     std_msgs
     geometry_msgs
-    processing_belt_interpreter
-    processing_lidar_objects
 )
 
 ################################################
@@ -58,6 +58,7 @@ catkin_package(
 
 include_directories(
     include
+    ${NLOHMANN_JSON_HEADER_LOCATION}
     ${catkin_INCLUDE_DIRS}
 )
 
