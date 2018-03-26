@@ -1,6 +1,7 @@
 
 #include "main_thread.h"
 #include "memory_map/MapGet.h"
+#include "recognition_objects_classifier/ClassifiedObjects.h"
 #include <memory>
 
 void MainThread::fetch_map_objects()
@@ -26,6 +27,8 @@ void MainThread::fetch_map_objects()
 void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects)
 {
 
+    double time = ros::Time::now().toSec();
+
     if(rects.rects.size() == 0)
         return;
 
@@ -37,7 +40,6 @@ void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects)
 
     for(auto it=rects.rects.begin(); it != rects.rects.end(); it++)
     {
-        rect_idx ++;
         int samples_x = (int)(it->w / STEP_X);
         int samples_y = (int)(it->h / STEP_Y);
 
@@ -68,6 +70,8 @@ void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects)
         }
 
         end_idx[rect_idx] = i - 1;
+
+        rect_idx++;
     }
 
     ROS_INFO("num points : %d", i);
@@ -82,11 +86,21 @@ void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects)
 
         used_threads ++;
 
-        threads_[t]->notify(t * size, size);
+        if(t*size + size >= i)
+            threads_[t]->notify(t * size, size - 1);
+        else
+            threads_[t]->notify(t * size, size);
     }
 
     for(int t = 0; t < used_threads; t++)
         threads_[t]->wait_processing();
+
+
+    std::lock_guard<std::mutex> lk(lists_mutex_);
+
+    // clear then populate rect classified arrays
+    map_rects_.clear();
+    unknown_rects_.clear();
 
     int running_idx = 0;
     int nbr_map = 0;
@@ -102,12 +116,39 @@ void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects)
         float frac_map = (float)nbr_map / (float)(end_idx[r] - running_idx);
         running_idx = end_idx[r] + 1;
 
-        //TODO: classify rect
+       if(frac_map >= MIN_MAP_FRAC)
+       {
+            map_rects_.push_back(rects.rects[r]);
+       }
+       else
+       {
+           unknown_rects_.push_back(rects.rects[r]);
+       }
     }
+
+    time = ros::Time::now().toSec() - time;
+
+    ROS_INFO("Took %f secs to process %d rects, %d points", time, (int)rects.rects.size(), i);
+
 
 }
 
-MainThread::MainThread(ros::NodeHandle &nh) : nh_(nh)
+void MainThread::pub_loop(const ros::TimerEvent&)
+{
+    std::lock_guard<std::mutex> lk(lists_mutex_);
+
+    recognition_objects_classifier::ClassifiedObjects msg;
+
+    msg.map_rects = map_rects_;
+    msg.unknown_rects = unknown_rects_;
+
+    pub_.publish(msg);
+}
+
+MainThread::MainThread(ros::NodeHandle &nh) :
+    nh_(nh),
+    pub_(nh.advertise<recognition_objects_classifier::ClassifiedObjects>(PUB_TOPIC, 1)),
+    timer_(nh_.createTimer(ros::Duration(1.0/PUB_FREQ), &MainThread::pub_loop, this))
 {
     for(int i = 0; i < THREADS_NBR; i++)
     {

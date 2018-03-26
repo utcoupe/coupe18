@@ -21,7 +21,7 @@ void ProcessingThread::thread_function()
 
         // process data
         for(unsigned int i = start_idx_; i < start_idx_ + length_; i++) {
-            std::cout << "Processing idx " << i << "x : " << points_[i].x << " y : " << points_[i].y << std::endl << std::flush;
+            //std::cout << "Processing idx " << i << std::endl << std::flush;
         }
 
         // unlocks guard and notifies main thread we finished
