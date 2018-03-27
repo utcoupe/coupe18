@@ -21,13 +21,14 @@ const std::string PUB_TOPIC = "/recognition/objects_classifier/objects";
 const float PUB_FREQ = 10.0;
 
 const int SENSORS_NBR = 6;
-const int MAX_POINTS = 100; // maximum number of points when the rects are discretized
+const int MAX_POINTS = 1000; // maximum number of points when the rects are discretized (approximate)
+// 1000 =~ 1.4 m range threshold
 
 const int THREADS_NBR = 6;
 
 // discretization steps
-const float STEP_X = 0.02;
-const float STEP_Y = 0.02;
+const float STEP_X = 0.01;
+const float STEP_Y = 0.01;
 
 // minimum fraction of a rect to be in map for it to be considered static
 const float MIN_MAP_FRAC = 0.5;

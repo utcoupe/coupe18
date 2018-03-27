@@ -21,7 +21,7 @@ void ProcessingThread::thread_function()
 
         // process data
         for(unsigned int i = start_idx_; i < start_idx_ + length_; i++) {
-            //std::cout << "Processing idx " << i << std::endl << std::flush;
+            points_[i].is_map = map_.contains_point(points_[i].x, points_[i].y);
         }
 
         // unlocks guard and notifies main thread we finished

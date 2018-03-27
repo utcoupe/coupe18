@@ -12,7 +12,7 @@ void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects)
     if(rects.rects.size() == 0)
         return;
 
-    unsigned int i = 0;
+    unsigned int point_idx = 0;
 
     // end indexes for each rect
     int end_idx[rects.rects.size()];
@@ -28,8 +28,8 @@ void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects)
 
         if(samples_x * samples_y > MAX_POINTS)
         {
-            stepx = (float)(sqrt(it->w * it->h / MAX_POINTS));
-            stepy = stepx;
+            stepx = (float)(it->w / sqrt(MAX_POINTS));
+            stepy = (float)(it->h / sqrt(MAX_POINTS));
 
             samples_x = (int)(it->w / stepx);
             samples_y = (int)(it->h / stepy);
@@ -43,30 +43,28 @@ void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects)
             for(float y = it->y - it->h / 2; y <= it->y + it->h / 2; y += stepy)
             {
 
-                this->points_[i].x = x;
-                this->points_[i].y = y;
-                i++;
+                this->points_[point_idx].x = x;
+                this->points_[point_idx].y = y;
+                point_idx++;
             }
         }
 
-        end_idx[rect_idx] = i - 1;
+        end_idx[rect_idx] = point_idx - 1;
 
         rect_idx++;
     }
 
-    ROS_INFO("num points : %d", i);
-
-    int size = (int)ceil((double)i / (double)THREADS_NBR);
+    int size = ceil((double)point_idx / (double)THREADS_NBR);
 
     int used_threads = 0;
     for(int t = 0; t < THREADS_NBR; t++)
     {
-        if(t*size >= i)
+        if(t*size >= point_idx)
             break;
 
         used_threads ++;
 
-        if(t*size + size >= i)
+        if(t*size + size >= point_idx)
             threads_[t]->notify(t * size, size - 1);
         else
             threads_[t]->notify(t * size, size);
@@ -102,13 +100,13 @@ void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects)
        }
        else
        {
-           unknown_rects_.push_back(rects.rects[r]);
+            unknown_rects_.push_back(rects.rects[r]);
        }
     }
 
     time = ros::Time::now().toSec() - time;
 
-    ROS_INFO("Took %f secs to process %d rects, %d points", time, (int)rects.rects.size(), i);
+    ROS_DEBUG("Took %f secs to process %d rects, %d points", time, (int)rects.rects.size(), point_idx);
 
 
 }
@@ -131,11 +129,13 @@ MainThread::MainThread(ros::NodeHandle &nh) :
     timer_(nh_.createTimer(ros::Duration(1.0/PUB_FREQ), &MainThread::pub_loop, this)),
     map_objects_(nh)
 {
-//    for(int i = 0; i < THREADS_NBR; i++)
-//    {
-//        threads_.push_back(std::unique_ptr<ProcessingThread>(new ProcessingThread(points_)));
-//        threads_[i]->start();
-//    }
-
     map_objects_.fetch_map_objects();
+
+    for(int i = 0; i < THREADS_NBR; i++)
+    {
+        threads_.push_back(std::unique_ptr<ProcessingThread>(new ProcessingThread(points_, map_objects_)));
+        threads_[i]->start();
+    }
+
+
 }
