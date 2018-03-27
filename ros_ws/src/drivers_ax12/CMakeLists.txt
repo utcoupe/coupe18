@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   drivers_port_finder
   ai_game_status
+  memory_definitions
 )
 
 add_action_files(
