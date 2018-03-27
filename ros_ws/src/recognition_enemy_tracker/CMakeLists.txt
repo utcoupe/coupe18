@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(recognition_enemy_racker)
+project(recognition_enemy_tracker)
 
 find_package(catkin REQUIRED COMPONENTS
     ai_game_status
