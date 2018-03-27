@@ -1,4 +1,3 @@
-
 #include "shapes.h"
 
 bool Circle::contains_point(float x, float y) const

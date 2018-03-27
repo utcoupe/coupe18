@@ -1,4 +1,3 @@
-
 #include "objects_listener.h"
 
 void ObjectsListener::on_belt_callback(const BeltRectsConstPtr &rects)

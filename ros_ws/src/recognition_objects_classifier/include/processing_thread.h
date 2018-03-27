@@ -5,6 +5,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+
 #include "map_objects.h"
 
 struct Point;

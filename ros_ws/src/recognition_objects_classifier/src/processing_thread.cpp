@@ -1,6 +1,7 @@
+#include <iostream>
+
 #include "processing_thread.h"
 #include "main_thread.h"
-#include <iostream>
 
 void ProcessingThread::start()
 {

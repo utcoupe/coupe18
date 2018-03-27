@@ -1,8 +1,17 @@
+#include <memory>
+
+#include <tf/transform_datatypes.h>
+#include <tf2/LinearMath/Vector3.h>
+
+#include <geometry_msgs/TransformStamped.h>
+#include <geometry_msgs/PointStamped.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+
+#include <memory_map/MapGet.h>
+#include <recognition_objects_classifier/ClassifiedObjects.h>
 
 #include "main_thread.h"
-#include "memory_map/MapGet.h"
-#include "recognition_objects_classifier/ClassifiedObjects.h"
-#include <memory>
+
 
 void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects)
 {
@@ -12,39 +21,65 @@ void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects)
     if(rects.rects.size() == 0)
         return;
 
-    unsigned int point_idx = 0;
+
 
     // end indexes for each rect
     int end_idx[rects.rects.size()];
-    int rect_idx = 0;
+    unsigned int rect_idx = 0;
+    unsigned int point_idx = 0;
+
+    unsigned int samples_x, samples_y;
+    float step_x, step_y;
+
+    geometry_msgs::TransformStamped transformStamped;
+    geometry_msgs::PointStamped point_init;
+    geometry_msgs::PointStamped point_map;
 
     for(auto it=rects.rects.begin(); it != rects.rects.end(); it++)
     {
-        int samples_x = (int)(it->w / STEP_X);
-        int samples_y = (int)(it->h / STEP_Y);
+        samples_x = it->w / STEP_X;
+        samples_y = it->h / STEP_Y;
 
-        float stepx = STEP_X;
-        float stepy = STEP_Y;
+        step_x = STEP_X;
+        step_y = STEP_Y;
 
         if(samples_x * samples_y > MAX_POINTS)
         {
-            stepx = (float)(it->w / sqrt(MAX_POINTS));
-            stepy = (float)(it->h / sqrt(MAX_POINTS));
+            step_x = it->w / sqrt(MAX_POINTS);
+            step_y = it->h / sqrt(MAX_POINTS);
 
-            samples_x = (int)(it->w / stepx);
-            samples_y = (int)(it->h / stepy);
+            samples_x = it->w / step_x;
+            samples_y = it->h / step_y;
         }
 
 
-        // TODO: handle the case where sampleX < 2 or sampleY < 2
+        // TODO: handle the case where sample_x < 2 or sample_y < 2
 
-        for(float x = it->x - it->w / 2; x <= it->x + it->w / 2; x += stepx)
+        try{
+            transformStamped = tf_buffer_.lookupTransform("map", it->header.frame_id, it->header.stamp);
+        }
+        catch (tf2::TransformException &ex) {
+            ROS_ERROR("%s", ex.what());
+            end_idx[rect_idx] = point_idx - 1;
+            rect_idx++;
+            continue;
+        }
+
+        point_init.header = it->header;
+
+        for(float x = it->x - it->w / 2; x <= it->x + it->w / 2; x += step_x)
         {
-            for(float y = it->y - it->h / 2; y <= it->y + it->h / 2; y += stepy)
+            for(float y = it->y - it->h / 2; y <= it->y + it->h / 2; y += step_y)
             {
 
-                this->points_[point_idx].x = x;
-                this->points_[point_idx].y = y;
+
+                point_init.point.x = x;
+                point_init.point.y = y;
+
+                tf2::doTransform(point_init, point_map, transformStamped);
+
+                this->points_[point_idx].x = (float)point_map.point.x;
+                this->points_[point_idx].y = (float)point_map.point.y;
                 point_idx++;
             }
         }
@@ -54,25 +89,33 @@ void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects)
         rect_idx++;
     }
 
-    int size = ceil((double)point_idx / (double)THREADS_NBR);
+    if(point_idx == 0)
+        return;
 
-    int used_threads = 0;
+
+    unsigned int size = ceil((double)point_idx / (double)THREADS_NBR);
+
+    unsigned int used_threads = 0;
     for(int t = 0; t < THREADS_NBR; t++)
     {
+        // we finished the list
         if(t*size >= point_idx)
             break;
 
         used_threads ++;
 
+        // end of the list
         if(t*size + size >= point_idx)
             threads_[t]->notify(t * size, size - 1);
         else
             threads_[t]->notify(t * size, size);
     }
 
+    // wait for the threads to finish
     for(int t = 0; t < used_threads; t++)
+    {
         threads_[t]->wait_processing();
-
+    }
 
     std::lock_guard<std::mutex> lk(lists_mutex_);
 
@@ -80,10 +123,11 @@ void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects)
     map_rects_.clear();
     unknown_rects_.clear();
 
-    int running_idx = 0;
-    int nbr_map = 0;
+    unsigned int running_idx = 0;
+    unsigned int nbr_map = 0;
     for(int r = 0; r < rects.rects.size(); r++)
     {
+
         nbr_map = 0;
         for(int p = running_idx; p <= end_idx[r]; p++)
         {
@@ -106,7 +150,7 @@ void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects)
 
     time = ros::Time::now().toSec() - time;
 
-    ROS_DEBUG("Took %f secs to process %d rects, %d points", time, (int)rects.rects.size(), point_idx);
+    ROS_INFO("Took %f secs to process %d rects, %d points", time, (int)rects.rects.size(), point_idx);
 
 
 }
@@ -127,6 +171,7 @@ MainThread::MainThread(ros::NodeHandle &nh) :
     nh_(nh),
     pub_(nh.advertise<recognition_objects_classifier::ClassifiedObjects>(PUB_TOPIC, 1)),
     timer_(nh_.createTimer(ros::Duration(1.0/PUB_FREQ), &MainThread::pub_loop, this)),
+    tl_(tf_buffer_),
     map_objects_(nh)
 {
     map_objects_.fetch_map_objects();
@@ -136,6 +181,14 @@ MainThread::MainThread(ros::NodeHandle &nh) :
         threads_.push_back(std::unique_ptr<ProcessingThread>(new ProcessingThread(points_, map_objects_)));
         threads_[i]->start();
     }
+}
 
-
+MainThread::~MainThread()
+{
+    for(int i = 0; i < THREADS_NBR; i++)
+    {
+        threads_[i]->stop();
+        threads_[i]->notify(0, 0);
+        threads_[i]->join();
+    }
 }

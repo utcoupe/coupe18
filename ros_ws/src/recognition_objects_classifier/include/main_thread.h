@@ -2,12 +2,15 @@
 #ifndef RECOGNITION_OBJECTS_CLASSIFIER_MAIN_THREAD_H
 #define RECOGNITION_OBJECTS_CLASSIFIER_MAIN_THREAD_H
 
-#include "processing_belt_interpreter/BeltRects.h"
-#include "processing_thread.h"
-#include "ros/ros.h"
-#include "map_objects.h"
 #include <vector>
 
+#include <ros/ros.h>
+#include <tf2_ros/transform_listener.h>
+
+#include <processing_belt_interpreter/BeltRects.h>
+
+#include "map_objects.h"
+#include "processing_thread.h"
 
 
 struct Point {
@@ -26,7 +29,7 @@ const int MAX_POINTS = 1000; // maximum number of points when the rects are disc
 
 const int THREADS_NBR = 6;
 
-// discretization steps
+// discretization steps (m)
 const float STEP_X = 0.01;
 const float STEP_Y = 0.01;
 
@@ -36,32 +39,37 @@ const float MIN_MAP_FRAC = 0.5;
 class MainThread
 {
 protected:
-    Point points_[SENSORS_NBR * MAX_POINTS];
-    std::vector<std::unique_ptr<ProcessingThread>> threads_;
+    ros::NodeHandle& nh_;
 
+    // classified lists
     std::vector<processing_belt_interpreter::RectangleStamped> map_rects_;
     std::vector<processing_belt_interpreter::RectangleStamped> unknown_rects_;
 
-    MapObjects map_objects_;
+    // protects the published lists
+    std::mutex lists_mutex_;
 
-    ros::NodeHandle& nh_;
-
+    // to publish classified lists
     ros::Publisher pub_;
     ros::Timer timer_;
 
-    // protects the published lists
-    std::mutex lists_mutex_;
+    // shared list of points to process (classify)
+    Point points_[SENSORS_NBR * MAX_POINTS];
+    std::vector<std::unique_ptr<ProcessingThread>> threads_;
+
+    // static objects
+    MapObjects map_objects_;
+
+    // transforms objects into tf /map
+    tf2_ros::Buffer tf_buffer_;
+    tf2_ros::TransformListener tl_;
 
     void pub_loop(const ros::TimerEvent&);
 
 public:
     MainThread(ros::NodeHandle& nh);
+    ~MainThread();
 
     void process_rects(processing_belt_interpreter::BeltRects& rects);
-
-
-
-
 };
 
 

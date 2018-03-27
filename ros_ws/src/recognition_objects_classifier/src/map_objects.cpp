@@ -1,8 +1,9 @@
+#include <ros/ros.h>
+#include <nlohmann/json.hpp>
+
+#include <memory_map/MapGet.h>
 
 #include "map_objects.h"
-#include "memory_map/MapGet.h"
-#include "ros/ros.h"
-#include "nlohmann/json.hpp"
 
 using namespace nlohmann;
 
@@ -68,6 +69,11 @@ void MapObjects::fetch_map_objects()
 
 bool MapObjects::contains_point(float x, float y)
 {
+    // TODO: remove hardcoded values and fetch from map
+
+    if(x > 3 || x < 0 || y < 0 || y > 2)
+        return true;
+
     for(auto it = map_shapes_.begin(); it != map_shapes_.end(); it++)
     {
         if((*it)->contains_point(x, y))

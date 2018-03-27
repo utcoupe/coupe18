@@ -2,10 +2,13 @@
 #ifndef PROJECT_MAP_OBJECTS_H
 #define PROJECT_MAP_OBJECTS_H
 
-#include "shapes.h"
-#include "ros/ros.h"
 #include <string>
 #include <vector>
+
+#include <ros/ros.h>
+
+#include "shapes.h"
+
 
 const std::string MAP_GET_SERVICE = "/memory/map/get";
 const std::string MAP_OBJECTS = "/terrain/walls/layer_belt/*";
