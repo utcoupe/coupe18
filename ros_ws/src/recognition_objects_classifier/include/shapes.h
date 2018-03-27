@@ -11,7 +11,7 @@ public:
     Shape(const Shape& other) {}
 };
 
-class Circle : Shape
+class Circle : public Shape
 {
 protected:
     float x_, y_, radius_;
@@ -22,7 +22,7 @@ public:
     bool contains_point(float x, float y) const;
 };
 
-class Rectangle : Shape
+class Rectangle : public Shape
 {
 protected:
     float x_, y_, width_, height_;

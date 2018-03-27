@@ -128,11 +128,14 @@ void MainThread::pub_loop(const ros::TimerEvent&)
 MainThread::MainThread(ros::NodeHandle &nh) :
     nh_(nh),
     pub_(nh.advertise<recognition_objects_classifier::ClassifiedObjects>(PUB_TOPIC, 1)),
-    timer_(nh_.createTimer(ros::Duration(1.0/PUB_FREQ), &MainThread::pub_loop, this))
+    timer_(nh_.createTimer(ros::Duration(1.0/PUB_FREQ), &MainThread::pub_loop, this)),
+    map_objects_(nh)
 {
-    for(int i = 0; i < THREADS_NBR; i++)
-    {
-        threads_.push_back(std::unique_ptr<ProcessingThread>(new ProcessingThread(points_)));
-        threads_[i]->start();
-    }
+//    for(int i = 0; i < THREADS_NBR; i++)
+//    {
+//        threads_.push_back(std::unique_ptr<ProcessingThread>(new ProcessingThread(points_)));
+//        threads_[i]->start();
+//    }
+
+    map_objects_.fetch_map_objects();
 }

@@ -5,6 +5,7 @@
 #include "processing_belt_interpreter/BeltRects.h"
 #include "processing_thread.h"
 #include "ros/ros.h"
+#include "map_objects.h"
 #include <vector>
 
 
@@ -39,6 +40,8 @@ protected:
 
     std::vector<processing_belt_interpreter::RectangleStamped> map_rects_;
     std::vector<processing_belt_interpreter::RectangleStamped> unknown_rects_;
+
+    MapObjects map_objects_;
 
     ros::NodeHandle& nh_;
 
