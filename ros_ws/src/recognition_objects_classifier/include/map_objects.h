@@ -13,18 +13,18 @@
 const std::string MAP_GET_SERVICE = "/memory/map/get";
 const std::string MAP_OBJECTS = "/terrain/walls/layer_belt/*";
 
-class MapObjects
-{
+class MapObjects {
 protected:
     std::vector<std::shared_ptr<const Shape>> map_shapes_;
-    ros::NodeHandle& nh_;
+    ros::NodeHandle &nh_;
 
 public:
     void fetch_map_objects();
+
     bool contains_point(float x, float y);
 
-    MapObjects(ros::NodeHandle& nh) :
-        nh_(nh) {}
+    MapObjects(ros::NodeHandle &nh) :
+            nh_(nh) {}
 
 };
 

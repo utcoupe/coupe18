@@ -36,10 +36,13 @@ const float STEP_Y = 0.01;
 // minimum fraction of a rect to be in map for it to be considered static
 const float MIN_MAP_FRAC = 0.5;
 
-class MainThread
-{
+// if the absolute time diff between the received time and the header time is
+// greater than this (s), adjusts the header time
+const float TIME_DIFF_MAX = 0.05;
+
+class MainThread {
 protected:
-    ros::NodeHandle& nh_;
+    ros::NodeHandle &nh_;
 
     // classified lists
     std::vector<processing_belt_interpreter::RectangleStamped> map_rects_;
@@ -63,13 +66,14 @@ protected:
     tf2_ros::Buffer tf_buffer_;
     tf2_ros::TransformListener tl_;
 
-    void pub_loop(const ros::TimerEvent&);
+    void pub_loop(const ros::TimerEvent &);
 
 public:
-    MainThread(ros::NodeHandle& nh);
+    MainThread(ros::NodeHandle &nh);
+
     ~MainThread();
 
-    void process_rects(processing_belt_interpreter::BeltRects& rects);
+    void process_rects(processing_belt_interpreter::BeltRects &rects);
 };
 
 

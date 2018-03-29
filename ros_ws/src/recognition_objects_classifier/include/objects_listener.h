@@ -16,22 +16,21 @@ const std::string BELT_TOPIC = "/processing/belt_interpreter/rects";
 const std::string LIDAR_TOPIC = "/processing/lidar_objects/obstacles";
 
 
-
-class ObjectsListener
-{
+class ObjectsListener {
 protected:
     ros::Subscriber belt_sub_;
     ros::Subscriber lidar_sub_;
-    MainThread& main_thread_;
+    MainThread &main_thread_;
 
-    void on_belt_callback(const BeltRectsConstPtr& rects);
-    void on_lidar_callback(const ObstaclesConstPtr& obstacles);
+    void on_belt_callback(const BeltRectsConstPtr &rects);
+
+    void on_lidar_callback(const ObstaclesConstPtr &obstacles);
 
 public:
     BeltRects rects;
     Obstacles lidar_obstacles;
 
-    ObjectsListener(ros::NodeHandle& nh, MainThread& main_thread) :
+    ObjectsListener(ros::NodeHandle &nh, MainThread &main_thread) :
             main_thread_(main_thread),
             belt_sub_(nh.subscribe(BELT_TOPIC, 1, &ObjectsListener::on_belt_callback, this)),
             lidar_sub_(nh.subscribe(LIDAR_TOPIC, 1, &ObjectsListener::on_lidar_callback, this)) {}
