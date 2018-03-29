@@ -12,8 +12,8 @@
 
 const std::string MARKERS_TOPIC = "/visualization_markers/objects";
 const float LIFETIME = 0.1;
-const float Z_POS = 0.0;
-const float Z_SCALE = 0.4   ;
+const float Z_POS = 0.2;
+const float Z_SCALE = 0.2;
 
 class MarkersPublisher {
 protected:

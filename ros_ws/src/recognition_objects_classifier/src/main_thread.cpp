@@ -13,6 +13,12 @@
 
 void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects) {
 
+    {
+        std::lock_guard<std::mutex> lk(lists_mutex_);
+        classified_objects_.map_rects.clear();
+        classified_objects_.unknown_rects.clear();
+    }
+
     if (rects.rects.empty())
         return;
 
@@ -123,9 +129,7 @@ void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects) {
 
     std::lock_guard<std::mutex> lk(lists_mutex_);
 
-    // clear then populate rect classified arrays
-    map_rects_.clear();
-    unknown_rects_.clear();
+    // populate rect classified arrays
 
     int running_idx = 0;
     unsigned int nbr_map = 0;
@@ -141,9 +145,9 @@ void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects) {
         running_idx = end_idx[r] + 1;
 
         if (frac_map >= MIN_MAP_FRAC) {
-            map_rects_.push_back(rects.rects[r]);
+            classified_objects_.map_rects.push_back(rects.rects[r]);
         } else {
-            unknown_rects_.push_back(rects.rects[r]);
+            classified_objects_.unknown_rects.push_back(rects.rects[r]);
         }
     }
 
@@ -152,18 +156,77 @@ void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects) {
     ROS_DEBUG("Took %f secs to process %lu rects, %d points", time, rects.rects.size(), point_idx);
 }
 
+void MainThread::process_lidar(processing_lidar_objects::Obstacles &obstacles) {
+
+    double time = ros::Time::now().toSec();
+
+    std::lock_guard<std::mutex> lk(lists_mutex_);
+
+    classified_objects_.map_circles.clear();
+    classified_objects_.unknown_circles.clear();
+    classified_objects_.map_segments.clear();
+    classified_objects_.unknown_segments.clear();
+
+    recognition_objects_classifier::CircleObstacleStamped circle_s;
+    circle_s.header = obstacles.header;
+
+    recognition_objects_classifier::SegmentObstacleStamped segment_s;
+    segment_s.header = obstacles.header;
+
+    // remove segments that are inside circles
+    for (auto &circle : obstacles.circles) {
+
+        // remove segments that are inside circles
+        for (auto it = obstacles.segments.begin(); it != obstacles.segments.end();) {
+            if (pow(it->first_point.x - circle.center.x, 2) + pow(it->first_point.y - circle.center.y, 2)
+                <= pow(circle.true_radius, 2) &&
+                pow(it->last_point.x - circle.center.x, 2) + pow(it->last_point.y - circle.center.y, 2)
+                <= pow(circle.true_radius, 2)) {
+
+                it = obstacles.segments.erase(it);
+            } else {
+                ++it;
+            }
+        }
+
+        // classify circle
+        circle_s.circle = circle;
+        if (pow(circle.velocity.x, 2) + pow(circle.velocity.y, 2) + pow(circle.velocity.z, 2) >=
+            pow(CIRCLE_SPEED_MAX, 2) || !map_objects_.contains_point(static_cast<float>(circle.center.x),
+                                                                     static_cast<float>(circle.center.y))) {
+
+            classified_objects_.unknown_circles.push_back(circle_s);
+        } else {
+            classified_objects_.map_circles.push_back(circle_s);
+        }
+    }
+
+    for (auto &segment : obstacles.segments) {
+        segment_s.segment = segment;
+
+        if (map_objects_.contains_point(static_cast<float>(segment.first_point.x),
+                                        static_cast<float>(segment.first_point.y)) &&
+            map_objects_.contains_point(static_cast<float>(segment.last_point.x),
+                                        static_cast<float>(segment.last_point.y))) {
+            classified_objects_.map_segments.push_back(segment_s);
+        } else {
+            classified_objects_.unknown_segments.push_back(segment_s);
+        }
+    }
+
+    time = ros::Time::now().toSec() - time;
+
+    ROS_DEBUG("Took %f secs to process lidar data", time);
+
+}
+
 void MainThread::pub_loop(const ros::TimerEvent &) {
     std::lock_guard<std::mutex> lk(lists_mutex_);
 
-    recognition_objects_classifier::ClassifiedObjects msg;
+    pub_.publish(classified_objects_);
 
-    msg.map_rects = map_rects_;
-    msg.unknown_rects = unknown_rects_;
-
-    pub_.publish(msg);
-
-    if(markers_publisher_.is_connected())
-        markers_publisher_.publish_rects(map_rects_, unknown_rects_);
+    if (markers_publisher_.is_connected())
+        markers_publisher_.publish_rects(classified_objects_.map_rects, classified_objects_.unknown_rects);
 }
 
 MainThread::MainThread(ros::NodeHandle &nh) :

@@ -8,6 +8,8 @@
 #include <tf2_ros/transform_listener.h>
 
 #include <processing_belt_interpreter/BeltRects.h>
+#include "processing_lidar_objects/Obstacles.h"
+#include <recognition_objects_classifier/ClassifiedObjects.h>
 
 #include "map_objects.h"
 #include "processing_thread.h"
@@ -38,18 +40,19 @@ const float STEP_Y = 0.01;
 const float MIN_MAP_FRAC = 0.5;
 
 // if the absolute time diff between the received time and the header time is
-// greater than this (s), adjusts the header time
+// greater than this (s), adjusts the header time (for rects)
 const float TIME_DIFF_MAX = 0.05;
+
+// if a circle has a velocity above this value, it is considered unknown
+const float CIRCLE_SPEED_MAX = 1.0;
 
 class MainThread {
 protected:
     ros::NodeHandle &nh_;
 
-    // classified lists
-    std::vector<processing_belt_interpreter::RectangleStamped> map_rects_;
-    std::vector<processing_belt_interpreter::RectangleStamped> unknown_rects_;
+    recognition_objects_classifier::ClassifiedObjects classified_objects_;
 
-    // protects the published lists
+    // protects the published objects
     std::mutex lists_mutex_;
 
     // to publish classified lists
@@ -77,6 +80,8 @@ public:
     ~MainThread();
 
     void process_rects(processing_belt_interpreter::BeltRects &rects);
+
+    void process_lidar(processing_lidar_objects::Obstacles &obstacles);
 };
 
 
