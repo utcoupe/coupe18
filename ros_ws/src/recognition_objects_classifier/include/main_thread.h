@@ -11,6 +11,7 @@
 
 #include "map_objects.h"
 #include "processing_thread.h"
+#include "markers_publisher.h"
 
 
 struct Point {
@@ -61,6 +62,8 @@ protected:
 
     // static objects
     MapObjects map_objects_;
+
+    MarkersPublisher markers_publisher_;
 
     // transforms objects into tf /map
     tf2_ros::Buffer tf_buffer_;

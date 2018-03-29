@@ -161,6 +161,9 @@ void MainThread::pub_loop(const ros::TimerEvent &) {
     msg.unknown_rects = unknown_rects_;
 
     pub_.publish(msg);
+
+    if(markers_publisher_.is_connected())
+        markers_publisher_.publish_rects(map_rects_, unknown_rects_);
 }
 
 MainThread::MainThread(ros::NodeHandle &nh) :
@@ -168,6 +171,7 @@ MainThread::MainThread(ros::NodeHandle &nh) :
         pub_(nh.advertise<recognition_objects_classifier::ClassifiedObjects>(PUB_TOPIC, 1)),
         timer_(nh_.createTimer(ros::Duration(1.0 / PUB_FREQ), &MainThread::pub_loop, this)),
         tl_(tf_buffer_),
+        markers_publisher_(nh),
         map_objects_(nh) {
 
     map_objects_.fetch_map_objects();

@@ -53,7 +53,8 @@ include_directories(
 
 
 add_executable(objects_classifier_node
-        src/objects_classifier_node.cpp src/objects_listener.cpp src/shapes.cpp src/processing_thread.cpp src/main_thread.cpp src/map_objects.cpp)
+        src/objects_classifier_node.cpp src/objects_listener.cpp src/shapes.cpp src/processing_thread.cpp
+        src/main_thread.cpp src/map_objects.cpp src/markers_publisher.cpp)
 
 add_dependencies(objects_classifier_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
