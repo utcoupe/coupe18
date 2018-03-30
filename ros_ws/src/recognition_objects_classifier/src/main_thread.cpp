@@ -36,6 +36,9 @@ void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects) {
     geometry_msgs::PointStamped point_init;
     geometry_msgs::PointStamped point_map;
 
+    geometry_msgs::PoseStamped pose_init;
+    geometry_msgs::PoseStamped pose_map;
+
     ros::Time common_time;
     std::string err_msg;
 
@@ -56,7 +59,12 @@ void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects) {
             samples_y = static_cast<unsigned int>(rect.h / step_y);
         }
 
-        // TODO: handle the case where sample_x < 2 or sample_y < 2
+        if (samples_x < 2) {
+            step_x = rect.w;
+        }
+        if (samples_y < 2) {
+            step_y = rect.h;
+        }
 
         // get the transform from the static tf to /map
         try {
@@ -82,7 +90,6 @@ void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects) {
         }
 
         point_init.header = rect.header;
-
         for (float x = rect.x - rect.w / 2; x <= rect.x + rect.w / 2; x += step_x) {
             point_init.point.x = x;
 
@@ -98,8 +105,20 @@ void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects) {
         }
 
         end_idx[rect_idx] = point_idx - 1;
-
         rect_idx++;
+
+        // transform rect into /map
+        pose_init.header = rect.header;
+        pose_init.pose.position.x = rect.x;
+        pose_init.pose.position.y = rect.y;
+        pose_init.pose.orientation = tf::createQuaternionMsgFromYaw(rect.a);
+
+        tf2::doTransform(pose_init, pose_map, transformStamped);
+
+        rect.x = static_cast<float>(pose_map.pose.position.x);
+        rect.y = static_cast<float>(pose_map.pose.position.y);
+        rect.a = static_cast<float>(tf::getYaw(pose_map.pose.orientation));
+        rect.header.frame_id = "/map";
     }
 
     if (point_idx == 0)

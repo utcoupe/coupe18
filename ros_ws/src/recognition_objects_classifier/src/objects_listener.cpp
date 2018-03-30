@@ -7,4 +7,5 @@ void ObjectsListener::on_belt_callback(const BeltRectsConstPtr &rects) {
 
 void ObjectsListener::on_lidar_callback(const ObstaclesConstPtr &obstacles) {
     this->lidar_obstacles = *obstacles;
+    main_thread_.process_lidar(this->lidar_obstacles);
 }
