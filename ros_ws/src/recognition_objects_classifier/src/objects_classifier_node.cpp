@@ -1,6 +1,6 @@
 #include <ros/ros.h>
+#include <ai_game_status/init_service.h>
 
-#include "processing_thread.h"
 #include "main_thread.h"
 #include "objects_listener.h"
 
@@ -11,6 +11,8 @@ int main(int argc, char **argv) {
 
     MainThread mt(node_handle);
     ObjectsListener ol(node_handle, mt);
+
+    StatusServices("recognition", "objects_classifier").setReady(true);
 
     ros::spin();
     return 0;
