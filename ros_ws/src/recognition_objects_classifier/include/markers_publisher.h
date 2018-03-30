@@ -9,6 +9,8 @@
 #include <ros/ros.h>
 
 #include "processing_belt_interpreter/RectangleStamped.h"
+#include "recognition_objects_classifier/CircleObstacleStamped.h"
+#include "recognition_objects_classifier/SegmentObstacleStamped.h"
 
 const std::string MARKERS_TOPIC = "/visualization_markers/objects";
 const float LIFETIME = 0.1;
@@ -22,6 +24,12 @@ protected:
 public:
     void publish_rects(std::vector<processing_belt_interpreter::RectangleStamped> map_rects,
                        std::vector<processing_belt_interpreter::RectangleStamped> unknown_rects);
+
+    void publish_circles(std::vector<recognition_objects_classifier::CircleObstacleStamped> map_circles,
+                         std::vector<recognition_objects_classifier::CircleObstacleStamped> unknown_circles);
+
+    void publish_segments(std::vector<recognition_objects_classifier::SegmentObstacleStamped> map_segments,
+                          std::vector<recognition_objects_classifier::SegmentObstacleStamped> unknown_segments);
 
     bool is_connected();
 

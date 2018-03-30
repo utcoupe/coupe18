@@ -112,6 +112,16 @@ Visualization Manager:
       Value: true
     - Class: rviz/Marker
       Enabled: true
+      Marker Topic: /visualization_markers/objects
+      Name: Classified Objects Markers
+      Namespaces:
+        rects: true
+        circles: true
+        segments: true
+      Queue Size: 1
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
       Marker Topic: /visualization_markers/navigation
       Name: Navigation Markers
       Namespaces:
