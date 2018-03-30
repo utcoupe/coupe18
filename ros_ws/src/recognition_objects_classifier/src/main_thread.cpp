@@ -11,7 +11,7 @@
 #include "main_thread.h"
 
 
-void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects) {
+void MainThread::classify_rects(processing_belt_interpreter::BeltRects &rects) {
 
     {
         std::lock_guard<std::mutex> lk(lists_mutex_);
@@ -23,83 +23,39 @@ void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects) {
         return;
 
     double time = ros::Time::now().toSec();
-    double step_y;
-    double step_x;
+    double step_x, step_y;
 
     int end_idx[rects.rects.size()];
 
     unsigned int rect_idx = 0;
     unsigned int point_idx = 0;
-    unsigned int samples_x, samples_y;
 
-    geometry_msgs::TransformStamped transformStamped;
-    geometry_msgs::PointStamped point_init;
-    geometry_msgs::PointStamped point_map;
+    geometry_msgs::TransformStamped transform_stamped;
 
-    geometry_msgs::PoseStamped pose_init;
-    geometry_msgs::PoseStamped pose_map;
-
-    ros::Time common_time;
-    std::string err_msg;
+    geometry_msgs::PointStamped point_static_frame, point_map_frame;
 
     for (auto &rect : rects.rects) {
 
-        // figure out the discretization steps
-        samples_x = static_cast<unsigned int>(rect.w / STEP_X);
-        samples_y = static_cast<unsigned int>(rect.h / STEP_Y);
+        std::tie(step_x, step_y) = compute_division_steps(rect);
 
-        step_x = STEP_X;
-        step_y = STEP_Y;
+        if (!fetch_transform_and_adjust_stamp(rect, transform_stamped)) {
 
-        if (samples_x * samples_y > MAX_POINTS) {
-            step_x = rect.w / sqrt(MAX_POINTS);
-            step_y = rect.h / sqrt(MAX_POINTS);
-
-            samples_x = static_cast<unsigned int>(rect.w / step_x);
-            samples_y = static_cast<unsigned int>(rect.h / step_y);
-        }
-
-        if (samples_x < 2) {
-            step_x = rect.w;
-        }
-        if (samples_y < 2) {
-            step_y = rect.h;
-        }
-
-        // get the transform from the static tf to /map
-        try {
-            // adjust the timestamp of the rect if it's a bit later than the last transform
-            tf_buffer_._getLatestCommonTime(
-                    tf_buffer_._lookupFrameNumber("map"),
-                    tf_buffer_._lookupFrameNumber(rect.header.frame_id),
-                    common_time, &err_msg
-            );
-
-            if (rect.header.stamp > common_time &&
-                fabs(rect.header.stamp.toSec() - common_time.toSec()) < TIME_DIFF_MAX) {
-                rect.header.stamp = common_time;
-            }
-
-            transformStamped = tf_buffer_.lookupTransform("map", rect.header.frame_id, rect.header.stamp);
-
-        } catch (tf2::TransformException &ex) {
-            ROS_WARN("%s", ex.what());
             end_idx[rect_idx] = point_idx - 1;
             rect_idx++;
             continue;
         }
 
-        point_init.header = rect.header;
+        point_static_frame.header = rect.header;
         for (float x = rect.x - rect.w / 2; x <= rect.x + rect.w / 2; x += step_x) {
-            point_init.point.x = x;
+            point_static_frame.point.x = x;
 
             for (float y = rect.y - rect.h / 2; y <= rect.y + rect.h / 2; y += step_y) {
-                point_init.point.y = y;
+                point_static_frame.point.y = y;
 
-                tf2::doTransform(point_init, point_map, transformStamped);
+                tf2::doTransform(point_static_frame, point_map_frame, transform_stamped);
 
-                this->points_[point_idx].x = static_cast<float>(point_map.point.x);
-                this->points_[point_idx].y = static_cast<float>(point_map.point.y);
+                this->points_[point_idx].x = static_cast<float>(point_map_frame.point.x);
+                this->points_[point_idx].y = static_cast<float>(point_map_frame.point.y);
                 point_idx++;
             }
         }
@@ -107,44 +63,13 @@ void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects) {
         end_idx[rect_idx] = point_idx - 1;
         rect_idx++;
 
-        // transform rect into /map
-        pose_init.header = rect.header;
-        pose_init.pose.position.x = rect.x;
-        pose_init.pose.position.y = rect.y;
-        pose_init.pose.orientation = tf::createQuaternionMsgFromYaw(rect.a);
-
-        tf2::doTransform(pose_init, pose_map, transformStamped);
-
-        rect.x = static_cast<float>(pose_map.pose.position.x);
-        rect.y = static_cast<float>(pose_map.pose.position.y);
-        rect.a = static_cast<float>(tf::getYaw(pose_map.pose.orientation));
-        rect.header.frame_id = "/map";
+        transform_rect(rect, transform_stamped);
     }
 
     if (point_idx == 0)
         return;
 
-    auto size = static_cast<unsigned int>(ceil((double) point_idx / (double) THREADS_NBR));
-
-    unsigned int used_threads = 0;
-    for (int t = 0; t < THREADS_NBR; t++) {
-        // we finished the list
-        if (t * size >= point_idx)
-            break;
-
-        used_threads++;
-
-        // end of the list
-        if (t * size + size >= point_idx)
-            threads_[t]->notify(t * size, size - 1);
-        else
-            threads_[t]->notify(t * size, size);
-    }
-
-    // wait for the threads to finish
-    for (auto &thread : threads_) {
-        thread->wait_processing();
-    }
+    notify_threads_and_wait(point_idx);
 
     std::lock_guard<std::mutex> lk(lists_mutex_);
 
@@ -175,7 +100,108 @@ void MainThread::process_rects(processing_belt_interpreter::BeltRects &rects) {
     ROS_DEBUG("Took %f secs to process %lu rects, %d points", time, rects.rects.size(), point_idx);
 }
 
-void MainThread::process_lidar(processing_lidar_objects::Obstacles &obstacles) {
+std::pair<float, float> MainThread::compute_division_steps(
+        const processing_belt_interpreter::RectangleStamped &rect) {
+
+    auto samples_x = static_cast<unsigned int>(rect.w / STEP_X);
+    auto samples_y = static_cast<unsigned int>(rect.h / STEP_Y);
+
+    float step_x = STEP_X;
+    float step_y = STEP_Y;
+
+    if (samples_x * samples_y > MAX_POINTS) {
+        step_x = static_cast<float>(rect.w / sqrt(MAX_POINTS));
+        step_y = static_cast<float>(rect.h / sqrt(MAX_POINTS));
+
+        samples_x = static_cast<unsigned int>(rect.w / step_x);
+        samples_y = static_cast<unsigned int>(rect.h / step_y);
+    }
+
+    if (samples_x < 2) {
+        step_x = rect.w;
+    }
+    if (samples_y < 2) {
+        step_y = rect.h;
+    }
+
+    return {step_x, step_y};
+}
+
+bool MainThread::fetch_transform_and_adjust_stamp(
+        processing_belt_interpreter::RectangleStamped &rect,
+        geometry_msgs::TransformStamped &transform_out) {
+
+    ros::Time common_time;
+    std::string err_msg;
+
+    try {
+        tf_buffer_._getLatestCommonTime(
+                tf_buffer_._lookupFrameNumber("map"),
+                tf_buffer_._lookupFrameNumber(rect.header.frame_id),
+                common_time, &err_msg
+        );
+
+        // adjust the timestamp of the rect if it's a bit later than the last transform
+        if (rect.header.stamp > common_time &&
+            fabs(rect.header.stamp.toSec() - common_time.toSec()) < TIME_DIFF_MAX) {
+            rect.header.stamp = common_time;
+        }
+
+        transform_out = tf_buffer_.lookupTransform("map", rect.header.frame_id, rect.header.stamp);
+
+    } catch (tf2::TransformException &ex) {
+        ROS_WARN("%s", ex.what());
+        return false;
+    }
+
+    return true;
+}
+
+
+void MainThread::transform_rect(processing_belt_interpreter::RectangleStamped &rect,
+                                geometry_msgs::TransformStamped &transform) {
+
+    geometry_msgs::PoseStamped pose_static_frame, pose_map_frame;
+
+    pose_static_frame.header = rect.header;
+    pose_static_frame.pose.position.x = rect.x;
+    pose_static_frame.pose.position.y = rect.y;
+    pose_static_frame.pose.orientation = tf::createQuaternionMsgFromYaw(rect.a);
+
+    tf2::doTransform(pose_static_frame, pose_map_frame, transform);
+
+    rect.x = static_cast<float>(pose_map_frame.pose.position.x);
+    rect.y = static_cast<float>(pose_map_frame.pose.position.y);
+    rect.a = static_cast<float>(tf::getYaw(pose_map_frame.pose.orientation));
+    rect.header.frame_id = transform.child_frame_id;
+
+}
+
+void MainThread::notify_threads_and_wait(int num_points) {
+
+    auto size = static_cast<unsigned int>(ceil((double) num_points / (double) THREADS_NBR));
+
+    unsigned int used_threads = 0;
+    for (int t = 0; t < THREADS_NBR; t++) {
+        // we finished the list
+        if (t * size >= num_points)
+            break;
+
+        used_threads++;
+
+        // end of the list
+        if (t * size + size >= num_points)
+            threads_[t]->notify(t * size, size - 1);
+        else
+            threads_[t]->notify(t * size, size);
+    }
+
+    for (int t = 0; t < used_threads; t++) {
+        threads_[t]->wait_processing();
+    }
+}
+
+void MainThread::classify_lidar_objects(processing_lidar_objects::Obstacles &obstacles) {
 
     double time = ros::Time::now().toSec();
 

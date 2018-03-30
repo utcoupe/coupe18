@@ -24,13 +24,13 @@ protected:
     std::mutex mutex_;
     std::condition_variable cv_;
 
-    // indicates the processing_thread to start processing
+    // informs the processing_thread to start processing
     bool ready_;
 
-    // indicates the main thread that the processing is finished
+    // informs the main thread that the processing is finished
     bool processed_;
 
-    void thread_function();
+    void classify_points();
 
 public:
     void start();

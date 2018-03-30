@@ -4,10 +4,10 @@
 #include "main_thread.h"
 
 void ProcessingThread::start() {
-    processing_thread_ = std::thread(&ProcessingThread::thread_function, this);
+    processing_thread_ = std::thread(&ProcessingThread::classify_points, this);
 }
 
-void ProcessingThread::thread_function() {
+void ProcessingThread::classify_points() {
     while (!thread_stopped_) {
         // wait until main thread notification
         std::unique_lock<std::mutex> lk(mutex_);
