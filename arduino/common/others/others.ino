@@ -53,7 +53,6 @@ void init_belt_sensors() {
 void loop_belt_sensors() {
     for(uint8_t i = 0; i < NUM_BELT_SENSORS; i++) {
         belt_range_msg.sensor_id = belt_sensors_names[i].c_str();
-//        belt_range_msg.range = belt_sensors[i].readRangeSingleMillimeters() / 1000.0; //in meters
         belt_range_msg.range = belt_sensors[i].readRangeContinuousMillimeters() / 1000.0; //in meters
         if (belt_range_msg.range > 65534)
             belt_range_msg.range = -1;
@@ -63,13 +62,14 @@ void loop_belt_sensors() {
 
 void init_sensors() {
     init_belt_sensors();
+    sensors_loop_imer.Start();
 }
 
 void loop_sensors() {
     loop_belt_sensors();
 }
 
-Timer sensorsLoopTimer = Timer(1000, &loop_sensors);
+Timer sensors_loop_timer = Timer(50, &loop_sensors);
 
 
 // ---- ACTUATORS DEPARTMENT ----
@@ -213,6 +213,7 @@ void init_actuators() {
     init_digital_actuators();
     init_pwm_actuators();
     init_servo_actuators();
+    atuators_loop_timer.Start();
 }
 
 void loop_actuators() {
@@ -220,6 +221,8 @@ void loop_actuators() {
     loop_pwm_actuators();
     loop_servo_actuators();
 }
+
+Timer actuators_loop_timer = Timer(100, &loop_actuators);
 
 // ---- MAIN FUCNTIONS ----
 
@@ -242,19 +245,14 @@ void setup() {
     init_sensors();
     init_actuators();
 
-    sensorsLoopTimer.Start();
-
     nh.loginfo("Node '/arduinos/others' initialized correctly.");
 }
 
 void loop() {
     // Components loop
-//    loop_sensors();
-//    loop_actuators();
-
-    sensorsLoopTimer.Update();
+    sensors_loop_imer.Update();
+    atuators_loop_timer.Update();
 
     // ROS loop
     nh.spinOnce();
-//    delay(10); //random delay for now
 }
