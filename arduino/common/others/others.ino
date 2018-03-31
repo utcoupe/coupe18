@@ -22,7 +22,7 @@ ros::NodeHandle nh;
 // ---- SENSORS DEPARTMENT ----
 
 #define NUM_BELT_SENSORS 2
-const int pins_belt_sensors_shut[NUM_BELT_SENSORS]     = {40, 42};
+const uint8_t pins_belt_sensors_shut[NUM_BELT_SENSORS]     = {40, 42};
 const uint8_t belt_sensors_addresses[NUM_BELT_SENSORS] = {22, 24};
 const String belt_sensors_names[NUM_BELT_SENSORS]      = {"sensor1", "sensor2"};
 VL53L0X belt_sensors[NUM_BELT_SENSORS];
@@ -60,32 +60,32 @@ void loop_belt_sensors() {
     }
 }
 
-void init_sensors() {
-    init_belt_sensors();
-    sensors_loop_imer.Start();
-}
-
 void loop_sensors() {
     loop_belt_sensors();
 }
 
 Timer sensors_loop_timer = Timer(50, &loop_sensors);
 
+void init_sensors() {
+    init_belt_sensors();
+    sensors_loop_timer.Start();
+}
+
 
 // ---- ACTUATORS DEPARTMENT ----
 
 #define NUM_DIGITAL_ACTUATORS 1
-const int pins_digital_actuators[NUM_DIGITAL_ACTUATORS]     = {12};
+const uint8_t pins_digital_actuators[NUM_DIGITAL_ACTUATORS]     = {12};
 bool digital_actuators_states[NUM_DIGITAL_ACTUATORS]        = {true};
 // Names : main_led, power_relay
 
 #define NUM_PWM_ACTUATORS 1
-const int pins_pwm_actuators_pwm[NUM_PWM_ACTUATORS]         = {8};
+const uint8_t pins_pwm_actuators_pwm[NUM_PWM_ACTUATORS]         = {8};
 uint8_t pwm_actuators_states[NUM_PWM_ACTUATORS]             = {0};
 // Names : motor_canon1, motor_canon2
 
 #define NUM_SERVO_ACTUATORS 3
-const int pins_servo_actuators_pwm[NUM_SERVO_ACTUATORS]     = {9,  10, 11};
+const uint8_t pins_servo_actuators_pwm[NUM_SERVO_ACTUATORS]     = {9,  10, 11};
 int16_t servo_actuators_states[NUM_SERVO_ACTUATORS]         = {10, 10, 10};
 Servo servo_actuators_objects[NUM_SERVO_ACTUATORS];
 // Names : servo_main_door
@@ -95,7 +95,7 @@ Servo servo_actuators_objects[NUM_SERVO_ACTUATORS];
 drivers_ard_others::MoveResponse move_response_msg;
 ros::Publisher move_responses_pub("/drivers/ard_others/move_response", &move_response_msg);
 
-void send_move_response(int order_nb, bool success) {
+void send_move_response(int16_t order_nb, bool success) {
     if(success) nh.loginfo("Move request succeeded.");
     else nh.logerror("Move request failed.");
 
@@ -209,13 +209,6 @@ void loop_servo_actuators() {
     servo_states_pub.publish(&servo_states_msg);
 }
 
-void init_actuators() {
-    init_digital_actuators();
-    init_pwm_actuators();
-    init_servo_actuators();
-    atuators_loop_timer.Start();
-}
-
 void loop_actuators() {
     loop_digital_actuators();
     loop_pwm_actuators();
@@ -223,6 +216,13 @@ void loop_actuators() {
 }
 
 Timer actuators_loop_timer = Timer(100, &loop_actuators);
+
+void init_actuators() {
+    init_digital_actuators();
+    init_pwm_actuators();
+    init_servo_actuators();
+    actuators_loop_timer.Start();
+}
 
 // ---- MAIN FUCNTIONS ----
 
@@ -250,8 +250,8 @@ void setup() {
 
 void loop() {
     // Components loop
-    sensors_loop_imer.Update();
-    atuators_loop_timer.Update();
+    sensors_loop_timer.Update();
+    actuators_loop_timer.Update();
 
     // ROS loop
     nh.spinOnce();
