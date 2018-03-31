@@ -13,7 +13,6 @@ from geometry_msgs.msg import Pose2D, TransformStamped, PointStamped
 from ai_game_status import StatusServices
 
 
-
 class BeltInterpreter(object):
     def __init__(self):
         super(BeltInterpreter, self).__init__()
