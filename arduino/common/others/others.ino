@@ -2,6 +2,9 @@
 #include <ros.h>
 ros::NodeHandle nh;
 
+//Arduino includes
+#include <Timer.h>
+
 //Sensors includes
 #include <Wire.h>
 #include "VL53L0X.h"
@@ -28,12 +31,12 @@ drivers_ard_others::BeltRange belt_range_msg;
 ros::Publisher belt_ranges_pub("/drivers/ard_others/belt_ranges", &belt_range_msg);
 
 void init_belt_sensors() {
-    for(int i = 0; i < NUM_BELT_SENSORS; i++) {
+    for(uint8_t i = 0; i < NUM_BELT_SENSORS; i++) {
         pinMode(pins_belt_sensors_shut[i], OUTPUT);
         digitalWrite(pins_belt_sensors_shut[i], LOW);
     }
 
-    for(int i = 0; i < NUM_BELT_SENSORS; i++) {
+    for(uint8_t i = 0; i < NUM_BELT_SENSORS; i++) {
         pinMode(pins_belt_sensors_shut[i], INPUT);
         delay(50);
         belt_sensors[i].init(true);
@@ -41,14 +44,17 @@ void init_belt_sensors() {
         belt_sensors[i].setAddress(belt_sensors_addresses[i]);
     }
 
-    for(int i = 0; i < NUM_BELT_SENSORS; i++)
+    for(uint8_t i = 0; i < NUM_BELT_SENSORS; i++) {
         belt_sensors[i].setTimeout(500);
+        belt_sensors[i].startContinuous();
+    }
 }
 
 void loop_belt_sensors() {
-    for(int i = 0; i < NUM_BELT_SENSORS; i++) {
+    for(uint8_t i = 0; i < NUM_BELT_SENSORS; i++) {
         belt_range_msg.sensor_id = belt_sensors_names[i].c_str();
-        belt_range_msg.range = belt_sensors[i].readRangeSingleMillimeters() / 1000.0; //in meters
+//        belt_range_msg.range = belt_sensors[i].readRangeSingleMillimeters() / 1000.0; //in meters
+        belt_range_msg.range = belt_sensors[i].readRangeContinuousMillimeters() / 1000.0; //in meters
         if (belt_range_msg.range > 65534)
             belt_range_msg.range = -1;
         belt_ranges_pub.publish(&belt_range_msg);
@@ -62,6 +68,8 @@ void init_sensors() {
 void loop_sensors() {
     loop_belt_sensors();
 }
+
+Timer sensorsLoopTimer = Timer(1000, &loop_sensors);
 
 
 // ---- ACTUATORS DEPARTMENT ----
@@ -156,14 +164,14 @@ ros::Publisher servo_states_pub("/drivers/ard_others/servo_act_states", &servo_s
 
 // Digital actuators
 void init_digital_actuators() {
-    for(int i = 0; i < NUM_DIGITAL_ACTUATORS; i++)
+    for(uint8_t i = 0; i < NUM_DIGITAL_ACTUATORS; i++)
         pinMode(pins_digital_actuators[i], OUTPUT);
 }
 
 void loop_digital_actuators() {
-    for(int i = 0; i < NUM_DIGITAL_ACTUATORS; i++)
+    for(uint8_t i = 0; i < NUM_DIGITAL_ACTUATORS; i++)
         digitalWrite(pins_digital_actuators[i], digital_actuators_states[i]);
-    
+
     digital_states_msg.states_length = NUM_DIGITAL_ACTUATORS;
     digital_states_msg.states = digital_actuators_states;
     digital_states_pub.publish(&digital_states_msg);
@@ -171,12 +179,12 @@ void loop_digital_actuators() {
 
 // PWM actuators
 void init_pwm_actuators() {
-    for(int i = 0; i < NUM_PWM_ACTUATORS; i++)
+    for(uint8_t i = 0; i < NUM_PWM_ACTUATORS; i++)
         pinMode(pins_pwm_actuators_pwm[i], OUTPUT);
 }
 
 void loop_pwm_actuators() {
-    for(int i = 0; i < NUM_PWM_ACTUATORS; i++)
+    for(uint8_t i = 0; i < NUM_PWM_ACTUATORS; i++)
         analogWrite(pins_pwm_actuators_pwm[i], pwm_actuators_states[i]);
 
     pwm_states_msg.states_length = NUM_PWM_ACTUATORS;
@@ -186,14 +194,14 @@ void loop_pwm_actuators() {
 
 // Servo actuators
 void init_servo_actuators() {
-    for(int i = 0; i < NUM_SERVO_ACTUATORS; i++) {
+    for(uint8_t i = 0; i < NUM_SERVO_ACTUATORS; i++) {
         pinMode(pins_digital_actuators[i], OUTPUT);
         servo_actuators_objects[i].attach(pins_servo_actuators_pwm[i]);
     }
 }
 
 void loop_servo_actuators() {
-    for(int i = 0; i < NUM_SERVO_ACTUATORS; i++)
+    for(uint8_t i = 0; i < NUM_SERVO_ACTUATORS; i++)
         servo_actuators_objects[i].write(servo_actuators_states[i]);
 
     servo_states_msg.states_length = NUM_SERVO_ACTUATORS;
@@ -234,15 +242,19 @@ void setup() {
     init_sensors();
     init_actuators();
 
+    sensorsLoopTimer.Start();
+
     nh.loginfo("Node '/arduinos/others' initialized correctly.");
 }
 
 void loop() {
     // Components loop
-    loop_sensors();
-    loop_actuators();
+//    loop_sensors();
+//    loop_actuators();
+
+    sensorsLoopTimer.Update();
 
     // ROS loop
     nh.spinOnce();
-    delay(20); //random delay for now
+//    delay(10); //random delay for now
 }
