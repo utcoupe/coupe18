@@ -13,7 +13,6 @@ from geometry_msgs.msg import Pose2D, TransformStamped, PointStamped
 from ai_game_status import StatusServices
 
 
-
 class BeltInterpreter(object):
     def __init__(self):
         super(BeltInterpreter, self).__init__()
@@ -30,6 +29,8 @@ class BeltInterpreter(object):
 
         self.PUB_RATE = rospy.Rate(10)
 
+        self.WATCHDOG_PERIOD = rospy.Duration(0.001)
+
         filepath = self.fetch_definition()
 
         self._belt_parser = BeltParser(filepath)
@@ -41,6 +42,8 @@ class BeltInterpreter(object):
         self._sensors_sub = rospy.Subscriber(self.SENSORS_TOPIC, BeltRange,
                                              self.callback)
 
+        self._watchdog = None
+
         self._rects = {}
         self._data_to_process = []
 
@@ -48,40 +51,36 @@ class BeltInterpreter(object):
         # Tell ai/game_status the node initialized successfuly.
         StatusServices("processing", "belt_interpreter").ready(True)
 
-        self.run_publisher()
-
-    def run_publisher(self):
-        while not rospy.is_shutdown():
-            self.process_data()
-            self._pub.publish(self._rects.values())
-            self.PUB_RATE.sleep()
-
-    def process_data(self):
-        for _ in range(len(self._data_to_process)):
-            data = self._data_to_process.pop()
-            if data.sensor_id not in self._belt_parser.Sensors.keys():
-                rospy.logerr("Received data from belt sensor '{}' but no such sensor is defined"
-                             .format(data.sensor_id))
-                continue
-            if data.range > self._belt_parser.Params["max_range"] or data.range <= 0:
-                self._rects.pop(data.sensor_id, None)
-                continue
+        rospy.spin()
 
 
-            width = self.get_rect_width(data.range)
-            height = self.get_rect_height(data.range)
+    def publish(self, event):
+        self._pub.publish(self._rects.values())
+        self._rects.clear()
 
-            rect = RectangleStamped()
-            rect.header.frame_id = self.SENSOR_FRAME_ID.format(data.sensor_id)
+    def process_range(self, data):
+        if data.sensor_id not in self._belt_parser.Sensors.keys():
+            rospy.logerr("Received data from belt sensor '{}' but no such sensor is defined"
+                         .format(data.sensor_id))
+            return
+        if data.range > self._belt_parser.Params["max_range"] or data.range <= 0:
+            return
 
-            rect.header.stamp = rospy.Time.now()
-            rect.x = self.get_rect_x(data.range)
-            rect.y = 0
-            rect.w = width
-            rect.h = height
-            rect.a = 0
 
-            self._rects.update({data.sensor_id: rect})
+        width = self.get_rect_width(data.range)
+        height = self.get_rect_height(data.range)
+
+        rect = RectangleStamped()
+        rect.header.frame_id = self.SENSOR_FRAME_ID.format(data.sensor_id)
+
+        rect.header.stamp = rospy.Time.now()
+        rect.x = self.get_rect_x(data.range)
+        rect.y = 0
+        rect.w = width
+        rect.h = height
+        rect.a = 0
+
+        self._rects.update({data.sensor_id: rect})
 
 
     def get_rect_width(self, r):
@@ -111,9 +110,12 @@ class BeltInterpreter(object):
         return (x_far + x_close) / 2
 
     def callback(self, data):
-        # remove all data from this sensor from stack
-        self._data_to_process = filter(lambda d: d.sensor_id != data.sensor_id, self._data_to_process)
-        self._data_to_process.append(data)
+        self.process_range(data)
+        if data.sensor_id in self._rects:
+            self.publish(None)
+            
+        elif data.sensor_id != 'sensor_tera1':
+            self._watchdog = rospy.Timer(self.WATCHDOG_PERIOD, self.publish, oneshot=True)
 
 
     def pub_static_transforms(self):
