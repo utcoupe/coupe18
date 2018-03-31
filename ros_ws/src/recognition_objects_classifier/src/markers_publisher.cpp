@@ -97,6 +97,8 @@ void MarkersPublisher::publish_segments(
     for (auto &list : both_lists) {
         points.clear();
 
+
+
         for (auto &segment : *list) {
             point.x = segment.segment.first_point.x;
             point.y = segment.segment.first_point.y;
@@ -106,8 +108,11 @@ void MarkersPublisher::publish_segments(
             point.y = segment.segment.last_point.y;
             points.push_back(point);
         }
-        marker.header = list->at(0).header;
-        pub_.publish(marker);
+
+        if(!list->empty()) {
+            marker.header = list->at(0).header;
+            pub_.publish(marker);
+        }
 
         marker.color.r = 1.0;
         marker.color.g = 0.0;

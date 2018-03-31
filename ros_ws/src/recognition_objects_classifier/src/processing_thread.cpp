@@ -74,11 +74,8 @@ void ProcessingThread::notify(unsigned int start_idx, unsigned int length) {
 
 
 void ProcessingThread::wait_processing() {
-    ROS_INFO("waiting");
     std::unique_lock<std::mutex> lk(mutex_);
     cv_.wait(lk, [this] { return processed_; });
-    ROS_INFO("waited");
-
 }
 
 void ProcessingThread::stop() {

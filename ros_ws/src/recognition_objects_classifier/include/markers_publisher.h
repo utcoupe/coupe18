@@ -13,7 +13,7 @@
 #include "recognition_objects_classifier/SegmentObstacleStamped.h"
 
 const std::string MARKERS_TOPIC = "/visualization_markers/objects";
-const float LIFETIME = 0.1;
+const float LIFETIME = 0.15;
 const float Z_POS = 0.2;
 const float Z_SCALE = 0.2;
 

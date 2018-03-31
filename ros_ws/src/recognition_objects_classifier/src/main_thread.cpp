@@ -11,7 +11,7 @@
 #include "main_thread.h"
 
 
-void MainThread::classify_rects(processing_belt_interpreter::BeltRects &rects) {
+void MainThread::classify_and_publish_rects(processing_belt_interpreter::BeltRects &rects) {
 
     {
         std::lock_guard<std::mutex> lk(lists_mutex_);
@@ -63,7 +63,6 @@ void MainThread::classify_rects(processing_belt_interpreter::BeltRects &rects) {
     if (point_idx == 0)
         return;
 
-    ROS_INFO("%d", rects_transforms_.size());
     notify_threads_and_wait(point_idx);
 
     std::lock_guard<std::mutex> lk(lists_mutex_);
@@ -92,6 +91,16 @@ void MainThread::classify_rects(processing_belt_interpreter::BeltRects &rects) {
             classified_objects_.unknown_rects.push_back(rects.rects[r]);
         }
     }
+
+    pub_.publish(classified_objects_);
+
+    if(ros::Time::now().toSec() - last_rviz_rect_pub_.toSec() > SECS_BETWEEN_RVIZ_PUB && markers_publisher_.is_connected()) {
+        markers_publisher_.publish_rects(classified_objects_.map_rects, classified_objects_.unknown_rects);
+        last_rviz_rect_pub_ = ros::Time::now();
+    }
+
+    classified_objects_.map_rects.clear();
+    classified_objects_.unknown_rects.clear();
 
     time = ros::Time::now().toSec() - time;
 
@@ -198,7 +207,7 @@ void MainThread::notify_threads_and_wait(int num_points) {
     }
 }
 
-void MainThread::classify_lidar_objects(processing_lidar_objects::Obstacles &obstacles) {
+void MainThread::classify_and_publish_lidar_objects(processing_lidar_objects::Obstacles &obstacles) {
 
     double time = ros::Time::now().toSec();
 
@@ -256,28 +265,35 @@ void MainThread::classify_lidar_objects(processing_lidar_objects::Obstacles &obs
         }
     }
 
+    pub_.publish(classified_objects_);
+
+
+    if(ros::Time::now().toSec() - last_rviz_lidar_pub_.toSec() > SECS_BETWEEN_RVIZ_PUB && markers_publisher_.is_connected()) {
+
+        //markers_publisher_.publish_segments(classified_objects_.map_segments, classified_objects_.unknown_segments);
+        //markers_publisher_.publish_circles(classified_objects_.map_circles, classified_objects_.unknown_circles);
+        last_rviz_lidar_pub_ = ros::Time::now();
+    }
+
+    classified_objects_.map_circles.clear();
+    classified_objects_.unknown_circles.clear();
+    classified_objects_.map_segments.clear();
+    classified_objects_.unknown_segments.clear();
+
     time = ros::Time::now().toSec() - time;
 
     ROS_DEBUG("Took %f secs to process lidar data", time);
 
 }
 
-void MainThread::pub_loop(const ros::TimerEvent &) {
-    std::lock_guard<std::mutex> lk(lists_mutex_);
-
-    pub_.publish(classified_objects_);
-
-    if (markers_publisher_.is_connected())
-        markers_publisher_.publish_rects(classified_objects_.map_rects, classified_objects_.unknown_rects);
-}
-
 MainThread::MainThread(ros::NodeHandle &nh) :
         nh_(nh),
         pub_(nh.advertise<recognition_objects_classifier::ClassifiedObjects>(PUB_TOPIC, 1)),
-        timer_(nh_.createTimer(ros::Duration(1.0 / PUB_FREQ), &MainThread::pub_loop, this)),
         tl_(tf_buffer_),
         markers_publisher_(nh),
-        map_objects_(nh) {
+        map_objects_(nh),
+        last_rviz_lidar_pub_(ros::Time::now()),
+        last_rviz_rect_pub_(ros::Time::now()) {
 
     map_objects_.fetch_map_objects();
 

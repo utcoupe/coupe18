@@ -24,7 +24,6 @@ struct Point {
 
 const std::string PUB_TOPIC = "/recognition/objects_classifier/objects";
 
-const float PUB_FREQ = 10.0;
 const int SENSORS_NBR = 6;
 
 // maximum number of points created per rect
@@ -46,6 +45,8 @@ const float TIME_DIFF_MAX = 0.05;
 // if a circle has a velocity above this value, it is considered unknown
 const float CIRCLE_SPEED_MAX = 1.0;
 
+const double SECS_BETWEEN_RVIZ_PUB = 0.08;
+
 class MainThread {
 protected:
     ros::NodeHandle &nh_;
@@ -54,7 +55,9 @@ protected:
     std::mutex lists_mutex_;
 
     ros::Publisher pub_;
-    ros::Timer timer_;
+
+    ros::Time last_rviz_rect_pub_;
+    ros::Time last_rviz_lidar_pub_;
 
     Point points_[SENSORS_NBR * MAX_POINTS];
     std::vector<std::pair<int, geometry_msgs::TransformStamped>> rects_transforms_;
@@ -87,9 +90,9 @@ public:
 
     ~MainThread();
 
-    void classify_rects(processing_belt_interpreter::BeltRects &rects);
+    void classify_and_publish_rects(processing_belt_interpreter::BeltRects &rects);
 
-    void classify_lidar_objects(processing_lidar_objects::Obstacles &obstacles);
+    void classify_and_publish_lidar_objects(processing_lidar_objects::Obstacles &obstacles);
 };
 
 
