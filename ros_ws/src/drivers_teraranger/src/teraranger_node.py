@@ -11,7 +11,7 @@ __author__ = "Thomas Fuhrmann"
 __date__ = 06/01/2018
 
 NODE_NAME = "teraranger"
-PUBLISH_INTERVAL = 0.1  # in ms
+PUBLISH_INTERVAL = 0.02  # in ms
 GET_PORT_SERVICE_NAME = "/drivers/port_finder/get_port"
 GET_PORT_SERVICE_TIMEOUT = 15  # in seconds
 
