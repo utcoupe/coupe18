@@ -2,8 +2,8 @@
 
 #include <tf/transform_datatypes.h>
 #include <tf2/LinearMath/Vector3.h>
-
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2_ros/transform_listener.h>
 
 #include <memory_map/MapGet.h>
 #include <recognition_objects_classifier/ClassifiedObjects.h>
@@ -32,33 +32,27 @@ void MainThread::classify_rects(processing_belt_interpreter::BeltRects &rects) {
 
     geometry_msgs::TransformStamped transform_stamped;
 
-    geometry_msgs::PointStamped point_static_frame, point_map_frame;
+    rects_transforms_.clear();
 
     for (auto &rect : rects.rects) {
 
         std::tie(step_x, step_y) = compute_division_steps(rect);
 
         if (!fetch_transform_and_adjust_stamp(rect, transform_stamped)) {
-
             end_idx[rect_idx] = point_idx - 1;
             rect_idx++;
             continue;
         }
 
-        point_static_frame.header = rect.header;
         for (float x = rect.x - rect.w / 2; x <= rect.x + rect.w / 2; x += step_x) {
-            point_static_frame.point.x = x;
-
             for (float y = rect.y - rect.h / 2; y <= rect.y + rect.h / 2; y += step_y) {
-                point_static_frame.point.y = y;
-
-                tf2::doTransform(point_static_frame, point_map_frame, transform_stamped);
-
-                this->points_[point_idx].x = static_cast<float>(point_map_frame.point.x);
-                this->points_[point_idx].y = static_cast<float>(point_map_frame.point.y);
+                this->points_[point_idx].x = x;
+                this->points_[point_idx].y = y;
                 point_idx++;
             }
         }
+
+        rects_transforms_.push_back({ point_idx - 1, transform_stamped });
 
         end_idx[rect_idx] = point_idx - 1;
         rect_idx++;
@@ -69,6 +63,7 @@ void MainThread::classify_rects(processing_belt_interpreter::BeltRects &rects) {
     if (point_idx == 0)
         return;
 
+    ROS_INFO("%d", rects_transforms_.size());
     notify_threads_and_wait(point_idx);
 
     std::lock_guard<std::mutex> lk(lists_mutex_);
@@ -78,6 +73,9 @@ void MainThread::classify_rects(processing_belt_interpreter::BeltRects &rects) {
     int running_idx = 0;
     unsigned int nbr_map = 0;
     for (int r = 0; r < rects.rects.size(); r++) {
+
+        if (end_idx[r] == -1 || (r > 0 && end_idx[r] == end_idx[r-1]))
+            continue;
 
         nbr_map = 0;
         for (int p = running_idx; p <= end_idx[r]; p++) {
@@ -173,8 +171,7 @@ void MainThread::transform_rect(processing_belt_interpreter::RectangleStamped &r
     rect.x = static_cast<float>(pose_map_frame.pose.position.x);
     rect.y = static_cast<float>(pose_map_frame.pose.position.y);
     rect.a = static_cast<float>(tf::getYaw(pose_map_frame.pose.orientation));
-    rect.header.frame_id = transform.child_frame_id;
-
+    rect.header.frame_id = transform.header.frame_id;
 }
 
 void MainThread::notify_threads_and_wait(int num_points) {
@@ -285,7 +282,7 @@ MainThread::MainThread(ros::NodeHandle &nh) :
     map_objects_.fetch_map_objects();
 
     for (int i = 0; i < THREADS_NBR; i++) {
-        threads_.push_back(std::unique_ptr<ProcessingThread>(new ProcessingThread(points_, map_objects_)));
+        threads_.push_back(std::unique_ptr<ProcessingThread>(new ProcessingThread(points_, rects_transforms_, map_objects_)));
         threads_[i]->start();
     }
 }

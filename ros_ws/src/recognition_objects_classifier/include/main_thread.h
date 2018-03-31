@@ -57,6 +57,7 @@ protected:
     ros::Timer timer_;
 
     Point points_[SENSORS_NBR * MAX_POINTS];
+    std::vector<std::pair<int, geometry_msgs::TransformStamped>> rects_transforms_;
     std::vector<std::unique_ptr<ProcessingThread>> threads_;
 
     MapObjects map_objects_;

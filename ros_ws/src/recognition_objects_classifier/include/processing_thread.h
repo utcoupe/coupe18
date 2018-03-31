@@ -6,6 +6,8 @@
 #include <mutex>
 #include <condition_variable>
 
+#include <geometry_msgs/TransformStamped.h>
+
 #include "map_objects.h"
 
 struct Point;
@@ -18,6 +20,7 @@ protected:
     unsigned int start_idx_;
     unsigned int length_;
     Point *points_;
+    std::vector<std::pair<int, geometry_msgs::TransformStamped>> &transforms_;
     MapObjects &map_;
 
     // to pause the thread
@@ -43,8 +46,9 @@ public:
 
     void wait_processing();
 
-    ProcessingThread(Point *points, MapObjects &map) :
+    ProcessingThread(Point *points, std::vector<std::pair<int, geometry_msgs::TransformStamped>>& transforms, MapObjects &map) :
             points_(points),
+            transforms_(transforms),
             thread_stopped_(false),
             ready_(false),
             processed_(false),
@@ -52,6 +56,7 @@ public:
 
     ProcessingThread(const ProcessingThread &other) :
             points_(other.points_),
+            transforms_(other.transforms_),
             thread_stopped_(other.thread_stopped_),
             ready_(other.ready_),
             processed_(other.processed_),
