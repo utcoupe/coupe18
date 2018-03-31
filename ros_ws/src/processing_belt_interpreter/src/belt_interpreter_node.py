@@ -117,8 +117,11 @@ class BeltInterpreter(object):
         self.process_range(data)
 
         if data.sensor_id != 'sensor_tera1' and not publish_now:
-            self._watchdog.shutdown()
+            if self._watchdog:
+                self._watchdog.shutdown()
             self._watchdog = rospy.Timer(self.WATCHDOG_PERIOD, self.publish, oneshot=True)
+            if self._watchdog is None:
+                rospy.logfatal("Oh non ! le chien regarde est nul :'(")
         elif publish_now:
             self.publish(None)
 
