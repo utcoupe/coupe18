@@ -29,7 +29,7 @@ class BeltInterpreter(object):
 
         self.PUB_RATE = rospy.Rate(10)
 
-        self.WATCHDOG_PERIOD = rospy.Duration(0.001)
+        self.WATCHDOG_PERIOD = rospy.Duration(0.015)
 
         filepath = self.fetch_definition()
 
@@ -110,12 +110,20 @@ class BeltInterpreter(object):
         return (x_far + x_close) / 2
 
     def callback(self, data):
-        self.process_range(data)
+        publish_now = False
         if data.sensor_id in self._rects:
-            self.publish(None)
-            
-        elif data.sensor_id != 'sensor_tera1':
+            publish_now = True
+
+        self.process_range(data)
+
+        if data.sensor_id != 'sensor_tera1' and not publish_now:
+            if self._watchdog:
+                self._watchdog.shutdown()
             self._watchdog = rospy.Timer(self.WATCHDOG_PERIOD, self.publish, oneshot=True)
+            if self._watchdog is None:
+                rospy.logfatal("Oh non ! le chien regarde est nul :'(")
+        elif publish_now:
+            self.publish(None)
 
 
     def pub_static_transforms(self):
