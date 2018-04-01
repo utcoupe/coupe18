@@ -45,7 +45,6 @@ if __name__ == "__main__":
     int_marker = InteractiveMarker()
     int_marker.header.frame_id = "map"
     int_marker.name = "robot_pos"
-    int_marker.description = "Pose of the robot"
     int_marker.scale = 0.5
 
     int_marker.pose.position.z = 0.001
