@@ -136,6 +136,16 @@ terrain:
                     type: rect
                     width: 0.05
                     height: 0.1
+            stations:
+                position:
+                    frame_id: /map
+                    x: 1.5
+                    y: 0.125
+                    type: fixed
+                shape:
+                    type: rect
+                    width: 1.212
+                    height: 0.250
 
         layer_pathfinder:
             _include: 
