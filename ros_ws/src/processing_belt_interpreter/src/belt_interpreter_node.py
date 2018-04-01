@@ -111,7 +111,7 @@ class BeltInterpreter(object):
 
     def callback(self, data):
         publish_now = False
-        if data.sensor_id in self._rects:
+        if data.sensor_id in self._rects and data.sensor_id != 'sensor_tera1':
             publish_now = True
 
         self.process_range(data)
@@ -120,8 +120,6 @@ class BeltInterpreter(object):
             if self._watchdog:
                 self._watchdog.shutdown()
             self._watchdog = rospy.Timer(self.WATCHDOG_PERIOD, self.publish, oneshot=True)
-            if self._watchdog is None:
-                rospy.logfatal("Oh non ! le chien regarde est nul :'(")
         elif publish_now:
             self.publish(None)
 
