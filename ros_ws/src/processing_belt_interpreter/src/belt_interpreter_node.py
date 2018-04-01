@@ -29,7 +29,8 @@ class BeltInterpreter(object):
 
         self.PUB_RATE = rospy.Rate(10)
 
-        self.WATCHDOG_PERIOD = rospy.Duration(0.015)
+        self.WATCHDOG_PERIOD_BELT = rospy.Duration(0.015)
+        self.WATCHDOG_PERIOD_TERA = rospy.Duration(0.05)
 
         filepath = self.fetch_definition()
 
@@ -42,7 +43,7 @@ class BeltInterpreter(object):
         self._sensors_sub = rospy.Subscriber(self.SENSORS_TOPIC, BeltRange,
                                              self.callback)
 
-        self._watchdog = None
+        self._watchdog = rospy.Timer(self.WATCHDOG_PERIOD_TERA, self.publish, oneshot=True)
 
         self._rects = {}
         self._data_to_process = []
@@ -53,9 +54,13 @@ class BeltInterpreter(object):
 
         rospy.spin()
 
-
     def publish(self, event):
-        self._pub.publish(self._rects.values())
+        if self._rects.keys() == ["sensor_tera1"] or not self._rects:
+            if self._watchdog:
+                self._watchdog.shutdown()
+            self._watchdog = rospy.Timer(self.WATCHDOG_PERIOD_TERA, self.publish, oneshot=True)
+        if self._rects:
+            self._pub.publish(self._rects.values())
         self._rects.clear()
 
     def process_range(self, data):
@@ -119,7 +124,7 @@ class BeltInterpreter(object):
         if data.sensor_id != 'sensor_tera1' and not publish_now:
             if self._watchdog:
                 self._watchdog.shutdown()
-            self._watchdog = rospy.Timer(self.WATCHDOG_PERIOD, self.publish, oneshot=True)
+            self._watchdog = rospy.Timer(self.WATCHDOG_PERIOD_BELT, self.publish, oneshot=True)
         elif publish_now:
             self.publish(None)
 
