@@ -15,7 +15,7 @@ class EnemyTrackerNode():
     def __init__(self):
         self._node = rospy.init_node('enemy_tracker')
         self._namespace = '/recognition/enemy_tracker/'
-        self._belt_sub = rospy.Subscriber('/processing/belt_interpreter/points', BeltRects, self.importPoint)
+        self._belt_sub = rospy.Subscriber('/processing/belt_interpreter/rects', BeltRects, self.importPoint)
         self.configure(None)
         self.rect = []
         self.data = []
