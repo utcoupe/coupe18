@@ -29,7 +29,7 @@ class MarkersPublisher():
                 self._publish_zones(world)  # departure area
                 self._publish_waypoints(world)
                 self._static_published = True
-            self._publish_objects(world.get("/objects/^"))  # play elements (balls, cubes...)
+                self._publish_objects(world.get("/objects/^"))  # play elements (balls, cubes...)
         else:
             self._prev_num_connections = 0
 
@@ -103,6 +103,7 @@ class MarkersPublisher():
         marker.type = markertypes[visual.get("type")]
         marker.ns = visual.get("ns")
         marker.id = marker_id
+        marker.frame_locked = True
 
         marker.action = Marker.ADD
         marker.scale.x = visual.get("scale")[0]
