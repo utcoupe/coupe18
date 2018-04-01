@@ -47,16 +47,29 @@ class PortFinder:
         # Tell ai/game_status the node initialized successfuly.
         StatusServices("drivers", "port_finder").ready(True)
 
+        # TODO find an other way ?
+        # Launch urg_node directly from port_finder to have the correct port
+        hokuyo_subprocess = None
+        hokuyo_port = self.get_port("hokuyo")
+        if hokuyo_port is not "":
+            hokuyo_subprocess = subprocess.Popen(["rosrun", "urg_node", "urg_node", "_serial_port:=" + hokuyo_port, "__ns:=sensors"])
+
         rospy.spin()
         for rosserial_fd in self._rosserial_call_list:
             rosserial_fd.terminate()
+        if hokuyo_subprocess:
+            hokuyo_subprocess.terminate()
+
+    def get_port(self, device_name):
+        port_name = ""
+        if device_name == "all":
+            port_name = str(self._associated_port_list)
+        elif device_name in dict(self._associated_port_list).keys():
+            port_name = dict(self._associated_port_list)[device_name]
+        return port_name
 
     def _callback_get_port(self, request):
-        response = ""
-        if request.component == "all":
-            response = str(self._associated_port_list)
-        elif request.component in dict(self._associated_port_list).keys():
-            response = dict(self._associated_port_list)[request.component]
+        response = self.get_port(request.component)
         return GetPortResponse(response)
 
     def _parse_xml_file(self, file):
@@ -117,6 +130,7 @@ class PortFinder:
                     merged_filtered_id_tty_list.append((id_dict_filtered[element][0], id_dict_filtered[element][1], tty_dict[tty_element], id_dict_filtered[element][2]))
                     break
         self._connected_component_list = merged_filtered_id_tty_list
+        rospy.logdebug("Connected components : " + str(self._connected_component_list))
 
     def _get_dmesg(self):
         """
@@ -143,6 +157,7 @@ class PortFinder:
                 self._associated_port_list.append(associated_element)
             else:
                 rospy.logdebug("Port_finder double found : " + str(associated_element))
+        rospy.logdebug("Associated components : " + str(self._associated_port_list))
 
     def _identify_arduino(self):
         # Temporary list used to store identified components
@@ -201,6 +216,8 @@ class PortFinder:
                         # Replace the tuple in list to keep a track that the port is used by rosserial
                         # Add an arbitrary id to rosserial to avoid having 2 components with the same name
                         final_port_list.append(("rosserial_node_" + str(counter), element[1]))
+            else:
+                final_port_list.append((element[0], element[1]))
         self._associated_port_list = final_port_list
 
     def _check_rosseriable(self, component_name):

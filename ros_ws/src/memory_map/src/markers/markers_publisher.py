@@ -7,19 +7,31 @@ from visualization_msgs.msg import Marker
 
 class MarkersPublisher():
     def __init__(self):
+        self._prev_num_connections = 0
         self.MARKERS_TOPIC = "/visualization_markers/world"
         self.MarkersPUBL = rospy.Publisher(self.MARKERS_TOPIC, Marker, queue_size=10)
 
     def _is_connected(self):
         return bool(self.MarkersPUBL.get_num_connections())
 
+    def _connections_has_changed(self):
+        if self._prev_num_connections != self.MarkersPUBL.get_num_connections():
+            self._prev_num_connections = self.MarkersPUBL.get_num_connections()
+            return True
+        else:
+            return False
+
     def updateMarkers(self, world):
         if self._is_connected():
-            self._publish_table(world)
-            self._publish_robot_stl(world)
-            self._publish_zones(world)
-            self._publish_waypoints(world)
-            self._publish_objects(world.get("/objects/^"))
+            if self._connections_has_changed():
+                self._publish_table(world)
+                self._publish_robot_stl(world)
+                self._publish_zones(world)  # departure area
+                self._publish_waypoints(world)
+                self._static_published = True
+                self._publish_objects(world.get("/objects/^"))  # play elements (balls, cubes...)
+        else:
+            self._prev_num_connections = 0
 
     def _publish_table(self, world):
         pos = map_attributes.Position2D({
@@ -91,6 +103,7 @@ class MarkersPublisher():
         marker.type = markertypes[visual.get("type")]
         marker.ns = visual.get("ns")
         marker.id = marker_id
+        marker.frame_locked = True
 
         marker.action = Marker.ADD
         marker.scale.x = visual.get("scale")[0]

@@ -1,7 +1,7 @@
 #!/usr/bin/python2.7
 # -*-coding:Utf-8 -*
 
-from processing_belt_interpreter.msg import BeltRects, RectangleStamped
+from recognition_objects_classifier.msg import ClassifiedObjects
 from libtools import Rect
 from enemy_tracker_tracker import EnemiesData
 import enemy_tracker_properties
@@ -15,7 +15,7 @@ class EnemyTrackerNode():
     def __init__(self):
         self._node = rospy.init_node('enemy_tracker')
         self._namespace = '/recognition/enemy_tracker/'
-        self._belt_sub = rospy.Subscriber('/processing/belt_interpreter/points', BeltRects, self.importPoint)
+        self._belt_sub = rospy.Subscriber('/recognition/objects_classifier/objects', ClassifiedObjects, self.importPoint)
         self.configure(None)
         self.rect = []
         self.data = []
@@ -23,9 +23,9 @@ class EnemyTrackerNode():
         # Tell ai/game_status the node initialized successfuly.
         StatusServices("recognition", "enemy_tracker").ready(True)
 
-    def importPoint(self, beltData):
+    def importPoint(self, data):
         rects = []
-        for rect in beltData.unknown_rects:
+        for rect in data.unknown_rects:
             # TODO check referentiel
             rects.append(Rect(rect.x, rect.y, rect.w, rect.h, rect.header.stamp))
         self.saveRect(rects)
@@ -48,6 +48,7 @@ class EnemyTrackerNode():
             prop = {'maxRectHistory': '3','maxEnemiesVelocity': '0.5'}
         self.maxRectHistory = int(prop['maxRectHistory'])
         self.maxEnemiesVelocity = float(prop['maxEnemiesVelocity'])
+
 
 if __name__ == '__main__':
     enemy_tracker_node = EnemyTrackerNode()

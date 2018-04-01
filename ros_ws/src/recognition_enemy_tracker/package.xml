@@ -3,7 +3,7 @@
     <name>recognition_enemy_tracker</name>
     <version>0.0.1</version>
     <description>
-        Detect enemies and calculate there speeds and trajectories.
+        Detect enemies and calculate their speeds and trajectories.
     </description>
     <license>GPLv3</license>
     <author>P. Potiron</author>
@@ -11,4 +11,6 @@
     <buildtool_depend>catkin</buildtool_depend>
     <depend>rospy</depend>
     <depend>std_msgs</depend>
+    <depend>ai_game_status</depend>
+    <depend>recognition_objects_classifier</depend>
 </package>

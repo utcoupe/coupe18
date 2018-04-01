@@ -8,12 +8,12 @@
     <sensor id="sensor1"> <!-- x, y in meters, a in rad -->
       <x>0.1</x>
       <y>0.15</y>
-      <a>0.2</a>
+      <a>0.0</a>
     </sensor>
     <sensor id="sensor2"> <!-- x, y in meters, a in rad -->
       <x>0.1</x>
       <y>-0.15</y>
-      <a>-0.2</a>
+      <a>0.0</a>
     </sensor>
     <sensor id="sensor_tera1"> <!-- x, y in meters, a in rad -->
       <x>0</x>
