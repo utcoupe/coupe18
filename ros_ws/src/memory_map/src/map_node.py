@@ -30,7 +30,7 @@ class MapNode():
         self.run()
 
     def run(self):
-        r = rospy.Rate(10)
+        r = rospy.Rate(5)
         while not rospy.is_shutdown():
             if rospy.has_param("/current_team"):
                 map_manager.Map.swap_team(rospy.get_param("/current_team"))
