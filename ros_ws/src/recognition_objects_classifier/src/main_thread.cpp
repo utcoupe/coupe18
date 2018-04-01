@@ -92,8 +92,9 @@ void MainThread::classify_and_publish_rects(processing_belt_interpreter::BeltRec
         }
     }
 
-    if(!classified_objects_.unknown_rects.empty() || !classified_objects_.map_rects.empty())
+    if(!classified_objects_.unknown_rects.empty() || !classified_objects_.map_rects.empty()) {
         pub_.publish(classified_objects_);
+    }
 
     if(ros::Time::now().toSec() - last_rviz_rect_pub_.toSec() > SECS_BETWEEN_RVIZ_PUB && markers_publisher_.is_connected()) {
         markers_publisher_.publish_rects(classified_objects_.map_rects, classified_objects_.unknown_rects);
@@ -266,9 +267,9 @@ void MainThread::classify_and_publish_lidar_objects(processing_lidar_objects::Ob
         }
     }
     if(!classified_objects_.unknown_segments.empty() || !classified_objects_.map_segments.empty()
-            || !classified_objects_.unknown_circles.empty() || !classified_objects_.map_circles.empty())
+            || !classified_objects_.unknown_circles.empty() || !classified_objects_.map_circles.empty()) {
         pub_.publish(classified_objects_);
-
+    }
 
     if(ros::Time::now().toSec() - last_rviz_lidar_pub_.toSec() > SECS_BETWEEN_RVIZ_PUB && markers_publisher_.is_connected()) {
 
