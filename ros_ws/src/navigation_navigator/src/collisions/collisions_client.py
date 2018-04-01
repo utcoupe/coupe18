@@ -25,7 +25,6 @@ class CollisionsClient(object):
 
     def _warnerCallback (self, message):
         if (message.danger_level <= message.LEVEL_DANGER):
-            rospy.loginfo("Navigator danger received")
             self._last_collision = True
             if not self._collision_active:
                 self._collision_active = True
