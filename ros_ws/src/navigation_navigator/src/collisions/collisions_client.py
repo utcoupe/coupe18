@@ -8,7 +8,7 @@ from navigation_collisions.srv import ActivateCollisions
 __author__ = "Gaëtan Blond"
 __date__ = 11/12/2017
 
-COLLISIONS_WATCHDOG_TIME = 0.5
+COLLISIONS_WATCHDOG_TIME = 0.1
 
 
 class CollisionsClient(object):
