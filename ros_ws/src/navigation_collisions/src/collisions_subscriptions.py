@@ -86,7 +86,7 @@ class CollisionsSubscriptions(object):
             new_belt.append(RectObstacle(Position(rect.x, rect.y,\
                                                   rect.a),\
                                                   rect.w, rect.h))
-
+        rospy.loginfo("Received classifier data")
         if len(new_belt) > 0:
             ObstaclesStack.updateBeltPoints(new_belt)
 
