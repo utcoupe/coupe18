@@ -177,20 +177,24 @@ void Ax12Server::main_loop(const ros::TimerEvent&)
      * Feedback is published too
      */
 
-    uint8_t motor_id;
-    int16_t curr_position;
-    int16_t curr_speed;
-    int16_t moving;
-    int32_t goal_position;
+    uint8_t motor_id = 0;
+    int16_t curr_position = 0;
+    int16_t curr_speed = 0;
+    int16_t moving = 0;
+    int32_t goal_position = 0;
 
     for(auto it = joint_goals_.begin(); it != joint_goals_.end();)
     {
         motor_id = it->getGoal()->motor_id;
         ROS_DEBUG("Checking state of motor %d", motor_id);
 
-        driver_.read_register(motor_id, PRESENT_POSITION, curr_position);
-        driver_.read_register(motor_id, MOVING, moving);
-        driver_.read_register(motor_id, PRESENT_SPEED, curr_speed);
+        bool pos_ok = driver_.read_register(motor_id, PRESENT_POSITION, curr_position);
+        bool moving_ok = driver_.read_register(motor_id, MOVING, moving);
+        bool speed_ok = driver_.read_register(motor_id, PRESENT_SPEED, curr_speed);
+
+        ROS_DEBUG("Read pos %d, RX %d", curr_position, pos_ok);
+        ROS_DEBUG("Read moving %d, RX %d", moving, moving_ok);
+        ROS_DEBUG("Read speed %d, RX %d", curr_speed, speed_ok);
 
         // motor is moving
         if(curr_speed % 1024 >= 1)
