@@ -39,7 +39,7 @@
 			<param name="preset" type="string" optional="true"/> <!-- Set either a preset or param-->
 			<param name="param" type="int" optional="true"/>
 
-			<param name="order" type="string" preset="true"/>JOINT</param>
+			<param name="order" type="string" preset="true">JOINT</param>
 		</message>
 	</order>
 
