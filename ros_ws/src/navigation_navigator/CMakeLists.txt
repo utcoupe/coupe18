@@ -6,11 +6,14 @@ find_package(catkin REQUIRED COMPONENTS
     rospy
     std_msgs
     geometry_msgs
+    visualization_msgs
     actionlib
     actionlib_msgs
     navigation_pathfinder
     drivers_ard_asserv
     memory_map
+    tf
+    interactive_markers
     ai_game_status
 )
 

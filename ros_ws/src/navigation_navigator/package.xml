@@ -11,7 +11,10 @@
     <depend>rospy</depend>
     <depend>std_msgs</depend>
     <depend>actionlib</depend>
+    <depend>tf</depend>
+    <depend>interactive_markers</depend>
     <depend>actionlib_msgs</depend>
+    <depend>visualization_msgs</depend>
     <depend>navigation_pathfinder</depend>
     <depend>drivers_ard_asserv</depend>
     <depend>memory_map</depend>

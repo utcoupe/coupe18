@@ -8,38 +8,49 @@ from visualization_msgs.msg import Marker
 from drivers_ard_asserv.srv import SetPos, SetPosRequest
 
 from tf.transformations import euler_from_quaternion
-from tf.transformations import quaternion_about_axis
+from tf.transformations import quaternion_from_euler
 
+from geometry_msgs.msg import Pose2D
+
+import tf2_ros
 
 
 def processFeedback(feedback):
+    if feedback.event_type != InteractiveMarkerFeedback.MOUSE_UP:
+        return
+    
     p = feedback.pose.position
-
-
-    srv = rospy.ServiceProxy("/drivers/ard_asserv/set_pos", SetPos)
-    q = [[o.x, o.y, o.z, o.w] for o in [feedback.pose.orientation]][0]
-
-    print euler_from_quaternion(q)
-
-    msg = SetPosRequest()
-    msg.position.x = feedback.pose.position.x
-    msg.position.y = feedback.pose.position.y
-    msg.position.theta = euler_from_quaternion(q)[2]
-
-
     try:
+        srv = rospy.ServiceProxy("/drivers/ard_asserv/set_pos", SetPos)
+        q = [[o.x, o.y, o.z, o.w] for o in [feedback.pose.orientation]][0]
+
+        msg = SetPosRequest()
+        msg.position.x = feedback.pose.position.x
+        msg.position.y = feedback.pose.position.y
+        msg.position.theta = euler_from_quaternion(q)[2]
         srv(msg)
-
-
     except Exception as e:
         rospy.logwarn(e)
-        pass
+
+def poseCallback(msg):
+    pose = int_marker.pose
+    pose.position.x = msg.x
+    pose.position.y = msg.y
+    q = quaternion_from_euler(0, 0, msg.theta)
+    pose.orientation.x = q[0]
+    pose.orientation.y = q[1]
+    pose.orientation.z = q[2]
+    pose.orientation.w = q[3]
+
+    server.setPose(int_marker.name, pose)
+    server.applyChanges()
 
 
 
 if __name__ == "__main__":
     rospy.init_node("asserv_interactive_marker")
 
+    rospy.Subscriber("/drivers/ard_asserv/pose2d", Pose2D, poseCallback)
     server = InteractiveMarkerServer("asserv_marker")
 
     int_marker = InteractiveMarker()
@@ -97,6 +108,10 @@ if __name__ == "__main__":
     # add the interactive marker to our collection &
     # tell the server to call processFeedback() when feedback arrives for it
     server.insert(int_marker, processFeedback)
+
+
+
+
 
     # 'commit' changes and send to all clients
     server.applyChanges()

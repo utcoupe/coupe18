@@ -41,13 +41,14 @@
 		<node pkg="movement_actuators"          name="actuators"  type="actuators_node.py"          output="screen" />
 	</group>
 
-    <group ns="external_nodes">
-        <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
-    </group>
+  <group ns="external_nodes">
+      <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
+  </group>
 
-    <group ns="markers_servers">
-        <node pkg="drivers_ard_asserv"    name="marker_server"  type="marker_server_node.py" />
-    </group>
+  <group ns="markers_servers">
+			<node pkg="drivers_ard_asserv"    name="asserv_marker_server"  type="marker_server_node.py" />
+      <node pkg="navigation_navigator"    name="navigator_marker_server"  type="marker_server_node.py" />
+  </group>
 
 	<include file="$(find memory_definitions)/def/robots/$(arg robot)/specific.launch"/>
 </launch>
