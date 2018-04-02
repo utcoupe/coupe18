@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "ai_game_status/init_service.h"
 
 using namespace std;
@@ -8,8 +10,8 @@ const string HALT_SRV = "/ai/game_status/status";
 const auto TIMEOUT_READY_SRV = ros::Duration(15.0);
 
 StatusServices::StatusServices(const string& namespaceName, const string& packageName, ArmCallback_t armCallback, StatusCallback_t statusCallback) :
-    _armCallback(armCallback),
-    _statusCallback(statusCallback)
+    _armCallback(std::move(armCallback)),
+    _statusCallback(std::move(statusCallback))
 {
     _nodeName = "/" + namespaceName + "/" + packageName;
     if (_armCallback)
