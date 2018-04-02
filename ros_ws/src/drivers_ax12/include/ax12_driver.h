@@ -21,8 +21,8 @@ protected:
 public:
     bool initialize(uint8_t port_index);
     void scan_motors();
-    bool write_register(uint8_t motor_id, const Ax12Table::Register reg, int16_t value);
-    bool read_register(uint8_t motor_id, const Ax12Table::Register reg, int16_t &value);
+    bool write_register(uint8_t motor_id, const Ax12Table::Register reg, uint16_t value);
+    bool read_register(uint8_t motor_id, const Ax12Table::Register reg, uint16_t &value);
     bool motor_id_exists(uint8_t motor_id);
     bool motor_id_connected(uint8_t motor_id);
     bool toggle_torque(bool enable);
