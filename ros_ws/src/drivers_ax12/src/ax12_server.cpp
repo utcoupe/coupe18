@@ -195,7 +195,7 @@ void Ax12Server::main_loop(const ros::TimerEvent&)
         // motor is moving
         if(curr_speed % 1024 >= 1)
         {
-            ROS_DEBUG("Motor is moving, publishing feedback");
+            ROS_DEBUG("Motor is moving (speed %d), publishing feedback", curr_speed);
             feedback_.position = curr_position;
             it->publishFeedback(feedback_);
             it++;
@@ -207,7 +207,7 @@ void Ax12Server::main_loop(const ros::TimerEvent&)
         // motor said he arrived and position is correct
         if(!moving && curr_position >= (goal_position - POSITION_MARGIN) && curr_position <= (goal_position + POSITION_MARGIN))
         {
-            ROS_DEBUG("Motor has reached the goal position");
+            ROS_DEBUG("Motor has reached the goal position ! curr_pos : %d, goal_pos : %d", curr_position, goal_position);
             result_.success = true;
             it->setSucceeded(result_);
             it = joint_goals_.erase(it);
@@ -217,7 +217,7 @@ void Ax12Server::main_loop(const ros::TimerEvent&)
         // motor said he arrived but position is not correct
         else if(!moving)
         {
-            ROS_DEBUG("Motor has not reached the goal position");
+            ROS_DEBUG("Motor has not reached the goal position ! curr_pos : %d, goal_pos : %d", curr_position, goal_position);
             result_.success = false;
             it->setAborted(result_);
             it = joint_goals_.erase(it);
