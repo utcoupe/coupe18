@@ -16,8 +16,10 @@ import tf2_ros
 
 
 def processFeedback(feedback):
+    if feedback.event_type != InteractiveMarkerFeedback.MOUSE_UP:
+        return
+    
     p = feedback.pose.position
-
     try:
         srv = rospy.ServiceProxy("/drivers/ard_asserv/set_pos", SetPos)
         q = [[o.x, o.y, o.z, o.w] for o in [feedback.pose.orientation]][0]
@@ -106,6 +108,10 @@ if __name__ == "__main__":
     # add the interactive marker to our collection &
     # tell the server to call processFeedback() when feedback arrives for it
     server.insert(int_marker, processFeedback)
+
+
+
+
 
     # 'commit' changes and send to all clients
     server.applyChanges()
