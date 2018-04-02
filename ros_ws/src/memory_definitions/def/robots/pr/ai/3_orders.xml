@@ -64,7 +64,8 @@
 
 	<order ref="set_robot_pos">
 		<message dest="/drivers/ard_asserv/set_pos">
-			<param name="position" type="pose2d"/>
+			<param name="position_waypoint" type="string" optional="true"/>
+			<param name="position" type="pose2d" optional="true"/>
 		</message>
 	</order>
 
