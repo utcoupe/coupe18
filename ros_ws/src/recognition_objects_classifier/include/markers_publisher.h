@@ -22,14 +22,14 @@ protected:
     ros::Publisher pub_;
 
 public:
-    void publish_rects(std::vector<processing_belt_interpreter::RectangleStamped> map_rects,
-                       std::vector<processing_belt_interpreter::RectangleStamped> unknown_rects);
+    void publish_rects(const std::vector<processing_belt_interpreter::RectangleStamped> &map_rects,
+                       const std::vector<processing_belt_interpreter::RectangleStamped> &unknown_rects);
 
-    void publish_circles(std::vector<recognition_objects_classifier::CircleObstacleStamped> map_circles,
-                         std::vector<recognition_objects_classifier::CircleObstacleStamped> unknown_circles);
+    void publish_circles(const std::vector<recognition_objects_classifier::CircleObstacleStamped> &map_circles,
+                         const std::vector<recognition_objects_classifier::CircleObstacleStamped> &unknown_circles);
 
-    void publish_segments(std::vector<recognition_objects_classifier::SegmentObstacleStamped> map_segments,
-                          std::vector<recognition_objects_classifier::SegmentObstacleStamped> unknown_segments);
+    void publish_segments(const std::vector<recognition_objects_classifier::SegmentObstacleStamped> &map_segments,
+                          const std::vector<recognition_objects_classifier::SegmentObstacleStamped> &unknown_segments);
 
     bool is_connected();
 

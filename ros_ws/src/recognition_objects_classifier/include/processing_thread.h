@@ -20,7 +20,7 @@ protected:
     unsigned int start_idx_;
     unsigned int length_;
     Point *points_;
-    std::vector<std::pair<int, geometry_msgs::TransformStamped>> &transforms_;
+    std::vector<std::pair<int, geometry_msgs::TransformStamped> > &transforms_;
     MapObjects &map_;
 
     // to pause the thread
@@ -46,7 +46,8 @@ public:
 
     void wait_processing();
 
-    ProcessingThread(Point *points, std::vector<std::pair<int, geometry_msgs::TransformStamped>>& transforms, MapObjects &map) :
+    ProcessingThread(Point *points, std::vector<std::pair<int, geometry_msgs::TransformStamped> > &transforms,
+                     MapObjects &map) :
             points_(points),
             transforms_(transforms),
             thread_stopped_(false),
