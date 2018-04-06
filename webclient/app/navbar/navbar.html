@@ -6,10 +6,10 @@
         <div style="display: inline-block;" ng-if="!$ctrl.ros.isConnected" id="disconnected" title='disconnected'></div>
       </span>
       <a class="navbar-brand" href="#!/">
-        <img src="assets/images/ros-logo.svg" height="22px"></img>
+        <img src="assets/images/ros-logo.svg" height="22px"/>
       </a>
       <a class="navbar-brand" href="#!/">
-          <img src="assets/images/utcoupe-logo.png" height="35px"></img>
+        <img src="assets/images/utcoupe-logo.png" height="35px"/>
       </a>
 
 
@@ -18,8 +18,6 @@
     <ul class="nav navbar-nav navbar-right">
       <li ng-class="{ 'active': $ctrl.isPath('/diagnostic') }"><a href="#!/diagnostic">Diagnostic</a></li>
       <li ng-class="{ 'active': $ctrl.isPath('/asserv') }"><a href="#!/asserv">Asserv</a></li>
-      <li ng-class="{ 'active': $ctrl.isPath('/reseau') }"><a href="#!/reseau">Réseau</a></li>
-      <li ng-class="{ 'active': $ctrl.isPath('/simulateur') }"><a href="#!/simulateur">Simulateur</a></li>
       <li ng-class="{ 'active': $ctrl.isPath('/hokuyo') }"><a href="#!/hokuyo">Hokuyo</a></li>
       <li ng-class="{ 'active': $ctrl.isPath('/telecommande') }"><a href="#!/telecommande">Télécommande</a></li>
       <li ng-class="{ 'active': $ctrl.isPath('/settings') }"><a href="#!/settings">Settings</a></li>
