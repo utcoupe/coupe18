@@ -20,14 +20,16 @@ gulp.task('js', function () {
 // Concat all libs into vendor.js
 gulp.task('js-vendor', function () {
     return gulp.src([
-        'node_modules/underscore/underscore.js',
-        'node_modules/angular/angular.js',
-        'node_modules/angular-animate/angular-animate.js',
-        'node_modules/angular-route/angular-route.js',
+        'node_modules/underscore/underscore-min.js',
+        'node_modules/angular/angular.min.js',
+        'node_modules/angular-animate/angular-animate.min.js',
+        'node_modules/angular-route/angular-route.min.js',
         'node_modules/angular-local-storage/dist/angular-local-storage.js',
         'node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js',
         'node_modules/eventemitter2/lib/eventemitter2.js',
-        'node_modules/jquery/dist/jquery.js'
+        'node_modules/jquery/dist/jquery.min.js',
+        'node_modules/smoothie/smoothie.js',
+        'node_modules/roslib/build/roslib.min.js'
     ])
         .pipe(concat('vendor.js'))
         .pipe(gulp.dest('assets/js/'));
