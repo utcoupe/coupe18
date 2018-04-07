@@ -6,19 +6,9 @@ using namespace Ax12Table;
 void Ax12Server::init_driver(const std::string& port)
 {
 
-    std::string param_key;
-    int8_t port_index;
-
-    // get the port index from the port string
-    size_t port_num_index = port.find_last_of("0123456789");
-    port_index = port[port_num_index] - '0';
-
-    if(port_num_index == std::string::npos || port_index < 0 || port_index > 9)
-        ROS_ERROR("Unable to get the port index from the port %s", port.c_str());
-
-    if(!driver_.initialize(port_index))
+    if(!driver_.initialize(port))
     {
-        ROS_FATAL("Unable to initialize the AX-12 driver with port index %d and baudrate index %d", port_index, driver_.BAUD_RATE_INDEX);
+        ROS_FATAL("Unable to initialize the AX-12 driver with port %s and baudrate index %d", port.c_str(), driver_.BAUD_RATE_INDEX);
         ros::shutdown();
         return;
     }
@@ -128,23 +118,13 @@ bool Ax12Server::handle_joint_goal(GoalHandle goal_handle)
     uint16_t curr_goal_pos = -1;
     uint16_t curr_goal_speed = -1;
 
-    unsigned int attempts = 0;
-    do {
 
-        if(attempts > 50) {
-            ROS_ERROR("AX-12 %d does not want to go to goal position %d", motor_id, position);
-            goal_handle.setRejected();
-            return false;
-        }
+    driver_.write_register(motor_id, GOAL_POSITION, position);
+    driver_.write_register(motor_id, MOVING_SPEED, speed);
 
-        attempts++;
-        driver_.write_register(motor_id, GOAL_POSITION, position);
-        driver_.write_register(motor_id, MOVING_SPEED, speed);
-        usleep(10);
-        driver_.read_register(motor_id, GOAL_POSITION, curr_goal_pos);
-        driver_.read_register(motor_id, MOVING_SPEED, curr_goal_speed);
+    driver_.read_register(motor_id, GOAL_POSITION, curr_goal_pos);
+    driver_.read_register(motor_id, MOVING_SPEED, curr_goal_speed);
 
-    } while(curr_goal_pos != position || curr_goal_speed != speed);
 
 
 
@@ -201,27 +181,17 @@ void Ax12Server::main_loop(const ros::TimerEvent&)
 
     uint8_t motor_id = 0;
     uint16_t curr_position = 0;
-    uint16_t curr_speed = 0;
-    uint16_t moving = 0;
     uint32_t goal_position = 0;
 
-    uint8_t test_n = 0;
 
     for(auto it = joint_goals_.begin(); it != joint_goals_.end();)
     {
         motor_id = it->getGoal()->motor_id;
         ROS_DEBUG("Checking state of motor %d", motor_id);
 
-        bool pos_ok = false;
-        test_n = 0;
-        do {
-            pos_ok = driver_.read_register(motor_id, PRESENT_POSITION, curr_position);
-            usleep(100);
-            test_n++;
-        } while ((curr_position < 0 || curr_position > 1023 || !pos_ok) && test_n < 20);
+        driver_.read_register(motor_id, PRESENT_POSITION, curr_position);
 
-
-        ROS_DEBUG("Read pos %u, RX %d", curr_position, pos_ok);
+        ROS_DEBUG("Read pos %u", curr_position);
 
         goal_position = it->getGoal()->position;
 

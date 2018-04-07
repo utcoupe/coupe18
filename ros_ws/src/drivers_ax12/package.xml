@@ -16,6 +16,7 @@
   <build_depend>std_msgs</build_depend>
   <build_depend>drivers_port_finder</build_depend>
   <build_depend>ai_game_status</build_depend>
+  <build_depend>dynamixel_sdk</build_depend>
   <exec_depend>actionlib</exec_depend>
   <exec_depend>actionlib_msgs</exec_depend>
   <exec_depend>message_runtime</exec_depend>
