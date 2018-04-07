@@ -55,7 +55,6 @@ class Asserv:
         self._srv_params = rospy.Service("/drivers/" + NODE_NAME + "/parameters", Parameters, self._callback_asserv_param)
         self._srv_management = rospy.Service("/drivers/" + NODE_NAME + "/management", Management, self._callback_management)
         self._act_goto = actionlib.ActionServer("/drivers/" + NODE_NAME + "/goto_action", DoGotoAction, self._callback_action_goto, auto_start=False)
-        self._sub_game_status = rospy.Subscriber("/ai/game_status/status", GameStatus, self._callback_game_status)
         self._pub_tf_odom = tf2_ros.TransformBroadcaster()
         self._act_goto.start()
         self._srv_client_map_fill_waypoints = None
@@ -81,7 +80,7 @@ class Asserv:
             rospy.logwarn("Memory_map has not been launched...")
 
         # Tell ai/game_status the node initialized successfuly.
-        StatusServices("drivers", "ard_asserv").ready(True)
+        StatusServices("drivers", "ard_asserv", None, self._callback_game_status).ready(True)
 
         self._asserv_instance.start()
 
@@ -313,6 +312,7 @@ class Asserv:
             management_msg = ManagementRequest()
             management_msg.mode = ManagementRequest.CLEANG
             self._callback_management(management_msg)
+            rospy.loginfo("Asserv successfuly stopped")
         elif self._is_halted and msg.game_status != GameStatus.STATUS_HALT:
             self._is_halted = False
             self._asserv_instance.set_emergency_stop(False)
