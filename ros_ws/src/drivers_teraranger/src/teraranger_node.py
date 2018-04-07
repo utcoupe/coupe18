@@ -4,6 +4,7 @@ import subprocess
 import rospy
 from drivers_ard_others.msg import *
 from drivers_port_finder.srv import *
+from ai_game_status import StatusServices
 from sensor_msgs.msg import Range
 from numpy import inf
 
@@ -14,7 +15,7 @@ NODE_NAME = "teraranger"
 PUBLISH_INTERVAL = 0.02  # in ms
 GET_PORT_SERVICE_NAME = "/drivers/port_finder/get_port"
 GET_PORT_SERVICE_TIMEOUT = 15  # in seconds
-WATHDOG_PERIOD = 0.1  # in seconds
+WATCHDOG_PERIOD = 0.1  # in seconds
 
 
 class Teraranger:
@@ -29,12 +30,16 @@ class Teraranger:
             teraranger_port = self._src_client_get_port("teraranger").port
         except rospy.ROSException:
             rospy.logerr("Port_finder service does not exist, can't fetch the teraranger port...")
+        
+        status = StatusServices("drivers", "teraranger")
         if teraranger_port != "":
             self._node_subprocess = subprocess.Popen(["rosrun", "teraranger", "one", "_portname:=" + teraranger_port, "__ns:=/"])
-            self._watchdog = rospy.Timer(rospy.Duration(WATHDOG_PERIOD), self._check_subprocess)
+            self._watchdog = rospy.Timer(rospy.Duration(WATCHDOG_PERIOD), self._check_subprocess)
             self._connected = True
+            status.ready(True)
         else:
             rospy.logerr("Teraranger port has not been found, start the node but can't send real data...")
+            status.ready(False)
         self._range_value = 0.0
         self._pub_belt_range = rospy.Publisher("/drivers/ard_others/belt_ranges", BeltRange, queue_size=1)
         self._sub_terarange = rospy.Subscriber("/teraranger_one", Range, self._callback_teranranger_range)
