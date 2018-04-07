@@ -24,7 +24,7 @@ class ActuatorsNode():
     def __init__(self):
         self.is_halted = False
 
-        self._node = rospy.init_node('actuators')
+        rospy.init_node('actuators')
         self._namespace = '/movement/actuators/'
         self._action_name = '{}dispatch'.format(self._namespace)
         self._lock = threading.RLock()
@@ -33,12 +33,11 @@ class ActuatorsNode():
         self._arduino_move = rospy.Publisher( '/drivers/ard_others/move', drivers_ard_others.msg.Move, queue_size=30)  # TODO check the queue_size
         self._arduino_response = rospy.Subscriber( '/drivers/ard_others/move_response', drivers_ard_others.msg.MoveResponse, self.ard_callback)
         self._ax12_client = actionlib.SimpleActionClient('/drivers/ax12', drivers_ax12.msg.Ax12CommandAction)
-        self._game_status_sub = rospy.Subscriber('/ai/game_status/status', GameStatus, self.game_status_callback)
         self._action_server.start()
 
 
         # Tell ai/game_status the node initialized successfuly.
-        StatusServices("movement", "actuators").ready(True)
+        StatusServices("movement", "actuators", None, self.game_status_callback).ready(True)
 
     def dispatch(self, command):
 
@@ -163,6 +162,13 @@ class ActuatorsNode():
     def game_status_callback(self, msg):
         if not self.is_halted and msg.game_status == GameStatus.STATUS_HALT:
             self.is_halted = True
+            for actuator in actuators_properties.getActuatorsList().values():
+                try:
+                    param = actuator.preset["OFF"]
+                    self.sendToArduino( actuator.id, actuator.type, actuator.type, param, actuator.default_timeout )
+                    rospy.loginfo("Turned off " + actuator.name)
+                except Exception:
+                    rospy.logwarn("Can't turn off an actuator!")
 
         elif self.is_halted and msg.game_status != GameStatus.STATUS_HALT:
             self.is_halted = False
