@@ -7,7 +7,7 @@ import random
 import threading
 import actionlib
 import movement_actuators.msg
-import actuators_properties
+from src.movement_actuators.src.actuators import actuators_properties
 import drivers_ard_others.msg
 import drivers_ax12.msg
 from ai_game_status import StatusServices
