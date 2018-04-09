@@ -154,6 +154,7 @@ class Asserv:
             rospy.logdebug("[ASSERV] Received a request (set_pos service), using waypoint")
             if self._srv_client_map_fill_waypoints is not None:
                 wpt = Waypoint(name=request.position_waypoint)
+                wpt.has_angle = True
                 set_position = self._srv_client_map_fill_waypoints.call(wpt).filled_waypoint.pose
             else:
                 rospy.logwarn("[ASSERV] Received a waypoint request but memory_map seems not to be launched...")
