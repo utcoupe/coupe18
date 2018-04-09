@@ -3,50 +3,66 @@
 
 using namespace Ax12Table;
 
-bool Ax12Driver::initialize(uint8_t port_index)
+bool Ax12Driver::initialize(const std::string &port_name)
 {
-    return (bool)dxl_initialize(port_index, BAUD_RATE_INDEX);
+    port_handler = dynamixel::PortHandler::getPortHandler(port_name.c_str());
+    packet_handler = dynamixel::PacketHandler::getPacketHandler(1.0);
+
+    return port_handler->openPort() &&
+            port_handler->setBaudRate(1000000 / BAUD_RATE_INDEX);
 }
 
 void Ax12Driver::scan_motors()
 {
+    uint8_t err = 0;
+    int result = 0;
     for(uint8_t i = 1; i <= SCAN_RANGE; i++)
     {
         for(uint8_t j = 0; j < PING_PASS_NBR; j++)
         {
-            dxl_ping(i);
-            usleep(PING_SLEEP);
-            if (dxl_get_result() == COMM_RXSUCCESS)
+            result = packet_handler->ping(port_handler, i, &err);
+
+            if (result == COMM_SUCCESS)
             {
                 motor_ids[motor_count++] = i;
                 break;
             }
+            usleep(PING_SLEEP);
         }
-
     }
 }
 
-bool Ax12Driver::write_register(uint8_t motor_id, Register reg, int16_t value)
+bool Ax12Driver::write_register(uint8_t motor_id, Register reg, uint16_t value)
 {
     if(reg.access == READ)
         return false;
 
-    if(reg.size == BYTE)
-        dxl_write_byte(motor_id, reg.address, value);
-    else
-        dxl_write_word(motor_id, reg.address, value);
+    int result;
 
-    return dxl_get_result() == COMM_TXSUCCESS;
+    if(reg.size == BYTE)
+        result = packet_handler->write1ByteTxRx(port_handler, motor_id, reg.address,
+                                                static_cast<uint8_t>(value));
+    else
+        result = packet_handler->write2ByteTxRx(port_handler, motor_id, reg.address, value);
+
+    return result == COMM_SUCCESS;
 }
 
-bool Ax12Driver::read_register(uint8_t motor_id, Register reg, int16_t &value)
+bool Ax12Driver::read_register(uint8_t motor_id, Register reg, uint16_t &value)
 {
-    if(reg.size == BYTE)
-        value = dxl_read_byte(motor_id, reg.address);
-    else
-        value = dxl_read_word(motor_id, reg.address);
+    int result;
 
-    return dxl_get_result() == COMM_RXSUCCESS;
+    if(reg.size == BYTE) {
+        uint8_t ret_val;
+        result = packet_handler->read1ByteTxRx(port_handler, motor_id, reg.address, &ret_val);
+        value = ret_val;
+    } else {
+        uint16_t ret_val;
+        result = packet_handler->read2ByteTxRx(port_handler, motor_id, reg.address, &ret_val);
+        value = ret_val;
+    }
+
+    return result == COMM_SUCCESS;
 }
 
 bool Ax12Driver::motor_id_exists(uint8_t motor_id)
@@ -69,14 +85,15 @@ bool Ax12Driver::motor_id_connected(uint8_t motor_id)
     /*
      * Returns true if the motor is still connected
      */
+    int result;
 
     for(uint8_t j = 0; j < PING_PASS_NBR; j++)
     {
-        dxl_ping(motor_id);
-        usleep(500);
-
-        if (dxl_get_result() == COMM_RXSUCCESS)
+        result = packet_handler->ping(port_handler, motor_id);
+        if (result == COMM_SUCCESS)
             return true;
+
+        usleep(PING_SLEEP);
     }
 
     return false;
@@ -86,8 +103,9 @@ bool Ax12Driver::toggle_torque(bool enable)
 {
     bool success = true;
 
-    for(uint8_t i = 0; i < motor_count; i++)
-        success &= write_register(motor_ids[i], TORQUE_ENABLE, enable);
+    for(uint8_t i = 0; i < motor_count; i++) {
+        success &= write_register(motor_ids[i], TORQUE_ENABLE, static_cast<uint16_t>(enable));
+    }
 
     return success;
 }
@@ -96,10 +114,10 @@ bool Ax12Driver::joint_mode(uint8_t motor_id, uint16_t min_angle, uint16_t max_a
 {
     bool success = true;
 
-    success &= write_register(motor_id, TORQUE_ENABLE, 0);
+//    success &= write_register(motor_id, TORQUE_ENABLE, 0);
     success &= write_register(motor_id, CW_ANGLE_LIMIT, min_angle);
     success &= write_register(motor_id, CCW_ANGLE_LIMIT, max_angle);
-    success &= write_register(motor_id, TORQUE_ENABLE, 1);
+//    success &= write_register(motor_id, TORQUE_ENABLE, 1);
 
     return success;
 }

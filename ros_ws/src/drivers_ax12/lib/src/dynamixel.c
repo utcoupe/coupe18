@@ -201,7 +201,8 @@ void dxl_txrx_packet()
 		return;	
 	
 	do{
-		dxl_rx_packet();		
+		dxl_rx_packet();
+		//printf("trrxWAITINGGGGGG");
 	}while( gbCommStatus == COMM_RXWAITING );	
 }
 

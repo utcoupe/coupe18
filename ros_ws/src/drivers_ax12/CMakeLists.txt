@@ -3,7 +3,7 @@ project(drivers_ax12)
 
 add_compile_options(-std=c++11)
 
-add_subdirectory(${PROJECT_SOURCE_DIR}/lib)
+# add_subdirectory(${PROJECT_SOURCE_DIR}/lib)
 
 find_package(catkin REQUIRED COMPONENTS
   actionlib
@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   drivers_port_finder
   ai_game_status
   memory_definitions
+  dynamixel_sdk
 )
 
 add_action_files(
@@ -52,6 +53,5 @@ add_dependencies(ax12_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED
 
 target_link_libraries(
   ax12_node
-  dxl
   ${catkin_LIBRARIES}
 )

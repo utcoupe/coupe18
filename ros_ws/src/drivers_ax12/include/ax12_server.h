@@ -18,9 +18,9 @@
 #include "ax12_driver.h"
 
 
-const double MAX_STOP_TIME = 1; //number of seconds to wait not moving before confirming the goal is not reached
-const double MAIN_FREQUENCY = 30;
-const uint8_t POSITION_MARGIN = 4;
+const double MAX_STOP_TIME = 3; //number of seconds to wait not moving before confirming the goal is not reached
+const double MAIN_FREQUENCY = 15;
+const uint8_t POSITION_MARGIN = 6;
 const std::string PORT_FINDER_SERVICE = "/drivers/port_finder/get_port";
 const std::string DEFAULT_PORT = "/dev/ttyACM0";
 const std::string GAME_STATUS_TOPIC = "/ai/game_status/status";

@@ -14,24 +14,9 @@
 		<params></params>
 		<conditions></conditions>
 		<actions>
-			<team name="green">
-				<orderref ref="set_robot_pos">
-					<position>
-						<x>0.228</x>
-						<y>1.448</y>
-						<theta>-1.57079</theta>
-					</position>
-				</orderref>
-			</team>
-			<team name="orange">
-				<orderref ref="set_robot_pos">
-					<position>
-						<x>2.772</x>
-						<y>1.448</y>
-						<theta>-1.57079</theta>
-					</position>
-				</orderref>
-			</team>
+			<orderref ref="set_robot_pos">
+				<position_waypoint>way_spawn</position_waypoint>
+			</orderref>
 
 			<actionref ref="jack"/>
 
@@ -143,15 +128,15 @@
 
 			<actionlist repeat="10">
 				<orderref ref="actuator_ax12_set_pos">
-					<motor_id>6</motor_id>
-					<position>450</position>
+					<name>barrel</name>
+					<preset>HIGH</preset>
 				</orderref>
 
 				<orderref ref="actuator_ax12_set_pos">
-					<motor_id>6</motor_id>
-					<position>850</position>
+					<name>barrel</name>
+					<preset>CANON</preset>
 				</orderref>
-                        </actionlist>
+      </actionlist>
 
 			<orderref ref="actuator_set" name="activate button with servo">
 				<name>canon</name>
@@ -174,26 +159,26 @@
 			</orderref>
 
 			<orderref ref="actuator_set" name="activate button with servo">
-                                <name>canon</name>
-                                <preset>MID</preset>
-                        </orderref>
+        <name>canon</name>
+        <preset>MID</preset>
+      </orderref>
 
-                        <actionlist repeat="10">
-                                <orderref ref="actuator_ax12_set_pos">
-                                        <motor_id>6</motor_id>
-                                        <position>450</position>
-                                </orderref>
+      <actionlist repeat="10">
+				<orderref ref="actuator_ax12_set_pos">
+					<name>barrel</name>
+					<preset>HIGH</preset>
+				</orderref>
 
-                                <orderref ref="actuator_ax12_set_pos">
-                                        <motor_id>6</motor_id>
-                                        <position>850</position>
-                                </orderref>
-                        </actionlist>
+				<orderref ref="actuator_ax12_set_pos">
+					<name>barrel</name>
+					<preset>CANON</preset>
+				</orderref>
+      </actionlist>
 
-                        <orderref ref="actuator_set" name="activate button with servo">
-                                <name>canon</name>
-                                <preset>OFF</preset>
-                        </orderref>
+      <orderref ref="actuator_set" name="activate button with servo">
+        <name>canon</name>
+        <preset>OFF</preset>
+      </orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="approach station">
 				<waypoint_name>way_station_approach</waypoint_name>

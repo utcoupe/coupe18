@@ -3,8 +3,9 @@
 
 #include "markers_publisher.h"
 
-void MarkersPublisher::publish_rects(std::vector<processing_belt_interpreter::RectangleStamped> map_rects,
-                                     std::vector<processing_belt_interpreter::RectangleStamped> unknown_rects) {
+void MarkersPublisher::publish_rects(
+        const std::vector<processing_belt_interpreter::RectangleStamped> &map_rects,
+        const std::vector<processing_belt_interpreter::RectangleStamped> &unknown_rects) {
 
     visualization_msgs::Marker marker;
     marker.action = marker.ADD;
@@ -18,10 +19,11 @@ void MarkersPublisher::publish_rects(std::vector<processing_belt_interpreter::Re
     marker.scale.z = Z_SCALE;
     marker.ns = "rects";
 
-    std::vector<processing_belt_interpreter::RectangleStamped> *both_lists[2] = {&map_rects, &unknown_rects};
+    const std::vector<processing_belt_interpreter::RectangleStamped> both_lists[2] = {std::move(map_rects),
+                                                                                std::move(unknown_rects)};
 
-    for (auto &list : both_lists) {
-        for (auto &rect : *list) {
+    for (const auto &list : both_lists) {
+        for (auto &rect : list) {
             marker.pose.position.x = rect.x;
             marker.pose.position.y = rect.y;
             marker.pose.orientation = tf::createQuaternionMsgFromYaw(rect.a);
@@ -37,8 +39,9 @@ void MarkersPublisher::publish_rects(std::vector<processing_belt_interpreter::Re
     }
 }
 
-void MarkersPublisher::publish_circles(std::vector<recognition_objects_classifier::CircleObstacleStamped> map_circles,
-                                       std::vector<recognition_objects_classifier::CircleObstacleStamped> unknown_circles) {
+void MarkersPublisher::publish_circles(
+        const std::vector<recognition_objects_classifier::CircleObstacleStamped> &map_circles,
+        const std::vector<recognition_objects_classifier::CircleObstacleStamped> &unknown_circles) {
 
     visualization_msgs::Marker marker;
     marker.action = marker.ADD;
@@ -52,11 +55,11 @@ void MarkersPublisher::publish_circles(std::vector<recognition_objects_classifie
     marker.scale.z = Z_SCALE;
     marker.ns = "circles";
 
-    std::vector<recognition_objects_classifier::CircleObstacleStamped> *both_lists[2] = {&map_circles,
-                                                                                         &unknown_circles};
+    const std::vector<recognition_objects_classifier::CircleObstacleStamped> both_lists[2] = {std::move(map_circles),
+                                                                                        std::move(unknown_circles)};
 
-    for (auto &list : both_lists) {
-        for (auto &circle : *list) {
+    for (const auto &list : both_lists) {
+        for (auto &circle : list) {
             marker.pose.position.x = circle.circle.center.x;
             marker.pose.position.y = circle.circle.center.y;
             marker.scale.x = circle.circle.true_radius;
@@ -72,8 +75,8 @@ void MarkersPublisher::publish_circles(std::vector<recognition_objects_classifie
 }
 
 void MarkersPublisher::publish_segments(
-        std::vector<recognition_objects_classifier::SegmentObstacleStamped> map_segments,
-        std::vector<recognition_objects_classifier::SegmentObstacleStamped> unknown_segments) {
+        const std::vector<recognition_objects_classifier::SegmentObstacleStamped> &map_segments,
+        const std::vector<recognition_objects_classifier::SegmentObstacleStamped> &unknown_segments) {
 
 
     std::vector<geometry_msgs::Point> points;
@@ -91,15 +94,14 @@ void MarkersPublisher::publish_segments(
 
     geometry_msgs::Point point;
 
-    std::vector<recognition_objects_classifier::SegmentObstacleStamped> *both_lists[2] = {&map_segments,
-                                                                                          &unknown_segments};
+    const   std::vector<recognition_objects_classifier::SegmentObstacleStamped> both_lists[2] = {std::move(map_segments),
+                                                                                          std::move(unknown_segments)};
 
-    for (auto &list : both_lists) {
+    for (const auto &list : both_lists) {
         points.clear();
 
 
-
-        for (auto &segment : *list) {
+        for (auto &segment : list) {
             point.x = segment.segment.first_point.x;
             point.y = segment.segment.first_point.y;
             points.push_back(point);
@@ -109,8 +111,8 @@ void MarkersPublisher::publish_segments(
             points.push_back(point);
         }
 
-        if(!list->empty()) {
-            marker.header = list->at(0).header;
+        if (!list.empty()) {
+            marker.header = list.at(0).header;
             pub_.publish(marker);
         }
 

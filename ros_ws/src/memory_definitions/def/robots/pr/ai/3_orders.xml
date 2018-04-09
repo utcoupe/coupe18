@@ -34,10 +34,12 @@
 	</order>
 
 	<order ref="actuator_ax12_set_pos" duration="1.5">
-		<message dest="/drivers/ax12">
-			<param name="motor_id" type="int"/>
-			<param name="position" type="int"/> <!-- Set either a preset or param-->
-			<param name="mode" type="int" preset="true">0</param>
+		<message dest="/movement/actuators/dispatch">
+			<param name="name" type="string"/>
+			<param name="preset" type="string" optional="true"/> <!-- Set either a preset or param-->
+			<param name="param" type="int" optional="true"/>
+
+			<param name="order" type="string" preset="true">JOINT</param>
 		</message>
 	</order>
 
@@ -64,7 +66,8 @@
 
 	<order ref="set_robot_pos">
 		<message dest="/drivers/ard_asserv/set_pos">
-			<param name="position" type="pose2d"/>
+			<param name="position_waypoint" type="string" optional="true"/>
+			<param name="position" type="pose2d" optional="true"/>
 		</message>
 	</order>
 

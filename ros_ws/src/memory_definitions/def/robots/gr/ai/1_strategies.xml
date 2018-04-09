@@ -19,4 +19,24 @@
 		<actions_onfinish name="After-Game Actions">
 		</actions_onfinish>
 	</strategy>
+
+	<strategy name="test_ax12">
+		<actions name="In-Game Actions">
+			<actionref ref="game_start"/>
+
+			<actionlist name="Main actions" repeat="100">
+				<orderref ref="actuator_ax12_set_pos" duration="1.5">
+					<motor_id>3</motor_id>
+					<position>600</position>
+				</orderref>
+
+				<orderref ref="actuator_ax12_set_pos" duration="1.5">
+					<motor_id>3</motor_id>
+					<position>700</position>
+				</orderref>
+			</actionlist>
+		</actions>
+		<actions_onfinish name="After-Game Actions">
+		</actions_onfinish>
+	</strategy>
 </strategies>
