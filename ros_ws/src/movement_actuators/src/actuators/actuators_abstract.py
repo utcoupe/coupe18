@@ -14,15 +14,13 @@ class ActuatorsAbstract:
         # TODO manage system HALT with game_status stuff (using main node ?)
         # Dictionary to manage received goals (mandatory for actionlib)
         self._goals_handler_dictionary = {}
-        # To keep a track of goals
-        # self._goal_handler_id_counter = 0
         self._action_type = None
         if action_name != "" and action_type is not None:
             self._action_type = action_type
             self._action_server = actionlib.ActionServer("/movement/" + NODE_NAME + "/" + action_name, action_type, self._callback_action, auto_start=False)
             self._action_server.start()
         else:
-            rospy.logerr("ActuatorsAbstract class can not be built whithout action_name and action_type, aborting.")
+            rospy.logerr("ActuatorsAbstract class can not be built without action_name and action_type, aborting.")
             exit(1)
 
     def _action_reached(self, goal_id, reached, result):
@@ -41,9 +39,12 @@ class ActuatorsAbstract:
 
     def _callback_action(self, goal_handle):
         rospy.logdebug("Just received an action")
+        goal = goal_handle.get_goal()
+
         # TODO manage goal rejection if node in bad mode
-        # TODO abstract method to check if goal's conformity ?
-        goal_handle.set_accepted()
-        self._goals_handler_dictionary[goal_handle.get_goal().id] = goal_handle
-        # self._goal_handler_id_counter += 1
-        self._process_action(goal_handle.get_goal())
+
+        if self._process_action(goal_handle.get_goal()):
+            goal_handle.set_accepted()
+            self._goals_handler_dictionary[goal.id] = goal_handle
+        else:
+            goal_handle.set_rejected()
