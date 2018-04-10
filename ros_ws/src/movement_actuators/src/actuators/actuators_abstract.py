@@ -45,6 +45,6 @@ class ActuatorsAbstract:
 
         if self._process_action(goal_handle.get_goal()):
             goal_handle.set_accepted()
-            self._goals_handler_dictionary[goal.id] = goal_handle
+            self._goals_handler_dictionary[goal_handle.get_goal_id()] = goal_handle
         else:
             goal_handle.set_rejected()

@@ -14,6 +14,13 @@ class ActuatorsNode():
     def __init__(self):
         rospy.init_node(NODE_NAME, log_level=rospy.DEBUG)
         self.dispatch_instance = actuators.ActuatorsDispatch()
+
+        robot = rospy.get_param('/robot')
+        if robot.lower() == "gr":
+            self.arm_instance = actuators.ActuatorsArm()
+        elif robot.lower() == "pr":
+            pass # TODO
+
         rospy.spin()
 
 

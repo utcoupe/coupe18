@@ -6,6 +6,8 @@ find_package(catkin REQUIRED COMPONENTS
     rospy
     std_msgs
     actionlib_msgs
+    tf2_ros
+    geometry_msgs
 )
 
 ## Generate actions in the 'action' folder

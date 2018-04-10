@@ -1,4 +1,7 @@
 # Specific action file for complex action "arm" of the big robot, 2018
-#TODO
+string frame_id
+float32 x
+float32 y
 ---
+bool sucess
 ---
