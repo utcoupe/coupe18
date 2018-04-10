@@ -33,10 +33,6 @@ class ActuatorsAbstract:
             self._goals_handler_dictionary[goal_id].set_succeeded(result)
             del self._goals_handler_dictionary[goal_id]
 
-    def _is_goal_valid(self, goal):
-        rospy.logerr("ActuatorsAbstract is abstract !")
-        return False
-
     def _process_action(self, goal):
         rospy.logerr("ActuatorsAbstract is abstract !")
         return False
