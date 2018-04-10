@@ -23,6 +23,7 @@ class ActuatorsDispatch(ActuatorsAbstract):
     def __init__(self):
         ActuatorsAbstract.__init__(self, "dispatch", DispatchAction)
         self._lock = threading.RLock()
+        # Random_id, thread_event
         self._call_stack = {}
         self._pub_ard_move = rospy.Publisher('/drivers/ard_others/move', drivers_ard_others.msg.Move, queue_size=3)
         self._sub_ard_response = rospy.Subscriber('/drivers/ard_others/move_response', drivers_ard_others.msg.MoveResponse, self._callback_move_response)
@@ -101,6 +102,7 @@ class ActuatorsDispatch(ActuatorsAbstract):
                 'servo': msg.TYPE_SERVO
             }[ard_type]
         msg.dest_value = param
+        # TODO do not use event because it is blocking !
         event = threading.Event()
         event.clear()
         msg.order_nb = self.generateId(event)
@@ -131,6 +133,7 @@ class ActuatorsDispatch(ActuatorsAbstract):
             rospy.logerr("Bad order: {}, expected joint or wheel".format(order))
             return False
         self._act_cli_ax12.send_goal(goal)
+        # TODO it in an asynchronous way because it's blocking !
         if self._act_cli_ax12.wait_for_result(rospy.Duration(int(timeout))):
             success = self._act_cli_ax12.get_result().success
         else:
