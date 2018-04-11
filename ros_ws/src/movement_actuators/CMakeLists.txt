@@ -2,12 +2,12 @@ cmake_minimum_required(VERSION 2.8.3)
 project(movement_actuators)
 
 find_package(catkin REQUIRED COMPONENTS
-    roscpp
     rospy
     std_msgs
     actionlib_msgs
     tf2_ros
     geometry_msgs
+    actionlib
 )
 
 ## Generate actions in the 'action' folder
@@ -25,7 +25,7 @@ generate_messages(
 )
 
 catkin_package(
-    CATKIN_DEPENDS actionlib_msgs rospy
+    CATKIN_DEPENDS std_msgs actionlib_msgs tf2_ros rospy actionlib
 )
 
 include_directories(

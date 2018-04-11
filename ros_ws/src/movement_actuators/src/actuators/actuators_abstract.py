@@ -33,7 +33,7 @@ class ActuatorsAbstract:
             self._goals_handler_dictionary[goal_id].set_succeeded(result)
             del self._goals_handler_dictionary[goal_id]
 
-    def _process_action(self, goal):
+    def _process_action(self, goal, goal_id):
         rospy.logerr("ActuatorsAbstract is abstract !")
         return False
 
@@ -43,7 +43,7 @@ class ActuatorsAbstract:
 
         # TODO manage goal rejection if node in bad mode
 
-        if self._process_action(goal_handle.get_goal()):
+        if self._process_action(goal_handle.get_goal(), goal_handle.get_goal_id()):
             goal_handle.set_accepted()
             self._goals_handler_dictionary[goal_handle.get_goal_id()] = goal_handle
         else:
