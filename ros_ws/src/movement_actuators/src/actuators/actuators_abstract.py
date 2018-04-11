@@ -39,7 +39,6 @@ class ActuatorsAbstract:
 
     def _callback_action(self, goal_handle):
         rospy.logdebug("Just received an action")
-        # TODO manage goal rejection if node in bad mode
         if self._process_action(goal_handle.get_goal(), goal_handle.get_goal_id()):
             goal_handle.set_accepted()
             self._goals_handler_dictionary[goal_handle.get_goal_id()] = goal_handle

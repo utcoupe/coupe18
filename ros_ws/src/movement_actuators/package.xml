@@ -12,5 +12,7 @@
     <depend>rospy</depend>
     <depend>std_msgs</depend>
     <depend>actionlib</depend>
+    <depend>geometry_msgs</depend>
+    <depend>tf2_ros</depend>
     <depend>actionlib_msgs</depend>
 </package>
