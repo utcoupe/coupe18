@@ -2,7 +2,7 @@
 #ifndef DRIVERS_AX12_AX12_DRIVER_H
 #define DRIVERS_AX12_AX12_DRIVER_H
 
-#include "dynamixel.h"
+#include <dynamixel_sdk/dynamixel_sdk.h>
 #include "ax12_table.h"
 
 class Ax12Driver
@@ -10,16 +10,18 @@ class Ax12Driver
 public:
 
     const static uint8_t SCAN_RANGE = 25; // the scan pings motors with id 1 to SCAN_RANGE
-    const static uint8_t PING_PASS_NBR = 20; // number of times a motor is pinged to make sure it is connected
+    const static uint8_t PING_PASS_NBR = 5; // number of times a motor is pinged to make sure it is connected
     const static uint8_t BAUD_RATE_INDEX = 1; // baudrate = 2000000 / (index + 1)
-    const static int PING_SLEEP = 800; // microsec to sleep between pings
+    const static int PING_SLEEP = 100; // microsec to sleep between pings
 
 protected:
     uint8_t motor_count;
     uint8_t motor_ids[SCAN_RANGE];
 
+    dynamixel::PortHandler *port_handler;
+    dynamixel::PacketHandler *packet_handler;
 public:
-    bool initialize(uint8_t port_index);
+    bool initialize(const std::string &port_index);
     void scan_motors();
     bool write_register(uint8_t motor_id, const Ax12Table::Register reg, uint16_t value);
     bool read_register(uint8_t motor_id, const Ax12Table::Register reg, uint16_t &value);
