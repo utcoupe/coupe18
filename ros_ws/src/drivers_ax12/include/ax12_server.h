@@ -50,6 +50,7 @@ protected:
 
 public:
     void execute_goal_cb(GoalHandle goal_handle);
+    void cancel_goal_cb(GoalHandle goal_handle);
     bool execute_set_service_cb(drivers_ax12::SetAx12Param::Request &req, drivers_ax12::SetAx12Param::Response &res);
     void game_status_cb(const ai_game_status::GameStatusConstPtr& status);
     std::string fetch_port(const std::string& service_name);

@@ -30,6 +30,39 @@ void Ax12Server::init_driver(const std::string& port)
 
 }
 
+void Ax12Server::cancel_goal_cb(GoalHandle goal_handle)
+{
+    ROS_DEBUG("Received a cancel request");
+
+    uint16_t moving;
+
+    uint8_t motor_id = goal_handle.getGoal()->motor_id;
+
+    driver_.read_register(motor_id, MOVING, moving);
+
+    if(!moving)
+    {
+        ROS_WARN("Received a cancel request but motor is not moving");
+        return;
+    }
+
+    driver_.joint_mode(motor_id);
+
+    uint16_t pos = 512;
+    driver_.read_register(motor_id, PRESENT_POSITION, pos);
+
+    driver_.write_register(motor_id, GOAL_POSITION, pos);
+
+    for(auto it = joint_goals_.begin(); it != joint_goals_.end(); it++)
+    {
+        if(goal_handle.getGoalID().id == it->getGoalID().id){
+            joint_goals_.erase(it);
+            return;
+        }
+    }
+
+    ROS_WARN("Received a cancel request for a goal, but no such goal is active");
+}
 void Ax12Server::execute_goal_cb(GoalHandle goal_handle)
 {
     /*
@@ -207,6 +240,11 @@ void Ax12Server::main_loop(const ros::TimerEvent&)
         else if(ros::Time::now().toSec() - it->getGoalID().stamp.toSec() > MAX_STOP_TIME)
         {
             ROS_DEBUG("Motor has not reached the goal position, timeout reached ! curr_pos : %d, goal_pos : %d", curr_position, goal_position);
+
+            //reset the alarm
+            driver_.write_register(motor_id, TORQUE_ENABLE, 0);
+            driver_.write_register(motor_id, TORQUE_ENABLE, 1);
+            
             result_.success = false;
             it->setAborted(result_);
             it = joint_goals_.erase(it);
@@ -223,8 +261,6 @@ void Ax12Server::main_loop(const ros::TimerEvent&)
     }
 
 }
-
-
 
 std::string Ax12Server::fetch_port(const std::string& service_name)
 {
@@ -367,7 +403,8 @@ void Ax12Server::game_status_cb(const ai_game_status::GameStatusConstPtr& status
 }
 
 Ax12Server::Ax12Server(std::string action_name, std::string service_name) :
-        as_(nh_, action_name, boost::bind(&Ax12Server::execute_goal_cb, this, _1), false),
+        as_(nh_, action_name, boost::bind(&Ax12Server::execute_goal_cb, this, _1),
+                              boost::bind(&Ax12Server::cancel_goal_cb, this, _1), false),
         set_param_service(nh_.advertiseService(service_name, &Ax12Server::execute_set_service_cb, this)),
         game_status_sub_(nh_.subscribe(GAME_STATUS_TOPIC, 30, &Ax12Server::game_status_cb, this)),
         driver_(),
