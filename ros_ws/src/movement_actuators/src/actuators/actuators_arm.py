@@ -8,16 +8,13 @@ from actuators_abstract import ActuatorsAbstract
 from drivers_ax12.msg import Ax12CommandGoal, Ax12CommandAction
 from geometry_msgs.msg import TransformStamped, PointStamped
 from movement_actuators.msg import ArmAction, ArmResult
+from functools import partial
 
 # Do not remove, used to transform PointStamped
 import tf2_geometry_msgs
 
 class ActuatorsArm(ActuatorsAbstract):
     def __init__(self):
-        ActuatorsAbstract.__init__(self,
-                                   action_name='arm',
-                                   action_type=ArmAction)
-
         self.ORIGIN_FRAME = "arm_origin"
         self.ORIGIN_X = 0.0
         self.ORIGIN_Y = 0.0
@@ -46,6 +43,8 @@ class ActuatorsArm(ActuatorsAbstract):
         self._max_range = self._motor1['length'] + self._motor2['length']
 
         self._ax12_goal_handles = {}
+        self._ax12_timers = {}
+
         self._bad_statuses = [GoalStatus.LOST,
                               GoalStatus.RECALLED,
                               GoalStatus.REJECTED,
@@ -58,6 +57,10 @@ class ActuatorsArm(ActuatorsAbstract):
         self._client.wait_for_server(rospy.Duration(10))
 
         rospy.logdebug('Ax12 server found')
+
+        ActuatorsAbstract.__init__(self,
+                                   action_name='arm',
+                                   action_type=ArmAction)
 
     def _process_action(self, goal, goal_id):
         point = PointStamped()
@@ -144,14 +147,29 @@ class ActuatorsArm(ActuatorsAbstract):
         self._ax12_goal_handles[goal_id][1] = \
             self._client.send_goal(goal2, transition_cb=self._callback)
 
+        if goal.timeout > 0:
+            self._ax12_timers[goal_id] = rospy.Timer(period=rospy.Duration(goal.timeout),
+                                                     callback=partial(self._trigger_timeout, goal_id=goal_id),
+                                                     oneshot=True)
+        else:
+            rospy.logwarn('No timeout specified, the action could take forever')
+
         return True
 
-    # TODO: timeout
+    def _trigger_timeout(self, event, goal_id):
+        rospy.logerr('Timeout triggered for goal %s, cancelling' % goal_id.id)
+        if self._ax12_goal_handles[goal_id]:
+            self._ax12_goal_handles[goal_id][0].cancel()
+            self._ax12_goal_handles[goal_id][1].cancel()
+
+        self._quit_action(goal_id, False)
+
     def _callback(self, gh):
         goal_id_ax12 = gh.comm_state_machine.action_goal.goal_id.id
 
         for goal_id, [gh1, gh2] in self._ax12_goal_handles.iteritems():
-            if gh1 != goal_id_ax12 and gh2 != goal_id_ax12:
+            if gh1.comm_state_machine.action_goal.goal_id.id != goal_id_ax12 \
+                    and gh2.comm_state_machine.action_goal.goal_id.id != goal_id_ax12:
                 continue
 
             gh1_status = gh1.get_goal_status()
@@ -159,15 +177,23 @@ class ActuatorsArm(ActuatorsAbstract):
 
             if gh1_status == GoalStatus.SUCCEEDED \
                     and gh2_status == GoalStatus.SUCCEEDED:
-                del self._ax12_goal_handles[goal_id]
-                self._action_reached(goal_id, True, ArmResult(success=True))
+                self._quit_action(goal_id, True)
+                return
 
             elif gh1_status in self._bad_statuses \
                     or gh2_status in self._bad_statuses:
-                gh1.cancel()
-                gh2.cancel()
-                del self._ax12_goal_handles[goal_id]
-                self._action_reached(goal_id, False, ArmResult(success=False))
+                self._quit_action(goal_id, False)
+                return
+
+    def _quit_action(self, goal_id, success):
+        if self._ax12_goal_handles[goal_id]:
+            del self._ax12_goal_handles[goal_id]
+
+        if self._ax12_timers[goal_id]:
+            self._ax12_timers[goal_id].shutdown()
+            del self._ax12_timers[goal_id]
+
+        self._action_reached(goal_id, success, ArmResult(success=success))
 
 
     def _pub_static_transform(self, x, y):
