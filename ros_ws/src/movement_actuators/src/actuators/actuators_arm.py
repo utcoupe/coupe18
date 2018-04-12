@@ -8,7 +8,9 @@ from actuators_abstract import ActuatorsAbstract
 from drivers_ax12.msg import Ax12CommandGoal, Ax12CommandAction
 from geometry_msgs.msg import TransformStamped, PointStamped
 from movement_actuators.msg import ArmAction, ArmResult
+from memory_definitions.srv import GetDefinition
 from functools import partial
+import yaml
 
 # Do not remove, used to transform PointStamped
 import tf2_geometry_msgs
@@ -16,29 +18,13 @@ import tf2_geometry_msgs
 class ActuatorsArm(ActuatorsAbstract):
     def __init__(self):
         self.ORIGIN_FRAME = "arm_origin"
-        self.ORIGIN_X = 0.0
-        self.ORIGIN_Y = 0.0
 
         self._broadcaster = tf2_ros.StaticTransformBroadcaster()
 
         self._buffer = tf2_ros.Buffer()
         self._listener = tf2_ros.TransformListener(self._buffer)
 
-        self._motor1 = {
-            'id': 3,
-            'center': 450,
-            'length': 0.117,
-            'min': 150,
-            'max': 750
-        }
-
-        self._motor2 = {
-            'id': 1,
-            'center': 512,
-            'length': 0.054,
-            'min': 200,
-            'max': 800
-        }
+        self._fetch_and_parse_config()
 
         self._max_range = self._motor1['length'] + self._motor2['length']
 
@@ -158,7 +144,7 @@ class ActuatorsArm(ActuatorsAbstract):
 
     def _trigger_timeout(self, event, goal_id):
         rospy.logerr('Timeout triggered for goal %s, cancelling' % goal_id.id)
-        if self._ax12_goal_handles[goal_id]:
+        if goal_id in self._ax12_goal_handles:
             self._ax12_goal_handles[goal_id][0].cancel()
             self._ax12_goal_handles[goal_id][1].cancel()
 
@@ -186,10 +172,10 @@ class ActuatorsArm(ActuatorsAbstract):
                 return
 
     def _quit_action(self, goal_id, success):
-        if self._ax12_goal_handles[goal_id]:
+        if goal_id in self._ax12_goal_handles:
             del self._ax12_goal_handles[goal_id]
 
-        if self._ax12_timers[goal_id]:
+        if goal_id in self._ax12_timers:
             self._ax12_timers[goal_id].shutdown()
             del self._ax12_timers[goal_id]
 
@@ -211,3 +197,25 @@ class ActuatorsArm(ActuatorsAbstract):
         tr.transform.rotation.w = 1
 
         self._broadcaster.sendTransform(tr)
+
+    def _fetch_and_parse_config(self):
+        rospy.wait_for_service('/memory/definitions/get')
+        service = rospy.ServiceProxy('/memory/definitions/get', GetDefinition)
+
+        try:
+            path = service('movement/arm.yml').path
+        except rospy.ServiceException as e:
+            rospy.logerr("Can't fetch arm config: %s" % e)
+            return
+
+        with open(path, 'r') as f:
+            try:
+                conf = yaml.load(f)
+                self._motor1 = conf['motor1']
+                self._motor2 = conf['motor2']
+
+                self.ORIGIN_X = conf['origin']['x']
+                self.ORIGIN_Y = conf['origin']['y']
+            except yaml.YAMLError as e:
+                rospy.logerr("Can't parse config file : %s" % e)
+
