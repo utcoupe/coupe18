@@ -9,6 +9,7 @@ ros::NodeHandle nh;
 #include <Wire.h>
 #include "VL53L0X.h"
 #include <drivers_ard_others/BeltRange.h>
+#include "sensors.h"
 
 //Actuators includes
 #include "Servo.h"
@@ -68,6 +69,7 @@ Timer sensors_loop_timer = Timer(50, &loop_sensors);
 
 void init_sensors() {
     init_belt_sensors();
+    color_sensor_init();
     sensors_loop_timer.Start();
 }
 
