@@ -19,7 +19,7 @@ class ActuatorsNode:
         if robot.lower() == "gr":
             self.arm_instance = actuators.ActuatorsArm()
         elif robot.lower() == "pr":
-            pass # TODO
+            self.barrel_instance = actuators.ActuatorsBarrel()
 
         rospy.spin()
 

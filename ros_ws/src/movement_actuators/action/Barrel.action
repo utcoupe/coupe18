@@ -1,4 +1,6 @@
-# Specific action file for complex action "arm" of the big robot, 2018
-#TODO
+# Specific action file for complex action "BarrelSort" of the big robot, 2018
+bool sort
+float32 timeout
 ---
+bool success
 ---
