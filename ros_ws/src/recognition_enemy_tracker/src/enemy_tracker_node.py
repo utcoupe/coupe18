@@ -9,27 +9,30 @@ from Data import Enemy, Point, Obstacle
 
 from recognition_objects_classifier.msg import ClassifiedObjects
 from ai_game_status import StatusServices
+from recognition_enemy_tracker.msg import Enemies
 
-NODE_NAME = "recognition"
-NODE_NAMESPACE = "enemy_tracker"
+NODE_NAMESPACE = "recognition"
+NODE_NAME = "enemy_tracker"
 FULL_NODE_NAME = "/" + NODE_NAMESPACE + "/" + NODE_NAME
 
 NB_ENEMIES = 3
 PUB_ENEMIES_POS_RATE = 10 # Hz
 
 CLASSIFIED_OBSTACLES_TOPIC = "/recognition/objects_classifier/objects"
+ENEMIES_TOPIC = FULL_NODE_NAME + "/enemies"
 
 class EnemyTrackerNode(object):
     def __init__ (self):
         self._lastObstacles = []
         self._enemies = []
-        for idEnemy in range(1, NB_ENEMIES):
+        for idEnemy in range(0, NB_ENEMIES):
             self._enemies.append(Enemy())
         
         rospy.init_node(NODE_NAME)
         self._obsTaclesSubscriber = rospy.Subscriber(CLASSIFIED_OBSTACLES_TOPIC, ClassifiedObjects, self._classifiedObjectsCallback)
-        rospy.loginfo("enemy_tracker up and tracking.")
-        StatusServices(NODE_NAME, NODE_NAMESPACE).ready(True)
+        self._enemiesPublisher = rospy.Publisher(ENEMIES_TOPIC, Enemies, queue_size=10)
+        rospy.loginfo("enemy_tracker up and tracking " + str(len(self._enemies)) + " enemies")
+        StatusServices(NODE_NAMESPACE, NODE_NAME).ready(True)
         self.run()
     
     def run(self):
@@ -49,24 +52,24 @@ class EnemyTrackerNode(object):
             sortedObstacleIdsPerEnemies.append(sortedObstacles)
         
         # TODO store next not owned obstacle for each list
-        for idAffectation in range(1, len(self._enemies)):
+        for idAffectation in range(0, len(self._enemies)):
             self._affecteObstacle(sortedObstacleIdsPerEnemies)
     
     def _sortObstacles (self, enemy):
-        obstacleIds = range(1, len(self._lastObstacles))
+        obstacleIds = range(0, len(self._lastObstacles))
         obstacleIds = sorted(obstacleIds, key=lambda obsId : Point.norm2Dist(self._lastObstacles[obsId].pos, enemy.getPos()))
         return obstacleIds
     
     def _affecteObstacle (self, sortedObstacleIdsPerEnemies):
-        bestEnemyId = 0
-        bestObsId = 0
-        bestDist = 0
+        bestEnemyId = -1
+        bestObsId = -1
+        bestDist = -1
 
-        for enemyId in range(1, len(self._enemies)):
+        for enemyId in range(0, len(self._enemies)):
             if self._enemies[enemyId].isOwner():
                 continue
             obsId = self._findNextNotOwnedObstacle(sortedObstacleIdsPerEnemies[enemyId])
-            if obsId == 0: # all obstacles already affected or no obstacles known
+            if obsId == -1: # all obstacles already affected or no obstacles known
                 break
             dist = Point.norm2Dist(self._enemies[enemyId].getPos(), self._lastObstacles[obsId].pos)
             if dist > bestDist:
@@ -74,7 +77,7 @@ class EnemyTrackerNode(object):
                 bestObsId = obsId
                 bestEnemyId = enemyId
 
-        if bestEnemyId != 0 and bestObsId != 0:
+        if bestEnemyId != -1 and bestObsId != -1:
             self._enemies[bestEnemyId].updatePos(self._lastObstacles[bestObsId])
             self._lastObstacles[bestObsId].setOwned()
     
@@ -82,7 +85,7 @@ class EnemyTrackerNode(object):
         for obsId in obstacleIds:
             if not self._lastObstacles[obsId].isOwned():
                 return obsId
-        return 0
+        return -1
     
     def _classifiedObjectsCallback (self, obstacles):
         del self._lastObstacles[:]
@@ -98,7 +101,10 @@ class EnemyTrackerNode(object):
             self._lastObstacles.append(obs)
     
     def _publishEnemyPoses(self):
-        pass
+        enemiesPoses = []
+        for enemy in self._enemies:
+            enemiesPoses.append(enemy.toEnemyStamped())
+        self._enemiesPublisher.publish(enemiesPoses)
 
 
 if __name__ == "__main__":

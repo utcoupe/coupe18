@@ -11,6 +11,7 @@
     <buildtool_depend>catkin</buildtool_depend>
     <depend>rospy</depend>
     <depend>std_msgs</depend>
+    <depend>geometry_msgs</depend>
     <depend>ai_game_status</depend>
     <depend>recognition_objects_classifier</depend>
 </package>

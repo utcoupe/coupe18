@@ -7,6 +7,7 @@ __date__ = 10/4/2018
 import rospy
 from point import Point
 from obstacle import Obstacle
+from recognition_enemy_tracker.msg import EnemyStamped
 
 class Enemy(object):
     def __init__ (self):
@@ -16,6 +17,11 @@ class Enemy(object):
         self._owner = False
 
     def updatePos(self, obstacle):
+        self._owner = True
+        
+        if self._lastSeen == obstacle.stamp:
+            return
+        
         if self._lastSeen != rospy.Time(0):
             timeElapsed = obstacle.stamp - self._lastSeen
             vect = obstacle.pos - self._lastPos
@@ -23,7 +29,6 @@ class Enemy(object):
 
         self._lastSeen = obstacle.stamp
         self._lastPos = obstacle.pos
-        self._owner = True
     
     def isOwner(self):
         return self._owner
@@ -35,4 +40,11 @@ class Enemy(object):
         return self._lastPos
     
     def toEnemyStamped(self):
-        pass
+        es = EnemyStamped()
+        es.pos.x = self._lastPos.x
+        es.pos.y = self._lastPos.y
+        es.speed.x = self._speed.x
+        es.speed.y = self._speed.y
+        # es.header.stamp = self._lastSeen
+        return es
+        

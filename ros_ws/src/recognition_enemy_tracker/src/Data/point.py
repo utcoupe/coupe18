@@ -17,7 +17,7 @@ class Point(object):
     def __sub__(self, other): # returns a vector
         return Point(self.x - other.y, self.y - other.y)
     
-    def _div_ (self, scalar):
+    def __div__ (self, scalar):
         return Point(self.x / scalar, self.y / scalar)
     
     @staticmethod

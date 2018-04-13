@@ -1,0 +1,1 @@
+EnemyStamped[] enemies
