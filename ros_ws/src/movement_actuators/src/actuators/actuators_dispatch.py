@@ -73,11 +73,22 @@ class ActuatorsDispatch(ActuatorsAbstract):
         received_goal_id = goal_handle.comm_state_machine.action_goal.goal_id.id
         for goal in self._active_goals_ax12:
             if goal.comm_state_machine.action_goal.goal_id.id == received_goal_id:
-                if goal_handle.get_goal_status() == GoalStatus.SUCCEEDED:
+                goal_status = goal_handle.get_goal_status()
+
+                if goal_status == GoalStatus.SUCCEEDED:
                     success = True
-                    self._action_reached(self._active_goals_ax12[goal], success, DispatchResult(success))
-                    del self._active_goals_ax12[goal]
+                elif goal_status in [GoalStatus.LOST,
+                              GoalStatus.RECALLED,
+                              GoalStatus.REJECTED,
+                              GoalStatus.ABORTED,
+                              GoalStatus.PREEMPTED]:
+                    success = False
+                else:
                     return
+
+                self._action_reached(self._active_goals_ax12[goal], success, DispatchResult(success))
+                del self._active_goals_ax12[goal]
+                return
 
     def _send_to_arduino(self, ard_id, ard_type, param):
         msg = drivers_ard_others.msg.Move()

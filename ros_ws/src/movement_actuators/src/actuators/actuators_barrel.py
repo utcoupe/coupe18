@@ -4,6 +4,8 @@ import rospy
 from actuators_abstract import ActuatorsAbstract
 from movement_actuators.msg import BarrelAction, BarrelResult, DispatchAction, DispatchGoal
 
+from actionlib.action_client import CommState
+
 class Color:
     UNKNOWN = 0
     ORANGE = 1
@@ -14,9 +16,9 @@ class ActuatorsBarrel(ActuatorsAbstract):
 
         self.COLOR_SENSOR_TOPIC = '/drivers/ard_others/...'
         self.BARREL_NAME = 'barrel' # name in the dispatcher
-        self.PRESET_BIN = 'bin'
-        self.PRESET_NORMAL = 'normal'
-        self.PRESET_CANON = 'canon'
+        self.PRESET_BIN = 'BIN'
+        self.PRESET_NORMAL = 'HIGH'
+        self.PRESET_CANON = 'CANON'
 
         self.ORANGE_HUE = 20
         self.GREEN_HUE = 100
@@ -45,6 +47,13 @@ class ActuatorsBarrel(ActuatorsAbstract):
 
         self._timer = None
 
+        self.aa = rospy.Timer(rospy.Duration(0.01), self.aaa)
+
+    def aaa(self, _):
+        if self._client.gh:
+            return
+            # rospy.logerr(CommState.to_string(self._client.gh.get_comm_state()))
+
     def _process_action(self, goal, goal_id):
         if self._is_running:
             rospy.logerr("Received a goal but another one is in process !")
@@ -54,16 +63,18 @@ class ActuatorsBarrel(ActuatorsAbstract):
         self._curr_goal_id = goal_id
 
         if goal.timeout > 0:
-            self._timer = rospy.Timer(rospy.Duration(goal.timeout), self._trigger_timeout, onshot=True)
+            self._timer = rospy.Timer(rospy.Duration(goal.timeout), self._trigger_timeout, oneshot=True)
         else:
             rospy.logwarn('No timeout is set, the action might take forever')
 
         if not goal.sort:
             self._start_goal_chain(self.PRESET_CANON)
 
+
         return True
 
     def _forth_done_cb(self, state, result):
+        rospy.logfatal('forth_done')
         self._doing_forth = False
 
         g = DispatchGoal()
@@ -75,6 +86,7 @@ class ActuatorsBarrel(ActuatorsAbstract):
         self._client.send_goal(g, done_cb=self._back_done_cb)
 
     def _back_done_cb(self, state, result):
+        rospy.logfatal('back_done')
         self._finish_action(result.success)
 
     def _trigger_timeout(self, event):
@@ -117,11 +129,13 @@ class ActuatorsBarrel(ActuatorsAbstract):
         self._is_running = False
         self._doing_forth = False
         self._doing_back = False
-        self._curr_goal_id = None
 
+        self._client.stop_tracking_goal()
 
         if self._timer:
             self._timer.shutdown()
             self._timer = None
 
-        self._action_reached(self, self._curr_goal_id, success, BarrelResult(success=success))
+        self._action_reached(self._curr_goal_id, success, BarrelResult(success=success))
+
+        self._curr_goal_id = None
