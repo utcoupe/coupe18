@@ -7,6 +7,7 @@
 
 #include "config.h"
 #include <Arduino.h>
+#include <ros.h>
 
 //********************************************************************************************************************//
 //
@@ -29,14 +30,14 @@ enum tsl_name_enum {
     TSL_LIGHTNESS
 };
 
-void color_sensor_init();
+void color_sensor_init(ros::NodeHandle* nh);
 void color_sensor_loop();
 
 // Private stuff
-void color_sensor_capture_values();
-void color_sensor_apply_filter(rgb_name_enum color);
+void color_sensor_values_capture();
+void color_sensor_filter_apply(rgb_name_enum color);
 void color_sensor_rgb_to_tsl(uint8_t rgbValues[3], uint16_t tslColors[3]);
-void color_sensor_publish_values(uint16_t tslColors[3]);
+void color_sensor_values_publish(uint16_t tslColors[3]);
 
 #endif
 
