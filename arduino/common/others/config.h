@@ -27,12 +27,12 @@
 #ifdef SENSOR_COLOR_ENABLED
 
 // Pins
-#define S0              8
-#define S1              9
-#define S2              10
-#define S3              11
+#define S0              7
+#define S1              6
+#define S2              5
+#define S3              4
 #define LED             2
-#define SENSOR_VALUE    12
+#define SENSOR_VALUE    3
 
 // Component configuration
 #define COLOR_ACCUMULATE_NB     1

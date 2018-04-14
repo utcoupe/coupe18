@@ -75,6 +75,8 @@ void color_sensor_values_capture() {
         rawFrequency = pulseIn(SENSOR_VALUE, LOW);
         if (rawFrequency > 0) {
             color_sensor_rgb_values[color_id] = constrain(map(rawFrequency, rgbMinMaxFrequency[color_id][0], rgbMinMaxFrequency[color_id][1], 255, 0), 0, 255);
+        } else {
+            node_handle->logwarn("Color sensor timed out, no values...");
         }
     }
 }
