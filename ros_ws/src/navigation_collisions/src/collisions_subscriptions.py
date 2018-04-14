@@ -104,10 +104,10 @@ class CollisionsSubscriptions(object):
             if circle.header.frame_id not in ["map", "/map"]:
                 rospy.logwarn("Lidar circle not in /map tf frame, skipping.")
                 continue
-            vel_d = math.sqrt(circle.velocity.y ** 2 + circle.velocity.x ** 2)
-            vel_a = math.atan2(circle.velocity.y, circle.velocity.x)
-            new_lidar.append(CircleObstacle(Position(circle.center.x, circle.center.y, angle = vel_a),
-                                            circle.radius, velocity = Velocity(circle.radius * 2, circle.radius * math.sqrt(3.0) / 2.0,
+            vel_d = math.sqrt(circle.circle.velocity.y ** 2 + circle.circle.velocity.x ** 2)
+            vel_a = math.atan2(circle.circle.velocity.y, circle.circle.velocity.x)
+            new_lidar.append(CircleObstacle(Position(circle.circle.center.x, circle.circle.center.y, angle = vel_a),
+                                            circle.circle.radius, velocity = Velocity(circle.circle.radius * 2, circle.circle.radius * math.sqrt(3.0) / 2.0,
                                             vel_d, 0.0)))
 
         if len(new_lidar) > 0:
