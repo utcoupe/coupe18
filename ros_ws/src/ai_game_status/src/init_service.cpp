@@ -15,7 +15,7 @@ StatusServices::StatusServices(const string& namespaceName, const string& packag
 {
     _nodeName = "/" + namespaceName + "/" + packageName;
     if (_armCallback)
-        _armServer = _nodeHandle.advertiseService(ARM_SRV, &StatusServices::_on_arm, this);
+        _armServer = _nodeHandle.advertiseService(_nodeName + ARM_SRV, &StatusServices::_on_arm, this);
     if (_statusCallback)
         _gameStatusSubscriber = _nodeHandle.subscribe(HALT_SRV, 10, &StatusServices::_on_gameStatus, this);
 }

@@ -425,12 +425,12 @@ Ax12Server::Ax12Server(std::string action_name, std::string service_name) :
 
     timer_ = nh_.createTimer(ros::Duration(1.0/MAIN_FREQUENCY), &Ax12Server::main_loop, this);
 
-    StatusServices ss("drivers", "ax12", [this, port](){ // arm callback
+    status_services_ = std::unique_ptr<StatusServices>(new StatusServices("drivers", "ax12", [this, port](){ // arm callback
         init_driver(port);
         return true;
-    });
+    }));
 
-    ss.setReady(true);
+    status_services_->setReady(true);
 
 }
 
