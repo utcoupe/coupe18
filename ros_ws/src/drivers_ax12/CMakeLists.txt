@@ -1,9 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(drivers_ax12)
 
-add_compile_options(-std=c++11)
-
-# add_subdirectory(${PROJECT_SOURCE_DIR}/lib)
+add_compile_options(-std=c++14)
 
 find_package(catkin REQUIRED COMPONENTS
   actionlib
@@ -39,7 +37,6 @@ catkin_package(
   INCLUDE_DIRS include
   LIBRARIES drivers_ax12
   CATKIN_DEPENDS actionlib actionlib_msgs roscpp std_msgs drivers_port_finder ai_game_status
-  #DEPENDS system_lib
 )
 
 include_directories(

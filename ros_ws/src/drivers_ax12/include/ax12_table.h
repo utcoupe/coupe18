@@ -5,16 +5,14 @@
 #include <stdint.h>
 
 
-namespace Ax12Table
-{
+namespace Ax12Table {
     /*
      * Defines the items of the register table.
      * This is specific the the AX-12A motor.
      * See http://support.robotis.com/en/techsupport_eng.htm#product/dynamixel/ax_series/dxl_ax_actuator.htm
      */
 
-    struct Register
-    {
+    struct Register {
         uint8_t address;
         uint8_t access;
         uint8_t size;

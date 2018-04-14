@@ -1,67 +1,51 @@
 #include "ax12_server.h"
+#include <memory>
 
 using namespace Ax12Table;
 
 
-void Ax12Server::init_driver(const std::string& port)
-{
+void Ax12Server::init_driver(const std::string &port) {
 
-    if(!driver_.initialize(port))
-    {
-        ROS_FATAL("Unable to initialize the AX-12 driver with port %s and baudrate index %d", port.c_str(), driver_.BAUD_RATE_INDEX);
+    if (!driver_.initialize(port)) {
+        ROS_FATAL("Unable to initialize the AX-12 SDK, shutting down !");
         ros::shutdown();
         return;
     }
 
     driver_.scan_motors();
 
-    ROS_INFO("Found %d AX-12 motors connected with a scan range of %d", driver_.get_motor_count(), driver_.SCAN_RANGE);
-
-    uint8_t* ids = driver_.get_motor_ids();
-
-    for(uint8_t i = 0; i < driver_.get_motor_count(); i++) {
-        driver_.write_register(ids[i], Ax12Table::STATUS_RETURN_LEVEL, 2);
-        ROS_INFO("Motor with id %d found.", ids[i]);
-    }
-
     driver_.toggle_torque(true);
 }
 
-void Ax12Server::cancel_goal_cb(GoalHandle goal_handle)
-{
-    ROS_DEBUG("Received a cancel request");
+void Ax12Server::cancel_goal_cb(GoalHandle goal_handle) {
+    uint8_t motor_id = goal_handle.getGoal()->motor_id;
+
+    ROS_INFO("Received a cancel request, stopping movement of motor %d", motor_id);
 
     uint16_t moving;
 
-    uint8_t motor_id = goal_handle.getGoal()->motor_id;
-
     driver_.read_register(motor_id, MOVING, moving);
 
-    if(!moving)
-    {
-        ROS_WARN("Received a cancel request but motor is not moving");
+    if (!moving) {
+        ROS_WARN("Received a cancel request but motor %d is not moving", motor_id);
         return;
     }
 
+    uint16_t pos;
     driver_.joint_mode(motor_id);
-
-    uint16_t pos = 512;
     driver_.read_register(motor_id, PRESENT_POSITION, pos);
-
     driver_.write_register(motor_id, GOAL_POSITION, pos);
 
-    for(auto it = joint_goals_.begin(); it != joint_goals_.end(); it++)
-    {
-        if(goal_handle.getGoalID().id == it->getGoalID().id){
+    for (auto it = joint_goals_.begin(); it != joint_goals_.end(); it++) {
+        if (goal_handle.getGoalID().id == it->getGoalID().id) {
             joint_goals_.erase(it);
+            ROS_DEBUG("Erased joint goal of motor %d from the list", motor_id);
             return;
         }
     }
-
-    ROS_WARN("Received a cancel request for a goal, but no such goal is active");
 }
-void Ax12Server::execute_goal_cb(GoalHandle goal_handle)
-{
+
+void Ax12Server::execute_goal_cb(GoalHandle goal_handle) {
     /*
      * Handles the goal requests of the action server.
      * Checks if the goal is valid, then tells the motor
@@ -71,139 +55,130 @@ void Ax12Server::execute_goal_cb(GoalHandle goal_handle)
     auto goal = goal_handle.getGoal();
     uint8_t motor_id = goal->motor_id;
 
-    if(is_halted)
-    {
+    if (is_halted) {
         ROS_ERROR("AX-12 action server received a goal, but game_status said that the system is halted !");
-        goal_handle.setRejected();
+        result_.success = 0;
+        goal_handle.setRejected(result_);
         return;
     }
 
-    if(!goal_handle.isValid())
-    {
+    if (!goal_handle.isValid()) {
         ROS_ERROR("AX-12 action server received an invalid goal !");
-        goal_handle.setRejected();
+        result_.success = 0;
+        goal_handle.setRejected(result_);
         return;
     }
 
-    if(!driver_.motor_id_exists(motor_id))
-    {
+    if (!driver_.motor_id_exists(motor_id)) {
         ROS_ERROR("AX-12 action server received a goal for motor ID %d, but no such motor was detected", motor_id);
-        goal_handle.setRejected();
+        result_.success = 0;
+        goal_handle.setRejected(result_);
         return;
     }
 
-    if(!driver_.motor_id_connected(motor_id))
-    {
+    if (!driver_.motor_id_connected(motor_id)) {
         ROS_ERROR("AX-12 action server received a goal for motor ID %d, but the motor was disconnected", motor_id);
-        goal_handle.setRejected();
+        result_.success = 0;
+        goal_handle.setRejected(result_);
         return;
     }
 
-    if(goal->mode == goal->JOINT)
+    if (goal->mode == goal->JOINT)
         handle_joint_goal(goal_handle);
     else
         handle_wheel_goal(goal_handle);
 }
 
-bool Ax12Server::handle_joint_goal(GoalHandle goal_handle)
-{
+bool Ax12Server::handle_joint_goal(GoalHandle goal_handle) {
     auto goal = goal_handle.getGoal();
     uint8_t motor_id = goal->motor_id;
     uint16_t position = goal->position;
 
-    if(position <= 0 || position > 1023)
-    {
-        ROS_ERROR("AX-12 action server received a joint goal for motor ID %d, but with an invalid position: %d", motor_id, position);
-        goal_handle.setRejected();
+    if (position <= 0 || position > 1023) {
+        ROS_ERROR("AX-12 action server received a joint goal for motor ID %d, but with an invalid position: %d",
+                  motor_id, position);
+        result_.success = 0;
+        goal_handle.setRejected(result_);
         return false;
     }
 
     uint16_t speed = goal->speed;
-    if(speed < 0 || speed > 1023)
-    {
-        ROS_ERROR("AX-12 action server received a joint goal for motor ID %d, but with an invalid speed: %d", motor_id, speed);
-        goal_handle.setRejected();
+    if (speed < 0 || speed > 1023) {
+        ROS_ERROR("AX-12 action server received a joint goal for motor ID %d,"
+                  " but with an invalid speed: %d", motor_id, speed);
+        result_.success = 0;
+        goal_handle.setRejected(result_);
         return false;
     }
 
     goal_handle.setAccepted();
 
-    for(auto it = joint_goals_.begin(); it != joint_goals_.end();)
-    {
-        if(it->getGoal()->motor_id == motor_id)
-        {
+    for (auto it = joint_goals_.begin(); it != joint_goals_.end();) {
+        if (it->getGoal()->motor_id == motor_id) {
             it->setCanceled();
-            ROS_INFO("AX-12 action server received a joint goal for motor ID %d while another joint goal was running for that motor. The old goal was canceled.", motor_id);
+            ROS_WARN("AX-12 action server received a joint goal for motor ID %d"
+                     " while another joint goal was running for that motor."
+                     " The old goal was canceled.", motor_id);
+
             it = joint_goals_.erase(it);
-        }
-        else
-        {
+        } else {
             it++;
         }
     }
 
-    driver_.joint_mode(motor_id);
+    bool success = true;
 
-    //make sure the ax12 received the position
-    uint16_t curr_goal_pos = -1;
-    uint16_t curr_goal_speed = -1;
+    success &= driver_.joint_mode(motor_id);
 
-
-    driver_.write_register(motor_id, GOAL_POSITION, position);
-    driver_.write_register(motor_id, MOVING_SPEED, speed);
-
-    driver_.read_register(motor_id, GOAL_POSITION, curr_goal_pos);
-    driver_.read_register(motor_id, MOVING_SPEED, curr_goal_speed);
-
-
-
+    success &= driver_.write_register(motor_id, GOAL_POSITION, position);
+    success &= driver_.write_register(motor_id, MOVING_SPEED, speed);
 
     joint_goals_.push_back(goal_handle);
-    ROS_DEBUG("Success setting goal and speed, adding the goal to the list");
-    return true;
+    ROS_DEBUG("Success setting goal and speed for motor %d, adding the goal to the list", motor_id);
+
+    return success;
 }
 
-bool Ax12Server::handle_wheel_goal(GoalHandle goal_handle)
-{
+bool Ax12Server::handle_wheel_goal(GoalHandle goal_handle) {
     auto goal = goal_handle.getGoal();
     uint8_t motor_id = goal->motor_id;
     uint16_t speed = goal->speed;
 
-    if(speed < 0 || speed > 2047)
-    {
-        ROS_ERROR("AX-12 action server received a wheel goal for motor ID %d, but with an invalid speed: %d", motor_id, speed);
-        goal_handle.setRejected();
+    if (speed < 0 || speed > 2047) {
+        ROS_ERROR("AX-12 action server received a wheel goal for motor ID %d,"
+                  " but with an invalid speed: %d", motor_id, speed);
+        result_.success = 0;
+        goal_handle.setRejected(result_);
         return false;
     }
 
     goal_handle.setAccepted();
 
-    for(auto it = joint_goals_.begin(); it != joint_goals_.end();)
-    {
-        if(it->getGoal()->motor_id == motor_id)
-        {
-            it->setCanceled();
-            ROS_INFO("AX-12 action server received a wheel goal for motor ID %d while another joint goal was running for that motor. The old goal was canceled.", motor_id);
+    for (auto it = joint_goals_.begin(); it != joint_goals_.end();) {
+        if (it->getGoal()->motor_id == motor_id) {
+            result_.success = 0;
+            it->setCanceled(result_);
+            ROS_INFO("AX-12 action server received a wheel goal for motor ID %d while "
+                     "another joint goal was running for that motor. "
+                     "The old goal was canceled.", motor_id);
             it = joint_goals_.erase(it);
-        }
-        else
-        {
+        } else {
             it++;
         }
     }
 
-    driver_.wheel_mode(motor_id);
-    driver_.write_register(motor_id, MOVING_SPEED, speed);
+    bool success = true;
+    success &= driver_.wheel_mode(motor_id);
+    success &= driver_.write_register(motor_id, MOVING_SPEED, speed);
 
 
-    result_.success = true;
+    result_.success = static_cast<unsigned char>(success);
     goal_handle.setSucceeded(result_);
 
-    return true;
+    return success;
 }
 
-void Ax12Server::main_loop(const ros::TimerEvent&)
-{
+void Ax12Server::main_loop(const ros::TimerEvent &) {
     /*
      * Called on a Timer, checks the status of all current goals and updates them
      * Feedback is published too
@@ -213,96 +188,73 @@ void Ax12Server::main_loop(const ros::TimerEvent&)
     uint16_t curr_position = 0;
     uint32_t goal_position = 0;
 
-
-    for(auto it = joint_goals_.begin(); it != joint_goals_.end();)
-    {
+    for (auto it = joint_goals_.begin(); it != joint_goals_.end();) {
         motor_id = it->getGoal()->motor_id;
-        ROS_DEBUG("Checking state of motor %d", motor_id);
-
         driver_.read_register(motor_id, PRESENT_POSITION, curr_position);
 
-        ROS_DEBUG("Read pos %u", curr_position);
+        ROS_DEBUG("Motor %d : position %d", motor_id, curr_position);
 
         goal_position = it->getGoal()->position;
 
-        if(curr_position >= (goal_position - POSITION_MARGIN) && curr_position <= (goal_position + POSITION_MARGIN))
-        {
-            ROS_DEBUG("Motor has reached the goal position ! curr_pos : %d, goal_pos : %d", curr_position, goal_position);
-            result_.success = true;
+        if (curr_position >= (goal_position - POSITION_MARGIN) && curr_position <= (goal_position + POSITION_MARGIN)) {
+            ROS_DEBUG("Motor has reached the goal position ! curr_pos : %d, goal_pos : %d", curr_position,
+                      goal_position);
+            result_.success = 1;
             it->setSucceeded(result_);
             it = joint_goals_.erase(it);
-            ROS_INFO("AX-12 position goal succeeded for motor ID %d", motor_id);
+            ROS_INFO("AX-12 position goal %d succeeded for motor ID %d", goal_position, motor_id);
 
-        }
-        else if(ros::Time::now().toSec() - it->getGoalID().stamp.toSec() > MAX_STOP_TIME)
-        {
-            ROS_DEBUG("Motor has not reached the goal position, timeout reached ! curr_pos : %d, goal_pos : %d", curr_position, goal_position);
+        } else if (ros::Time::now().toSec() - it->getGoalID().stamp.toSec() > MAX_STOP_TIME) {
+            ROS_ERROR("Motor has not reached the goal position, timeout reached ! curr_pos : %d, goal_pos : %d",
+                      curr_position, goal_position);
 
-            //reset the alarm
+            // reset the alarm
             driver_.write_register(motor_id, TORQUE_ENABLE, 0);
             driver_.write_register(motor_id, TORQUE_ENABLE, 1);
-            
-            result_.success = false;
+
+            result_.success = 0;
             it->setAborted(result_);
             it = joint_goals_.erase(it);
-            ROS_ERROR("AX-12 position goal aborted for motor ID %d", motor_id);
-        }
-        else
-        {
-            ROS_DEBUG("Publishing feedback");
+        } else {
             feedback_.position = curr_position;
             it->publishFeedback(feedback_);
             it++;
         }
-
     }
-
 }
 
-std::string Ax12Server::fetch_port(const std::string& service_name)
-{
+std::string Ax12Server::fetch_port(const std::string &service_name) {
     /*
      * Asks the port_finder for the motor port
      */
 
     std::string port;
 
-    if(!ros::service::waitForService(service_name, 15000))
-    {
+    if (!ros::service::waitForService(service_name, 15000)) {
         ROS_ERROR("Failed to contact drivers_port_finder (service not up)");
-    }
-    else
-    {
+    } else {
         ros::ServiceClient client = nh_.serviceClient<drivers_port_finder::GetPort>(service_name);
         drivers_port_finder::GetPort srv;
         srv.request.component = "usb2ax";
 
-        if (client.call(srv))
-        {
+        if (client.call(srv)) {
             port = srv.response.port;
-        }
-        else
-        {
+        } else {
             ROS_ERROR("Failed to fetch the AX-12 port from drivers_port_finder");
         }
     }
 
-    if(port.length() == 0)
-    {
-//        ROS_ERROR("The AX-12 port is not set, falling back to default: %s", DEFAULT_PORT.c_str());
-        ROS_FATAL("The AX-12 port is not set, quitting...");
+    if (port.length() == 0) {
+        ROS_FATAL("The AX-12 port is not set, shutting down...");
         ros::shutdown();
-        return "";
-//        port = DEFAULT_PORT;
+        return NULL;
     }
 
     return port;
 }
 
-const Ax12Table::Register* Ax12Server::service_param_to_register(uint8_t param)
-{
-    switch(param)
-    {
+const Ax12Table::Register *Ax12Server::service_param_to_register(uint8_t param) {
+    switch (param) {
         case drivers_ax12::SetAx12ParamRequest::ID:
             return &ID;
         case drivers_ax12::SetAx12ParamRequest::BAUD_RATE:
@@ -349,93 +301,78 @@ const Ax12Table::Register* Ax12Server::service_param_to_register(uint8_t param)
             return &LOCK;
         case drivers_ax12::SetAx12ParamRequest::PUNCH:
             return &PUNCH;
+        default:
+            return nullptr;
     }
-
-    return nullptr;
 }
 
 bool Ax12Server::execute_set_service_cb(drivers_ax12::SetAx12Param::Request &req,
-                                        drivers_ax12::SetAx12Param::Response &res)
-{
+                                        drivers_ax12::SetAx12Param::Response &res) {
 
-    if(!driver_.motor_id_exists(req.motor_id))
-    {
-        ROS_ERROR("AX-12 set_param service server received a request for motor ID %d, but no such motor was detected", req.motor_id);
+    if (!driver_.motor_id_exists(req.motor_id)) {
+        ROS_ERROR("AX-12 set_param service server received a request for motor ID %d, but no such motor was detected",
+                  req.motor_id);
         res.success = 0;
         return true;
     }
 
-    if(!driver_.motor_id_connected(req.motor_id))
-    {
-        ROS_ERROR("AX-12 set_param service server received a request for motor ID %d, but the motor was disconnected", req.motor_id);
+    if (!driver_.motor_id_connected(req.motor_id)) {
+        ROS_ERROR("AX-12 set_param service server received a request for motor ID %d, but the motor was disconnected",
+                  req.motor_id);
         res.success = 0;
         return true;
     }
 
+    const Register *reg = service_param_to_register(req.param);
 
-    const Register* reg = service_param_to_register(req.param);
-
-    if(reg == nullptr)
-    {
-        ROS_ERROR("AX-12 set_param service server received a invalid param request");
-        res.success = 0;
-        return true;
-    }
+    res.success = (uint8_t) driver_.write_register(req.motor_id, *reg, static_cast<uint16_t>(req.value));
 
     ROS_INFO("Successfully changed parameter %d of motor with ID %d to %d", req.param, req.motor_id, req.value);
 
-    res.success = (uint8_t)driver_.write_register(req.motor_id, *reg, req.value);
     return true;
 }
 
-void Ax12Server::game_status_cb(const ai_game_status::GameStatusConstPtr& status)
-{
-    if(!is_halted && status->game_status == status->STATUS_HALT)
-    {
+void Ax12Server::game_status_cb(const ai_game_status::GameStatusConstPtr &status) {
+    if (!is_halted && status->game_status == status->STATUS_HALT) {
         is_halted = true;
         driver_.toggle_torque(false);
-    }
-    else if(is_halted && status->game_status != status->STATUS_HALT)
-    {
+    } else if (is_halted && status->game_status != status->STATUS_HALT) {
         is_halted = false;
         driver_.toggle_torque(true);
     }
 }
 
-Ax12Server::Ax12Server(std::string action_name, std::string service_name) :
+Ax12Server::Ax12Server(const std::string &action_name, const std::string &service_name) :
         as_(nh_, action_name, boost::bind(&Ax12Server::execute_goal_cb, this, _1),
-                              boost::bind(&Ax12Server::cancel_goal_cb, this, _1), false),
+            boost::bind(&Ax12Server::cancel_goal_cb, this, _1), false),
         set_param_service(nh_.advertiseService(service_name, &Ax12Server::execute_set_service_cb, this)),
         game_status_sub_(nh_.subscribe(GAME_STATUS_TOPIC, 30, &Ax12Server::game_status_cb, this)),
         driver_(),
         joint_goals_(),
         feedback_(),
         result_(),
-        is_halted(false)
-{
-    std::string port;
+        is_halted(false) {
 
     as_.start();
 
-    port = fetch_port(PORT_FINDER_SERVICE);
+    std::string port = fetch_port(PORT_FINDER_SERVICE);
 
     init_driver(port);
 
     ROS_INFO("AX-12 action server initialized for port %s, waiting for goals", port.c_str());
 
-    timer_ = nh_.createTimer(ros::Duration(1.0/MAIN_FREQUENCY), &Ax12Server::main_loop, this);
+    timer_ = nh_.createTimer(ros::Duration(1.0 / MAIN_FREQUENCY), &Ax12Server::main_loop, this);
 
-    status_services_ = std::unique_ptr<StatusServices>(new StatusServices("drivers", "ax12", [this, port](){ // arm callback
-        init_driver(port);
-        return true;
-    }));
+    status_services_ = std::make_unique<StatusServices>(
+            "drivers", "ax12", [this, port]() { // arm callback
+                init_driver(port);
+                return true;
+            });
 
     status_services_->setReady(true);
-
 }
 
-Ax12Server::~Ax12Server()
-{
+Ax12Server::~Ax12Server() {
     driver_.toggle_torque(false);
     ros::shutdown();
 }
