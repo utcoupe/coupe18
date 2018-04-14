@@ -5,6 +5,7 @@ __author__ = "Gaëtan Blond"
 __date__ = 14/4/2018
 
 import math
+from collections import OrderedDict
 
 import rospy
 
@@ -32,15 +33,19 @@ class Plan(object):
     def __init__ (self, asservClient, pathfinderClient, resultCallback, updateCallback):
         self._asservClient = asservClient
         self._pathfinderClient = pathfinderClient
-        self._currentPath = {}
+        self._currentPath = OrderedDict()
         self._resultCallback = resultCallback
         self._updateCallback = updateCallback
         self._status = PlanStatuses.IDLE
     
-    def newGoal(self, startPos, endPos, hasAngle, direction):
+    def newPlan(self, startPos, endPos, hasAngle, direction):
         if len(self._currentPath) > 0:
             self.cancelAsservGoals()
-        self._currentPath = {} # needed ?
+        self._currentPath = OrderedDict() # needed ?
+        debugStr = "Asked to go from "
+        debugStr += pointToStr(startPos)
+        debugStr += " to " + pointToStr(endPos)
+        rospy.logdebug(debugStr)
         try:
             # sends a request to the pathfinder
             path = self._pathfinderClient.FindPath(startPos, endPos)
@@ -54,8 +59,11 @@ class Plan(object):
                 self._currentPath[idOrder] = point
                 lastPoint = point
             idOrder = self._asservClient.doGoto(endPos, self._getDirection(direction, endPos, lastPoint), hasAngle, self._asservGotoCallback)
-            self._currentPath[idOrder] = point
+            self._currentPath[idOrder] = endPos
             self._status = PlanStatuses.NAVIGATING
+            rospy.logdebug("Our path has " + str(len(self._currentPath)) + " points:")
+            for key in self._currentPath.keys():
+                rospy.logdebug(key)
             self._updateCallback() # needed ?
         except Exception as e:
             rospy.logdebug("Navigation failed: " + e.message)
@@ -64,6 +72,8 @@ class Plan(object):
             self._resultCallback(False)
 
     def _asservGotoCallback(self, idOrder, result):
+        rospy.logdebug("Callback for " + idOrder)
+        rospy.logdebug("Path size : " + str(len(self._currentPath)))
         if idOrder in self._currentPath.keys():
             del self._currentPath[idOrder]
             if len(self._currentPath) == 0:
@@ -73,6 +83,7 @@ class Plan(object):
                 self._resultCallback(result)
         else:
             rospy.logwarn("Trying to delete an unknown order...")
+        self._updateCallback()
 
 
     def cancelAsservGoals(self):
@@ -81,7 +92,11 @@ class Plan(object):
             self._asservClient.cancelGoal(idGoal)
     
     def getCurrentPath(self):
-        return self._currentPath.values
+        path = []
+        for idOrder in self._currentPath.keys():
+            rospy.logdebug("order " + idOrder)
+            path.append(self._currentPath[idOrder])
+        return path
 
     def _getAngle(self, v1, v2):
         prodScal = v1.x*v2.x + v1.y*v2.y

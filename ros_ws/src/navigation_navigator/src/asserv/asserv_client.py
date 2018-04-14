@@ -59,7 +59,10 @@ class AsservClient(object):
 
     def _handleUpdatePose (self, newPose):
         self.currentPose = newPose
-
+    
+    def cancelGoal(self, idOrder):
+        if idOrder in self._currentActions:
+            self._currentActions[idOrder].cancel()
 
     def goto (self, pos, hasAngle):
         response = False

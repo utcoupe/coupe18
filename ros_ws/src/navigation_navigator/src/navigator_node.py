@@ -16,6 +16,8 @@ from asserv import AsservClient
 from localizer import LocalizerClient
 from collisions import CollisionsClient
 from map import MapClient
+from planning import Plan
+#
 
 from ai_game_status import StatusServices
 
@@ -39,12 +41,6 @@ class NavigatorStatuses(object):
     NAV_NAVIGATING = 1
     NAV_STOPPED = 2
 
-def pointToStr(point):
-    """
-    Convert a geometry_msgs/Pose2D object (or any object with x an y properties) to a string
-    """
-    return "(" + str(point.x) + "," + str(point.y) + ")"
-
 class NavigatorNode(object):
     """
     The NavigatorNode class is the link between the AI, the Pathfinder and the Asserv.
@@ -67,30 +63,13 @@ class NavigatorNode(object):
         self._mapClient = ""
 
         self._currentStatus = NavigatorStatuses.NAV_IDLE
-        self._currentPath = {}
+        self._currentPlan = ""
+        self._currentGoal = ""
 
-    def _printPath (self, path):
-        """
-        Print the path in the debug log from ROS.
-        @param path:    An array of Pose2D
-        """
-        debugStr = "Received path: ["
-        for point in path:
-            debugStr += pointToStr(point)
-        debugStr += "]"
-        rospy.logdebug (debugStr)
-
-    def _callbackAsservForDoGotoAction (self, handledGoal, isFinalPos, idAct, resultAsserv):
-        if self._currentPath:
-            self._currentPath.pop(0)
-        self._updateStatus()
-        if isFinalPos:
-            result = DoGotoResult(True)
-            if (not resultAsserv) or (self._currentStatus == NavigatorStatuses.NAV_STOPPED):
-                result.success = False
-            self._currentStatus = NavigatorStatuses.NAV_IDLE
-            self._collisionsClient.setEnabled(False)
-            handledGoal.set_succeeded(result)
+    def _planResultCallback (self, result):
+        self._currentStatus = NavigatorStatuses.NAV_IDLE
+        self._collisionsClient.setEnabled(False)
+        self._currentGoal.set_succeeded(DoGotoResult(result))
 
     def _handleDoGotoRequest (self, handledGoal):
         """
@@ -121,39 +100,15 @@ class NavigatorNode(object):
     def _executeGoto (self, startPos, endPos, hasAngle, handledGoal):
         self._currentStatus = NavigatorStatuses.NAV_NAVIGATING
         self._collisionsClient.setEnabled(not handledGoal.get_goal().disable_collisions)
-        debugStr = "Asked to go from "
-        debugStr += pointToStr(startPos)
-        debugStr += " to " + pointToStr(endPos)
-        rospy.logdebug(debugStr)
         handledGoal.set_accepted()
-        try:
-            # sends the request to the pathfinder
-            path = self._pathfinderClient.FindPath(startPos, endPos)
-            self._printPath (path)
-            # then sends the path point per point to the arduino_asserv
-            path.pop(0) # The last point will be given end Position
-            self._currentPath = path[:] # _currentPath is the path send to collision
-            self._currentPath.append(endPos)
-            self._updateStatus()
-            lastPoint = startPos
-            for point in path:
-                cb = partial(self._callbackAsservForDoGotoAction, handledGoal, False)
-                self._asservClient.doGoto(point, self._getDirection(handledGoal.get_goal().direction, point, lastPoint), False, cb)
-                lastPoint = point
-            cb = partial(self._callbackAsservForDoGotoAction, handledGoal, True)
-            self._asservClient.doGoto(endPos, self._getDirection(handledGoal.get_goal().direction, endPos, lastPoint), hasAngle, cb)
-        except Exception, e:
-            rospy.logdebug("Navigation failed: " + e.message)
-            result = DoGotoResult(False)
-            self._currentStatus = NavigatorStatuses.NAV_IDLE
-            self._collisionsClient.setEnabled(False)
-            self._updateStatus()
-            handledGoal.set_succeeded(result)
+        self._currentGoal = handledGoal
+        self._currentPlan.newPlan(startPos, endPos, hasAngle, handledGoal.get_goal().direction)
 
     def _callbackEmergencyStop (self):
         """
         Ask the asserv to stop and update the status
         """
+        # TODO if already stopped for 3 sec, cancel and redo plan
         self._currentStatus = NavigatorStatuses.NAV_STOPPED
         self._asservClient.stopAsserv()
         self._updateStatus()
@@ -170,31 +125,8 @@ class NavigatorNode(object):
         """
         statusMsg = Status()
         statusMsg.status = self._currentStatus
-        if len(self._currentPath) > 0:
-            statusMsg.currentPath = self._currentPath
+        statusMsg.currentPath = self._currentPlan.getCurrentPath()
         self._statusPublisher.publish(statusMsg)
-
-    def _getDirection(self, askedDirection, newPos, lastPos):
-        if askedDirection != DoGotoGoal.AUTOMATIC:
-            return askedDirection
-        if abs(lastPos.theta - self._getAngle(lastPos, newPos)) > (math.pi / 2):
-            return DoGotoGoal.BACKWARD
-        else:
-            return DoGotoGoal.FORWARD
-    
-    def _getAngle(self, v1, v2):
-        prodScal = v1.x*v2.x + v1.y*v2.y
-        normeV1 = math.sqrt(pow(v1.x, 2) + pow(v1.y, 2))
-        normeV2 = math.sqrt(pow(v2.x, 2) + pow(v2.y, 2))
-        cosV1V2 = prodScal / (normeV1 * normeV2)
-
-        # fix float precision
-        if cosV1V2 > 1.0:
-            cosV1V2 = 1.0
-        elif cosV1V2 < -1.0:
-            cosV1V2 = -1.0
-
-        return math.acos(cosV1V2)
 
     def startNode(self):
         """
@@ -215,6 +147,7 @@ class NavigatorNode(object):
         self._actionSrv_Dogoto.start()
         self._actionSrv_doGotoWaypoint.start()
         rospy.loginfo ("Ready to navigate!")
+        self._currentPlan = Plan(self._asservClient, self._pathfinderClient, self._planResultCallback, self._updateStatus)
         self._updateStatus()
 
         # Tell ai/game_status the node initialized successfuly.
