@@ -12,7 +12,7 @@ NODE_NAME = "actuators"
 
 class ActuatorsNode:
     def __init__(self):
-        rospy.init_node(NODE_NAME, log_level=rospy.DEBUG)
+        rospy.init_node(NODE_NAME, log_level=rospy.INFO)
         self.dispatch_instance = actuators.ActuatorsDispatch()
 
         robot = rospy.get_param('/robot')
@@ -21,6 +21,7 @@ class ActuatorsNode:
         elif robot.lower() == "pr":
             self.barrel_instance = actuators.ActuatorsBarrel()
 
+        rospy.loginfo("Movement actuators has correctly started.")
         rospy.spin()
 
 

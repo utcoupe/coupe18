@@ -19,12 +19,11 @@ class ActuatorsDispatch(ActuatorsAbstract):
     def __init__(self):
         ActuatorsAbstract.__init__(self, "dispatch", DispatchAction)
         self._lock = threading.RLock()
-        # order_id_counter, goal_id
-        self._active_goals_arduino = {}
-        # ax_client_goal, goal_id
-        self._active_goals_ax12 = {}
+        # goal_id, order_id for arduino and goal for ax12
+        self._active_goals = {}
+        # goal_id and timer
         self._active_goal_timers = {}
-        # Those counters enables to keep a track of orders sent
+        # This counter enables to keep a track of orders sent to arduino
         self._order_id_counter = 0
         self._act_parser = actuators_parser.ActuatorsParser()
         self._pub_ard_move = rospy.Publisher('/drivers/ard_others/move', drivers_ard_others.msg.Move, queue_size=3)
@@ -38,77 +37,72 @@ class ActuatorsDispatch(ActuatorsAbstract):
         if actuator_properties is None:
             return False
         param = goal.param
-        # TODO add more checks !
         if param == "":
             if goal.preset != "":
                 param = actuator_properties.preset[goal.preset]
+            else:
+                rospy.logwarn("Received goal ({}) as no param nor preset, reject the goal.".format(goal_id))
+                return False
         if actuator_properties.family.lower() == 'arduino':
             result = self._send_to_arduino(actuator_properties.id, actuator_properties.type, param)
             if result >= 0:
                 with self._lock:
-                    self._active_goals_arduino[result] = goal_id
+                    self._active_goals[goal_id] = result
                 to_return = True
         elif actuator_properties.family.lower() == 'ax12':
             goal_handle = self._send_to_ax12(actuator_properties.id, goal.order, param)
             if goal_handle is not None:
                 with self._lock:
-                    self._active_goals_ax12[goal_handle] = goal_id
+                    self._active_goals[goal_id] = goal_handle
                 to_return = True
             else:
                 to_return = False
         if to_return:
-            if goal.timeout > 0:
-                self._active_goal_timers[goal_id] = rospy.Timer(period=rospy.Duration(goal.timeout / 1000),
-                                                                callback=partial(self._timer_callback_timeout, goal_id=goal_id),
-                                                                oneshot=True)
+            timeout = goal.timeout
+            if goal.timeout == 0:
+                rospy.logwarn("No timeout given to dispatch goal, use default xml value.")
+                timeout = actuator_properties.default_timeout
+                if timeout == 0:
+                    rospy.logerr("Goal {} has no timeout nor default timeout, reject it.".format(goal_id))
+                    return False
+            self._active_goal_timers[goal_id] = rospy.Timer(period=rospy.Duration(timeout / 1000.0),
+                                                            callback=partial(self._timer_callback_timeout, goal_id=goal_id),
+                                                            oneshot=True)
         return to_return
 
-    def _timer_callback_timeout(self, event, goal_id):
-        rospy.logerr('Timeout triggered for goal %s, cancelling' % goal_id.id)
-        for goal in self._active_goals_ax12.iterkeys():
-            if self._active_goals_ax12[goal] == goal_id:
-                self._action_reached(self._active_goals_ax12[goal], False, DispatchResult(False))
-                del self._active_goals_ax12[goal]
-        for goal in self._active_goals_arduino.iterkeys():
-            if self._active_goals_arduino[goal] == goal_id:
-                self._action_reached(self._active_goals_arduino[goal], False, DispatchResult(False))
-                del self._active_goals_arduino[goal]
-
     def _callback_move_response(self, msg):
-        goal_found = False
-        with self._lock:
-            # TODO improve
-            for key in self._active_goals_arduino.iterkeys():
-                if msg.order_nb == key:
-                    goal_found = True
-                    self._action_reached(self._active_goals_arduino[key], msg.success, DispatchResult(msg.success))
-                    del self._active_goals_arduino[key]
-                    if key in self._active_goal_timers:
-                        self._active_goal_timers[key].shutdown()
-                        del self._active_goal_timers[key]
-        if not goal_found:
+        if msg.order_nb in self._active_goals.values():
+            received_goal_id = None
+            for goal_id in self._active_goals.iterkeys():
+                if self._active_goals[goal_id] == msg.order_nb:
+                    received_goal_id = goal_id
+            if received_goal_id is not None:
+                self._goal_reached(received_goal_id, msg.success)
+        else:
             rospy.logwarn('Unknow id received : {}'.format(msg.order_nb))
 
     def _callback_ax12_client(self, goal_handle):
-        received_goal_id = goal_handle.comm_state_machine.action_goal.goal_id.id
-        for goal in self._active_goals_ax12:
-            if goal.comm_state_machine.action_goal.goal_id.id == received_goal_id:
-                goal_status = goal_handle.get_goal_status()
+        received_goal_id = goal_handle.get_comm_state().action_goal.goal_id.id
+        if goal_handle in self._active_goals.values():
+            for goal_id, goal in self._active_goals.iteritems():
+                if goal.comm_state_machine.action_goal.goal_id.id == received_goal_id:
+                    goal_status = goal_handle.get_goal_status()
 
-                if goal_status == GoalStatus.SUCCEEDED:
-                    success = True
-                elif goal_status in [GoalStatus.LOST,
-                              GoalStatus.RECALLED,
-                              GoalStatus.REJECTED,
-                              GoalStatus.ABORTED,
-                              GoalStatus.PREEMPTED]:
-                    success = False
-                else:
+                    if goal_status == GoalStatus.SUCCEEDED:
+                        success = True
+                    elif goal_status in [GoalStatus.LOST,
+                                  GoalStatus.RECALLED,
+                                  GoalStatus.REJECTED,
+                                  GoalStatus.ABORTED,
+                                  GoalStatus.PREEMPTED]:
+                        success = False
+                    else:
+                        return
+
+                    self._goal_reached(goal_id, success)
                     return
-
-                self._action_reached(self._active_goals_ax12[goal], success, DispatchResult(success))
-                del self._active_goals_ax12[goal]
-                return
+        else:
+            rospy.logwarn("Unknow ax12 goal received : {}".format(received_goal_id))
 
     def _send_to_arduino(self, ard_id, ard_type, param):
         msg = drivers_ard_others.msg.Move()
@@ -127,7 +121,7 @@ class ActuatorsDispatch(ActuatorsAbstract):
         try:
             goal_position = int(param)
         except ValueError as ex:
-            rospy.logerr("Try to dispatch an ax12 order with invalid position... Abort it.")
+            rospy.logerr("Try to dispatch an ax12 order with invalid position... Reject it.")
             return None
         goal = drivers_ax12.msg.Ax12CommandGoal()
         goal.motor_id = int(motor_id)
@@ -148,3 +142,19 @@ class ActuatorsDispatch(ActuatorsAbstract):
             current_id = self._order_id_counter
             self._order_id_counter += 1
         return current_id
+
+    def _timer_callback_timeout(self, event, goal_id):
+        rospy.logerr('Timeout triggered for goal %s, cancelling' % goal_id.id)
+        self._goal_reached(goal_id, False)
+
+    def _goal_reached(self, goal_id, reached):
+        if goal_id in self._active_goals.keys():
+            with self._lock:
+                # Remove goal from active goals
+                del self._active_goals[goal_id]
+                # Remove goal timeout
+                if goal_id in self._active_goal_timers:
+                    if self._active_goal_timers[goal_id]:
+                        self._active_goal_timers[goal_id].shutdown()
+                    del self._active_goal_timers[goal_id]
+            self._action_reached(goal_id, reached, DispatchResult(reached))
