@@ -51,17 +51,47 @@ void color_sensor_loop() {
     uint16_t rgbColorAccumulator[3] = {0, 0, 0};
     uint8_t rgbMeanValues[3] = {0, 0, 0};
     uint16_t tslValues[3] = {0, 0, 0};
+    uint8_t color_sensor_rgb_values_array[COLOR_ACCUMULATE_NB][3];
+    uint8_t color_sensor_rgb_values_sorted_array[COLOR_ACCUMULATE_NB][3];
     // First accumulate color sensor values to be more accurate
     for (uint8_t accumulator_nb = 0; accumulator_nb < COLOR_ACCUMULATE_NB; accumulator_nb++) {
         color_sensor_values_capture();
-        rgbColorAccumulator[RGB_RED] += color_sensor_rgb_values[RGB_RED];
-        rgbColorAccumulator[RGB_GREEN] += color_sensor_rgb_values[RGB_GREEN];
-        rgbColorAccumulator[RGB_BLUE] += color_sensor_rgb_values[RGB_BLUE];
+        color_sensor_rgb_values_array[accumulator_nb][RGB_RED] = color_sensor_rgb_values[RGB_RED];
+        color_sensor_rgb_values_array[accumulator_nb][RGB_GREEN] = color_sensor_rgb_values[RGB_GREEN];
+        color_sensor_rgb_values_array[accumulator_nb][RGB_BLUE] = color_sensor_rgb_values[RGB_BLUE];
+//        rgbColorAccumulator[RGB_RED] += color_sensor_rgb_values[RGB_RED];
+//        rgbColorAccumulator[RGB_GREEN] += color_sensor_rgb_values[RGB_GREEN];
+//        rgbColorAccumulator[RGB_BLUE] += color_sensor_rgb_values[RGB_BLUE];
+
     }
+    // Sort the values to compute the median
+    for (uint8_t accumulator_nb = 0; accumulator_nb < COLOR_ACCUMULATE_NB; ++accumulator_nb) {
+        uint8_t min_values_rgb[3] = {color_sensor_rgb_values_array[accumulator_nb][RGB_RED],
+                                     color_sensor_rgb_values_array[accumulator_nb][RGB_GREEN],
+                                     color_sensor_rgb_values_array[accumulator_nb][RGB_BLUE]};
+        for (uint8_t min_nb = accumulator_nb; min_nb < COLOR_ACCUMULATE_NB; ++min_nb) {
+            if (color_sensor_rgb_values_array[min_nb][RGB_RED] < min_values_rgb[RGB_RED]) {
+                min_values_rgb[RGB_RED] = color_sensor_rgb_values_array[min_nb][RGB_RED];
+            }
+            if (color_sensor_rgb_values_array[min_nb][RGB_GREEN] < min_values_rgb[RGB_GREEN]) {
+                min_values_rgb[RGB_GREEN] = color_sensor_rgb_values_array[min_nb][RGB_GREEN];
+            }
+            if (color_sensor_rgb_values_array[min_nb][RGB_BLUE] < min_values_rgb[RGB_BLUE]) {
+                min_values_rgb[RGB_BLUE] = color_sensor_rgb_values_array[min_nb][RGB_BLUE];
+            }
+        }
+        color_sensor_rgb_values_sorted_array[accumulator_nb][RGB_RED] = min_values_rgb[RGB_RED];
+        color_sensor_rgb_values_sorted_array[accumulator_nb][RGB_GREEN] = min_values_rgb[RGB_GREEN];
+        color_sensor_rgb_values_sorted_array[accumulator_nb][RGB_BLUE] = min_values_rgb[RGB_BLUE];
+    }
+    // Extract the median
+    rgbMeanValues[RGB_RED] = color_sensor_rgb_values_sorted_array[COLOR_ACCUMULATE_NB / 2][RGB_RED];
+    rgbMeanValues[RGB_GREEN] = color_sensor_rgb_values_sorted_array[COLOR_ACCUMULATE_NB / 2][RGB_GREEN];
+    rgbMeanValues[RGB_BLUE] = color_sensor_rgb_values_sorted_array[COLOR_ACCUMULATE_NB / 2][RGB_BLUE];
     // Get the mean of the accumulated rgb data
-    rgbMeanValues[RGB_RED] = rgbColorAccumulator[RGB_RED] / COLOR_ACCUMULATE_NB;
-    rgbMeanValues[RGB_GREEN] = rgbColorAccumulator[RGB_GREEN] / COLOR_ACCUMULATE_NB;
-    rgbMeanValues[RGB_BLUE] = rgbColorAccumulator[RGB_BLUE] / COLOR_ACCUMULATE_NB;
+//    rgbMeanValues[RGB_RED] = rgbColorAccumulator[RGB_RED] / COLOR_ACCUMULATE_NB;
+//    rgbMeanValues[RGB_GREEN] = rgbColorAccumulator[RGB_GREEN] / COLOR_ACCUMULATE_NB;
+//    rgbMeanValues[RGB_BLUE] = rgbColorAccumulator[RGB_BLUE] / COLOR_ACCUMULATE_NB;
     // Compute the corresponding tsl colors
     color_sensor_rgb_to_tsl(rgbMeanValues, tslValues);
     // Finally send the data
@@ -136,10 +166,17 @@ void color_sensor_rgb_to_tsl(uint8_t rgbValues[3], uint16_t tslColors[3]) {
         }
         hue *= 60.0;
         if (hue < 0) hue += 360;
+        if (hue >= HUE_MAX_VALUE) {
+            hue = 0;
+        }
         tslColors[TSL_HUE] = (uint16_t)hue;
     }
     // Compute the tsl values
-    tslColors[TSL_SATURATION] = (uint16_t)((uint16_t)100 * (uint16_t)((maxColorValue - minColorValue)) / (uint16_t)maxColorValue);
+    uint16_t saturation = (uint16_t)((uint16_t)100 * (uint16_t)((maxColorValue - minColorValue)) / (uint16_t)maxColorValue);
+    if (saturation >= SATURATION_MAX_VALUE) {
+        saturation = 0;
+    }
+    tslColors[TSL_SATURATION] = saturation;
     tslColors[TSL_LIGHTNESS] = (uint16_t)((uint16_t)100 * maxColorValue) / (uint16_t)255;
 }
 

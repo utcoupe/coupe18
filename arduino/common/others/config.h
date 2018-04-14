@@ -35,8 +35,10 @@
 #define SENSOR_VALUE    3
 
 // Component configuration
-#define COLOR_ACCUMULATE_NB     1
+#define COLOR_ACCUMULATE_NB     5
 #define COLOR_SENSOR_TIMEOUT    100000//in µs
+#define SATURATION_MAX_VALUE    360
+#define HUE_MAX_VALUE           340
 
 #endif
 
