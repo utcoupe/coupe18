@@ -82,7 +82,7 @@ class ActuatorsDispatch(ActuatorsAbstract):
             rospy.logwarn('Unknow id received : {}'.format(msg.order_nb))
 
     def _callback_ax12_client(self, goal_handle):
-        received_goal_id = goal_handle.get_comm_state().action_goal.goal_id.id
+        received_goal_id = goal_handle.comm_state_machine.action_goal.goal_id.id
         if goal_handle in self._active_goals.values():
             for goal_id, goal in self._active_goals.iteritems():
                 if goal.comm_state_machine.action_goal.goal_id.id == received_goal_id:
