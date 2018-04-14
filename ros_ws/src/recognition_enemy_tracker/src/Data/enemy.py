@@ -45,6 +45,6 @@ class Enemy(object):
         es.pos.y = self._lastPos.y
         es.speed.x = self._speed.x
         es.speed.y = self._speed.y
-        # es.header.stamp = self._lastSeen
+        es.header.stamp = self._lastSeen
         return es
         
