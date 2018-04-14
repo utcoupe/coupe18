@@ -15,7 +15,7 @@ class Point(object):
         return self.norm2Dist(self, other)
     
     def __sub__(self, other): # returns a vector
-        return Point(self.x - other.y, self.y - other.y)
+        return Point(self.x - other.x, self.y - other.y)
     
     def __div__ (self, scalar):
         return Point(self.x / scalar, self.y / scalar)
