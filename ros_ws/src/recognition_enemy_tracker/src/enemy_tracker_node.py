@@ -5,6 +5,7 @@ __author__ = "Gaëtan Blond"
 __date__ = 10/4/2018
 
 import rospy
+from threading import Lock
 from Data import Enemy, Point, Obstacle
 
 from recognition_objects_classifier.msg import ClassifiedObjects
@@ -17,6 +18,7 @@ FULL_NODE_NAME = "/" + NODE_NAMESPACE + "/" + NODE_NAME
 
 NB_ENEMIES = 3
 PUB_ENEMIES_POS_RATE = 10 # Hz
+MIN_RADIUS = 0.1
 
 CLASSIFIED_OBSTACLES_TOPIC = "/recognition/objects_classifier/objects"
 ENEMIES_TOPIC = FULL_NODE_NAME + "/enemies"
@@ -28,6 +30,8 @@ class EnemyTrackerNode(object):
         for idEnemy in range(0, NB_ENEMIES):
             self._enemies.append(Enemy())
         
+        self._mutex = Lock()
+
         rospy.init_node(NODE_NAME)
         self._obsTaclesSubscriber = rospy.Subscriber(CLASSIFIED_OBSTACLES_TOPIC, ClassifiedObjects, self._classifiedObjectsCallback)
         self._enemiesPublisher = rospy.Publisher(ENEMIES_TOPIC, Enemies, queue_size=10)
@@ -39,8 +43,10 @@ class EnemyTrackerNode(object):
         rate = rospy.Rate(PUB_ENEMIES_POS_RATE)
         # TODO mutex on _lastObstacles ?
         while not rospy.is_shutdown():
+            self._mutex.acquire()
             self._processObstacles()
             self._publishEnemyPoses()
+            self._mutex.release()
             rate.sleep()
     
     def _processObstacles(self):
@@ -63,7 +69,7 @@ class EnemyTrackerNode(object):
     def _affecteObstacle (self, sortedObstacleIdsPerEnemies):
         bestEnemyId = -1
         bestObsId = -1
-        bestDist = -1
+        bestDist = float("inf")
 
         for enemyId in range(0, len(self._enemies)):
             if self._enemies[enemyId].isOwner():
@@ -72,7 +78,7 @@ class EnemyTrackerNode(object):
             if obsId == -1: # all obstacles already affected or no obstacles known
                 break
             dist = Point.norm2Dist(self._enemies[enemyId].getPos(), self._lastObstacles[obsId].pos)
-            if dist > bestDist:
+            if dist < bestDist:
                 bestDist = dist
                 bestObsId = obsId
                 bestEnemyId = enemyId
@@ -88,6 +94,7 @@ class EnemyTrackerNode(object):
         return -1
     
     def _classifiedObjectsCallback (self, obstacles):
+        self._mutex.acquire()
         del self._lastObstacles[:]
         for rect in obstacles.unknown_rects:
             obs = Obstacle()
@@ -95,10 +102,13 @@ class EnemyTrackerNode(object):
             obs.stamp = rect.header.stamp
             self._lastObstacles.append(obs)
         for circ in obstacles.unknown_circles:
+            if circ.circle.radius < MIN_RADIUS:
+                continue
             obs = Obstacle()
             obs.pos = Point(circ.circle.center.x, circ.circle.center.y)
             obs.stamp = circ.header.stamp
             self._lastObstacles.append(obs)
+        self._mutex.release()
     
     def _publishEnemyPoses(self):
         enemiesPoses = []
