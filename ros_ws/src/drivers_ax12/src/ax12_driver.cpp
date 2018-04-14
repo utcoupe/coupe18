@@ -16,6 +16,7 @@ void Ax12Driver::scan_motors()
 {
     uint8_t err = 0;
     int result = 0;
+    motor_count = 0;
     for(uint8_t i = 1; i <= SCAN_RANGE; i++)
     {
         for(uint8_t j = 0; j < PING_PASS_NBR; j++)

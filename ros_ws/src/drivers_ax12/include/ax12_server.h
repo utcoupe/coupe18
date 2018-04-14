@@ -46,6 +46,8 @@ protected:
     Ax12Driver driver_;
     ros::Timer timer_;
 
+    std::unique_ptr<StatusServices> status_services_;
+
     bool is_halted;
 
 public:

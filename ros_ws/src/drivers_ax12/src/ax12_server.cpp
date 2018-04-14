@@ -25,9 +25,6 @@ void Ax12Server::init_driver(const std::string& port)
     }
 
     driver_.toggle_torque(true);
-
-
-
 }
 
 void Ax12Server::cancel_goal_cb(GoalHandle goal_handle)
@@ -292,8 +289,11 @@ std::string Ax12Server::fetch_port(const std::string& service_name)
 
     if(port.length() == 0)
     {
-        ROS_ERROR("The AX-12 port is not set, falling back to default: %s", DEFAULT_PORT.c_str());
-        port = DEFAULT_PORT;
+//        ROS_ERROR("The AX-12 port is not set, falling back to default: %s", DEFAULT_PORT.c_str());
+        ROS_FATAL("The AX-12 port is not set, quitting...");
+        ros::shutdown();
+        return "";
+//        port = DEFAULT_PORT;
     }
 
     return port;
@@ -425,7 +425,13 @@ Ax12Server::Ax12Server(std::string action_name, std::string service_name) :
 
     timer_ = nh_.createTimer(ros::Duration(1.0/MAIN_FREQUENCY), &Ax12Server::main_loop, this);
 
-    StatusServices("drivers", "ax12").setReady(true);
+    status_services_ = std::unique_ptr<StatusServices>(new StatusServices("drivers", "ax12", [this, port](){ // arm callback
+        init_driver(port);
+        return true;
+    }));
+
+    status_services_->setReady(true);
+
 }
 
 Ax12Server::~Ax12Server()
