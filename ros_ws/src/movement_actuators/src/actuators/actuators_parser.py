@@ -52,24 +52,30 @@ class ActuatorsParser:
 
     def get_xml_path(self, filename):
         get_def = rospy.ServiceProxy(GET_DEFINITION_SERVICE_NAME, GetDefinition)
+        xml_path = ""
         try:
             get_def.wait_for_service(GET_DEFINITION_SERVICE_TIMEOUT)
             res = get_def(filename)
             if not res.success:
                 rospy.logerr("Error when fetching '{}' definition file".format(filename))
-            return res.path
+            else:
+                xml_path = res.path
+        except rospy.exceptions.ROSException as ex:
+            rospy.logerr("memory_defintion service can not be reached...")
         except rospy.ServiceException as exc:
             rospy.logerr("Unhandled error while getting def file: {}".format(str(exc)))
-            raise Exception()
+        return xml_path
 
     def parse_xml_file(self, filepath):
-        if filepath is not None:
+        if filepath != "":
             try:
                 xml_root = ET.parse(filepath).getroot()
                 for child in xml_root.iter('act'):
                     self._parse_xml_element(child)
             except IOError as err:
                 rospy.logerr("Actuators xml file does not exists : {}".format(filepath))
+        else:
+            rospy.logerr("The path of file to parse is empty...")
 
     def _parse_xml_element(self, element):
         self._actuators_dictionary[element.get("name")] = ActuatorsProperties(element)

@@ -2,6 +2,7 @@
 
 import rospy
 import threading
+from functools import partial
 from actuators_abstract import *
 import actuators_parser
 from movement_actuators.msg import DispatchAction, DispatchResult
@@ -18,11 +19,11 @@ class ActuatorsDispatch(ActuatorsAbstract):
     def __init__(self):
         ActuatorsAbstract.__init__(self, "dispatch", DispatchAction)
         self._lock = threading.RLock()
-        # TODO add timeout management
         # order_id_counter, goal_id
         self._active_goals_arduino = {}
         # ax_client_goal, goal_id
         self._active_goals_ax12 = {}
+        self._active_goal_timers = {}
         # Those counters enables to keep a track of orders sent
         self._order_id_counter = 0
         self._act_parser = actuators_parser.ActuatorsParser()
@@ -43,7 +44,7 @@ class ActuatorsDispatch(ActuatorsAbstract):
                 param = actuator_properties.preset[goal.preset]
         if actuator_properties.family.lower() == 'arduino':
             result = self._send_to_arduino(actuator_properties.id, actuator_properties.type, param)
-            if result > 0:
+            if result >= 0:
                 with self._lock:
                     self._active_goals_arduino[result] = goal_id
                 to_return = True
@@ -55,7 +56,23 @@ class ActuatorsDispatch(ActuatorsAbstract):
                 to_return = True
             else:
                 to_return = False
+        if to_return:
+            if goal.timeout > 0:
+                self._active_goal_timers[goal_id] = rospy.Timer(period=rospy.Duration(goal.timeout / 1000),
+                                                                callback=partial(self._timer_callback_timeout, goal_id=goal_id),
+                                                                oneshot=True)
         return to_return
+
+    def _timer_callback_timeout(self, event, goal_id):
+        rospy.logerr('Timeout triggered for goal %s, cancelling' % goal_id.id)
+        for goal in self._active_goals_ax12.iterkeys():
+            if self._active_goals_ax12[goal] == goal_id:
+                self._action_reached(self._active_goals_ax12[goal], False, DispatchResult(False))
+                del self._active_goals_ax12[goal]
+        for goal in self._active_goals_arduino.iterkeys():
+            if self._active_goals_arduino[goal] == goal_id:
+                self._action_reached(self._active_goals_arduino[goal], False, DispatchResult(False))
+                del self._active_goals_arduino[goal]
 
     def _callback_move_response(self, msg):
         goal_found = False
@@ -66,6 +83,9 @@ class ActuatorsDispatch(ActuatorsAbstract):
                     goal_found = True
                     self._action_reached(self._active_goals_arduino[key], msg.success, DispatchResult(msg.success))
                     del self._active_goals_arduino[key]
+                    if key in self._active_goal_timers:
+                        self._active_goal_timers[key].shutdown()
+                        del self._active_goal_timers[key]
         if not goal_found:
             rospy.logwarn('Unknow id received : {}'.format(msg.order_nb))
 
