@@ -114,10 +114,10 @@ bool Ax12Driver::joint_mode(uint8_t motor_id, uint16_t min_angle, uint16_t max_a
 {
     bool success = true;
 
-//    success &= write_register(motor_id, TORQUE_ENABLE, 0);
+    success &= write_register(motor_id, TORQUE_ENABLE, 0);
     success &= write_register(motor_id, CW_ANGLE_LIMIT, min_angle);
     success &= write_register(motor_id, CCW_ANGLE_LIMIT, max_angle);
-//    success &= write_register(motor_id, TORQUE_ENABLE, 1);
+    success &= write_register(motor_id, TORQUE_ENABLE, 1);
 
     return success;
 }
