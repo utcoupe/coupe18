@@ -3,8 +3,11 @@ import actionlib
 import rospy
 from actuators_abstract import ActuatorsAbstract
 from movement_actuators.msg import BarrelAction, BarrelResult, DispatchAction, DispatchGoal
+import drivers_ard_others.msg
 
 from actionlib.action_client import CommState
+
+import matplotlib.pyplot as plt
 
 class Color:
     UNKNOWN = 0
@@ -14,15 +17,17 @@ class Color:
 class ActuatorsBarrel(ActuatorsAbstract):
     def __init__(self):
 
-        self.COLOR_SENSOR_TOPIC = '/drivers/ard_others/...'
+        self.COLOR_SENSOR_TOPIC = '/drivers/ard_others/color'
         self.BARREL_NAME = 'barrel' # name in the dispatcher
         self.PRESET_BIN = 'BIN'
         self.PRESET_NORMAL = 'HIGH'
         self.PRESET_CANON = 'CANON'
 
-        self.ORANGE_HUE = 20
-        self.GREEN_HUE = 100
-        self.HUE_MARGIN = 20
+        self.ORANGE_HUE = 15
+        self.GREEN_HUE = 120
+        self.HUE_MARGIN = 15
+
+        self.SATURATION_TRESH = 90
 
         self.BALL_COUNT = 8
 
@@ -31,7 +36,7 @@ class ActuatorsBarrel(ActuatorsAbstract):
 
         self._curr_color = Color.UNKNOWN
 
-        # self._color_client = rospy.Subscriber(self.COLOR_SENSOR_TOPIC, xxxTYPExxx, self._color_callback)
+        self._color_client = rospy.Subscriber(self.COLOR_SENSOR_TOPIC, drivers_ard_others.msg.Color, self._color_callback)
 
         self._team_color = Color.ORANGE if rospy.get_param('/current_team', 'orange') == 'orange' else Color.GREEN
 
@@ -47,13 +52,6 @@ class ActuatorsBarrel(ActuatorsAbstract):
 
         self._timer = None
 
-        self.aa = rospy.Timer(rospy.Duration(0.01), self.aaa)
-
-    def aaa(self, _):
-        if self._client.gh:
-            return
-            # rospy.logerr(CommState.to_string(self._client.gh.get_comm_state()))
-
     def _process_action(self, goal, goal_id):
         if self._is_running:
             rospy.logerr("Received a goal but another one is in process !")
@@ -68,13 +66,13 @@ class ActuatorsBarrel(ActuatorsAbstract):
             rospy.logwarn('No timeout is set, the action might take forever')
 
         if not goal.sort:
+            rospy.logdebug('Starting goal chain with no sort')
             self._start_goal_chain(self.PRESET_CANON)
-
 
         return True
 
     def _forth_done_cb(self, state, result):
-        rospy.logfatal('forth_done')
+        rospy.logdebug('forth_done')
         self._doing_forth = False
 
         g = DispatchGoal()
@@ -86,7 +84,7 @@ class ActuatorsBarrel(ActuatorsAbstract):
         self._client.send_goal(g, done_cb=self._back_done_cb)
 
     def _back_done_cb(self, state, result):
-        rospy.logfatal('back_done')
+        rospy.logdebug('back_done')
         self._finish_action(result.success)
 
     def _trigger_timeout(self, event):
@@ -94,12 +92,15 @@ class ActuatorsBarrel(ActuatorsAbstract):
         self._finish_action(False)
 
     def _color_callback(self, msg):
-        if msg.h <= self.ORANGE_HUE + self.HUE_MARGIN \
-            and msg.h >= self.ORANGE_HUE + self.HUE_MARGIN:
+
+        if msg.hue <= self.ORANGE_HUE + self.HUE_MARGIN \
+            and msg.hue >= self.ORANGE_HUE - self.HUE_MARGIN\
+                and msg.saturation > self.SATURATION_TRESH:
             self._curr_color = Color.ORANGE
 
-        elif msg.h <= self.GREEN_HUE + self.HUE_MARGIN \
-            and msg.h >= self.GREEN_HUE + self.HUE_MARGIN:
+        elif msg.hue <= self.GREEN_HUE + self.HUE_MARGIN \
+            and msg.hue >= self.GREEN_HUE - self.HUE_MARGIN \
+                and msg.saturation > self.SATURATION_TRESH:
             self._curr_color = Color.GREEN
 
         else:
@@ -111,8 +112,12 @@ class ActuatorsBarrel(ActuatorsAbstract):
             and self._curr_color != Color.UNKNOWN:
 
             if self._team_color != self._curr_color:
+                rospy.logfatal('Starting goal chain for ennemy color ball (h: %d, s: %d, v %d)'
+                               % (msg.hue, msg.saturation, msg.lightness))
                 self._start_goal_chain(self.PRESET_BIN)
             else:
+                rospy.logfatal('Starting goal chain for ally color balll (h: %d, s: %d, v %d)'
+                               % (msg.hue, msg.saturation, msg.lightness))
                 self._start_goal_chain(self.PRESET_CANON)
 
 
