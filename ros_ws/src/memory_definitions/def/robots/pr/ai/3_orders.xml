@@ -46,7 +46,8 @@
 	<order ref="do_barrel_action" duration="3">
 		<message dest="/movement/actuators/barrel">
 			<param name="sort" type="bool"/>
-			<param name="timeout" type="float" preset="true">5</param>
+			<param name="timeout" type="float" preset="true">6</param>
+			<param name="pause" type="float" preset="true">1</param>
 		</message>
 	</order>
 

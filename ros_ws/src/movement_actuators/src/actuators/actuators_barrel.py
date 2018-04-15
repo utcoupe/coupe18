@@ -49,8 +49,12 @@ class ActuatorsBarrel(ActuatorsAbstract):
         self._doing_forth = False
 
         self._curr_goal_id = None
+        self._curr_pause = 0
+
+        self._pause_timer = None
 
         self._timer = None
+        self._curr_timeout = 0
 
     def _process_action(self, goal, goal_id):
         if self._is_running:
@@ -59,11 +63,16 @@ class ActuatorsBarrel(ActuatorsAbstract):
 
         self._is_running = True
         self._curr_goal_id = goal_id
+        self._curr_pause = goal.pause
+
+
 
         if goal.timeout > 0:
+            self._curr_timeout = goal.timeout*1000
             self._timer = rospy.Timer(rospy.Duration(goal.timeout), self._trigger_timeout, oneshot=True)
         else:
-            rospy.logwarn('No timeout is set, the action might take forever')
+            self._curr_timeout = 5000
+            rospy.logwarn('No timeout is set, setting dispatcher timeout to 5s')
 
         if not goal.sort:
             rospy.logdebug('Starting goal chain with no sort')
@@ -71,17 +80,24 @@ class ActuatorsBarrel(ActuatorsAbstract):
 
         return True
 
-    def _forth_done_cb(self, state, result):
-        rospy.logdebug('forth_done')
-        self._doing_forth = False
-
+    def _start_back(self, e=None):
         g = DispatchGoal()
         g.name = self.BARREL_NAME
         g.order = 'JOINT'
         g.preset = self.PRESET_NORMAL
+        g.timeout = self._curr_timeout
 
-        self._doing_back=True
+        self._doing_back = True
+        self._doing_forth = False
         self._client.send_goal(g, done_cb=self._back_done_cb)
+
+
+    def _forth_done_cb(self, state, result):
+        rospy.logdebug('forth_done, waiting %d seconds' % self._curr_pause)
+        if self._curr_pause > 0:
+            self._pause_timer = rospy.Timer(rospy.Duration(self._curr_pause), self._start_back, oneshot=True)
+        else:
+            self._start_back()
 
     def _back_done_cb(self, state, result):
         rospy.logdebug('back_done')
@@ -126,6 +142,7 @@ class ActuatorsBarrel(ActuatorsAbstract):
         g.name = self.BARREL_NAME
         g.order = 'JOINT'
         g.preset = preset
+        g.timeout = self._curr_timeout
 
         self._doing_forth = True
         self._client.send_goal(g, done_cb=self._forth_done_cb)
