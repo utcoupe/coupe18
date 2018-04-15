@@ -86,13 +86,13 @@ bool digital_actuators_states[NUM_DIGITAL_ACTUATORS]        = {true};
 #define NUM_PWM_ACTUATORS 1
 const uint8_t pins_pwm_actuators_pwm[NUM_PWM_ACTUATORS]         = {8};
 uint8_t pwm_actuators_states[NUM_PWM_ACTUATORS]             = {0};
-// Names : motor_canon1, motor_canon2
+// Names : canon
 
 #define NUM_SERVO_ACTUATORS 3
 const uint8_t pins_servo_actuators_pwm[NUM_SERVO_ACTUATORS]     = {9,  10, 11};
 int16_t servo_actuators_states[NUM_SERVO_ACTUATORS]         = {10, 10, 10};
 Servo servo_actuators_objects[NUM_SERVO_ACTUATORS];
-// Names : servo_main_door
+// Names : servo_front_lift, servo_back_lift, servo_lock
 
 // Actuators ROS callbacks
 
