@@ -4,6 +4,7 @@ import Queue
 import serial
 import threading
 import os
+from math import pi
 import rospy
 from geometry_msgs.msg import Pose2D
 from drivers_ard_asserv.msg import RobotSpeed
@@ -184,7 +185,9 @@ class AsservReal(AsservAbstract):
             rospy.logdebug("[ASSERV] Received status data.")
             receied_data_list = data.split(";")
             try:
-                robot_position = Pose2D(float(receied_data_list[2]) / 1000.0, float(receied_data_list[3]) / 1000.0, float(receied_data_list[4]) / 1000.0)
+                angle = float(receied_data_list[4]) / 1000.0
+                angle %= 2.0 * pi
+                robot_position = Pose2D(float(receied_data_list[2]) / 1000.0, float(receied_data_list[3]) / 1000.0, angle)
                 self._robot_raw_position = robot_position
                 self._node.send_robot_position(robot_position)
                 self._node.send_robot_speed(RobotSpeed(float(receied_data_list[5]), float(receied_data_list[6]), float(receied_data_list[7]) / 1000.0, float(receied_data_list[8]), float(receied_data_list[9])))
