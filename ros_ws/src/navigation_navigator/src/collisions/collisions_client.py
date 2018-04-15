@@ -29,7 +29,7 @@ class CollisionsClient(object):
             if not self._collision_active:
                 self._collision_active = True
                 rospy.loginfo("Obstacle detected, stopping the robot")
-                self._callbackStop()
+            self._callbackStop()
 
     def _connectToServers (self):
         rospy.loginfo("Waiting for \"" + self.ACTIVATE_COLLISIONS_SERVICE_NAME + "\"")

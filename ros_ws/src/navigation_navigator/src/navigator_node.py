@@ -25,9 +25,12 @@ from ai_game_status import StatusServices
 __author__ = "Gaëtan Blond"
 __date__ = 17/10/2017
 
-NODE_NAME = "navigator"
-NODE_NAMESPACE = "navigation"
-FULL_NODE_NAME = "/" + NODE_NAMESPACE + "/" + NODE_NAME
+NODE_NAME       = "navigator"
+NODE_NAMESPACE  = "navigation"
+FULL_NODE_NAME  = "/" + NODE_NAMESPACE + "/" + NODE_NAME
+
+NB_MAX_TRY      = 3
+TIME_MAX_STOP   = 3 # sec
 
 # Constants used for the status of goto requests
 class GotoStatuses(object):
@@ -65,11 +68,17 @@ class NavigatorNode(object):
         self._currentStatus = NavigatorStatuses.NAV_IDLE
         self._currentPlan = ""
         self._currentGoal = ""
+        self._lastStopped = rospy.Time(0)
+        self._idCurrentTry = 0
 
     def _planResultCallback (self, result):
-        self._currentStatus = NavigatorStatuses.NAV_IDLE
-        self._collisionsClient.setEnabled(False)
-        self._currentGoal.set_succeeded(DoGotoResult(result))
+        if result == True or self._idCurrentTry == NB_MAX_TRY:
+            self._currentStatus = NavigatorStatuses.NAV_IDLE
+            self._collisionsClient.setEnabled(False)
+            self._currentGoal.set_succeeded(DoGotoResult(result))
+        else:
+            self._idCurrentTry += 1
+            self._currentPlan.replan()
 
     def _handleDoGotoRequest (self, handledGoal):
         """
@@ -102,16 +111,20 @@ class NavigatorNode(object):
         self._collisionsClient.setEnabled(not handledGoal.get_goal().disable_collisions)
         handledGoal.set_accepted()
         self._currentGoal = handledGoal
+        self._idCurrentTry = 1
         self._currentPlan.newPlan(startPos, endPos, hasAngle, handledGoal.get_goal().direction)
 
     def _callbackEmergencyStop (self):
         """
         Ask the asserv to stop and update the status
         """
-        # TODO if already stopped for 3 sec, cancel and redo plan
-        self._currentStatus = NavigatorStatuses.NAV_STOPPED
-        self._asservClient.stopAsserv()
-        self._updateStatus()
+        if self._currentStatus != NavigatorStatuses.NAV_STOPPED:
+            self._currentStatus = NavigatorStatuses.NAV_STOPPED
+            self._asservClient.stopAsserv()
+            self._lastStopped = rospy.Time.now()
+            self._updateStatus()
+        elif rospy.Time.now() - self._lastStopped > rospy.Duration(TIME_MAX_STOP):
+            self._currentGoal.cancelAsservGoals()
 
     def _callbackAsservResume(self):
         self._currentStatus = NavigatorStatuses.NAV_NAVIGATING

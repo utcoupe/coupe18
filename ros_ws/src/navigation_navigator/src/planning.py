@@ -37,29 +37,40 @@ class Plan(object):
         self._resultCallback = resultCallback
         self._updateCallback = updateCallback
         self._status = PlanStatuses.IDLE
+        self._startPos = ""
+        self._endPos = ""
+        self._hasAngle = False
+        self._direction = Directions.AUTOMATIC
     
     def newPlan(self, startPos, endPos, hasAngle, direction):
+        self._startPos = startPos
+        self._endPos = endPos
+        self._hasAngle = hasAngle
+        self._direction = direction
+        self.replan()
+    
+    def replan(self):
         if len(self._currentPath) > 0:
             self.cancelAsservGoals()
         self._currentPath = OrderedDict() # needed ?
         debugStr = "Asked to go from "
-        debugStr += pointToStr(startPos)
-        debugStr += " to " + pointToStr(endPos)
+        debugStr += pointToStr(self._startPos)
+        debugStr += " to " + pointToStr(self._endPos)
         rospy.logdebug(debugStr)
         try:
             # sends a request to the pathfinder
-            path = self._pathfinderClient.FindPath(startPos, endPos)
+            path = self._pathfinderClient.FindPath(self._startPos, self._endPos)
             self._printPath (path)
             # then sends the path point per point to the arduino_asserv
             path.pop(0) # Removes the first point (we are already on startPos)
             path.pop() # Removes the last point
-            lastPoint = startPos
+            lastPoint = self._startPos
             for point in path:
-                idOrder = self._asservClient.doGoto(point, self._getDirection(direction, point, lastPoint), False, self._asservGotoCallback)
+                idOrder = self._asservClient.doGoto(point, self._getDirection(self._direction, point, lastPoint), False, self._asservGotoCallback)
                 self._currentPath[idOrder] = point
                 lastPoint = point
-            idOrder = self._asservClient.doGoto(endPos, self._getDirection(direction, endPos, lastPoint), hasAngle, self._asservGotoCallback)
-            self._currentPath[idOrder] = endPos
+            idOrder = self._asservClient.doGoto(self._endPos, self._getDirection(self._direction, self._endPos, lastPoint), self._hasAngle, self._asservGotoCallback)
+            self._currentPath[idOrder] = self._endPos
             self._status = PlanStatuses.NAVIGATING
             rospy.logdebug("Our path has " + str(len(self._currentPath)) + " points:")
             for key in self._currentPath.keys():
@@ -67,9 +78,11 @@ class Plan(object):
             self._updateCallback() # needed ?
         except Exception as e:
             rospy.logdebug("Navigation failed: " + e.message)
-            self.cancelAsservGoals()
-            self._status = PlanStatuses.IDLE
-            self._resultCallback(False)
+            if len(self._currentPath) > 0:
+                self.cancelAsservGoals()
+            else:
+                self._status = PlanStatuses.IDLE
+                self._resultCallback(False)
 
     def _asservGotoCallback(self, idOrder, result):
         rospy.logdebug("Callback for " + idOrder)
