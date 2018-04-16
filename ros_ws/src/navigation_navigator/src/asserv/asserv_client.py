@@ -63,6 +63,8 @@ class AsservClient(object):
     def cancelGoal(self, idOrder):
         if idOrder in self._currentActions:
             self._currentActions[idOrder].cancel()
+        else:
+            rospy.logwarn("Trying to cancel an unknown goal")
 
     def goto (self, pos, hasAngle):
         response = False

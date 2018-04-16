@@ -78,7 +78,7 @@ class NavigatorNode(object):
             self._currentGoal.set_succeeded(DoGotoResult(result))
         else:
             self._idCurrentTry += 1
-            self._currentPlan.replan()
+            self._currentPlan.replan(self._localizerClient.getLastKnownPos())
 
     def _handleDoGotoRequest (self, handledGoal):
         """
