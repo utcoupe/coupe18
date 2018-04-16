@@ -124,7 +124,7 @@ class NavigatorNode(object):
             self._lastStopped = rospy.Time.now()
             self._updateStatus()
         elif rospy.Time.now() - self._lastStopped > rospy.Duration(TIME_MAX_STOP):
-            self._currentGoal.cancelAsservGoals()
+            self._currentPlan.cancelAsservGoals()
 
     def _callbackAsservResume(self):
         self._currentStatus = NavigatorStatuses.NAV_NAVIGATING
