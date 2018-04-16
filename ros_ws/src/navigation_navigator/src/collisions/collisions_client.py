@@ -24,7 +24,7 @@ class CollisionsClient(object):
         self._connectToServers()
 
     def _warnerCallback (self, message):
-        if (message.danger_level <= message.LEVEL_DANGER):
+        if (message.danger_level <= message.LEVEL_STOP):
             self._last_collision = True
             if not self._collision_active:
                 self._collision_active = True
