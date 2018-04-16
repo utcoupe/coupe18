@@ -75,7 +75,7 @@ class NavigatorNode(object):
     def _planResultCallback (self, result):
         self._isCanceling = False
         if result == True or self._idCurrentTry == NB_MAX_TRY:
-            if self._idCurrentTry == NB_MAX_TRY:
+            if self._idCurrentTry == NB_MAX_TRY and not result:
                 rospy.logwarn("Something wrong happenned with our goal, abording")
             self._currentStatus = NavigatorStatuses.NAV_IDLE
             self._collisionsClient.setEnabled(False)
@@ -137,6 +137,7 @@ class NavigatorNode(object):
 
     def _callbackAsservResume(self):
         self._currentStatus = NavigatorStatuses.NAV_NAVIGATING
+        self._isCanceling = False
         self._collisionsClient.setEnabled(True)
         self._asservClient.resumeAsserv()
         self._updateStatus()
