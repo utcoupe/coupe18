@@ -69,11 +69,11 @@ class NavigatorNode(object):
         self._currentPlan = ""
         self._currentGoal = ""
         self._lastStopped = rospy.Time(0)
-        self._isStopping = False
+        self._isCanceling = False
         self._idCurrentTry = 0
 
     def _planResultCallback (self, result):
-        self._isStopping = False
+        self._isCanceling = False
         if result == True or self._idCurrentTry == NB_MAX_TRY:
             if self._idCurrentTry == NB_MAX_TRY:
                 rospy.logwarn("Something wrong happenned with our goal, abording")
@@ -130,8 +130,8 @@ class NavigatorNode(object):
             self._asservClient.stopAsserv()
             self._lastStopped = rospy.Time.now()
             self._updateStatus()
-        elif rospy.Time.now() - self._lastStopped > rospy.Duration(TIME_MAX_STOP):
-            self._isStopping = True
+        elif rospy.Time.now() - self._lastStopped > rospy.Duration(TIME_MAX_STOP) and not self._isCanceling:
+            self._isCanceling = True
             rospy.loginfo("Something is blocking our way, cancelling all goals")
             self._currentPlan.cancelAsservGoals()
 
