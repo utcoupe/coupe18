@@ -69,9 +69,11 @@ class NavigatorNode(object):
         self._currentPlan = ""
         self._currentGoal = ""
         self._lastStopped = rospy.Time(0)
+        self._isStopping = False
         self._idCurrentTry = 0
 
     def _planResultCallback (self, result):
+        self._isStopping = False
         if result == True or self._idCurrentTry == NB_MAX_TRY:
             if self._idCurrentTry == NB_MAX_TRY:
                 rospy.logwarn("Something wrong happenned with our goal, abording")
@@ -81,6 +83,7 @@ class NavigatorNode(object):
         else:
             self._idCurrentTry += 1
             rospy.loginfo("Trying a new time to reach the goal : try number " + str(self._idCurrentTry))
+            self._currentStatus = NavigatorStatuses.NAV_NAVIGATING
             self._currentPlan.replan(self._localizerClient.getLastKnownPos())
 
     def _handleDoGotoRequest (self, handledGoal):
@@ -128,6 +131,7 @@ class NavigatorNode(object):
             self._lastStopped = rospy.Time.now()
             self._updateStatus()
         elif rospy.Time.now() - self._lastStopped > rospy.Duration(TIME_MAX_STOP):
+            self._isStopping = True
             rospy.loginfo("Something is blocking our way, cancelling all goals")
             self._currentPlan.cancelAsservGoals()
 
