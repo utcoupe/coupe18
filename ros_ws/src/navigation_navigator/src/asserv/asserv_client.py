@@ -124,6 +124,10 @@ class AsservClient(object):
                 del self._callbacksDoGoto[idAct]
                 del self._currentActions[idAct]
     
+    def cancelAllGoals(self):
+        self._asservManageService.call(mode=ManagementRequest.CLEANG)
+        self._asservManageService.call(mode=ManagementRequest.KILLG)
+    
     def stopAsserv (self):
         rospy.loginfo("stop asserv")
         self._asservEmergencyStopService.call(enable=True)
