@@ -79,6 +79,7 @@ class NavigatorNode(object):
                 rospy.logwarn("Something wrong happenned with our goal, abording")
             self._currentStatus = NavigatorStatuses.NAV_IDLE
             self._collisionsClient.setEnabled(False)
+            self._updateStatus()
             self._currentGoal.set_succeeded(DoGotoResult(result))
         else:
             self._idCurrentTry += 1
@@ -138,7 +139,7 @@ class NavigatorNode(object):
     def _callbackAsservResume(self):
         self._currentStatus = NavigatorStatuses.NAV_NAVIGATING
         self._isCanceling = False
-        self._collisionsClient.setEnabled(True)
+        #self._collisionsClient.setEnabled(True)
         self._asservClient.resumeAsserv()
         self._updateStatus()
 
