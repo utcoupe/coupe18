@@ -73,9 +73,9 @@ bool ObjectsClassifierSubscriber::isInsideRect(const Rectangle& rect, const geom
     double da, db;
     da = a/rect.w;
     db = b/rect.h;
-    if (da * 2 > 1 || da * 2 < -1)
+    if (da - _safetyMargin > 1.0/2.0 || da + _safetyMargin  < -1.0/2.0)
         return false;
-    if (db * 2 > 1 || db * 2 < -1)
+    if (db - _safetyMargin > 1.0/2.0 || db + _safetyMargin  < -1.0/2.0)
         return false;
     return true;
 }
