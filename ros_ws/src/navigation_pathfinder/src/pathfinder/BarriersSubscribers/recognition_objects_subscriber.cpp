@@ -1,5 +1,7 @@
 #include "pathfinder/BarriersSubscribers/recognition_objects_classifier_subscriber.h"
 
+#include <cmath>
+
 using namespace std;
 using namespace Recognition;
 
@@ -59,9 +61,21 @@ void ObjectsClassifierSubscriber::addCircles(const std::vector<Circle>& circs)
 
 bool ObjectsClassifierSubscriber::isInsideRect(const Rectangle& rect, const geometry_msgs::Pose2D& pos) const
 {
-    if (pos.x + _safetyMargin < (rect.x - rect.w/2) || pos.x - _safetyMargin > (rect.x + rect.w/2))
+    if (rect.h == 0 || rect.w == 0)
         return false;
-    if (pos.y + _safetyMargin < (rect.y - rect.h/2) || pos.y - _safetyMargin > (rect.y + rect.h/2))
+    double dx, dy; // we want the center of the rectangle as origin
+    dx = pos.x - rect.x;
+    dy = pos.y - rect.y;
+    double a, b; // (a,b) => coordinates of pos with the center of the rectangle as origin and its sides as vectors
+    a = -dx*cos(rect.a) - dy*sin(M_PI - rect.a);
+    b = dx*sin(rect.a) - dy*cos(rect.a);
+    // if a/rect.witdh  is in [-1/2,1/2] and b/rect.height in [-1/2,1/2], then the pos is inside the rectangle
+    double da, db;
+    da = a/rect.w;
+    db = b/rect.h;
+    if (da * 2 > 1 || da * 2 < -1)
+        return false;
+    if (db * 2 > 1 || db * 2 < -1)
         return false;
     return true;
 }
