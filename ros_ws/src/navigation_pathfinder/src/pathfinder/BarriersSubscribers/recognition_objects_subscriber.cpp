@@ -71,7 +71,7 @@ bool ObjectsClassifierSubscriber::isInsideRect(const Rectangle& rect, const geom
     b = dx*sin(rect.a) - dy*cos(rect.a);
     // if a/rect.witdh  is in [-1/2,1/2] and b/rect.height in [-1/2,1/2], then the pos is inside the rectangle
     double da, db;
-    da = a/(rect.w + 2*_safetyMargin);
+    da = a/(rect.w + _safetyMargin);
     db = b/(rect.h + 2*_safetyMargin);
     if (da  > 1.0/2.0 || da < -1.0/2.0)
         return false;
