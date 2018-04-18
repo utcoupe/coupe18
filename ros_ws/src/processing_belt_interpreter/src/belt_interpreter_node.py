@@ -5,6 +5,7 @@ from belt_parser import BeltParser
 import tf
 import tf2_ros
 import math
+import copy
 
 from memory_definitions.srv import GetDefinition
 from processing_belt_interpreter.msg import *
@@ -32,6 +33,8 @@ class BeltInterpreter(object):
         self.WATCHDOG_PERIOD_BELT = rospy.Duration(0.015)
         self.WATCHDOG_PERIOD_TERA = rospy.Duration(0.05)
 
+        self.PREVIOUS_DATA_SIZE = 2
+
         filepath = self.fetch_definition()
 
         self._belt_parser = BeltParser(filepath)
@@ -45,8 +48,11 @@ class BeltInterpreter(object):
 
         self._watchdog = rospy.Timer(self.WATCHDOG_PERIOD_TERA, self.publish, oneshot=True)
 
-        self._rects = {}
+        self._current_rects = {}
+        self._current_statuses = {}
         self._data_to_process = []
+        self._previous_rects = []
+        self._previous_statuses = []
 
         rospy.loginfo("Belt interpreter is ready. Listening for sensor data on '{}'.".format(self.SENSORS_TOPIC)) # TODO duplicate log with status_services.ready()
         # Tell ai/game_status the node initialized successfuly.
@@ -55,20 +61,43 @@ class BeltInterpreter(object):
         rospy.spin()
 
     def publish(self, event):
-        if self._rects.keys() == ["sensor_tera1"] or not self._rects:
+        if self._current_rects.keys() == ["sensor_tera1"] or not self._current_rects:
             if self._watchdog:
                 self._watchdog.shutdown()
             self._watchdog = rospy.Timer(self.WATCHDOG_PERIOD_TERA, self.publish, oneshot=True)
-        if self._rects:
-            self._pub.publish(self._rects.values())
-        self._rects.clear()
+        if len(self._current_rects) > 0:
+            self._previous_rects.append(copy.deepcopy(self._current_rects))
+            self._previous_statuses.append(copy.deepcopy(self._current_statuses))
+
+            if(len(self._previous_rects) > self.PREVIOUS_DATA_SIZE):
+                self._previous_rects.pop(0)
+
+            if (len(self._previous_statuses) > self.PREVIOUS_DATA_SIZE):
+                self._previous_statuses.pop(0)
+
+            self._pub.publish(self._current_rects.values())
+        self._current_rects.clear()
+        self._current_statuses.clear()
 
     def process_range(self, data):
         if data.sensor_id not in self._belt_parser.Sensors.keys():
             rospy.logerr("Received data from belt sensor '{}' but no such sensor is defined"
                          .format(data.sensor_id))
             return
+
+
         if data.range > self._belt_parser.Params["max_range"] or data.range <= 0:
+            self._current_statuses.update({data.sensor_id: False})
+            # If we published this sensor most of the time and its bad, publish the last one we got
+            l = [data.sensor_id in d and d[data.sensor_id] for d in self._previous_statuses]
+            if sum(l) > math.ceil((self.PREVIOUS_DATA_SIZE + 1) / 2):
+                for d in reversed(self._previous_rects):
+                    if data.sensor_id in d:
+                        rospy.logwarning('Got bad data for sensor %s but publishing the last good data' % data.sensor_id)
+                        r = d[data.sensor_id]
+                        r.header.stamp = rospy.Time.now()
+                        self._current_rects.update({data.sensor_id: d[data.sensor_id]})
+                        return
             return
 
 
@@ -85,7 +114,8 @@ class BeltInterpreter(object):
         rect.h = height
         rect.a = 0
 
-        self._rects.update({data.sensor_id: rect})
+        self._current_rects.update({data.sensor_id: rect})
+        self._current_statuses.update({data.sensor_id: True})
 
 
     def get_rect_width(self, r):
@@ -116,7 +146,7 @@ class BeltInterpreter(object):
 
     def callback(self, data):
         publish_now = False
-        if data.sensor_id in self._rects and data.sensor_id != 'sensor_tera1':
+        if data.sensor_id in self._current_rects and data.sensor_id != 'sensor_tera1':
             publish_now = True
 
         self.process_range(data)
