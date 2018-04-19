@@ -3,6 +3,7 @@
 
 import rospy
 import actuators
+from ai_game_status import StatusServices
 
 __author__ = "P. Potiron", "Thomas Fuhrmann"
 __date__ = 9/04/2018
@@ -22,7 +23,11 @@ class ActuatorsNode:
             self.barrel_instance = actuators.ActuatorsBarrel()
 
         rospy.loginfo("Movement actuators has correctly started.")
+        StatusServices("movement", "actuators", None, self._on_gameStatus).ready(True)
         rospy.spin()
+    
+    def _on_gameStatus(self, msg):
+        pass
 
 
 if __name__ == '__main__':
