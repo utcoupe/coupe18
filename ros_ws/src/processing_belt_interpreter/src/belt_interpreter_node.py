@@ -13,6 +13,7 @@ from drivers_ard_others.msg import BeltRange
 from geometry_msgs.msg import Pose2D, TransformStamped, PointStamped
 from ai_game_status import StatusServices
 
+from multiprocessing import Lock
 
 class BeltInterpreter(object):
     def __init__(self):
@@ -46,6 +47,8 @@ class BeltInterpreter(object):
         self._sensors_sub = rospy.Subscriber(self.SENSORS_TOPIC, BeltRange,
                                              self.callback)
 
+        self._mutex = Lock()
+
         self._watchdog = rospy.Timer(self.WATCHDOG_PERIOD_TERA, self.publish, oneshot=True)
 
         self._current_rects = {}
@@ -61,23 +64,24 @@ class BeltInterpreter(object):
         rospy.spin()
 
     def publish(self, event):
-        if self._current_rects.keys() == ["sensor_tera1"] or not self._current_rects:
-            if self._watchdog:
-                self._watchdog.shutdown()
-            self._watchdog = rospy.Timer(self.WATCHDOG_PERIOD_TERA, self.publish, oneshot=True)
-        if len(self._current_rects) > 0:
-            self._previous_rects.append(copy.deepcopy(self._current_rects))
-            self._previous_statuses.append(copy.deepcopy(self._current_statuses))
+        with self._mutex:
+            if self._current_rects.keys() == ["sensor_tera1"] or not self._current_rects:
+                if self._watchdog:
+                    self._watchdog.shutdown()
+                self._watchdog = rospy.Timer(self.WATCHDOG_PERIOD_TERA, self.publish, oneshot=True)
+            if len(self._current_rects) > 0:
+                self._previous_rects.append(copy.deepcopy(self._current_rects))
+                self._previous_statuses.append(copy.deepcopy(self._current_statuses))
 
-            if(len(self._previous_rects) > self.PREVIOUS_DATA_SIZE):
-                self._previous_rects.pop(0)
+                if(len(self._previous_rects) > self.PREVIOUS_DATA_SIZE):
+                    self._previous_rects.pop(0)
 
-            if (len(self._previous_statuses) > self.PREVIOUS_DATA_SIZE):
-                self._previous_statuses.pop(0)
+                if (len(self._previous_statuses) > self.PREVIOUS_DATA_SIZE):
+                    self._previous_statuses.pop(0)
 
-            self._pub.publish(self._current_rects.values())
-        self._current_rects.clear()
-        self._current_statuses.clear()
+                self._pub.publish(self._current_rects.values())
+                self._current_rects.clear()
+                self._current_statuses.clear()
 
     def process_range(self, data):
         if data.sensor_id not in self._belt_parser.Sensors.keys():
@@ -85,37 +89,37 @@ class BeltInterpreter(object):
                          .format(data.sensor_id))
             return
 
+        with self._mutex:
+            if data.range > self._belt_parser.Params["max_range"] or data.range <= 0:
+                self._current_statuses.update({data.sensor_id: False})
+                # If we published this sensor most of the time and its bad, publish the last one we got
+                l = [data.sensor_id in d and d[data.sensor_id] for d in self._previous_statuses]
+                if sum(l) > math.ceil((self.PREVIOUS_DATA_SIZE + 1) / 2):
+                    for d in reversed(self._previous_rects):
+                        if data.sensor_id in d:
+                            rospy.logwarn('Got bad data for sensor %s but publishing the last good data' % data.sensor_id)
+                            r = d[data.sensor_id]
+                            r.header.stamp = rospy.Time.now()
+                            self._current_rects.update({data.sensor_id: d[data.sensor_id]})
+                            return
+                return
 
-        if data.range > self._belt_parser.Params["max_range"] or data.range <= 0:
-            self._current_statuses.update({data.sensor_id: False})
-            # If we published this sensor most of the time and its bad, publish the last one we got
-            l = [data.sensor_id in d and d[data.sensor_id] for d in self._previous_statuses]
-            if sum(l) > math.ceil((self.PREVIOUS_DATA_SIZE + 1) / 2):
-                for d in reversed(self._previous_rects):
-                    if data.sensor_id in d:
-                        rospy.logwarn('Got bad data for sensor %s but publishing the last good data' % data.sensor_id)
-                        r = d[data.sensor_id]
-                        r.header.stamp = rospy.Time.now()
-                        self._current_rects.update({data.sensor_id: d[data.sensor_id]})
-                        return
-            return
 
+            width = self.get_rect_width(data.range)
+            height = self.get_rect_height(data.range)
 
-        width = self.get_rect_width(data.range)
-        height = self.get_rect_height(data.range)
+            rect = RectangleStamped()
+            rect.header.frame_id = self.SENSOR_FRAME_ID.format(data.sensor_id)
 
-        rect = RectangleStamped()
-        rect.header.frame_id = self.SENSOR_FRAME_ID.format(data.sensor_id)
+            rect.header.stamp = rospy.Time.now()
+            rect.x = self.get_rect_x(data.range)
+            rect.y = 0
+            rect.w = width
+            rect.h = height
+            rect.a = 0
 
-        rect.header.stamp = rospy.Time.now()
-        rect.x = self.get_rect_x(data.range)
-        rect.y = 0
-        rect.w = width
-        rect.h = height
-        rect.a = 0
-
-        self._current_rects.update({data.sensor_id: rect})
-        self._current_statuses.update({data.sensor_id: True})
+            self._current_rects.update({data.sensor_id: rect})
+            self._current_statuses.update({data.sensor_id: True})
 
 
     def get_rect_width(self, r):
