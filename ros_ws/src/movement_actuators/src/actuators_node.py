@@ -4,6 +4,7 @@
 import rospy
 import actuators
 from ai_game_status import StatusServices
+from ai_game_status.msg import GameStatus
 
 __author__ = "P. Potiron", "Thomas Fuhrmann"
 __date__ = 9/04/2018
@@ -16,18 +17,33 @@ class ActuatorsNode:
         rospy.init_node(NODE_NAME, log_level=rospy.INFO)
         self.dispatch_instance = actuators.ActuatorsDispatch()
 
-        robot = rospy.get_param('/robot')
-        if robot.lower() == "gr":
+        self._robot = rospy.get_param('/robot')
+        if self._robot.lower() == "gr":
             self.arm_instance = actuators.ActuatorsArm()
-        elif robot.lower() == "pr":
+        elif self._robot.lower() == "pr":
             self.barrel_instance = actuators.ActuatorsBarrel()
+
+        self._isHalted = False
 
         rospy.loginfo("Movement actuators has correctly started.")
         StatusServices("movement", "actuators", None, self._on_gameStatus).ready(True)
         rospy.spin()
     
     def _on_gameStatus(self, msg):
-        pass
+        stateChanged = False
+        if not self._isHalted and msg.game_status == GameStatus.STATUS_HALT:
+            self._isHalted = True
+            stateChanged = True
+        elif self._isHalted and msg.game_status != GameStatus.STATUS_HALT:
+            self._isHalted = False
+            stateChanged = True
+        
+        if stateChanged:
+            self.dispatch_instance.setHalted(self._isHalted)
+            if self._robot.lower() == "gr":
+                self.arm_instance.setHalted(self._isHalted)
+            elif self._robot.lower() == "pr":
+                self.barrel_instance.setHalted(self._isHalted)
 
 
 if __name__ == '__main__':

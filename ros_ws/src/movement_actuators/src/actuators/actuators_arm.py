@@ -49,6 +49,9 @@ class ActuatorsArm(ActuatorsAbstract):
                                    action_type=ArmAction)
 
     def _process_action(self, goal, goal_id):
+        if self._isHalted:
+            rospy.logerr("Arm actuator is turned off!")
+            return False
         point = PointStamped()
         point.header.frame_id = goal.frame_id
         point.point.x = goal.x
@@ -219,3 +222,7 @@ class ActuatorsArm(ActuatorsAbstract):
             except yaml.YAMLError as e:
                 rospy.logerr("Can't parse config file : %s" % e)
 
+    def setHalted(self, isHalted):
+        self._isHalted = isHalted
+        # TODO stop AX12 ?
+        pass

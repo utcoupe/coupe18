@@ -11,9 +11,9 @@ NODE_NAME = "actuators"
 
 class ActuatorsAbstract:
     def __init__(self, action_name, action_type):
-        # TODO manage system HALT with game_status stuff (using main node ?)
         # Dictionary to manage received goals (mandatory for actionlib)
         self._goals_handler_dictionary = {}
+        self._isHalted = False
         self._action_type = None
         if action_name != "" and action_type is not None:
             self._action_type = action_type
@@ -44,3 +44,7 @@ class ActuatorsAbstract:
             self._goals_handler_dictionary[goal_handle.get_goal_id()] = goal_handle
         else:
             goal_handle.set_rejected()
+    
+    def setHalted(self, isHalted):
+        rospy.logerr("ActuatorsAbstract is abstract !")
+        pass

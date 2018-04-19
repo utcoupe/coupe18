@@ -30,8 +30,12 @@ class ActuatorsDispatch(ActuatorsAbstract):
         self._sub_ard_response = rospy.Subscriber('/drivers/ard_others/move_response', drivers_ard_others.msg.MoveResponse, self._callback_move_response)
         self._act_cli_ax12 = actionlib.ActionClient('/drivers/ax12', Ax12CommandAction)
         self._act_cli_ax12.wait_for_server(rospy.Duration(10))
+        self._isHalted = False
 
     def _process_action(self, goal, goal_id):
+        if self._isHalted:
+            rospy.logerr("Actuators are turned off!")
+            return False
         to_return = False
         actuator_properties = self._act_parser.get_actuator_properties(goal.name, goal.id)
         if actuator_properties is None:
@@ -158,3 +162,14 @@ class ActuatorsDispatch(ActuatorsAbstract):
                         self._active_goal_timers[goal_id].shutdown()
                     del self._active_goal_timers[goal_id]
             self._action_reached(goal_id, reached, DispatchResult(reached))
+
+    def setHalted(self, isHalted):
+        self._isHalted = isHalted
+        if isHalted:
+            for actuator in self._act_parser._actuators_dictionary.values():
+                if "OFF" in actuator.preset.keys():
+                    if actuator.family == "arduino":
+                        self._send_to_arduino(actuator.ard_id, actuator.ard_type, actuator.preset["OFF"])
+                        continue
+                    # TODO stop AX12 ?
+        

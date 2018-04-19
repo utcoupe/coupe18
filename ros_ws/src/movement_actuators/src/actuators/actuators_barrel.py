@@ -57,6 +57,9 @@ class ActuatorsBarrel(ActuatorsAbstract):
         self._curr_timeout = 0
 
     def _process_action(self, goal, goal_id):
+        if self._isHalted:
+            rospy.logerr("Barrel actuator is turned off!")
+            return False
         if self._is_running:
             rospy.logerr("Received a goal but another one is in process !")
             return False
@@ -161,3 +164,9 @@ class ActuatorsBarrel(ActuatorsAbstract):
         self._action_reached(self._curr_goal_id, success, BarrelResult(success=success))
 
         self._curr_goal_id = None
+    
+
+    def setHalted(self, isHalted):
+        self._isHalted = isHalted
+        # TODO stop AX12 ?
+        pass
