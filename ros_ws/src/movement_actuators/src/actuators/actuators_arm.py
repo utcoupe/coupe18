@@ -224,5 +224,4 @@ class ActuatorsArm(ActuatorsAbstract):
 
     def setHalted(self, isHalted):
         self._isHalted = isHalted
-        # TODO stop AX12 ?
-        pass
+        self._client.cancel_all_goals()
