@@ -7,6 +7,8 @@ void MarkersPublisher::publish_rects(
         const std::vector<processing_belt_interpreter::RectangleStamped> &map_rects,
         const std::vector<processing_belt_interpreter::RectangleStamped> &unknown_rects) {
 
+    static unsigned int id_counter = 0;
+
     visualization_msgs::Marker marker;
     marker.action = marker.ADD;
     marker.type = marker.CUBE;
@@ -31,6 +33,7 @@ void MarkersPublisher::publish_rects(
             marker.scale.y = rect.h;
             marker.header = rect.header;
 
+            marker.id = id_counter++;
             pub_.publish(marker);
         }
 
@@ -42,6 +45,8 @@ void MarkersPublisher::publish_rects(
 void MarkersPublisher::publish_circles(
         const std::vector<recognition_objects_classifier::CircleObstacleStamped> &map_circles,
         const std::vector<recognition_objects_classifier::CircleObstacleStamped> &unknown_circles) {
+
+    static unsigned int id_counter = 0;
 
     visualization_msgs::Marker marker;
     marker.action = marker.ADD;
@@ -60,12 +65,14 @@ void MarkersPublisher::publish_circles(
 
     for (const auto &list : both_lists) {
         for (auto &circle : list) {
+
             marker.pose.position.x = circle.circle.center.x;
             marker.pose.position.y = circle.circle.center.y;
             marker.scale.x = circle.circle.true_radius;
             marker.scale.y = circle.circle.true_radius;
             marker.header = circle.header;
 
+            marker.id = id_counter++;
             pub_.publish(marker);
         }
 
@@ -78,6 +85,8 @@ void MarkersPublisher::publish_segments(
         const std::vector<recognition_objects_classifier::SegmentObstacleStamped> &map_segments,
         const std::vector<recognition_objects_classifier::SegmentObstacleStamped> &unknown_segments) {
 
+
+    static unsigned int id_counter = 0;
 
     std::vector<geometry_msgs::Point> points;
 
@@ -94,7 +103,7 @@ void MarkersPublisher::publish_segments(
 
     geometry_msgs::Point point;
 
-    const   std::vector<recognition_objects_classifier::SegmentObstacleStamped> both_lists[2] = {std::move(map_segments),
+    const std::vector<recognition_objects_classifier::SegmentObstacleStamped> both_lists[2] = {std::move(map_segments),
                                                                                           std::move(unknown_segments)};
 
     for (const auto &list : both_lists) {
@@ -113,6 +122,7 @@ void MarkersPublisher::publish_segments(
 
         if (!list.empty()) {
             marker.header = list.at(0).header;
+            marker.id = id_counter++;
             pub_.publish(marker);
         }
 

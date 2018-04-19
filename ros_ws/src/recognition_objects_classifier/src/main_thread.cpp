@@ -273,8 +273,8 @@ void MainThread::classify_and_publish_lidar_objects(processing_lidar_objects::Ob
 
     if(ros::Time::now().toSec() - last_rviz_lidar_pub_.toSec() > SECS_BETWEEN_RVIZ_PUB && markers_publisher_.is_connected()) {
 
-        //markers_publisher_.publish_segments(classified_objects_.map_segments, classified_objects_.unknown_segments);
-        //markers_publisher_.publish_circles(classified_objects_.map_circles, classified_objects_.unknown_circles);
+        markers_publisher_.publish_segments(classified_objects_.map_segments, classified_objects_.unknown_segments);
+        markers_publisher_.publish_circles(classified_objects_.map_circles, classified_objects_.unknown_circles);
         last_rviz_lidar_pub_ = ros::Time::now();
     }
 

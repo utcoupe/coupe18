@@ -247,7 +247,7 @@ std::string Ax12Server::fetch_port(const std::string &service_name) {
     if (port.length() == 0) {
         ROS_FATAL("The AX-12 port is not set, shutting down...");
         ros::shutdown();
-        return NULL;
+        return "";
     }
 
     return port;
