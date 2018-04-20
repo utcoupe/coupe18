@@ -63,11 +63,14 @@ class MapServices():
         rospy.loginfo("SET:" + str(req.request_path))
 
         success = False
-        success = Map.set(req.request_path, req.mode)
+        # success = Map.set(req.request_path, req.mode)
         try:
             success = Map.set(req.request_path, req.mode)
         except Exception as e:
             rospy.logerr("    SET Request failed (python reason) : " + str(e))
+
+        if success:
+            Map.Dirty = True
 
         rospy.logdebug("    Responding: " + str(success))
         rospy.logdebug("    Process took {0:.2f}ms".format(time.time() * 1000 - s))
@@ -80,6 +83,7 @@ class MapServices():
         if elem:
             success = Map.set(req.old_path, SetMode.MODE_DELETE) and \
                       Map.set(req.new_path + "/{}".format(elem_name), SetMode.MODE_ADD, instance = elem)
+            Map.Dirty = True
         else:
             rospy.logerr("    TRANSFER Request failed : could not find the object at old_path '{}'.".format(req.old_path))
             success = False
