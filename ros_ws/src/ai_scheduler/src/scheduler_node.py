@@ -51,27 +51,22 @@ class AINode():
             rospy.logwarn("[AI] HMI Asked to stop ! Stopping strategy execution.")
             self.AI.halt()
 
-    def on_arm(self, req):
-        GameProperties.CURRENT_STRATEGY = GameProperties.AVAILABLE_STRATEGIES[req.chosen_strategy_id]
-        GameProperties.CURRENT_TEAM     = GameProperties.AVAILABLE_TEAMS[req.chosen_team_id]
-        rospy.set_param("/current_strategy", GameProperties.CURRENT_STRATEGY)
-        rospy.set_param("/current_team",     GameProperties.CURRENT_TEAM)
-        self._ai_start_request = True
-
     def on_hmi_event(self, req):
         if req.event == req.EVENT_HMI_INITIALIZED:
             time.sleep(0.5)
             self._hmi_init = True
-        # if req.event == req.EVENT_START: # DEPRECATED, kept for now
-        #     GameProperties.CURRENT_STRATEGY = GameProperties.AVAILABLE_STRATEGIES[req.chosen_strategy_id]
-        #     GameProperties.CURRENT_TEAM     = GameProperties.AVAILABLE_TEAMS[req.chosen_team_id]
-        #     rospy.set_param("/current_strategy", GameProperties.CURRENT_STRATEGY)
-        #     rospy.set_param("/current_team",     GameProperties.CURRENT_TEAM)
-        #     self._ai_start_request = True
+        if req.event == req.EVENT_START:
+            GameProperties.CURRENT_STRATEGY = GameProperties.AVAILABLE_STRATEGIES[req.chosen_strategy_id]
+            GameProperties.CURRENT_TEAM     = GameProperties.AVAILABLE_TEAMS[req.chosen_team_id]
+            rospy.set_param("/current_strategy", GameProperties.CURRENT_STRATEGY)
+            rospy.set_param("/current_team",     GameProperties.CURRENT_TEAM)
         #     rospy.loginfo("[AI] Starting actions ! Strategy '{}' and team '{}'.".format(GameProperties.CURRENT_STRATEGY, GameProperties.CURRENT_TEAM))
         # elif req.event == req.EVENT_GAME_CANCEL: # TODO remove ? Should be trigerred by a game_status HALT
         #     rospy.logwarn("[AI] HMI Asked to stop ! Stopping strategy execution.")
         #     self.AI.halt()
+
+    def on_arm(self, req):
+        self._ai_start_request = True # Start the strategy
 
 '''
 PACKAGE STARTING POINT HERE

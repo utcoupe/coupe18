@@ -30,7 +30,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_action_files(
     DIRECTORY action
     FILES
-        dispatch.action
+        Dispatch.action
         arduino.action
 )
 
