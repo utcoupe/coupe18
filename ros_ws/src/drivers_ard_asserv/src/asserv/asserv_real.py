@@ -9,6 +9,7 @@ from geometry_msgs.msg import Pose2D
 from drivers_ard_asserv.msg import RobotSpeed
 from asserv_abstract import *
 import protocol_parser
+import math
 
 __author__ = "Thomas Fuhrmann"
 __date__ = 16/12/2017
@@ -241,7 +242,10 @@ class AsservReal(AsservAbstract):
 
     def _check_reached_angle(self, a):
         rospy.loginfo("Check reached angle, own angle = {}, check angle  = {}".format(self._robot_raw_position.theta, a))
-        return (self._robot_raw_position.theta > a - ASSERV_ERROR_ANGLE) and (self._robot_raw_position.theta < a + ASSERV_ERROR_ANGLE)
+        return (self._robot_raw_position.theta % (2 * math.pi) + 2 * math.pi <
+                a % (2 * math.pi) + 2 * math.pi + ASSERV_ERROR_ANGLE) and \
+               (self._robot_raw_position.theta % (2 * math.pi) + 2 * math.pi >
+                a % (2 * math.pi) + 2 * math.pi - ASSERV_ERROR_ANGLE)
 
     def _check_reached_position(self, x, y):
         rospy.loginfo("Check reached position, own pos = {}, {}, check pos  = {}, {}".format(self._robot_raw_position.x, self._robot_raw_position.y, x, y))
