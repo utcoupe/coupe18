@@ -19,7 +19,7 @@ class ActionList(Task):
         self._repeats_max = ActionList.MAX_REPEATS
         if self.repeatMode == RepeatMode.ONCE: self._repeats_max = 1
         if self.repeatMode == RepeatMode.FOR:  self._repeats_max = int(xml.attrib["repeat"])
-        print "max repeats" + str(self._repeats_max)
+
         self.executionOrder = ExecutionOrder.fromText(xml.attrib["order"])  if "order" in xml.attrib else ExecutionOrder.LINEAR
         self.Conditions = xml.find("conditions") if "conditions" in xml else None # Conditions that must be true before executing the actions.
         self.TASKS = self.loadxml(xml, actions, orders)

@@ -21,12 +21,12 @@ add_message_files(
     FILES
     GameStatus.msg
     NodesStatus.msg
+    ArmRequest.msg
 )
 
 add_service_files(
     FILES
     SetStatus.srv
-    ArmRequest.srv
     NodeReady.srv
 )
 
