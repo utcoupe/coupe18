@@ -37,9 +37,9 @@ class RequestTypes(object):
 
             "/navigation/navigator/goto_action": (RequestTypes.ACTION,  navigation_navigator.msg.DoGotoAction, navigation_navigator.msg.DoGotoGoal),
             "/navigation/navigator/gotowaypoint_action": (RequestTypes.ACTION,  navigation_navigator.msg.DoGotoWaypointAction, navigation_navigator.msg.DoGotoWaypointGoal),
-            # "/movement/actuators/dispatch":      (RequestTypes.ACTION,  movement_actuators.msg.DispatchAction, movement_actuators.msg.DispatchGoal),
-            # "/movement/actuators/barrel":        (RequestTypes.ACTION, movement_actuators.msg.BarrelAction, movement_actuators.msg.BarrelGoal),
-            # "/movement/actuators/arm":           (RequestTypes.ACTION, movement_actuators.msg.ArmAction, movement_actuators.msg.ArmGoal),
+            "/movement/actuators/dispatch":      (RequestTypes.ACTION,  movement_actuators.msg.DispatchAction, movement_actuators.msg.DispatchGoal),
+            "/movement/actuators/barrel":        (RequestTypes.ACTION, movement_actuators.msg.BarrelAction, movement_actuators.msg.BarrelGoal),
+            "/movement/actuators/arm":           (RequestTypes.ACTION, movement_actuators.msg.ArmAction, movement_actuators.msg.ArmGoal),
 
             "/drivers/ard_asserv/set_pos":       (RequestTypes.SERVICE, drivers_ard_asserv.srv.SetPos),
             "/drivers/ax12":                (RequestTypes.ACTION, drivers_ax12.msg.Ax12CommandAction, drivers_ax12.msg.Ax12CommandGoal),
@@ -85,7 +85,7 @@ class AICommunication():
             else:
                 return response
         else:
-            raise ValueError, "Message destination '{}' was not recognized. Has it been added to ai_communication.py definition dict, or mispelled ?".format(dest)
+            raise ValueError, "Message destination '{}' was not recognized. Has it been added to scheduler_communication.py definition dict, or mispelled ?".format(dest)
 
     def _pub_msg(self, dest, msg_class, params):
         try:
@@ -94,7 +94,7 @@ class AICommunication():
             pub.publish(**params)
             return TaskResult(0, "")
         except Exception as e:
-            return TaskResult(2, "ai_communication.py could not send message to topic '{}': {}".format(dest, e))
+            return TaskResult(2, "scheduler_communication.py could not send message to topic '{}': {}".format(dest, e))
 
     def _sub_msg(self, dest, msg_class):
         rospy.loginfo("waiting for message on topic '{}'...".format(dest))
