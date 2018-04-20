@@ -169,7 +169,7 @@ class ActuatorsDispatch(ActuatorsAbstract):
             for actuator in self._act_parser._actuators_dictionary.values():
                 if "OFF" in actuator.preset.keys():
                     if actuator.family == "arduino":
-                        self._send_to_arduino(actuator.ard_id, actuator.ard_type, actuator.preset["OFF"])
+                        self._send_to_arduino(actuator.id, actuator.type, actuator.preset["OFF"])
                         continue
                     # TODO stop AX12 ?
         
