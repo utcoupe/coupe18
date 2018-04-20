@@ -289,7 +289,7 @@ class StatesManager():
         elif self.state == State.ROTATING_TO_ALIGN_TRAJ:
             wanted_angle = self.get_wanted_angle_to_align_traj(curr_pose, goal_pose, direction)
 
-        diff = (wanted_angle + 2 * math.pi < curr_pose.theta + 2 * math.pi) % (2 * math.pi)
+        diff = (wanted_angle - curr_pose.theta) % (2 * math.pi)
         if diff > math.pi:
             return -1
         else:
