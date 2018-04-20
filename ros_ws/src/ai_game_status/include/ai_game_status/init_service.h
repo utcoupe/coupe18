@@ -17,7 +17,7 @@ class StatusServices
 {
 public:
     /** @brief Type of the callback for the arm request */
-    using ArmCallback_t = std::function<bool ()>;
+    using ArmCallback_t = std::function<void (const ai_game_status::ArmRequest::ConstPtr &)>;
     /** @brief Type of the callback for the status event */
     using StatusCallback_t = std::function<void (const ai_game_status::GameStatus::ConstPtr &)>;
     
@@ -50,10 +50,10 @@ private:
     ArmCallback_t _armCallback;
     StatusCallback_t _statusCallback;
     ros::NodeHandle _nodeHandle;
-    ros::ServiceServer _armServer;
+    ros::Subscriber _armServer;
     ros::Subscriber _gameStatusSubscriber;
 
-    bool _on_arm(ai_game_status::ArmRequest::Request &req, ai_game_status::ArmRequest::Response &rep);
+    void _on_arm(const ai_game_status::ArmRequest::ConstPtr& msg);
     void _on_gameStatus(const ai_game_status::GameStatus::ConstPtr& msg);
 };
 

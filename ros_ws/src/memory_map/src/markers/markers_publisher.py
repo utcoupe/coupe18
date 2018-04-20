@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import math
+import math, time
 import rospy
 from map_manager import map_attributes, DictManager
 from visualization_msgs.msg import Marker
@@ -9,29 +9,27 @@ class MarkersPublisher():
     def __init__(self):
         self._prev_num_connections = 0
         self.MARKERS_TOPIC = "/visualization_markers/world"
-        self.MarkersPUBL = rospy.Publisher(self.MARKERS_TOPIC, Marker, queue_size=10)
+        self._pub = rospy.Publisher(self.MARKERS_TOPIC, Marker, queue_size=10)
 
     def _is_connected(self):
-        return bool(self.MarkersPUBL.get_num_connections())
+        return bool(self._pub.get_num_connections())
 
     def _connections_has_changed(self):
-        if self._prev_num_connections != self.MarkersPUBL.get_num_connections():
-            self._prev_num_connections = self.MarkersPUBL.get_num_connections()
+        if self._prev_num_connections != self._pub.get_num_connections():
+            time.sleep(0.3)
             return True
         else:
             return False
 
     def updateMarkers(self, world):
-        if self._is_connected():
-            if self._connections_has_changed():
-                self._publish_table(world)
-                self._publish_robot_stl(world)
-                self._publish_zones(world)  # departure area
-                self._publish_waypoints(world)
-                self._static_published = True
-                self._publish_objects(world.get("/objects/^"))  # play elements (balls, cubes...)
-        else:
-            self._prev_num_connections = 0
+        if (self._is_connected() and self._connections_has_changed()) or world.is_dirty(): # Draw if new connection or new content
+            self._publish_table(world)                      # Table STL without colors
+            self._publish_robot_stl(world)                  # Simple rectangle representing the robot shape.
+            self._publish_zones(world)                      # Departure areas
+            self._publish_waypoints(world)                  # Navigation positions
+            self._publish_objects(world.get("/objects/^"))  # game elements (balls, cubes...)
+
+        self._prev_num_connections = self._pub.get_num_connections()
 
     def _publish_table(self, world):
         pos = map_attributes.Position2D({
@@ -124,7 +122,7 @@ class MarkersPublisher():
 
         marker.mesh_resource = visual.get("mesh_path") if marker.type == Marker.MESH_RESOURCE else ''
 
-        self.MarkersPUBL.publish(marker)
+        self._pub.publish(marker)
 
     def _euler_to_quaternion(self, xyz):
         cr, sr = math.cos(xyz[0] * 0.5), math.sin(xyz[0] * 0.5)

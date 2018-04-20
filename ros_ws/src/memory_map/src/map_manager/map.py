@@ -9,6 +9,7 @@ from map_teams import Team
 
 class Map():
     MAP_DICT = None
+    Dirty = True # Whether a service changed the dict since the last RViz Marker publish.
 
     # Internal global variables
     Colors = []
@@ -65,6 +66,12 @@ class Map():
                     team.swap()
                     return
             rospy.logerr("Found no team with name '{}', aborting team swap.".format(team_name))
+
+    @staticmethod
+    def is_dirty():
+        dirty = Map.Dirty
+        Map.Dirty = False
+        return dirty
 
     @staticmethod
     def get(requestpath):

@@ -5,8 +5,8 @@
 using namespace std;
 
 const string READY_SRV = "/ai/game_status/node_ready";
-const string ARM_SRV = "/arm";
-const string HALT_SRV = "/ai/game_status/status";
+const string ARM_SRV   = "/ai/game_status/arm";
+const string HALT_SRV  = "/ai/game_status/status";
 const auto TIMEOUT_READY_SRV = ros::Duration(15.0);
 
 StatusServices::StatusServices(const string& namespaceName, const string& packageName, ArmCallback_t armCallback, StatusCallback_t statusCallback) :
@@ -15,7 +15,7 @@ StatusServices::StatusServices(const string& namespaceName, const string& packag
 {
     _nodeName = "/" + namespaceName + "/" + packageName;
     if (_armCallback)
-        _armServer = _nodeHandle.advertiseService(_nodeName + ARM_SRV, &StatusServices::_on_arm, this);
+        _armServer = _nodeHandle.subscribe(ARM_SRV, 10, &StatusServices::_on_arm, this);
     if (_statusCallback)
         _gameStatusSubscriber = _nodeHandle.subscribe(HALT_SRV, 10, &StatusServices::_on_gameStatus, this);
 }
@@ -44,10 +44,9 @@ void StatusServices::setReady(bool success)
 }
 
 
-bool StatusServices::_on_arm(ai_game_status::ArmRequest::Request &req, ai_game_status::ArmRequest::Response &rep)
+void StatusServices::_on_arm(const ai_game_status::ArmRequest::ConstPtr& msg)
 {
-    rep.success = _armCallback();
-    return true;
+    _armCallback(msg);
 }
 
 void StatusServices::_on_gameStatus(const ai_game_status::GameStatus::ConstPtr& msg)

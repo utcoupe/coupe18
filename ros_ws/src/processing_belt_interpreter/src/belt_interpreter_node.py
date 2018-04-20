@@ -97,7 +97,7 @@ class BeltInterpreter(object):
                 if sum(l) > math.ceil((self.PREVIOUS_DATA_SIZE + 1) / 2):
                     for d in reversed(self._previous_rects):
                         if data.sensor_id in d:
-                            rospy.logwarn('Got bad data for sensor %s but publishing the last good data' % data.sensor_id)
+                            rospy.logdebug('Got bad data for sensor %s but publishing the last good data' % data.sensor_id)
                             r = d[data.sensor_id]
                             r.header.stamp = rospy.Time.now()
                             self._current_rects.update({data.sensor_id: d[data.sensor_id]})

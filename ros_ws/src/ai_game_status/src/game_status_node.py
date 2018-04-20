@@ -2,8 +2,10 @@
 import time
 import rospy
 
-from ai_game_status.msg import GameStatus, NodesStatus
+from ai_game_status.msg import GameStatus, NodesStatus, ArmRequest
 from ai_game_status.srv import SetStatus, SetStatusResponse, NodeReady, NodeReadyResponse
+
+from drivers_ard_hmi.msg import HMIEvent
 
 
 class Status():
@@ -54,7 +56,10 @@ class GameStatusNode():
         self._node_ready_notif = rospy.Service("/ai/game_status/node_ready", NodeReady, self.on_node_ready)
         self._set_status_srv   = rospy.Service("/ai/game_status/set_status", SetStatus, self.on_set_status)
         self._game_status_pub  = rospy.Publisher("/ai/game_status/status", GameStatus,        queue_size = 10)
+        self._arm_pub          = rospy.Publisher("/ai/game_status/arm",    ArmRequest,        queue_size = 1)
         self._nodes_status_pub = rospy.Publisher("/ai/game_status/nodes_status", NodesStatus, queue_size = 10)
+
+        rospy.Subscriber("/feedback/ard_hmi/hmi_event", HMIEvent, self.on_hmi_event)
 
         self.game_status = Status.STATUS_INIT
         self.init_status = Status.INIT_INITIALIZING
@@ -122,6 +127,12 @@ class GameStatusNode():
     def on_set_status(self, req):
         self.game_status = req.new_game_status
         return SetStatusResponse(True)
+
+    def on_hmi_event(self, req):
+        if req.event == req.EVENT_START:
+            self._arm_pub.publish(ArmRequest())
+        elif req.event == req.EVENT_GAME_CANCEL:
+            self.game_status = GameStatus.STATUS_HALT
 
 if __name__ == "__main__":
     GameStatusNode()
