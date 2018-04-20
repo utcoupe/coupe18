@@ -48,6 +48,7 @@ void init_belt_sensors() {
 
     for(uint8_t i = 0; i < NUM_BELT_SENSORS; i++) {
         belt_sensors[i].setTimeout(500);
+        belt_sensors[i].setMeasurementTimingBudget(200000);
         belt_sensors[i].startContinuous();
     }
 }
@@ -64,14 +65,18 @@ void loop_belt_sensors() {
 
 void loop_sensors() {
     loop_belt_sensors();
+#ifdef SENSOR_COLOR_ENABLED
     color_sensor_loop();
+#endif
 }
 
 Timer sensors_loop_timer = Timer(50, &loop_sensors);
 
 void init_sensors() {
     init_belt_sensors();
+#ifdef SENSOR_COLOR_ENABLED
     color_sensor_init(&nh);
+#endif
     sensors_loop_timer.Start();
 }
 
