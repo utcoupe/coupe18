@@ -5,7 +5,7 @@ import tf2_ros, tf
 from obstacles_stack import Map, ObstaclesStack
 from collisions_robot import Robot
 from collisions_engine import Point, Position, Velocity, SegmentObstacle, RectObstacle, CircleObstacle
-from status_services import StatusServices
+from ai_game_status import StatusServices
 
 from memory_map.srv import MapGet
 from navigation_navigator.msg import Status
