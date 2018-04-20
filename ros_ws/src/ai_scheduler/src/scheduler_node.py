@@ -23,7 +23,7 @@ class AINode():
         rospy.Subscriber("/feedback/ard_hmi/hmi_event", HMIEvent, self.on_hmi_event)
 
         # Sending init status to ai/game_status, subscribing to game_status status pub.
-        status_services = StatusServices(self.DepartmentName, self.PackageName, None, self.on_game_status)
+        status_services = StatusServices(self.DepartmentName, self.PackageName, self.on_arm, self.on_game_status)
         status_services.ready(True) # Tell ai/game_status the node initialized successfuly.
 
         r = rospy.Rate(10)
@@ -48,22 +48,30 @@ class AINode():
 
     def on_game_status(self, msg):
         if msg.game_status == msg.STATUS_HALT:
+            rospy.logwarn("[AI] HMI Asked to stop ! Stopping strategy execution.")
             self.AI.halt()
+
+    def on_arm(self, req):
+        GameProperties.CURRENT_STRATEGY = GameProperties.AVAILABLE_STRATEGIES[req.chosen_strategy_id]
+        GameProperties.CURRENT_TEAM     = GameProperties.AVAILABLE_TEAMS[req.chosen_team_id]
+        rospy.set_param("/current_strategy", GameProperties.CURRENT_STRATEGY)
+        rospy.set_param("/current_team",     GameProperties.CURRENT_TEAM)
+        self._ai_start_request = True
 
     def on_hmi_event(self, req):
         if req.event == req.EVENT_HMI_INITIALIZED:
             time.sleep(0.5)
             self._hmi_init = True
-        if req.event == req.EVENT_START:
-            GameProperties.CURRENT_STRATEGY = GameProperties.AVAILABLE_STRATEGIES[req.chosen_strategy_id]
-            GameProperties.CURRENT_TEAM     = GameProperties.AVAILABLE_TEAMS[req.chosen_team_id]
-            rospy.set_param("/current_strategy", GameProperties.CURRENT_STRATEGY)
-            rospy.set_param("/current_team",     GameProperties.CURRENT_TEAM)
-            self._ai_start_request = True
-            rospy.loginfo("[AI] Starting actions ! Strategy '{}' and team '{}'.".format(GameProperties.CURRENT_STRATEGY, GameProperties.CURRENT_TEAM))
-        elif req.event == req.EVENT_GAME_CANCEL: # TODO remove ? Should be trigerred by a game_status HALT
-            rospy.logwarn("[AI] HMI Asked to stop ! Stopping strategy execution.")
-            self.AI.halt()
+        # if req.event == req.EVENT_START: # DEPRECATED, kept for now
+        #     GameProperties.CURRENT_STRATEGY = GameProperties.AVAILABLE_STRATEGIES[req.chosen_strategy_id]
+        #     GameProperties.CURRENT_TEAM     = GameProperties.AVAILABLE_TEAMS[req.chosen_team_id]
+        #     rospy.set_param("/current_strategy", GameProperties.CURRENT_STRATEGY)
+        #     rospy.set_param("/current_team",     GameProperties.CURRENT_TEAM)
+        #     self._ai_start_request = True
+        #     rospy.loginfo("[AI] Starting actions ! Strategy '{}' and team '{}'.".format(GameProperties.CURRENT_STRATEGY, GameProperties.CURRENT_TEAM))
+        # elif req.event == req.EVENT_GAME_CANCEL: # TODO remove ? Should be trigerred by a game_status HALT
+        #     rospy.logwarn("[AI] HMI Asked to stop ! Stopping strategy execution.")
+        #     self.AI.halt()
 
 '''
 PACKAGE STARTING POINT HERE
