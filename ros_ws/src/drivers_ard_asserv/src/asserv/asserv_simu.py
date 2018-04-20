@@ -161,7 +161,8 @@ class AsservSimu(AsservAbstract):
 
         if self._states.should_rotate_to_align_traj(
             curr_pose=self._current_pose,
-            goal_pose=self._current_goal.pose):
+            goal_pose=self._current_goal.pose,
+            direction=self._current_goal.direction):
 
             self._states.state = State.ROTATING_TO_ALIGN_TRAJ
 
@@ -169,6 +170,7 @@ class AsservSimu(AsservAbstract):
             curr_pose=self._current_pose,
             goal_pose=self._current_goal.pose,
             direction=self._current_goal.direction):
+
 
             self._states.state = State.MOVING_ON_TRAJ
 
@@ -260,6 +262,8 @@ class StatesManager():
         wanted_angle = math.atan2(goal_pose.y - curr_pose.y,
                                   goal_pose.x - curr_pose.x)
         wanted_angle += math.pi if direction == 0 else 0
+
+        wanted_angle %= 2* math.pi
         return wanted_angle
 
     def should_move_on_traj(self, curr_pose, goal_pose, direction):
@@ -269,8 +273,8 @@ class StatesManager():
                and not self.is_pos_in_margins(curr_pose, goal_pose) \
                and self.is_angle_in_margins(curr_pose.theta, wanted_angle)
 
-    def should_rotate_to_align_traj(self, curr_pose, goal_pose):
-        wanted_angle = self.get_wanted_angle_to_align_traj(curr_pose, goal_pose)
+    def should_rotate_to_align_traj(self, curr_pose, goal_pose, direction):
+        wanted_angle = self.get_wanted_angle_to_align_traj(curr_pose, goal_pose, direction)
         return self.in_movement and not self.emergency_stop and \
                not self.is_angle_in_margins(curr_pose.theta, wanted_angle) and \
                not self.is_pos_in_margins(curr_pose, goal_pose)
