@@ -250,12 +250,10 @@ class AsservReal(AsservAbstract):
                (self._robot_raw_position.theta % (2 * math.pi) + 2 * math.pi >
                 a % (2 * math.pi) + 2 * math.pi - ASSERV_ERROR_ANGLE)
 
-    def _check_reached_position(self, x, y):
+    def _check_reached_position(self, x, y, ratio=1):
         rospy.loginfo("Check reached position, own pos = {}, {}, check pos  = {}, {}".format(self._robot_raw_position.x, self._robot_raw_position.y, x, y))
-        return ((self._robot_raw_position.x > x - ASSERV_ERROR_POSITION) and
-                (self._robot_raw_position.x < x + ASSERV_ERROR_POSITION) and
-                (self._robot_raw_position.y > y - ASSERV_ERROR_POSITION) and
-                (self._robot_raw_position.y < y + ASSERV_ERROR_POSITION))
+        position_error = math.sqrt(math.pow(self._robot_raw_position.x, 2) + math.pow(self._robot_raw_position.y, 2))
+        return position_error < ASSERV_ERROR_POSITION * ratio
 
     def _callback_timer_check_reached(self, event):
         rospy.logdebug("In check reached timer callback")
@@ -270,7 +268,7 @@ class AsservReal(AsservAbstract):
             elif len(goal_data) == 3:
                 reached = self._check_reached_position(goal_data[1], goal_data[2])
             elif len(goal_data) == 4:
-                reached = self._check_reached_position(goal_data[1], goal_data[2])
+                reached = self._check_reached_position(goal_data[1], goal_data[2], 2)
                 reached &= self._check_reached_angle(goal_data[3])
             else:
                 rospy.logwarn("Goal id ack but not corresponding goal data...")
