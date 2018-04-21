@@ -367,8 +367,9 @@ Ax12Server::Ax12Server(const std::string &action_name, const std::string &servic
     timer_ = nh_.createTimer(ros::Duration(1.0 / MAIN_FREQUENCY), &Ax12Server::main_loop, this);
 
     status_services_ = std::make_unique<StatusServices>(
-        "drivers", "ax12", [this, port](const ai_game_status::ArmRequest::ConstPtr &){
-            this->_on_armRequest(port);
+        "drivers", "ax12", [this](const ai_game_status::ArmRequest::ConstPtr &){
+            driver_.scan_motors();
+            driver_.toggle_torque(true);
         });
 
     status_services_->setReady(true);
@@ -377,11 +378,5 @@ Ax12Server::Ax12Server(const std::string &action_name, const std::string &servic
 Ax12Server::~Ax12Server() {
     driver_.toggle_torque(false);
     ros::shutdown();
-}
-
-void Ax12Server::_on_armRequest(std::string port)
-{
-    driver_.scan_motors();
-    driver_.toggle_torque(true);
 }
 
