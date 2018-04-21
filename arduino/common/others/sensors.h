@@ -38,6 +38,7 @@ void color_sensor_values_capture();
 void color_sensor_filter_apply(rgb_name_enum color);
 void color_sensor_rgb_to_tsl(uint8_t rgbValues[3], uint16_t tslColors[3]);
 void color_sensor_values_publish(uint16_t tslColors[3]);
+void color_sensor_mean_value_compute(uint16_t tslColors[3]);
 
 #endif
 
