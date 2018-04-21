@@ -46,6 +46,19 @@ uint8_t getLog10(const uint16_t number) {
     return 1;
 }
 
+void emergencyStop(const uint8_t enable) {
+    // Reset the PID to remove the error sum
+    PIDReset(&PID_left);
+    PIDReset(&PID_right);
+    if (enable == 0) {
+        digitalWrite(LED_DEBUG, LOW);
+        ControlUnsetStop(EMERGENCY_BIT);
+    } else {
+        digitalWrite(LED_DEBUG, HIGH);
+        ControlSetStop(EMERGENCY_BIT);
+    }
+}
+
 //order is order;id_servo;params
 void parseAndExecuteOrder(const String& order) {
     static char receivedOrder[25];
@@ -60,6 +73,7 @@ void parseAndExecuteOrder(const String& order) {
     switch (orderChar) {
         case START:
         {
+            emergencyStop(0);
             // Ack that arduino has started
             SerialSender::SerialSend(SERIAL_INFO, "%d;", order_id);
             SerialSender::SerialSend(SERIAL_DEBUG, "Arduino %s has started (%d)", ARDUINO_ID, order_id);
@@ -68,6 +82,7 @@ void parseAndExecuteOrder(const String& order) {
         }
         case HALT:
         {
+            emergencyStop(1);
             // Ack that arduino has stopped
             SerialSender::SerialSend(SERIAL_INFO, "%d;", order_id);
             SerialSender::SerialSend(SERIAL_DEBUG, "Arduino %s has stopped (%d)", ARDUINO_ID, order_id);
@@ -269,12 +284,9 @@ void parseAndExecuteOrder(const String& order) {
             int enable;
             sscanf(receivedOrderPtr, "%i", &enable);
             if (enable == 0) {
-                ControlUnsetStop(EMERGENCY_BIT);
+                emergencyStop(0);
             } else {
-                // Reset the PID to remove the error sum
-                PIDReset(&PID_left);
-                PIDReset(&PID_right);
-                ControlSetStop(EMERGENCY_BIT);
+                emergencyStop(1);
             }
             SerialSender::SerialSend(SERIAL_INFO, "%d;", order_id);
             break;
