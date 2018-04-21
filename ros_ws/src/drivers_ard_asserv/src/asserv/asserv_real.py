@@ -244,16 +244,22 @@ class AsservReal(AsservAbstract):
             self._sending_queue.task_done()
 
     def _check_reached_angle(self, a):
-        rospy.loginfo("Check reached angle, own angle = {}, check angle  = {}".format(self._robot_raw_position.theta, a))
-        return (self._robot_raw_position.theta % (2 * math.pi) + 2 * math.pi <
-                a % (2 * math.pi) + 2 * math.pi + ASSERV_ERROR_ANGLE) and \
-               (self._robot_raw_position.theta % (2 * math.pi) + 2 * math.pi >
-                a % (2 * math.pi) + 2 * math.pi - ASSERV_ERROR_ANGLE)
+        result = (self._robot_raw_position.theta % (2 * math.pi) + 2 * math.pi < a % (2 * math.pi) + 2 * math.pi + ASSERV_ERROR_ANGLE) and \
+                 (self._robot_raw_position.theta % (2 * math.pi) + 2 * math.pi > a % (2 * math.pi) + 2 * math.pi - ASSERV_ERROR_ANGLE)
+        if result:
+            rospy.loginfo("Angle reached, own angle = {}, check angle  = {}".format(self._robot_raw_position.theta, a))
+        else:
+            rospy.logwarn("Angle not reached, own angle = {}, check angle  = {}".format(self._robot_raw_position.theta, a))
+        return result
 
     def _check_reached_position(self, x, y, ratio=1):
-        rospy.loginfo("Check reached position, own pos = {}, {}, check pos  = {}, {}".format(self._robot_raw_position.x, self._robot_raw_position.y, x, y))
-        position_error = math.sqrt(math.pow(self._robot_raw_position.x, 2) + math.pow(self._robot_raw_position.y, 2))
-        return position_error < ASSERV_ERROR_POSITION * ratio
+        position_error = math.sqrt(math.pow(self._robot_raw_position.x - x, 2) + math.pow(self._robot_raw_position.y - y, 2))
+        result = position_error < ASSERV_ERROR_POSITION * ratio
+        if result:
+            rospy.loginfo("Position reached, own pos = {}, {}, check pos  = {}, {}".format(self._robot_raw_position.x, self._robot_raw_position.y, x, y))
+        else:
+            rospy.logwarn("Position not reached, own pos = {}, {}, check pos  = {}, {}".format(self._robot_raw_position.x, self._robot_raw_position.y, x, y))
+        return result
 
     def _callback_timer_check_reached(self, event):
         rospy.logdebug("In check reached timer callback")
