@@ -42,10 +42,8 @@ void ObjectsClassifierSubscriber::objectsCallback(const Objects::ConstPtr& msg)
 {
     lock_guard<mutex> lock(g_mutex);
     lastRects.clear();
-    addRects(msg->map_rects);
     addRects(msg->unknown_rects);
     lastCircles.clear();
-    addCircles(msg->map_circles);
     addCircles(msg->unknown_circles);
 }
 
