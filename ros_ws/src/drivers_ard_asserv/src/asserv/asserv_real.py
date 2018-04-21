@@ -16,8 +16,8 @@ __author__ = "Thomas Fuhrmann"
 __date__ = 16/12/2017
 
 ASSERV_ERROR_POSITION = 0.01  # in meters
-ASSERV_ERROR_ANGLE = 0.1  # in radians
-POSITION_REACHED_CHECK_DELAY = 1  # in seconds
+ASSERV_ERROR_ANGLE = 0.15  # in radians
+POSITION_REACHED_CHECK_DELAY = 0.25  # in seconds
 
 
 class AsservReal(AsservAbstract):
