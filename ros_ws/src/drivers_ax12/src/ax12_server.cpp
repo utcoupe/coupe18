@@ -1,4 +1,7 @@
 #include "ax12_server.h"
+
+#include <ai_game_status/ArmRequest.h>
+
 #include <memory>
 
 using namespace Ax12Table;
@@ -347,10 +350,10 @@ Ax12Server::Ax12Server(const std::string &action_name, const std::string &servic
             boost::bind(&Ax12Server::cancel_goal_cb, this, _1), false),
         set_param_service(nh_.advertiseService(service_name, &Ax12Server::execute_set_service_cb, this)),
         game_status_sub_(nh_.subscribe(GAME_STATUS_TOPIC, 30, &Ax12Server::game_status_cb, this)),
-        driver_(),
         joint_goals_(),
         feedback_(),
         result_(),
+        driver_(),
         is_halted(false) {
 
     as_.start();
@@ -363,11 +366,15 @@ Ax12Server::Ax12Server(const std::string &action_name, const std::string &servic
 
     timer_ = nh_.createTimer(ros::Duration(1.0 / MAIN_FREQUENCY), &Ax12Server::main_loop, this);
 
-    status_services_ = std::make_unique<StatusServices>(
+    /*status_services_ = std::make_unique<StatusServices>(
             "drivers", "ax12", [this, port]() { // arm callback
                 init_driver(port);
                 return true;
-            });
+            });*/
+    status_services_ = std::make_unique<StatusServices>(
+        "drivers", "ax12", [this, port](const ai_game_status::ArmRequest::ConstPtr &){
+            this->_on_armRequest(port);
+        });
 
     status_services_->setReady(true);
 }
@@ -376,3 +383,9 @@ Ax12Server::~Ax12Server() {
     driver_.toggle_torque(false);
     ros::shutdown();
 }
+
+void Ax12Server::_on_armRequest(std::string port)
+{
+    init_driver(port);
+}
+
