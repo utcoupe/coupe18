@@ -164,7 +164,7 @@ class AsservReal(AsservAbstract):
             except KeyboardInterrupt:
                 break
             except serial.SerialException as ex:
-                rospy.logwarn("[ASSERV] Serial read problem : " + ex)
+                rospy.logwarn("[ASSERV] Serial read problem : " + ex.message)
             rospy.sleep(0.001)
 
     def _process_received_data(self, data):
@@ -194,7 +194,7 @@ class AsservReal(AsservAbstract):
                 self._robot_raw_position = robot_position
                 self._node.send_robot_position(robot_position)
                 self._node.send_robot_speed(RobotSpeed(float(receied_data_list[5]), float(receied_data_list[6]), float(receied_data_list[7]) / 1000.0, float(receied_data_list[8]), float(receied_data_list[9])))
-            except:
+            except ValueError:
                 rospy.logwarn("[ASSERV] Received bad position from the robot, drop it...")
         # Received order ack
         elif data.find(";") >= 1 and data.find(";") <= 3:
@@ -208,7 +208,7 @@ class AsservReal(AsservAbstract):
                 ack_data = data.split(";")
                 try:
                     ack_id = int(ack_data[0])
-                except:
+                except ValueError:
                     ack_id = -1
                 if ack_id in self._orders_id_dictionary:
                     rospy.logdebug("[ASSERV] Found key %d in order_id dictionary !", ack_id)
