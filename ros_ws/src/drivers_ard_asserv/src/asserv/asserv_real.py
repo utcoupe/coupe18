@@ -36,6 +36,8 @@ class AsservReal(AsservAbstract):
         self._orders_id_dictionary = {}
         # This list stores the last received ack ID from Arduino (a list to avoid zapping an ack). This list is used by the timer callback which check that position has been reached
         self._last_received_id_dictionary = {}
+        # This is kind of a ack because the GOTOA order is transformed in GOTO + ROT in the Arduino asserv and this makes some trouble for goal reach check...
+        self._gotoa_second_goal_received = False
         # Store the current position of robot, this one is the raw value returned by the asserv
         self._robot_raw_position = Pose2D(0, 0, 0)
         # Timer for the send of serial data to avoid that sending are buffered in the internal OS buffer (make the arduino crash)
@@ -208,12 +210,22 @@ class AsservReal(AsservAbstract):
                     ack_id = int(ack_data[0])
                 except:
                     ack_id = -1
-                # TODO manage status
                 if ack_id in self._orders_id_dictionary:
                     rospy.logdebug("[ASSERV] Found key %d in order_id dictionary !", ack_id)
-                    self._last_received_id_dictionary[ack_id] = self._orders_id_dictionary[ack_id]
-                    del self._orders_id_dictionary[ack_id]
-                    self._check_reached_timer = rospy.Timer(rospy.Duration(POSITION_REACHED_CHECK_DELAY), self._callback_timer_check_reached, oneshot=True)
+                    # Check if received a GOTOA ack because it needs extra processing
+                    if len(self._orders_id_dictionary[ack_id]) == 4:
+                        if self._gotoa_second_goal_received:
+                            # Normal operation
+                            self._gotoa_second_goal_received = False
+                        else:
+                            # Drop the received ack_id, we are waiting for the second one
+                            # TODO better solution for -1 ?
+                            ack_id = -1
+                            self._gotoa_second_goal_received = True
+                    if ack_id != -1:
+                        self._last_received_id_dictionary[ack_id] = self._orders_id_dictionary[ack_id]
+                        del self._orders_id_dictionary[ack_id]
+                        self._check_reached_timer = rospy.Timer(rospy.Duration(POSITION_REACHED_CHECK_DELAY), self._callback_timer_check_reached, oneshot=True)
                 else:
                     # Do nothing, some IDs are returned but do not correspond to a value in the dictionary.
                     rospy.logdebug("Received ack id ({}) but dropping it.".format(ack_id))
