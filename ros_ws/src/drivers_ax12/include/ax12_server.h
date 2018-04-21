@@ -72,9 +72,6 @@ public:
     Ax12Server(const std::string &action_name, const std::string &service_name);
 
     ~Ax12Server();
-
-private:
-    void _on_armRequest(std::string port);
 };
 
 #endif //DRIVERS_AX12_AX12_SERVER_H

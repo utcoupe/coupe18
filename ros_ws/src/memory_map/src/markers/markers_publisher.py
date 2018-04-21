@@ -81,6 +81,7 @@ class MarkersPublisher():
     def _publish_objects(self, objects_dictman, j = 0): # TODO containers inside containers
         i = 0
         for e in objects_dictman.Dict.keys():
+            time.sleep(0.005)
             if "container_" in e:
                 i += self._publish_objects(objects_dictman.get("{}/^".format(e)), i)
             else:
