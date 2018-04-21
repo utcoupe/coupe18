@@ -61,7 +61,7 @@ class AsservReal(AsservAbstract):
                     self._reception_queue.task_done()
                 except KeyboardInterrupt:
                     break
-            rospy.sleep(0.01)
+            rospy.sleep(0.001)
         # Force the arduino to halt
         self._halt()
 
@@ -163,7 +163,7 @@ class AsservReal(AsservAbstract):
                 break
             except serial.SerialException as ex:
                 rospy.logwarn("[ASSERV] Serial read problem : " + ex)
-            rospy.sleep(0.01)
+            rospy.sleep(0.001)
 
     def _process_received_data(self, data):
         """

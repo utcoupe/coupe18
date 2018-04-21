@@ -20,7 +20,7 @@ __date__ = 21/10/2017
 NODE_NAME = "ard_asserv"
 GET_PORT_SERVICE_NAME = "/drivers/port_finder/get_port"
 GET_MAP_SERVICE_NAME = "/memory/map/fill_waypoint"
-GET_PORT_SERVICE_TIMEOUT = 15  # in seconds
+GET_PORT_SERVICE_TIMEOUT = 25  # in seconds
 
 
 class Asserv:
