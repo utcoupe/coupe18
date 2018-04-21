@@ -9,6 +9,8 @@ ros::NodeHandle nh;
 #include <Wire.h>
 #include "VL53L0X.h"
 #include <drivers_ard_others/BeltRange.h>
+#include <drivers_ard_others/Color.h>
+#include "sensors.h"
 
 //Actuators includes
 #include "Servo.h"
@@ -46,6 +48,7 @@ void init_belt_sensors() {
 
     for(uint8_t i = 0; i < NUM_BELT_SENSORS; i++) {
         belt_sensors[i].setTimeout(500);
+        belt_sensors[i].setMeasurementTimingBudget(200000);
         belt_sensors[i].startContinuous();
     }
 }
@@ -62,12 +65,18 @@ void loop_belt_sensors() {
 
 void loop_sensors() {
     loop_belt_sensors();
+#ifdef SENSOR_COLOR_ENABLED
+    color_sensor_loop();
+#endif
 }
 
 Timer sensors_loop_timer = Timer(50, &loop_sensors);
 
 void init_sensors() {
     init_belt_sensors();
+#ifdef SENSOR_COLOR_ENABLED
+    color_sensor_init(&nh);
+#endif
     sensors_loop_timer.Start();
 }
 
@@ -82,13 +91,13 @@ bool digital_actuators_states[NUM_DIGITAL_ACTUATORS]        = {true};
 #define NUM_PWM_ACTUATORS 1
 const uint8_t pins_pwm_actuators_pwm[NUM_PWM_ACTUATORS]         = {8};
 uint8_t pwm_actuators_states[NUM_PWM_ACTUATORS]             = {0};
-// Names : motor_canon1, motor_canon2
+// Names : canon
 
 #define NUM_SERVO_ACTUATORS 3
 const uint8_t pins_servo_actuators_pwm[NUM_SERVO_ACTUATORS]     = {9,  10, 11};
 int16_t servo_actuators_states[NUM_SERVO_ACTUATORS]         = {10, 10, 10};
 Servo servo_actuators_objects[NUM_SERVO_ACTUATORS];
-// Names : servo_main_door
+// Names : servo_front_lift, servo_back_lift, servo_lock
 
 // Actuators ROS callbacks
 

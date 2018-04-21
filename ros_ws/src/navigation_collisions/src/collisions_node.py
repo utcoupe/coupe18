@@ -33,6 +33,7 @@ class CollisionsNode():
         r = rospy.Rate(20)
         while not rospy.is_shutdown():
             #ObstaclesStack.updateBeltPoints([RectObstacle(Position(1.5, 0.5, 0.2), 0.3, 0.15)])
+#            startTime = rospy.Time.now()
             self.subscriptions.update_robot()
             if self.active:
                 for c in Map.Robot.check_collisions(ObstaclesStack.toList()):
@@ -42,6 +43,11 @@ class CollisionsNode():
             self.markers.publishObstacles(ObstaclesStack.toList())
 
             ObstaclesStack.garbageCollect()
+
+#            duration = rospy.Time.now() - startTime
+#            if rospy.Time.now() - lastPub > rospy.Duration(1):
+#                lastPub = rospy.Time.now()
+#                rospy.loginfo("check done in " + str(duration.to_sec()))
 
             r.sleep()
 

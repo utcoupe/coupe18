@@ -127,14 +127,8 @@
 			</orderref>
 
 			<actionlist repeat="10">
-				<orderref ref="actuator_ax12_set_pos">
-					<name>barrel</name>
-					<preset>HIGH</preset>
-				</orderref>
-
-				<orderref ref="actuator_ax12_set_pos">
-					<name>barrel</name>
-					<preset>CANON</preset>
+				<orderref ref="do_barrel_action">
+					<sort>0</sort>
 				</orderref>
       </actionlist>
 
@@ -164,14 +158,8 @@
       </orderref>
 
       <actionlist repeat="10">
-				<orderref ref="actuator_ax12_set_pos">
-					<name>barrel</name>
-					<preset>HIGH</preset>
-				</orderref>
-
-				<orderref ref="actuator_ax12_set_pos">
-					<name>barrel</name>
-					<preset>CANON</preset>
+				<orderref ref="do_barrel_action">
+					<sort>0</sort>
 				</orderref>
       </actionlist>
 

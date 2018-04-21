@@ -6,17 +6,17 @@
   </params>
   <sensors>
     <sensor id="sensor1"> <!-- x, y in meters, a in rad -->
-      <x>0.1</x>
-      <y>0.15</y>
+      <x>0.074</x>
+      <y>0.05</y>
       <a>0.0</a>
     </sensor>
     <sensor id="sensor2"> <!-- x, y in meters, a in rad -->
-      <x>0.1</x>
-      <y>-0.15</y>
+      <x>0.074</x>
+      <y>-0.05</y>
       <a>0.0</a>
     </sensor>
     <sensor id="sensor_tera1"> <!-- x, y in meters, a in rad -->
-      <x>0</x>
+      <x>0.085</x>
       <y>0</y>
       <a>0</a>
     </sensor>

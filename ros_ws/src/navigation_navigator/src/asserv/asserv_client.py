@@ -59,7 +59,12 @@ class AsservClient(object):
 
     def _handleUpdatePose (self, newPose):
         self.currentPose = newPose
-
+    
+    def cancelGoal(self, idOrder):
+        if idOrder in self._currentActions:
+            self._currentActions[idOrder].cancel()
+        else:
+            rospy.logwarn("Trying to cancel an unknown goal")
 
     def goto (self, pos, hasAngle):
         response = False
@@ -118,6 +123,10 @@ class AsservClient(object):
                 self._callbacksDoGoto[idAct](idAct, False)
                 del self._callbacksDoGoto[idAct]
                 del self._currentActions[idAct]
+    
+    def cancelAllGoals(self):
+        self._asservManageService.call(mode=ManagementRequest.CLEANG)
+        self._asservManageService.call(mode=ManagementRequest.KILLG)
     
     def stopAsserv (self):
         rospy.loginfo("stop asserv")

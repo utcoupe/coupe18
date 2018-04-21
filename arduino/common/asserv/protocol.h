@@ -85,5 +85,6 @@ extern unsigned char flagArduinoConnected;
 void parseAndExecuteOrder(const String& order);
 uint8_t getLog10(const uint16_t number);
 void ProtocolAutoSendStatus();
+void emergencyStop(const uint8_t enable);
 
 #endif //ASSERV_PROTOCOL_H

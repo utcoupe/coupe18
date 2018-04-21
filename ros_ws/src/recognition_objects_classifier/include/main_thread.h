@@ -36,7 +36,7 @@ const float STEP_X = 0.02;
 const float STEP_Y = 0.02;
 
 // minimum fraction of a rect to be in map for it to be considered static
-const float MIN_MAP_FRAC = 0.5;
+const float MIN_MAP_FRAC = 0.35;
 
 // if the absolute time diff between the received time and the header time is
 // greater than this (s), adjusts the header time (for rects)

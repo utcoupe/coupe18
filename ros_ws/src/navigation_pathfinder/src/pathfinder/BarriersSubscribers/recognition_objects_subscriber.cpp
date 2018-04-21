@@ -42,10 +42,8 @@ void ObjectsClassifierSubscriber::objectsCallback(const Objects::ConstPtr& msg)
 {
     lock_guard<mutex> lock(g_mutex);
     lastRects.clear();
-    addRects(msg->map_rects);
     addRects(msg->unknown_rects);
     lastCircles.clear();
-    addCircles(msg->map_circles);
     addCircles(msg->unknown_circles);
 }
 
@@ -67,7 +65,7 @@ bool ObjectsClassifierSubscriber::isInsideRect(const Rectangle& rect, const geom
     dx = pos.x - rect.x;
     dy = pos.y - rect.y;
     double a, b; // (a,b) => coordinates of pos with the center of the rectangle as origin and its sides as vectors
-    a = -dx*cos(rect.a) - dy*sin(M_PI - rect.a);
+    a = -dx*cos(rect.a) - dy*sin(M_PI - rect.a) + rect.w/2;
     b = dx*sin(rect.a) - dy*cos(rect.a);
     // if a/rect.witdh  is in [-1/2,1/2] and b/rect.height in [-1/2,1/2], then the pos is inside the rectangle
     double da, db;

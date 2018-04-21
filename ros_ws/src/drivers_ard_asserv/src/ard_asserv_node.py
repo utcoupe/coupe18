@@ -20,7 +20,7 @@ __date__ = 21/10/2017
 NODE_NAME = "ard_asserv"
 GET_PORT_SERVICE_NAME = "/drivers/port_finder/get_port"
 GET_MAP_SERVICE_NAME = "/memory/map/fill_waypoint"
-GET_PORT_SERVICE_TIMEOUT = 15  # in seconds
+GET_PORT_SERVICE_TIMEOUT = 25  # in seconds
 
 
 class Asserv:
@@ -55,7 +55,6 @@ class Asserv:
         self._srv_params = rospy.Service("/drivers/" + NODE_NAME + "/parameters", Parameters, self._callback_asserv_param)
         self._srv_management = rospy.Service("/drivers/" + NODE_NAME + "/management", Management, self._callback_management)
         self._act_goto = actionlib.ActionServer("/drivers/" + NODE_NAME + "/goto_action", DoGotoAction, self._callback_action_goto, auto_start=False)
-        self._sub_game_status = rospy.Subscriber("/ai/game_status/status", GameStatus, self._callback_game_status)
         self._pub_tf_odom = tf2_ros.TransformBroadcaster()
         self._act_goto.start()
         self._srv_client_map_fill_waypoints = None
@@ -81,7 +80,7 @@ class Asserv:
             rospy.logwarn("Memory_map has not been launched...")
 
         # Tell ai/game_status the node initialized successfuly.
-        StatusServices("drivers", "ard_asserv").ready(True)
+        StatusServices("drivers", "ard_asserv", None, self._callback_game_status).ready(True)
 
         self._asserv_instance.start()
 
@@ -158,7 +157,10 @@ class Asserv:
                 set_position = self._srv_client_map_fill_waypoints.call(wpt).filled_waypoint.pose
             else:
                 rospy.logwarn("[ASSERV] Received a waypoint request but memory_map seems not to be launched...")
-        ret_value = self._asserv_instance.set_pos(set_position.x, set_position.y, set_position.theta)
+        if self._asserv_instance:
+            ret_value = self._asserv_instance.set_pos(set_position.x, set_position.y, set_position.theta)
+        else:
+            ret_value = False
         return SetPosResponse(ret_value)
 
     def _callback_pwm(self, request):
@@ -170,7 +172,10 @@ class Asserv:
         @rtype:         PwmResponse
         """
         rospy.logdebug("[ASSERV] Received a request (pwm service).")
-        ret_value = self._asserv_instance.pwm(request.left, request.right, request.duration)
+        if self._asserv_instance:
+            ret_value = self._asserv_instance.pwm(request.left, request.right, request.duration)
+        else:
+            ret_value = False
         return PwmResponse(ret_value)
 
     def _callback_speed(self, request):
@@ -182,7 +187,10 @@ class Asserv:
         @rtype:         SpeedResponse
         """
         rospy.logdebug("[ASSERV] Received a request (speed service).")
-        ret_value = self._asserv_instance.speed(request.linear, request.angular, request.duration)
+        if self._asserv_instance:
+            ret_value = self._asserv_instance.speed(request.linear, request.angular, request.duration)
+        else:
+            ret_value = False
         return SpeedResponse(ret_value)
 
     def _callback_emergency_stop(self, request):
@@ -194,7 +202,10 @@ class Asserv:
         @rtype:         EmergencyStopResponse
         """
         rospy.logdebug("[ASSERV] Received a request (emergency_stop service).")
-        ret_value = self._asserv_instance.set_emergency_stop(request.enable)
+        if self._asserv_instance:
+            ret_value = self._asserv_instance.set_emergency_stop(request.enable)
+        else:
+            ret_value = False
         return EmergencyStopResponse(ret_value)
 
     def _callback_asserv_param(self, request):
@@ -207,21 +218,24 @@ class Asserv:
         """
         rospy.logdebug("[ASSERV] Received a request (parameters service).")
         response = True
-        if request.mode == request.SPDMAX:
-            response = self._asserv_instance.set_max_speed(request.spd, request.spd_ratio)
-        elif request.mode == request.ACCMAX:
-            response = self._asserv_instance.set_max_accel(request.acc)
-        elif request.mode == request.PIDRIGHT:
-            # TODO manage left and right
-            response = self._asserv_instance.set_pid(request.p, request.i, request.d)
-        elif request.mode == request.PIDLEFT:
-            # TODO manage left and right
-            response = self._asserv_instance.set_pid(request.p, request.i, request.d)
-        elif request.mode == request.PIDALL:
-            response = self._asserv_instance.set_pid(request.p, request.i, request.d)
+        if self._asserv_instance:
+            if request.mode == request.SPDMAX:
+                response = self._asserv_instance.set_max_speed(request.spd, request.spd_ratio)
+            elif request.mode == request.ACCMAX:
+                response = self._asserv_instance.set_max_accel(request.acc)
+            elif request.mode == request.PIDRIGHT:
+                # TODO manage left and right
+                response = self._asserv_instance.set_pid(request.p, request.i, request.d)
+            elif request.mode == request.PIDLEFT:
+                # TODO manage left and right
+                response = self._asserv_instance.set_pid(request.p, request.i, request.d)
+            elif request.mode == request.PIDALL:
+                response = self._asserv_instance.set_pid(request.p, request.i, request.d)
+            else:
+                response = False
+                rospy.logerr("[ASSERV] Parameter mode %d does not exists...", request.mode)
         else:
             response = False
-            rospy.logerr("[ASSERV] Parameter mode %d does not exists...", request.mode)
         return ParametersResponse(response)
 
     def _callback_management(self, request):
@@ -234,23 +248,26 @@ class Asserv:
         """
         rospy.logdebug("[ASSERV] Received a request (management service).")
         response = True
-        if request.mode == request.KILLG:
-            response = self._asserv_instance.kill_goal()
-        elif request.mode == request.CLEANG:
-            response = self._asserv_instance.clean_goals()
-            # Delete all internal goals
-            for goal in self._goals_dictionary.values():
-                goal.set_canceled()
-            self._goals_dictionary.clear()
-        elif request.mode == request.PAUSE:
-            response = self._asserv_instance.pause(True)
-        elif request.mode == request.RESUME:
-            response = self._asserv_instance.pause(False)
-        elif request.mode == request.RESET_ID:
-            response = self._asserv_instance.reset_id()
+        if self._asserv_instance:
+            if request.mode == request.KILLG:
+                response = self._asserv_instance.kill_goal()
+            elif request.mode == request.CLEANG:
+                response = self._asserv_instance.clean_goals()
+                # Delete all internal goals
+                for goal in self._goals_dictionary.values():
+                    goal.set_canceled()
+                self._goals_dictionary.clear()
+            elif request.mode == request.PAUSE:
+                response = self._asserv_instance.pause(True)
+            elif request.mode == request.RESUME:
+                response = self._asserv_instance.pause(False)
+            elif request.mode == request.RESET_ID:
+                response = self._asserv_instance.reset_id()
+            else:
+                response = False
+                rospy.logerr("[ASSERV] Management mode %d does not exists...", request.mode)
         else:
             response = False
-            rospy.logerr("[ASSERV] Management mode %d does not exists...", request.mode)
         return ManagementResponse(response)
 
     def _callback_action_goto(self, goal_handled):
@@ -288,34 +305,40 @@ class Asserv:
         @rtype:         bool
         """
         to_return = True
-        if mode == GotoRequest.GOTO:
-            rospy.loginfo("[ASSERV] Accepting goal GOTO (id = {}, x = {}, y = {}).".format(goal_id, x, y))
-            to_return = self._asserv_instance.goto(goal_id, x, y, direction)
-        elif mode == GotoRequest.GOTOA:
-            rospy.loginfo("[ASSERV] Accepting goal GOTOA (id = {}, x = {}, y = {}, a = {}).".format(goal_id, x, y, a))
-            to_return = self._asserv_instance.gotoa(goal_id, x, y, a, direction)
-        elif mode == GotoRequest.ROT:
-            rospy.loginfo("[ASSERV] Accepting goal ROT (id = {}, a = {}).".format(goal_id, a))
-            to_return = self._asserv_instance.rot(goal_id, a, False)
-        elif mode == GotoRequest.ROTNOMODULO:
-            rospy.loginfo("[ASSERV] Accepting goal ROT NOMODULO (id = {}, a = {}).".format(goal_id, a))
-            to_return = self._asserv_instance.rot(goal_id, a, True)
+        if self._asserv_instance:
+            if mode == GotoRequest.GOTO:
+                rospy.loginfo("[ASSERV] Accepting goal GOTO (id = {}, x = {}, y = {}).".format(goal_id, x, y))
+                to_return = self._asserv_instance.goto(goal_id, x, y, direction)
+            elif mode == GotoRequest.GOTOA:
+                rospy.loginfo("[ASSERV] Accepting goal GOTOA (id = {}, x = {}, y = {}, a = {}).".format(goal_id, x, y, a))
+                to_return = self._asserv_instance.gotoa(goal_id, x, y, a, direction)
+            elif mode == GotoRequest.ROT:
+                rospy.loginfo("[ASSERV] Accepting goal ROT (id = {}, a = {}).".format(goal_id, a))
+                to_return = self._asserv_instance.rot(goal_id, a, False)
+            elif mode == GotoRequest.ROTNOMODULO:
+                rospy.loginfo("[ASSERV] Accepting goal ROT NOMODULO (id = {}, a = {}).".format(goal_id, a))
+                to_return = self._asserv_instance.rot(goal_id, a, True)
+            else:
+                to_return = False
+                rospy.logerr("[ASSERV] GOTO mode %d does not exists...", mode)
         else:
             to_return = False
-            rospy.logerr("[ASSERV] GOTO mode %d does not exists...", mode)
         return to_return
 
     def _callback_game_status(self, msg):
         if not self._is_halted and msg.game_status == GameStatus.STATUS_HALT:
             self._is_halted = True
             # Halt the system, emergency stop + clean all goals
-            self._asserv_instance.set_emergency_stop(True)
+            if self._asserv_instance:
+                self._asserv_instance.set_emergency_stop(True)
             management_msg = ManagementRequest()
             management_msg.mode = ManagementRequest.CLEANG
             self._callback_management(management_msg)
+            rospy.loginfo("Asserv successfuly stopped")
         elif self._is_halted and msg.game_status != GameStatus.STATUS_HALT:
             self._is_halted = False
-            self._asserv_instance.set_emergency_stop(False)
+            if self._asserv_instance:
+                self._asserv_instance.set_emergency_stop(False)
 
 
 if __name__ == "__main__":

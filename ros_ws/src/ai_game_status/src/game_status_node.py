@@ -40,8 +40,11 @@ class Status():
         # "/processing/lidar_objects": None,
 
         "/drivers/ard_asserv": None,
+        #"/drivers/ard_hmi": None,
+        #"/drivers/ard_others": None,
         "/drivers/port_finder": None,
-        "/drivers/ax12": None
+        "/drivers/ax12": None,
+        "/drivers/teraranger": None,
     }
 
 

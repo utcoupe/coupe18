@@ -233,7 +233,7 @@ std::string Ax12Server::fetch_port(const std::string &service_name) {
 
     std::string port;
 
-    if (!ros::service::waitForService(service_name, 15000)) {
+    if (!ros::service::waitForService(service_name, 25000)) {
         ROS_ERROR("Failed to contact drivers_port_finder (service not up)");
     } else {
         ros::ServiceClient client = nh_.serviceClient<drivers_port_finder::GetPort>(service_name);
@@ -366,14 +366,10 @@ Ax12Server::Ax12Server(const std::string &action_name, const std::string &servic
 
     timer_ = nh_.createTimer(ros::Duration(1.0 / MAIN_FREQUENCY), &Ax12Server::main_loop, this);
 
-    /*status_services_ = std::make_unique<StatusServices>(
-            "drivers", "ax12", [this, port]() { // arm callback
-                init_driver(port);
-                return true;
-            });*/
     status_services_ = std::make_unique<StatusServices>(
-        "drivers", "ax12", [this, port](const ai_game_status::ArmRequest::ConstPtr &){
-            this->_on_armRequest(port);
+        "drivers", "ax12", [this](const ai_game_status::ArmRequest::ConstPtr &){
+            driver_.scan_motors();
+            driver_.toggle_torque(true);
         });
 
     status_services_->setReady(true);
@@ -382,10 +378,5 @@ Ax12Server::Ax12Server(const std::string &action_name, const std::string &servic
 Ax12Server::~Ax12Server() {
     driver_.toggle_torque(false);
     ros::shutdown();
-}
-
-void Ax12Server::_on_armRequest(std::string port)
-{
-    init_driver(port);
 }
 

@@ -64,16 +64,6 @@ terrain:
                     type: rect
                     width: 1.212
                     height: 0.250
-            uni_distrib_green:
-                position:
-                    frame_id: /map
-                    x: 1.5
-                    y: 0.125
-                    type: fixed
-                shape:
-                    type: rect
-                    width: 1.212
-                    height: 0.250
 
         layer_belt:
             castle_green:
@@ -99,42 +89,42 @@ terrain:
             uni_distrib_green:
                 position:
                     frame_id: /map
-                    x: 0.025
+                    x: 0.05
                     y: 1.160
                     type: fixed
                 shape:
                     type: rect
                     width: 0.1
-                    height: 0.05
+                    height: 0.08
             multi_distrib_green:
                 position:
                     frame_id: /map
                     x: 2.390
-                    y: 0.025
+                    y: 0.05
                     type: fixed
                 shape:
                     type: rect
-                    width: 0.05
+                    width: 0.08
                     height: 0.1
             uni_distrib_orange:
                 position:
                     frame_id: /map
-                    x: 2.975
+                    x: 2.95
                     y: 1.160
                     type: fixed
                 shape:
                     type: rect
                     width: 0.1
-                    height: 0.05
+                    height: 0.08
             multi_distrib_orange:
                 position:
                     frame_id: /map
                     x: 0.610
-                    y: 0.025
+                    y: 0.05
                     type: fixed
                 shape:
                     type: rect
-                    width: 0.05
+                    width: 0.08
                     height: 0.1
             stations:
                 position:

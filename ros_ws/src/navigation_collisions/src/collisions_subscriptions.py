@@ -9,9 +9,9 @@ from collisions_engine import Point, Position, Velocity, SegmentObstacle, RectOb
 from memory_map.srv import MapGet
 from navigation_navigator.msg import Status
 from drivers_ard_asserv.msg import RobotSpeed
-
 from recognition_objects_classifier.msg import ClassifiedObjects
 from ai_game_status import StatusServices
+
 
 class CollisionsSubscriptions(object):
     def __init__(self):

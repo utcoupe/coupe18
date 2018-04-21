@@ -59,8 +59,8 @@ void MapObjects::fetch_map_objects() {
 
 bool MapObjects::contains_point(float x, float y) {
     // TODO: remove hardcoded values and fetch from map
-
-    if (x > 3 || x < 0 || y < 0 || y > 2)
+    
+    if (x > 3 - WALLS_MARGIN || x < WALLS_MARGIN || y < WALLS_MARGIN || y > 2 - WALLS_MARGIN)
         return true;
 
     for (auto &map_shape : map_shapes_) {

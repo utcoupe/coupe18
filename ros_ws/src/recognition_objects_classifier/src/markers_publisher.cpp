@@ -68,8 +68,8 @@ void MarkersPublisher::publish_circles(
 
             marker.pose.position.x = circle.circle.center.x;
             marker.pose.position.y = circle.circle.center.y;
-            marker.scale.x = circle.circle.true_radius;
-            marker.scale.y = circle.circle.true_radius;
+            marker.scale.x = circle.circle.true_radius * 2.0;
+            marker.scale.y = circle.circle.true_radius * 2.0;
             marker.header = circle.header;
 
             marker.id = id_counter++;

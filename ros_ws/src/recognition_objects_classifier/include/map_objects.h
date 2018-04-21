@@ -12,6 +12,7 @@
 
 const std::string MAP_GET_SERVICE = "/memory/map/get";
 const std::string MAP_OBJECTS = "/terrain/walls/layer_belt/*";
+const float WALLS_MARGIN = 0.03;
 
 class MapObjects {
 protected:

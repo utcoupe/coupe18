@@ -47,6 +47,8 @@ bool Pathfinder::findPath(const Point& startPos, const Point& endPos, Path& path
     );
     if (!exploreGraph(mapDist, startPos, endPos)) // endPos not found or no paths exist between startPos and endPos
     {
+        if (_renderAfterComputing)
+            _mapStorage.saveMapToFile(_renderFile, _allowedPositions, _dynBarriersMng, Path(), Path());
         ROS_DEBUG("Pathfinder: No path found!");
         return true;
     }
