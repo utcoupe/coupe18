@@ -27,9 +27,6 @@ class CollisionsNode():
         self.subscriptions.send_init()
         rospy.loginfo("navigation/collisions ready, waiting for activation.")
 
-        # Tell ai/game_status the node initialized successfuly.
-        StatusServices("navigation", "collisions").ready(True)
-
         self.run()
 
     def run(self):
