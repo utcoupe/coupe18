@@ -1,6 +1,6 @@
 classes:
     cube:
-        collision: true # is the object to be avoided in the pathfinder
+        collision: false # is the object to be avoided in the pathfinder
         position:
             frame_id: /map
             type: pickable
