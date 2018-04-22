@@ -52,7 +52,7 @@ void MainThread::classify_and_publish_rects(processing_belt_interpreter::BeltRec
             }
         }
 
-        rects_transforms_.push_back({ point_idx - 1, transform_stamped });
+        rects_transforms_.push_back({point_idx - 1, transform_stamped});
 
         end_idx[rect_idx] = point_idx - 1;
         rect_idx++;
@@ -73,7 +73,7 @@ void MainThread::classify_and_publish_rects(processing_belt_interpreter::BeltRec
     unsigned int nbr_map = 0;
     for (int r = 0; r < rects.rects.size(); r++) {
 
-        if (end_idx[r] == -1 || (r > 0 && end_idx[r] == end_idx[r-1]))
+        if (end_idx[r] == -1 || (r > 0 && end_idx[r] == end_idx[r - 1]))
             continue;
 
         nbr_map = 0;
@@ -92,11 +92,12 @@ void MainThread::classify_and_publish_rects(processing_belt_interpreter::BeltRec
         }
     }
 
-    if(!classified_objects_.unknown_rects.empty() || !classified_objects_.map_rects.empty()) {
+    if (!classified_objects_.unknown_rects.empty() || !classified_objects_.map_rects.empty()) {
         pub_.publish(classified_objects_);
     }
 
-    if(ros::Time::now().toSec() - last_rviz_rect_pub_.toSec() > SECS_BETWEEN_RVIZ_PUB && markers_publisher_.is_connected()) {
+    if (ros::Time::now().toSec() - last_rviz_rect_pub_.toSec() > SECS_BETWEEN_RVIZ_PUB &&
+        markers_publisher_.is_connected()) {
         markers_publisher_.publish_rects(classified_objects_.map_rects, classified_objects_.unknown_rects);
         last_rviz_rect_pub_ = ros::Time::now();
     }
@@ -266,12 +267,13 @@ void MainThread::classify_and_publish_lidar_objects(processing_lidar_objects::Ob
             classified_objects_.unknown_segments.push_back(segment_s);
         }
     }
-    if(!classified_objects_.unknown_segments.empty() || !classified_objects_.map_segments.empty()
-            || !classified_objects_.unknown_circles.empty() || !classified_objects_.map_circles.empty()) {
+    if (!classified_objects_.unknown_segments.empty() || !classified_objects_.map_segments.empty()
+        || !classified_objects_.unknown_circles.empty() || !classified_objects_.map_circles.empty()) {
         pub_.publish(classified_objects_);
     }
 
-    if(ros::Time::now().toSec() - last_rviz_lidar_pub_.toSec() > SECS_BETWEEN_RVIZ_PUB && markers_publisher_.is_connected()) {
+    if (ros::Time::now().toSec() - last_rviz_lidar_pub_.toSec() > SECS_BETWEEN_RVIZ_PUB &&
+        markers_publisher_.is_connected()) {
 
         markers_publisher_.publish_segments(classified_objects_.map_segments, classified_objects_.unknown_segments);
         markers_publisher_.publish_circles(classified_objects_.map_circles, classified_objects_.unknown_circles);
@@ -289,6 +291,12 @@ void MainThread::classify_and_publish_lidar_objects(processing_lidar_objects::Ob
 
 }
 
+void MainThread::reconfigure_callback(recognition_objects_classifier::ObjectsClassifierConfig &config, uint32_t level) {
+    MIN_MAP_FRAC = config.MIN_MAP_FRAC;
+    map_objects_.WALLS_MARGIN = config.WALLS_MARGIN;
+    ROS_INFO("Setting MIN_MAP_FRAC to %f and WALLS_MARGIN to %f", MIN_MAP_FRAC, map_objects_.WALLS_MARGIN);
+}
+
 MainThread::MainThread(ros::NodeHandle &nh) :
         nh_(nh),
         pub_(nh.advertise<recognition_objects_classifier::ClassifiedObjects>(PUB_TOPIC, 1)),
@@ -300,8 +308,11 @@ MainThread::MainThread(ros::NodeHandle &nh) :
 
     map_objects_.fetch_map_objects();
 
+    dyn_server_.setCallback(boost::bind(&MainThread::reconfigure_callback, this, _1, _2));
+
     for (int i = 0; i < THREADS_NBR; i++) {
-        threads_.push_back(std::unique_ptr<ProcessingThread>(new ProcessingThread(points_, rects_transforms_, map_objects_)));
+        threads_.push_back(
+                std::unique_ptr<ProcessingThread>(new ProcessingThread(points_, rects_transforms_, map_objects_)));
         threads_[i]->start();
     }
 }
