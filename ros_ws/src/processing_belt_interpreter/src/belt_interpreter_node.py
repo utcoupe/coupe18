@@ -122,8 +122,12 @@ class BeltInterpreter(object):
                 return
 
 
-            width = self.get_rect_width(data.range, params) * self.RECT_SCALE_WIDTH
-            height = self.get_rect_height(data.range, params) * self.RECT_SCALE_HEIGHT
+            if params["scale_responsive"]:
+                width = self.get_rect_width(data.range, params) * self.RECT_SCALE_WIDTH
+                height = self.get_rect_height(data.range, params) * self.RECT_SCALE_HEIGHT
+            else:
+                width = self.get_rect_width(data.range, params)
+                height = self.get_rect_height(data.range, params)
 
             rect = RectangleStamped()
             rect.header.frame_id = self.SENSOR_FRAME_ID.format(data.sensor_id)

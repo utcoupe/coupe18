@@ -12,7 +12,7 @@ class BeltParser(object):
 
         root = ET.parse(file).getroot()
 
-        required = ["max_range", "angle", "precision"]
+        required = ["max_range", "angle", "precision", "scale_responsive"]
 
         #  parse params
         if required and root.find("params") is None:
