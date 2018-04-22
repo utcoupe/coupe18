@@ -104,7 +104,10 @@ class BeltInterpreter(object):
             return
 
         with self._mutex:
-            if data.range > self._belt_parser.Params["max_range"] or data.range <= 0:
+
+            params = self._belt_parser.Params[self._belt_parser.Sensors[data.sensor_id]["type"]]
+
+            if data.range > params["max_range"] or data.range <= 0:
                 self._current_statuses.update({data.sensor_id: False})
                 # If we published this sensor most of the time and its bad, publish the last one we got
                 l = [data.sensor_id in d and d[data.sensor_id] for d in self._previous_statuses]
@@ -119,14 +122,14 @@ class BeltInterpreter(object):
                 return
 
 
-            width = self.get_rect_width(data.range) * self.RECT_SCALE_WIDTH
-            height = self.get_rect_height(data.range) * self.RECT_SCALE_HEIGHT
+            width = self.get_rect_width(data.range, params) * self.RECT_SCALE_WIDTH
+            height = self.get_rect_height(data.range, params) * self.RECT_SCALE_HEIGHT
 
             rect = RectangleStamped()
             rect.header.frame_id = self.SENSOR_FRAME_ID.format(data.sensor_id)
 
             rect.header.stamp = rospy.Time.now()
-            rect.x = self.get_rect_x(data.range)
+            rect.x = self.get_rect_x(data.range, params)
             rect.y = 0
             rect.w = width
             rect.h = height
@@ -136,9 +139,9 @@ class BeltInterpreter(object):
             self._current_statuses.update({data.sensor_id: True})
 
 
-    def get_rect_width(self, r):
-        prec = r * self._belt_parser.Params["precision"]
-        angle = self._belt_parser.Params["angle"]
+    def get_rect_width(self, r, params):
+        prec = r * params["precision"]
+        angle = params["angle"]
 
         x_far = r + prec
         x_close = math.cos(angle / 2) * (r - prec)
@@ -147,16 +150,16 @@ class BeltInterpreter(object):
         width = abs(x_far - x_close)
         return width
 
-    def get_rect_height(self, r):
-        prec = r * self._belt_parser.Params["precision"]
-        angle = self._belt_parser.Params["angle"]
+    def get_rect_height(self, r, params):
+        prec = r * params["precision"]
+        angle = params["angle"]
 
         return abs(2 * math.sin(angle / 2) * (r + prec))
 
 
-    def get_rect_x(self, r):
-        prec = r * self._belt_parser.Params["precision"]
-        angle = self._belt_parser.Params["angle"]
+    def get_rect_x(self, r, params):
+        prec = r * params["precision"]
+        angle = params["angle"]
 
         x_far = r + prec
         x_close = math.cos(angle / 2) * (r - prec)

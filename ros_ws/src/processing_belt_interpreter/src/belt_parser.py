@@ -20,14 +20,17 @@ class BeltParser(object):
             rospy.logfatal(msg)
             raise rospy.ROSInitException(msg)
 
-        self.Params = {c.tag: float(c.text) for c in root.find("params")}
+        self.Params = { p.attrib["type"] : {c.tag: float(c.text) for c in p} for p in root.find("params")}
+
+        rospy.loginfo(self.Params)
 
         for p in required:
-            if p not in self.Params:
-                msg = "Can't parse belt definition: a '{}' element is required in the parameters. Shutting down."\
-                    .format(p)
-                rospy.logfatal(msg)
-                raise rospy.ROSInitException(msg)
+            for s in self.Params:
+                if p not in self.Params[s]:
+                    msg = "Can't parse belt definition: a '{}' element is required in the parameters. Shutting down."\
+                        .format(p)
+                    rospy.logfatal(msg)
+                    raise rospy.ROSInitException(msg)
 
         #  parse sensors
         if root.find("sensors") is None:
@@ -46,12 +49,21 @@ class BeltParser(object):
                 if sensor.find(p) is None:
                     rospy.logerr("Can't parse sensor definition: a '{}' element is required. Skipping this sensor.".format(p))
 
+            if "type" not in sensor.attrib:
+                rospy.logerr("Can't parse sensor definition: a 'type' attribute is required. Skipping this sensor.")
+                continue
+
+            if sensor.attrib["type"] not in self.Params:
+                rospy.logerr("Can't parse sensor definition: {} sensor type is not defined. Skipping this sensor."
+                             .format(sensor.attrib["type"]))
+                continue
 
             sensors.append({
                 "id": sensor.attrib["id"],
                 "x": float(sensor.find("x").text),
                 "y": float(sensor.find("y").text),
-                "a": float(sensor.find("a").text)
+                "a": float(sensor.find("a").text),
+                "type": sensor.attrib["type"]
             })
 
 
