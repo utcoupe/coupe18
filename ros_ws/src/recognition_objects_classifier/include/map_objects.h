@@ -12,7 +12,6 @@
 
 const std::string MAP_GET_SERVICE = "/memory/map/get";
 const std::string MAP_OBJECTS = "/terrain/walls/layer_belt/*";
-const float WALLS_MARGIN = 0.03;
 
 class MapObjects {
 protected:
@@ -20,6 +19,8 @@ protected:
     ros::NodeHandle &nh_;
 
 public:
+    float WALLS_MARGIN = 0.03;
+
     void fetch_map_objects();
 
     bool contains_point(float x, float y);

@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
     tf2
     tf2_ros
     rospy
+    dynamic_reconfigure
 )
 
 ################################################
@@ -24,6 +25,10 @@ generate_messages(
     DEPENDENCIES
     geometry_msgs
     std_msgs
+)
+
+generate_dynamic_reconfigure_options(
+    cfg/BeltInterpreter.cfg
 )
 
 ###################################

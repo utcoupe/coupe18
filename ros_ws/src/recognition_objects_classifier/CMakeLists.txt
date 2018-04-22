@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
     std_msgs
     tf2
     tf2_ros
+    dynamic_reconfigure
 )
 
 ################################################
@@ -32,6 +33,10 @@ generate_messages(
     processing_belt_interpreter
     geometry_msgs
     std_msgs
+)
+
+generate_dynamic_reconfigure_options(
+    cfg/ObjectsClassifier.cfg
 )
 
 ###################################
@@ -57,7 +62,7 @@ add_executable(objects_classifier_node
         src/objects_classifier_node.cpp src/objects_listener.cpp src/shapes.cpp src/processing_thread.cpp
         src/main_thread.cpp src/map_objects.cpp src/markers_publisher.cpp)
 
-add_dependencies(objects_classifier_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(objects_classifier_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
 
 
 target_link_libraries(

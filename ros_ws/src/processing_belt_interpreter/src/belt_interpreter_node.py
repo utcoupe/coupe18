@@ -12,6 +12,8 @@ from processing_belt_interpreter.msg import *
 from drivers_ard_others.msg import BeltRange
 from geometry_msgs.msg import Pose2D, TransformStamped, PointStamped
 from ai_game_status import StatusServices
+from dynamic_reconfigure.server import Server
+from processing_belt_interpreter.cfg import BeltInterpreterConfig
 
 from multiprocessing import Lock
 
@@ -31,6 +33,9 @@ class BeltInterpreter(object):
 
         self.PUB_RATE = rospy.Rate(10)
 
+        self.RECT_SCALE_WIDTH = 1.0
+        self.RECT_SCALE_HEIGHT = 1.0
+
         self.WATCHDOG_PERIOD_BELT = rospy.Duration(0.015)
         self.WATCHDOG_PERIOD_TERA = rospy.Duration(0.05)
 
@@ -47,6 +52,8 @@ class BeltInterpreter(object):
         self._sensors_sub = rospy.Subscriber(self.SENSORS_TOPIC, BeltRange,
                                              self.callback)
 
+        self.syn_param_srv = Server(BeltInterpreterConfig, self.dyn_param_cb)
+
         self._mutex = Lock()
 
         self._watchdog = rospy.Timer(self.WATCHDOG_PERIOD_TERA, self.publish, oneshot=True)
@@ -62,6 +69,13 @@ class BeltInterpreter(object):
         StatusServices("processing", "belt_interpreter").ready(True)
 
         rospy.spin()
+
+    def dyn_param_cb(self, config, level):
+        self.RECT_SCALE_HEIGHT = config["RECT_SCALE_HEIGHT"]
+        self.RECT_SCALE_WIDTH = config["RECT_SCALE_WIDTH"]
+        rospy.loginfo("Set rect scale to (%f, %f)" % (self.RECT_SCALE_WIDTH, self.RECT_SCALE_HEIGHT))
+
+        return config
 
     def publish(self, event):
         with self._mutex:
@@ -105,8 +119,8 @@ class BeltInterpreter(object):
                 return
 
 
-            width = self.get_rect_width(data.range)
-            height = self.get_rect_height(data.range)
+            width = self.get_rect_width(data.range) * self.RECT_SCALE_WIDTH
+            height = self.get_rect_height(data.range) * self.RECT_SCALE_HEIGHT
 
             rect = RectangleStamped()
             rect.header.frame_id = self.SENSOR_FRAME_ID.format(data.sensor_id)
