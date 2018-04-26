@@ -50,11 +50,6 @@ function install_ros() {
 		sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 		sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 		sudo apt-get update
-		if [ "$ARCH" = "x86_64" ]; then
-			sudo apt-get install ros-kinetic-desktop-full ros-kinetic-rosserial-arduino ros-kinetic-rosbridge-suite ros-kinetic-tf2-web-republisher ros-kinetic-serial ros-kinetic-dynamixel-sdk ros-kinetic-rosserial-python
-		elif [ "$ARCH" = "armv7l" ]; then
-			sudo apt-get install ros-kinetic-ros-base ros-kinetic-tf2 ros-kinetic-tf2-ros ros-kinetic-rviz ros-kinetic-diagnostic-updater ros-kinetic-roslint ros-kinetic-camera-info-manager ros-kinetic-rosserial-arduino ros-kinetic-rosbridge-suite ros-kinetic-tf2-web-republisher ros-kinetic-serial ros-kinetic-dynamixel-sdk ros-kinetic-rosserial-python
-		fi
 		# "Install" Arduino libs needed by us
 		if [ -d "/usr/share/arduino" ] && [ -d "$PWD/libs/arduino-libraries" ]; then
 			sudo cp -ar $PWD/libs/arduino-libraries/* /usr/share/arduino/libraries/
@@ -65,6 +60,14 @@ function install_ros() {
 		rosdep update
 	else
 		red_echo "Your OS is not Ubuntu Willy or Xenial, ROS will not been installed..."
+	fi
+}
+
+function install_ros_depencies() {
+	if [ "$ARCH" = "x86_64" ]; then
+		sudo apt-get install ros-kinetic-desktop-full ros-kinetic-rosserial-arduino ros-kinetic-rosbridge-suite ros-kinetic-tf2-web-republisher ros-kinetic-serial ros-kinetic-dynamixel-sdk ros-kinetic-rosserial-python
+	elif [ "$ARCH" = "armv7l" ]; then
+		sudo apt-get install ros-kinetic-ros-base ros-kinetic-tf2 ros-kinetic-tf2-ros ros-kinetic-rviz ros-kinetic-diagnostic-updater ros-kinetic-roslint ros-kinetic-camera-info-manager ros-kinetic-rosserial-arduino ros-kinetic-rosbridge-suite ros-kinetic-tf2-web-republisher ros-kinetic-serial ros-kinetic-dynamixel-sdk ros-kinetic-rosserial-python
 	fi
 }
 
@@ -128,6 +131,7 @@ function launch_script() {
 			printf "ROS has not been detected in /opt/ros, launch the installation process..."
 			install_ros
 		fi
+		install_ros_depencies
 	fi
 	printf "Install UTCoupe ROS workspace (ROS must to be installed) ? [Y/n]?"
 	read answer
