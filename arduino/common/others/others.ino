@@ -20,6 +20,8 @@ ros::NodeHandle nh;
 #include <drivers_ard_others/ActPWMStates.h>
 #include <drivers_ard_others/ActServoStates.h>
 
+#include "AFMotor.h"
+
 
 // ---- SENSORS DEPARTMENT ----
 
@@ -99,6 +101,11 @@ int16_t servo_actuators_states[NUM_SERVO_ACTUATORS]         = {10, 10, 10};
 Servo servo_actuators_objects[NUM_SERVO_ACTUATORS];
 // Names : servo_front_lift, servo_back_lift, servo_lock
 
+#define NUM_STEPPER_ACTUATORS 1
+const uint8_t pins_stepper_actuators[NUM_STEPPER_ACTUATORS]         = {8}; //TODO adapt value
+int16_t stepper_actuators_states[NUM_SERVO_ACTUATORS]         = {0};
+AF_Stepper stepper_actuators_objects[NUM_STEPPER_ACTUATORS] = {AF_Stepper(200, 1)};
+
 // Actuators ROS callbacks
 
 drivers_ard_others::MoveResponse move_response_msg;
@@ -151,6 +158,26 @@ void on_move(const drivers_ard_others::Move& msg){
                     nh.logerror("MOVE failed : dest_value invalid (0 to 180).");
                     success = false;
                 }
+            } else {
+                nh.logerror("MOVE failed : invalid id.");
+                success = false;
+            }
+            break;
+        case msg.TYPE_STEPPER:
+            if(msg.id >= 0 && msg.id <= NUM_STEPPER_ACTUATORS) {
+                stepper_actuators_states[msg.id] = msg.dest_value;
+                if(msg.dest_value == 0) {
+                    stepper_actuators_objects[msg.id].release();
+                }
+                if(msg.dest_value < 0) {
+                    stepper_actuators_objects[msg.id].setSpeed(60);
+                    stepper_actuators_objects[msg.id].step(-msg.dest_value,FORWARD, DOUBLE);
+                }
+                else{
+                    stepper_actuators_objects[msg.id].setSpeed(120);
+                    stepper_actuators_objects[msg.id].step(msg.dest_value,BACKWARD, DOUBLE);
+                }
+                success = true;
             } else {
                 nh.logerror("MOVE failed : invalid id.");
                 success = false;
@@ -218,10 +245,27 @@ void loop_servo_actuators() {
     servo_states_pub.publish(&servo_states_msg);
 }
 
+// Stepper actuators
+void init_stepper_actuators() {
+    for(uint8_t i = 0; i < NUM_STEPPER_ACTUATORS; i++) {
+        stepper_actuators_objects[i].setSpeed(60);
+    }
+}
+
+void loop_stepper_actuators() {
+//    for(uint8_t i = 0; i < NUM_STEPPER_ACTUATORS; i++) {
+//        stepper_actuators_objects[i].
+//    }
+//    servo_states_msg.states_length = NUM_SERVO_ACTUATORS;
+//    servo_states_msg.states = servo_actuators_states;
+//    servo_states_pub.publish(&servo_states_msg);
+}
+
 void loop_actuators() {
     loop_digital_actuators();
     loop_pwm_actuators();
     loop_servo_actuators();
+    loop_stepper_actuators();
 }
 
 Timer actuators_loop_timer = Timer(100, &loop_actuators);
@@ -230,6 +274,7 @@ void init_actuators() {
     init_digital_actuators();
     init_pwm_actuators();
     init_servo_actuators();
+    init_stepper_actuators();
     actuators_loop_timer.Start();
 }
 
