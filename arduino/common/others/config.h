@@ -5,8 +5,8 @@
 #ifndef ARDUINO_CONFIG_H
 #define ARDUINO_CONFIG_H
 
-#define SENSOR_BELT_ENABLED
-#define SENSOR_COLOR_ENABLED
+//#define SENSOR_BELT_ENABLED
+//#define SENSOR_COLOR_ENABLED
 
 //********************************************************************************************************************//
 //

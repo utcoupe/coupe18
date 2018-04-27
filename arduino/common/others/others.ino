@@ -85,25 +85,32 @@ void init_sensors() {
 
 // ---- ACTUATORS DEPARTMENT ----
 
-#define NUM_DIGITAL_ACTUATORS 1
-const uint8_t pins_digital_actuators[NUM_DIGITAL_ACTUATORS]     = {12};
-bool digital_actuators_states[NUM_DIGITAL_ACTUATORS]        = {true};
+// If a stepper board is connected, don't use the following pins : 3 4 7 8 11 12 13
+
+#define NUM_DIGITAL_ACTUATORS 0
+//const uint8_t pins_digital_actuators[NUM_DIGITAL_ACTUATORS]     = {12};
+//bool digital_actuators_states[NUM_DIGITAL_ACTUATORS]        = {true};
+const uint8_t pins_digital_actuators[NUM_DIGITAL_ACTUATORS]     = {};
+bool digital_actuators_states[NUM_DIGITAL_ACTUATORS]        = {};
 // Names : main_led, power_relay
 
-#define NUM_PWM_ACTUATORS 1
-const uint8_t pins_pwm_actuators_pwm[NUM_PWM_ACTUATORS]         = {8};
-uint8_t pwm_actuators_states[NUM_PWM_ACTUATORS]             = {0};
+#define NUM_PWM_ACTUATORS 0
+//const uint8_t pins_pwm_actuators_pwm[NUM_PWM_ACTUATORS]         = {8};
+//uint8_t pwm_actuators_states[NUM_PWM_ACTUATORS]             = {0};
+const uint8_t pins_pwm_actuators_pwm[NUM_PWM_ACTUATORS]         = {};
+uint8_t pwm_actuators_states[NUM_PWM_ACTUATORS]             = {};
 // Names : canon
 
-#define NUM_SERVO_ACTUATORS 3
-const uint8_t pins_servo_actuators_pwm[NUM_SERVO_ACTUATORS]     = {9,  10, 11};
-int16_t servo_actuators_states[NUM_SERVO_ACTUATORS]         = {10, 10, 10};
+#define NUM_SERVO_ACTUATORS 0
+//const uint8_t pins_servo_actuators_pwm[NUM_SERVO_ACTUATORS]     = {9,  10, 11};
+//int16_t servo_actuators_states[NUM_SERVO_ACTUATORS]         = {10, 10, 10};
+const uint8_t pins_servo_actuators_pwm[NUM_SERVO_ACTUATORS]     = {};
+int16_t servo_actuators_states[NUM_SERVO_ACTUATORS]         = {};
 Servo servo_actuators_objects[NUM_SERVO_ACTUATORS];
 // Names : servo_front_lift, servo_back_lift, servo_lock
 
 #define NUM_STEPPER_ACTUATORS 1
-const uint8_t pins_stepper_actuators[NUM_STEPPER_ACTUATORS]         = {8}; //TODO adapt value
-int16_t stepper_actuators_states[NUM_SERVO_ACTUATORS]         = {0};
+int16_t stepper_actuators_states[NUM_STEPPER_ACTUATORS]         = {0};
 AF_Stepper stepper_actuators_objects[NUM_STEPPER_ACTUATORS] = {AF_Stepper(200, 1)};
 
 // Actuators ROS callbacks
@@ -166,16 +173,16 @@ void on_move(const drivers_ard_others::Move& msg){
         case msg.TYPE_STEPPER:
             if(msg.id >= 0 && msg.id <= NUM_STEPPER_ACTUATORS) {
                 stepper_actuators_states[msg.id] = msg.dest_value;
-                if(msg.dest_value == 0) {
+                if (msg.dest_value == 0) {
                     stepper_actuators_objects[msg.id].release();
                 }
-                if(msg.dest_value < 0) {
+                if (msg.dest_value < 0) {
                     stepper_actuators_objects[msg.id].setSpeed(60);
-                    stepper_actuators_objects[msg.id].step(-msg.dest_value,FORWARD, DOUBLE);
+                    stepper_actuators_objects[msg.id].step(-msg.dest_value, FORWARD, SINGLE);
                 }
-                else{
+                else {
                     stepper_actuators_objects[msg.id].setSpeed(120);
-                    stepper_actuators_objects[msg.id].step(msg.dest_value,BACKWARD, DOUBLE);
+                    stepper_actuators_objects[msg.id].step(msg.dest_value, BACKWARD, SINGLE);
                 }
                 success = true;
             } else {
@@ -184,7 +191,6 @@ void on_move(const drivers_ard_others::Move& msg){
             }
             break;
     }
-
     nh.loginfo("Finished move order handling.");
     if(msg.order_nb != 0) send_move_response(msg.order_nb, success); // send response if order_nb provided.
 }
@@ -197,6 +203,8 @@ drivers_ard_others::ActPWMStates pwm_states_msg;
 ros::Publisher pwm_states_pub("/drivers/ard_others/pwm_act_states", &pwm_states_msg);
 drivers_ard_others::ActServoStates servo_states_msg;
 ros::Publisher servo_states_pub("/drivers/ard_others/servo_act_states", &servo_states_msg);
+drivers_ard_others::ActServoStates stepper_states_msg;
+ros::Publisher stepper_states_pub("/drivers/ard_others/stepper_act_states", &stepper_states_msg);
 
 // Digital actuators
 void init_digital_actuators() {
@@ -253,12 +261,9 @@ void init_stepper_actuators() {
 }
 
 void loop_stepper_actuators() {
-//    for(uint8_t i = 0; i < NUM_STEPPER_ACTUATORS; i++) {
-//        stepper_actuators_objects[i].
-//    }
-//    servo_states_msg.states_length = NUM_SERVO_ACTUATORS;
-//    servo_states_msg.states = servo_actuators_states;
-//    servo_states_pub.publish(&servo_states_msg);
+    stepper_states_msg.states_length = NUM_SERVO_ACTUATORS;
+    stepper_states_msg.states = servo_actuators_states;
+    stepper_states_pub.publish(&stepper_states_msg);
 }
 
 void loop_actuators() {
