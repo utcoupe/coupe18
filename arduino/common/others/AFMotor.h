@@ -185,7 +185,10 @@ class AF_DCMotor
 
 class AF_Stepper {
  public:
+  // The no arg constructor is a hack, if you use it, you have to call the init(uint16_t, uint8_t) function !
+  AF_Stepper();
   AF_Stepper(uint16_t, uint8_t);
+  void init(uint16_t, uint8_t);
   void step(uint16_t steps, uint8_t dir,  uint8_t style = SINGLE);
   void setSpeed(uint16_t);
   uint8_t onestep(uint8_t dir, uint8_t style);
@@ -195,6 +198,7 @@ class AF_Stepper {
   uint32_t usperstep, steppingcounter;
  private:
   uint8_t currentstep;
+  uint8_t is_init;
 
 };
 

@@ -463,7 +463,16 @@ void AF_DCMotor::setSpeed(uint8_t speed) {
                STEPPERS
 ******************************************/
 
+AF_Stepper::AF_Stepper() {
+  is_init = 0;
+}
+
 AF_Stepper::AF_Stepper(uint16_t steps, uint8_t num) {
+  if (is_init == 0)
+    init(steps, num);
+}
+
+void AF_Stepper::init(uint16_t steps, uint8_t num)   {
   MC.enable();
 
   revsteps = steps;
@@ -471,40 +480,41 @@ AF_Stepper::AF_Stepper(uint16_t steps, uint8_t num) {
   currentstep = 0;
 
   if (steppernum == 1) {
-    latch_state &= ~_BV(MOTOR1_A) & ~_BV(MOTOR1_B) &
-      ~_BV(MOTOR2_A) & ~_BV(MOTOR2_B); // all motor pins to 0
-    MC.latch_tx();
-    
-    // enable both H bridges
-    pinMode(11, OUTPUT);
-    pinMode(3, OUTPUT);
-    digitalWrite(11, HIGH);
-    digitalWrite(3, HIGH);
+      latch_state &= ~_BV(MOTOR1_A) & ~_BV(MOTOR1_B) &
+                     ~_BV(MOTOR2_A) & ~_BV(MOTOR2_B); // all motor pins to 0
+      MC.latch_tx();
 
-    // use PWM for microstepping support
-    initPWM1(STEPPER1_PWM_RATE);
-    initPWM2(STEPPER1_PWM_RATE);
-    setPWM1(255);
-    setPWM2(255);
+      // enable both H bridges
+      pinMode(11, OUTPUT);
+      pinMode(3, OUTPUT);
+      digitalWrite(11, HIGH);
+      digitalWrite(3, HIGH);
+
+      // use PWM for microstepping support
+      initPWM1(STEPPER1_PWM_RATE);
+      initPWM2(STEPPER1_PWM_RATE);
+      setPWM1(255);
+      setPWM2(255);
 
   } else if (steppernum == 2) {
-    latch_state &= ~_BV(MOTOR3_A) & ~_BV(MOTOR3_B) &
-      ~_BV(MOTOR4_A) & ~_BV(MOTOR4_B); // all motor pins to 0
-    MC.latch_tx();
+      latch_state &= ~_BV(MOTOR3_A) & ~_BV(MOTOR3_B) &
+                     ~_BV(MOTOR4_A) & ~_BV(MOTOR4_B); // all motor pins to 0
+      MC.latch_tx();
 
-    // enable both H bridges
-    pinMode(5, OUTPUT);
-    pinMode(6, OUTPUT);
-    digitalWrite(5, HIGH);
-    digitalWrite(6, HIGH);
+      // enable both H bridges
+      pinMode(5, OUTPUT);
+      pinMode(6, OUTPUT);
+      digitalWrite(5, HIGH);
+      digitalWrite(6, HIGH);
 
-    // use PWM for microstepping support
-    // use PWM for microstepping support
-    initPWM3(STEPPER2_PWM_RATE);
-    initPWM4(STEPPER2_PWM_RATE);
-    setPWM3(255);
-    setPWM4(255);
+      // use PWM for microstepping support
+      // use PWM for microstepping support
+      initPWM3(STEPPER2_PWM_RATE);
+      initPWM4(STEPPER2_PWM_RATE);
+      setPWM3(255);
+      setPWM4(255);
   }
+  is_init = 1;
 }
 
 void AF_Stepper::setSpeed(uint16_t rpm) {
