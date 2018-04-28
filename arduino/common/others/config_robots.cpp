@@ -49,8 +49,8 @@ uint8_t pins_pwm_actuators_pwm[NUM_PWM_ACTUATORS]       = {};
 uint8_t pwm_actuators_states[NUM_PWM_ACTUATORS]         = {};
 // Names :
 
-uint8_t pins_servo_actuators_pwm[NUM_SERVO_ACTUATORS]   = {};
-int16_t servo_actuators_states[NUM_SERVO_ACTUATORS]     = {};
+uint8_t pins_servo_actuators_pwm[NUM_SERVO_ACTUATORS]   = {37};
+int16_t servo_actuators_states[NUM_SERVO_ACTUATORS]     = {10};
 // Names :
 
 int16_t stepper_actuators_states[NUM_STEPPER_ACTUATORS] = {0};

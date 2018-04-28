@@ -86,8 +86,8 @@ void init_sensors() {
 
 // ---- ACTUATORS DEPARTMENT ----
 
-extern const uint8_t pins_digital_actuators[NUM_DIGITAL_ACTUATORS];
-extern bool digital_actuators_states[NUM_DIGITAL_ACTUATORS];
+extern const uint8_t pins_digital_actuators[];
+extern bool digital_actuators_states[];
 
 extern const uint8_t pins_pwm_actuators_pwm[];
 extern uint8_t pwm_actuators_states[];
@@ -243,14 +243,15 @@ void loop_servo_actuators() {
 // Stepper actuators
 void init_stepper_actuators() {
     for(uint8_t i = 0; i < NUM_STEPPER_ACTUATORS; i++) {
+        //TODO better initialisation with different stepper_number
         stepper_actuators_objects[i].init(200, 1);
         stepper_actuators_objects[i].setSpeed(60);
     }
 }
 
 void loop_stepper_actuators() {
-    stepper_states_msg.states_length = NUM_SERVO_ACTUATORS;
-    stepper_states_msg.states = servo_actuators_states;
+    stepper_states_msg.states_length = NUM_STEPPER_ACTUATORS;
+    stepper_states_msg.states = stepper_actuators_states;
     stepper_states_pub.publish(&stepper_states_msg);
 }
 
@@ -284,6 +285,7 @@ void setup() {
     nh.advertise(digital_states_pub);
     nh.advertise(pwm_states_pub);
     nh.advertise(servo_states_pub);
+    nh.advertise(stepper_states_pub);
 
     // Libs init
     Wire.begin();
