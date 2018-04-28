@@ -25,6 +25,11 @@ bool ObjectsClassifierSubscriber::hasBarrier(const geometry_msgs::Pose2D& pos)
         if (isInsideCircle(circ, pos))
             return true;
     
+    // Segments
+    for (const auto& seg : lastSegments)
+        if (isCloseToSegment(seg, pos))
+            return true;
+        
     return false;
 }
 
@@ -45,6 +50,8 @@ void ObjectsClassifierSubscriber::objectsCallback(const Objects::ConstPtr& msg)
     addRects(msg->unknown_rects);
     lastCircles.clear();
     addCircles(msg->unknown_circles);
+    lastSegments.clear();
+    addSegments(msg->unknown_segments);
 }
 
 void ObjectsClassifierSubscriber::addRects(const std::vector<Rectangle>& rects)
@@ -55,6 +62,11 @@ void ObjectsClassifierSubscriber::addRects(const std::vector<Rectangle>& rects)
 void ObjectsClassifierSubscriber::addCircles(const std::vector<Circle>& circs)
 {
     lastCircles.insert(lastCircles.end(), circs.begin(), circs.end());
+}
+
+void ObjectsClassifierSubscriber::addSegments(const std::vector<Segment>& segs)
+{
+    lastSegments.insert(lastSegments.end(), segs.begin(), segs.end());
 }
 
 bool ObjectsClassifierSubscriber::isInsideRect(const Rectangle& rect, const geometry_msgs::Pose2D& pos) const
@@ -78,11 +90,41 @@ bool ObjectsClassifierSubscriber::isInsideRect(const Rectangle& rect, const geom
     return true;
 }
 
-bool Recognition::ObjectsClassifierSubscriber::isInsideCircle(const Circle& circ, const geometry_msgs::Pose2D& pos) const
+bool ObjectsClassifierSubscriber::isInsideCircle(const Circle& circ, const geometry_msgs::Pose2D& pos) const
 {
     processing_lidar_objects::CircleObstacle circle(circ.circle);
     double distToCenter = sqrt(pow(pos.x - circle.center.x, 2) + pow(pos.y - circle.center.y, 2));
     if (distToCenter + _safetyMargin <= circle.radius)
         return true;
     return false;
+}
+
+bool ObjectsClassifierSubscriber::isCloseToSegment(const Segment& seg, const geometry_msgs::Pose2D& pos) const
+{
+    if (seg.segment.first_point.x == seg.segment.last_point.x && seg.segment.first_point.y == seg.segment.last_point.y)
+        return false;
+    // A and B are the limits of the segment, M is our current position
+    pair<double, double> vectAB(seg.segment.last_point.x - seg.segment.first_point.x, seg.segment.last_point.y - seg.segment.first_point.y);
+    pair<double, double> vectAM(pos.x - seg.segment.first_point.x, pos.y - seg.segment.first_point.y);
+    pair<double, double> vectBM(pos.x - seg.segment.last_point.x, pos.y - seg.segment.last_point.y);
+    double proj = scalarProduct(vectAB, vectAM);
+    
+    double distToSeg;
+    if (proj < 0)
+        distToSeg = sqrt(scalarProduct(vectAM, vectAM));
+    else if (proj > scalarProduct(vectAB, vectAB))
+        distToSeg = sqrt(scalarProduct(vectBM, vectBM));
+    else
+        distToSeg = abs(vectorProduct(vectAB, vectAM))/(sqrt(scalarProduct(vectAB, vectAB)));
+    return distToSeg <= _safetyMargin;
+}
+
+double ObjectsClassifierSubscriber::scalarProduct(pair<double, double> vA, pair<double, double> vB) const
+{
+    return vA.first*vB.first + vA.second*vB.second;
+}
+
+double ObjectsClassifierSubscriber::vectorProduct(pair<double, double> vA, pair<double, double> vB) const
+{
+    return vA.first*vB.second - vA.second*vB.first;
 }
