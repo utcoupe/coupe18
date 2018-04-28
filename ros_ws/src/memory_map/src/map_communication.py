@@ -108,9 +108,6 @@ class MapServices():
 
     def on_fill_waypoint(self, req):
         s = time.time() * 1000
-        rospy.loginfo("FILL_WAYPOINT: {} ({}, {}{})".format(str(req.waypoint.name if req.waypoint.name else "<no name>"),
-                                                           req.waypoint.pose.x, req.waypoint.pose.y,
-                                                           ", {}".format(req.waypoint.pose.theta) if req.waypoint.has_angle else ""))
 
         filled_waypoint, filled_waypoint_name = None, req.waypoint.name
         if filled_waypoint_name is not None and filled_waypoint_name != '': # name was given, complete the rest
@@ -145,4 +142,8 @@ class MapServices():
                                                                   ", {}".format(w.pose.theta) if w.has_angle else ""))
 
         rospy.logdebug("    Process took {0:.2f}ms".format(time.time() * 1000 - s))
+        rospy.loginfo("FILL_WAYPOINT: {} ({}, {}{})".format(str(req.waypoint.name if req.waypoint.name else "<no name>"),
+                                                  req.waypoint.pose.x, req.waypoint.pose.y,
+                                                  ", {}".format(
+                                                      req.waypoint.pose.theta) if req.waypoint.has_angle else ""))
         return memory_map.srv.FillWaypointResponse(success, w)
