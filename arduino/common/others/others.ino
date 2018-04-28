@@ -21,6 +21,7 @@ ros::NodeHandle nh;
 #include <drivers_ard_others/ActServoStates.h>
 
 #include "AFMotor.h"
+#include "config_sensors.h"
 
 
 // ---- SENSORS DEPARTMENT ----
@@ -85,33 +86,18 @@ void init_sensors() {
 
 // ---- ACTUATORS DEPARTMENT ----
 
-// If a stepper board is connected, don't use the following pins : 3 4 7 8 11 12 13
+extern const uint8_t pins_digital_actuators[NUM_DIGITAL_ACTUATORS];
+extern bool digital_actuators_states[NUM_DIGITAL_ACTUATORS];
 
-#define NUM_DIGITAL_ACTUATORS 0
-//const uint8_t pins_digital_actuators[NUM_DIGITAL_ACTUATORS]     = {12};
-//bool digital_actuators_states[NUM_DIGITAL_ACTUATORS]        = {true};
-const uint8_t pins_digital_actuators[NUM_DIGITAL_ACTUATORS]     = {};
-bool digital_actuators_states[NUM_DIGITAL_ACTUATORS]        = {};
-// Names : main_led, power_relay
+extern const uint8_t pins_pwm_actuators_pwm[];
+extern uint8_t pwm_actuators_states[];
 
-#define NUM_PWM_ACTUATORS 0
-//const uint8_t pins_pwm_actuators_pwm[NUM_PWM_ACTUATORS]         = {8};
-//uint8_t pwm_actuators_states[NUM_PWM_ACTUATORS]             = {0};
-const uint8_t pins_pwm_actuators_pwm[NUM_PWM_ACTUATORS]         = {};
-uint8_t pwm_actuators_states[NUM_PWM_ACTUATORS]             = {};
-// Names : canon
-
-#define NUM_SERVO_ACTUATORS 0
-//const uint8_t pins_servo_actuators_pwm[NUM_SERVO_ACTUATORS]     = {9,  10, 11};
-//int16_t servo_actuators_states[NUM_SERVO_ACTUATORS]         = {10, 10, 10};
-const uint8_t pins_servo_actuators_pwm[NUM_SERVO_ACTUATORS]     = {};
-int16_t servo_actuators_states[NUM_SERVO_ACTUATORS]         = {};
+extern const uint8_t pins_servo_actuators_pwm[];
+extern int16_t servo_actuators_states[];
 Servo servo_actuators_objects[NUM_SERVO_ACTUATORS];
-// Names : servo_front_lift, servo_back_lift, servo_lock
 
-#define NUM_STEPPER_ACTUATORS 1
-int16_t stepper_actuators_states[NUM_STEPPER_ACTUATORS]         = {0};
-AF_Stepper stepper_actuators_objects[NUM_STEPPER_ACTUATORS] = {AF_Stepper(200, 1)};
+extern int16_t stepper_actuators_states[];
+AF_Stepper stepper_actuators_objects[NUM_STEPPER_ACTUATORS];
 
 // Actuators ROS callbacks
 
@@ -208,8 +194,9 @@ ros::Publisher stepper_states_pub("/drivers/ard_others/stepper_act_states", &ste
 
 // Digital actuators
 void init_digital_actuators() {
-    for(uint8_t i = 0; i < NUM_DIGITAL_ACTUATORS; i++)
+    for(uint8_t i = 0; i < NUM_DIGITAL_ACTUATORS; i++) {
         pinMode(pins_digital_actuators[i], OUTPUT);
+    }
 }
 
 void loop_digital_actuators() {
@@ -256,6 +243,7 @@ void loop_servo_actuators() {
 // Stepper actuators
 void init_stepper_actuators() {
     for(uint8_t i = 0; i < NUM_STEPPER_ACTUATORS; i++) {
+        stepper_actuators_objects[i].init(200, 1);
         stepper_actuators_objects[i].setSpeed(60);
     }
 }

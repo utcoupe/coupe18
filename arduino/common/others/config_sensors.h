@@ -5,8 +5,7 @@
 #ifndef ARDUINO_CONFIG_H
 #define ARDUINO_CONFIG_H
 
-//#define SENSOR_BELT_ENABLED
-//#define SENSOR_COLOR_ENABLED
+#include "config_robots.h"
 
 //********************************************************************************************************************//
 //
@@ -27,12 +26,12 @@
 #ifdef SENSOR_COLOR_ENABLED
 
 // Pins
-#define S0              7
-#define S1              6
-#define S2              5
-#define S3              4
-#define LED             2
-#define SENSOR_VALUE    3
+#define S0              SENSOR_COLOR_S0
+#define S1              SENSOR_COLOR_S1
+#define S2              SENSOR_COLOR_S2
+#define S3              SENSOR_COLOR_S3
+#define LED             SENSOR_COLOR_LED
+#define SENSOR_VALUE    SENSOR_COLOR_SENSOR_VALUE
 
 // Component configuration
 #define COLOR_ACCUMULATE_NB     4

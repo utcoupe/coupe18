@@ -5,7 +5,7 @@
 #ifndef ARDUINO_SENSOR_H
 #define ARDUINO_SENSOR_H
 
-#include "config.h"
+#include "config_sensors.h"
 #include <Arduino.h>
 #include <ros.h>
 
