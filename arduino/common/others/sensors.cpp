@@ -3,7 +3,64 @@
 //
 
 #include "sensors.h"
+#include "VL53L0X.h"
 #include <drivers_ard_others/Color.h>
+#include <drivers_ard_others/BeltRange.h>
+
+//********************************************************************************************************************//
+//
+// Belt sensor
+//
+//********************************************************************************************************************//
+
+#ifdef SENSOR_BELT_ENABLED
+
+ros::NodeHandle* node_handle_belt_sensor = NULL;
+
+extern uint8_t pins_belt_sensors_shut[];
+extern uint8_t belt_sensors_addresses[];
+extern  String belt_sensors_names[];
+VL53L0X belt_sensors[NUM_BELT_SENSORS];
+
+drivers_ard_others::BeltRange belt_range_msg;
+ros::Publisher belt_ranges_pub("/drivers/ard_others/belt_ranges", &belt_range_msg);
+
+void init_belt_sensors(ros::NodeHandle* nh) {
+    node_handle_belt_sensor = nh;
+    if (node_handle_belt_sensor) {
+        node_handle_belt_sensor->advertise(belt_ranges_pub);
+    }
+    for(uint8_t i = 0; i < NUM_BELT_SENSORS; i++) {
+        pinMode(pins_belt_sensors_shut[i], OUTPUT);
+        digitalWrite(pins_belt_sensors_shut[i], LOW);
+    }
+
+    for(uint8_t i = 0; i < NUM_BELT_SENSORS; i++) {
+        pinMode(pins_belt_sensors_shut[i], INPUT);
+        delay(50);
+        belt_sensors[i].init(true);
+        delay(100);
+        belt_sensors[i].setAddress(belt_sensors_addresses[i]);
+    }
+
+    for(uint8_t i = 0; i < NUM_BELT_SENSORS; i++) {
+        belt_sensors[i].setTimeout(500);
+        belt_sensors[i].setMeasurementTimingBudget(200000);
+        belt_sensors[i].startContinuous();
+    }
+}
+
+void loop_belt_sensors() {
+    for(uint8_t i = 0; i < NUM_BELT_SENSORS; i++) {
+        belt_range_msg.sensor_id = belt_sensors_names[i].c_str();
+        belt_range_msg.range = belt_sensors[i].readRangeContinuousMillimeters() / 1000.0; //in meters
+        if (belt_range_msg.range > 65534)
+            belt_range_msg.range = -1;
+        belt_ranges_pub.publish(&belt_range_msg);
+    }
+}
+
+#endif
 
 //********************************************************************************************************************//
 //
@@ -13,7 +70,7 @@
 
 #ifdef SENSOR_COLOR_ENABLED
 
-ros::NodeHandle* node_handle = NULL;
+ros::NodeHandle* node_handle_color_sensor = NULL;
 
 drivers_ard_others::Color color_msg;
 ros::Publisher color_pub("/drivers/ard_others/color", &color_msg);
@@ -35,9 +92,9 @@ uint8_t rgbMinMaxFrequency[3][2] = {
 };
 
 void color_sensor_init(ros::NodeHandle* nh) {
-    node_handle = nh;
-    if (node_handle) {
-        node_handle->advertise(color_pub);
+    node_handle_color_sensor = nh;
+    if (node_handle_color_sensor) {
+        node_handle_color_sensor->advertise(color_pub);
     }
     pinMode(S0, OUTPUT);
     pinMode(S1, OUTPUT);
@@ -115,7 +172,7 @@ void color_sensor_values_capture() {
         if (rawFrequency > 0) {
             color_sensor_rgb_values[color_id] = constrain(map(rawFrequency, rgbMinMaxFrequency[color_id][0], rgbMinMaxFrequency[color_id][1], 255, 0), 0, 255);
         } else {
-            node_handle->logwarn("Color sensor timed out, no values...");
+            node_handle_color_sensor->logwarn("Color sensor timed out, no values...");
         }
     }
 }
@@ -193,7 +250,7 @@ void color_sensor_values_publish(uint16_t tslColors[3]) {
     color_msg.hue = tslColors[TSL_HUE];
     color_msg.saturation = tslColors[TSL_SATURATION];
     color_msg.lightness = tslColors[TSL_LIGHTNESS];
-    if (node_handle) {
+    if (node_handle_color_sensor) {
         color_pub.publish(&color_msg);
     }
 }

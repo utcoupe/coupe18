@@ -4,6 +4,7 @@
 
 #include "config_robots.h"
 #include "stdint.h"
+#include "Arduino.h"
 
 // TODO this way to do is kind of ugly, think how to not duplicate variable declaration
 // TODO find a way to just declares pins as define and to automatically fill the variable structures
@@ -31,6 +32,10 @@ int16_t servo_actuators_states[NUM_SERVO_ACTUATORS]     = {10, 10, 10};
 int16_t stepper_actuators_states[NUM_STEPPER_ACTUATORS] = {};
 // Names :
 
+uint8_t pins_belt_sensors_shut[NUM_BELT_SENSORS]        = {40, 42};
+uint8_t belt_sensors_addresses[NUM_BELT_SENSORS]        = {22, 24};
+String belt_sensors_names[NUM_BELT_SENSORS]             = {"sensor1", "sensor2"};
+
 #endif
 
 //********************************************************************************************************************//
@@ -55,5 +60,9 @@ int16_t servo_actuators_states[NUM_SERVO_ACTUATORS]     = {10};
 
 int16_t stepper_actuators_states[NUM_STEPPER_ACTUATORS] = {0};
 // Names :
+
+uint8_t pins_belt_sensors_shut[NUM_BELT_SENSORS]        = {40, 42};
+uint8_t belt_sensors_addresses[NUM_BELT_SENSORS]        = {22, 24};
+String belt_sensors_names[NUM_BELT_SENSORS]             = {"sensor1", "sensor2"};
 
 #endif

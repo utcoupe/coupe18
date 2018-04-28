@@ -1,73 +1,32 @@
 //ROS includes
 #include <ros.h>
-ros::NodeHandle nh;
 
 //Arduino includes
+#include "Arduino.h"
 #include <Timer.h>
+#include <Wire.h>
 
 //Sensors includes
-#include <Wire.h>
-#include "VL53L0X.h"
-#include <drivers_ard_others/BeltRange.h>
-#include <drivers_ard_others/Color.h>
 #include "sensors.h"
+#include "config_sensors.h"
 
 //Actuators includes
 #include "Servo.h"
+#include "AFMotor.h"
 #include <drivers_ard_others/Move.h>
 #include <drivers_ard_others/MoveResponse.h>
 #include <drivers_ard_others/ActDigitalStates.h>
 #include <drivers_ard_others/ActPWMStates.h>
 #include <drivers_ard_others/ActServoStates.h>
 
-#include "AFMotor.h"
-#include "config_sensors.h"
-
+ros::NodeHandle nh;
 
 // ---- SENSORS DEPARTMENT ----
 
-#define NUM_BELT_SENSORS 2
-const uint8_t pins_belt_sensors_shut[NUM_BELT_SENSORS]     = {40, 42};
-const uint8_t belt_sensors_addresses[NUM_BELT_SENSORS] = {22, 24};
-const String belt_sensors_names[NUM_BELT_SENSORS]      = {"sensor1", "sensor2"};
-VL53L0X belt_sensors[NUM_BELT_SENSORS];
-
-drivers_ard_others::BeltRange belt_range_msg;
-ros::Publisher belt_ranges_pub("/drivers/ard_others/belt_ranges", &belt_range_msg);
-
-void init_belt_sensors() {
-    for(uint8_t i = 0; i < NUM_BELT_SENSORS; i++) {
-        pinMode(pins_belt_sensors_shut[i], OUTPUT);
-        digitalWrite(pins_belt_sensors_shut[i], LOW);
-    }
-
-    for(uint8_t i = 0; i < NUM_BELT_SENSORS; i++) {
-        pinMode(pins_belt_sensors_shut[i], INPUT);
-        delay(50);
-        belt_sensors[i].init(true);
-        delay(100);
-        belt_sensors[i].setAddress(belt_sensors_addresses[i]);
-    }
-
-    for(uint8_t i = 0; i < NUM_BELT_SENSORS; i++) {
-        belt_sensors[i].setTimeout(500);
-        belt_sensors[i].setMeasurementTimingBudget(200000);
-        belt_sensors[i].startContinuous();
-    }
-}
-
-void loop_belt_sensors() {
-    for(uint8_t i = 0; i < NUM_BELT_SENSORS; i++) {
-        belt_range_msg.sensor_id = belt_sensors_names[i].c_str();
-        belt_range_msg.range = belt_sensors[i].readRangeContinuousMillimeters() / 1000.0; //in meters
-        if (belt_range_msg.range > 65534)
-            belt_range_msg.range = -1;
-        belt_ranges_pub.publish(&belt_range_msg);
-    }
-}
-
 void loop_sensors() {
+#ifdef SENSOR_BELT_ENABLED
     loop_belt_sensors();
+#endif
 #ifdef SENSOR_COLOR_ENABLED
     color_sensor_loop();
 #endif
@@ -76,13 +35,14 @@ void loop_sensors() {
 Timer sensors_loop_timer = Timer(50, &loop_sensors);
 
 void init_sensors() {
-    init_belt_sensors();
+#ifdef SENSOR_BELT_ENABLED
+    init_belt_sensors(&nh);
+#endif
 #ifdef SENSOR_COLOR_ENABLED
     color_sensor_init(&nh);
 #endif
     sensors_loop_timer.Start();
 }
-
 
 // ---- ACTUATORS DEPARTMENT ----
 
@@ -277,11 +237,9 @@ void init_actuators() {
 void setup() {
     // ROS init
     nh.initNode();
-    nh.advertise(belt_ranges_pub);
 
     nh.subscribe(sub_move);
     nh.advertise(move_responses_pub);
-
     nh.advertise(digital_states_pub);
     nh.advertise(pwm_states_pub);
     nh.advertise(servo_states_pub);

@@ -39,6 +39,10 @@
 // ---- STEPPER ACTUATORS ----
 #define NUM_STEPPER_ACTUATORS 0
 
+// ---- BELT SENSOR ----
+#define SENSOR_BELT_ENABLED
+#define NUM_BELT_SENSORS 2
+
 // ---- COLOR SENSOR ----
 #define SENSOR_COLOR_ENABLED
 #define SENSOR_COLOR_S0              7
@@ -69,6 +73,10 @@
 
 // ---- STEPPER ACTUATORS ----
 #define NUM_STEPPER_ACTUATORS 1
+
+// ---- BELT SENSOR ----
+#define SENSOR_BELT_ENABLED
+#define NUM_BELT_SENSORS 2
 
 #endif
 
