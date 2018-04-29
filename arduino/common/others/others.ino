@@ -186,7 +186,7 @@ void loop_digital_actuators() {
 void init_pwm_actuators() {
     for(uint8_t i = 0; i < NUM_PWM_ACTUATORS; i++) {
 #ifdef REGULATED_ACTUATORS_ENABLED
-        init_regulated_actuators();
+        init_regulated_actuators(&nh);
 #else
         pinMode(pins_pwm_actuators_pwm[i], OUTPUT);
 #endif

@@ -14,13 +14,16 @@
 
 #ifdef REGULATED_ACTUATORS_ENABLED
 
+ros::NodeHandle* node_handle_regulated_actuators = NULL;
+
 void interrupt_regulated_actuators();
 
 unsigned long ticks_counter = 0;
 uint8_t regulation_activated = 0;
 float regulation_reference_value = 0;
 
-void init_regulated_actuators() {
+void init_regulated_actuators(ros::NodeHandle* nh) {
+    node_handle_regulated_actuators = nh;
     pinMode(REGULATED_ACTUATORS_INTERRUPT_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(REGULATED_ACTUATORS_INTERRUPT_PIN), interrupt_regulated_actuators, RISING);
     pinMode(REGULATED_ACTUATORS_PIN, OUTPUT);
@@ -40,9 +43,10 @@ void loop_regulated_actuators() {
             last_ticks = ticks_counter;
             float speed_error = regulation_reference_value - wheel_speed;
             sum_speed_error += speed_error;
-            int pwm_to_apply = REGULATED_ACTUATORS_PID_P * speed_error +
-                               REGULATED_ACTUATORS_PID_I * sum_speed_error +
-                               REGULATED_ACTUATORS_PID_D * (speed_error - last_speed_error);
+            float pwm_p = REGULATED_ACTUATORS_PID_P * speed_error;
+            float pwm_i = REGULATED_ACTUATORS_PID_I * sum_speed_error;
+            float pwm_d = REGULATED_ACTUATORS_PID_D * (speed_error - last_speed_error);
+            int pwm_to_apply = pwm_p + pwm_i + pwm_d;
             last_speed_error = speed_error;
             if (pwm_to_apply > REGULATED_ACTUATORS_PWM_MAX) {
                 pwm_to_apply = REGULATED_ACTUATORS_PWM_MAX;
@@ -50,6 +54,8 @@ void loop_regulated_actuators() {
                 pwm_to_apply = 0;
             }
             analogWrite(REGULATED_ACTUATORS_PIN, pwm_to_apply);
+            String debug("pwm : " + String(pwm_to_apply) + ", cur_spd : " + String(wheel_speed) + ", p_value : " + String(pwm_p) + ", i_value : " + String(pwm_i));
+            node_handle_regulated_actuators->loginfo(debug.c_str());
         }
     } else {
         analogWrite(REGULATED_ACTUATORS_PIN, 0);

@@ -6,6 +6,7 @@
 #define ARDUINO_ACTUATORS_H
 
 #include <stdint.h>
+#include <ros.h>
 
 //********************************************************************************************************************//
 //
@@ -15,7 +16,7 @@
 
 #ifdef REGULATED_ACTUATORS_ENABLED
 
-void init_regulated_actuators();
+void init_regulated_actuators(ros::NodeHandle* nh);
 void loop_regulated_actuators();
 void activate_regulated_actuators(float reference_value);
 void deactivate_regulated_actuators();
