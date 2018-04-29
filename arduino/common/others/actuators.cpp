@@ -17,10 +17,15 @@
 ros::NodeHandle* node_handle_regulated_actuators = NULL;
 
 void interrupt_regulated_actuators();
+void reset_internal_values();
 
 unsigned long ticks_counter = 0;
 uint8_t regulation_activated = 0;
 float regulation_reference_value = 0;
+unsigned long last_ticks = 0;
+float sum_speed_error = 0.0;
+float last_speed_error = 0.0;
+unsigned long last_control_time = 0;
 
 void init_regulated_actuators(ros::NodeHandle* nh) {
     node_handle_regulated_actuators = nh;
@@ -30,21 +35,25 @@ void init_regulated_actuators(ros::NodeHandle* nh) {
 }
 
 void loop_regulated_actuators() {
-    static unsigned long last_control_time = 0;
     unsigned long current_control_time = millis();
     unsigned long delta_time = current_control_time - last_control_time;
     last_control_time = current_control_time;
     if (regulation_activated > 0) {
         if (delta_time >= REGULATED_ACTUATORS_CONTROL_LOOP_MS) {
-            static unsigned long last_ticks = 0;
-            static float sum_speed_error = 0.0;
-            static float last_speed_error = 0.0;
             float wheel_speed = ((ticks_counter - last_ticks) / float(REGULATED_ACTUATORS_TICS_PER_REVOLUTION)) / (delta_time / 1000.0);
             last_ticks = ticks_counter;
             float speed_error = regulation_reference_value - wheel_speed;
             sum_speed_error += speed_error;
             float pwm_p = REGULATED_ACTUATORS_PID_P * speed_error;
+            if (pwm_p > 255) {
+                pwm_p = 255;
+            } else if (pwm_p < -255) {
+                pwm_p = -255;
+            }
             float pwm_i = REGULATED_ACTUATORS_PID_I * sum_speed_error;
+            if (pwm_i > 255) {
+                pwm_i = 255;
+            }
             float pwm_d = REGULATED_ACTUATORS_PID_D * (speed_error - last_speed_error);
             int pwm_to_apply = pwm_p + pwm_i + pwm_d;
             last_speed_error = speed_error;
@@ -54,7 +63,7 @@ void loop_regulated_actuators() {
                 pwm_to_apply = 0;
             }
             analogWrite(REGULATED_ACTUATORS_PIN, pwm_to_apply);
-            String debug("pwm : " + String(pwm_to_apply) + ", cur_spd : " + String(wheel_speed) + ", p_value : " + String(pwm_p) + ", i_value : " + String(pwm_i));
+            String debug("t:" + String(delta_time) + " pwm:" + String(pwm_to_apply) + " spd:" + String(wheel_speed) + " p:" + String(pwm_p) + " i:" + String(pwm_i));
             node_handle_regulated_actuators->loginfo(debug.c_str());
         }
     } else {
@@ -65,6 +74,7 @@ void loop_regulated_actuators() {
 void activate_regulated_actuators(float reference_value) {
     regulation_reference_value = reference_value;
     regulation_activated = 1;
+    reset_internal_values();
 }
 
 void deactivate_regulated_actuators() {
@@ -74,6 +84,14 @@ void deactivate_regulated_actuators() {
 
 void interrupt_regulated_actuators() {
     ticks_counter++;
+}
+
+void reset_internal_values() {
+//    ticks_counter = 0;
+    last_ticks = 0;
+    sum_speed_error = 0.0;
+    last_speed_error = 0.0;
+//    last_control_time = 0;
 }
 
 #endif
