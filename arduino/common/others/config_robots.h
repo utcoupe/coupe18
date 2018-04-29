@@ -2,12 +2,12 @@
 // Created by tfuhrman on 27/04/18.
 //
 
-#ifndef ARDUINO_PINS_H
-#define ARDUINO_PINS_H
+#ifndef ARDUINO_CONFIG_ROBOTS_H
+#define ARDUINO_CONFIG_ROBOTS_H
 
 // You have to select a robot and only one !!!
-//#define PR_ROBOT
-#define GR_ROBOT
+#define PR_ROBOT
+//#define GR_ROBOT
 
 /*
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -32,6 +32,7 @@
 
 // ---- PWM ACTUATORS ----
 #define NUM_PWM_ACTUATORS 1
+#define REGULATED_ACTUATORS_ENABLED
 
 // ---- SERVO ACTUATORS ----
 #define NUM_SERVO_ACTUATORS 3
@@ -44,7 +45,7 @@
 #define NUM_BELT_SENSORS 2
 
 // ---- COLOR SENSOR ----
-#define SENSOR_COLOR_ENABLED
+//#define SENSOR_COLOR_ENABLED
 #define SENSOR_COLOR_S0              7
 #define SENSOR_COLOR_S1              6
 #define SENSOR_COLOR_S2              5
@@ -80,4 +81,4 @@
 
 #endif
 
-#endif //ARDUINO_PINS_H
+#endif //ARDUINO_CONFIG_ROBOTS_H

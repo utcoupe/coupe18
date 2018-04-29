@@ -2,8 +2,8 @@
 // Created by tfuhrman on 13/04/18.
 //
 
-#ifndef ARDUINO_CONFIG_H
-#define ARDUINO_CONFIG_H
+#ifndef ARDUINO_CONFIG_SENSORS_H
+#define ARDUINO_CONFIG_SENSORS_H
 
 #include "config_robots.h"
 
@@ -42,4 +42,4 @@
 
 #endif
 
-#endif //ARDUINO_CONFIG_H
+#endif //ARDUINO_CONFIG_SENSORS_H

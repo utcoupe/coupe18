@@ -18,6 +18,10 @@
 #include <drivers_ard_others/ActDigitalStates.h>
 #include <drivers_ard_others/ActPWMStates.h>
 #include <drivers_ard_others/ActServoStates.h>
+#include "actuators.h"
+#include "config_actuators.h"
+
+#include "config_robots.h"
 
 ros::NodeHandle nh;
 
@@ -92,8 +96,18 @@ void on_move(const drivers_ard_others::Move& msg){
             break;
         case msg.TYPE_PWM:
             if(msg.id >= 0 && msg.id <= NUM_PWM_ACTUATORS) {
-                if(msg.dest_value >= 0 && msg.dest_value <= 255)
+                if(msg.dest_value >= 0 && msg.dest_value <= 255) {
                     pwm_actuators_states[msg.id] = msg.dest_value;
+#ifdef REGULATED_ACTUATORS_ENABLED
+                    if (msg.dest_value == 0) {
+                        deactivate_regulated_actuators();
+                        nh.loginfo("Deactivate regulation");
+                    } else {
+                        activate_regulated_actuators(msg.dest_value);
+                        nh.loginfo("Activate regulation");
+                    }
+#endif
+                }
                 else {
                     nh.logerror("MOVE failed : dest_value invalid (0 to 255).");
                     success = false;
@@ -170,13 +184,23 @@ void loop_digital_actuators() {
 
 // PWM actuators
 void init_pwm_actuators() {
-    for(uint8_t i = 0; i < NUM_PWM_ACTUATORS; i++)
+    for(uint8_t i = 0; i < NUM_PWM_ACTUATORS; i++) {
+#ifdef REGULATED_ACTUATORS_ENABLED
+        init_regulated_actuators();
+#else
         pinMode(pins_pwm_actuators_pwm[i], OUTPUT);
+#endif
+    }
 }
 
 void loop_pwm_actuators() {
-    for(uint8_t i = 0; i < NUM_PWM_ACTUATORS; i++)
+    for(uint8_t i = 0; i < NUM_PWM_ACTUATORS; i++) {
+#ifdef REGULATED_ACTUATORS_ENABLED
+        loop_regulated_actuators();
+#else
         analogWrite(pins_pwm_actuators_pwm[i], pwm_actuators_states[i]);
+#endif
+    }
 
     pwm_states_msg.states_length = NUM_PWM_ACTUATORS;
     pwm_states_msg.states = pwm_actuators_states;
