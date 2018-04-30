@@ -11,13 +11,13 @@
 
 // Buttons matrix pins
 #define BTN_L1 D6
-#define BTN_L2 D1 //TODO to change
+#define BTN_L2 D7
 #define BTN_R1 D5
 #define BTN_R2 D0
 
 // LED pins
 #define LED_RED     D3
 #define LED_BLUE    D4
-#define LED_GREEN   D2 //TODO to change
+#define LED_GREEN   D8
 
 #endif //ARDUINO_PINS_H
