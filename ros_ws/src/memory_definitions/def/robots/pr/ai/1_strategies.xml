@@ -34,4 +34,28 @@
 		<actions_onfinish name="After-Game Actions">
 		</actions_onfinish>
 	</strategy>
+
+	<strategy name="canon_tests">
+		<actions name="In-Game Actions">
+			<actionref ref="game_start"/>
+
+			<actionlist name="Main actions">
+				<orderref ref="actuator_set" name="activate button with servo">
+					<name>canon</name>
+					<preset>ON</preset>
+				</orderref>
+				<actionlist repeat="10">
+					<orderref ref="do_barrel_action">
+						<sort>0</sort>
+					</orderref>
+				</actionlist>
+				<orderref ref="actuator_set" name="activate button with servo">
+					<name>canon</name>
+					<preset>OFF</preset>
+				</orderref>
+			</actionlist>
+		</actions>
+		<actions_onfinish name="After-Game Actions">
+		</actions_onfinish>
+	</strategy>
 </strategies>
