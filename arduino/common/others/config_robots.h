@@ -46,12 +46,12 @@
 
 // ---- COLOR SENSOR ----
 //#define SENSOR_COLOR_ENABLED
-#define SENSOR_COLOR_S0              7
-#define SENSOR_COLOR_S1              6
-#define SENSOR_COLOR_S2              5
-#define SENSOR_COLOR_S3              4
-#define SENSOR_COLOR_LED             2
-#define SENSOR_COLOR_SENSOR_VALUE    3
+#define SENSOR_COLOR_S0              53
+#define SENSOR_COLOR_S1              51
+#define SENSOR_COLOR_S2              49
+#define SENSOR_COLOR_S3              47
+#define SENSOR_COLOR_LED             50
+#define SENSOR_COLOR_SENSOR_VALUE    45
 
 #endif
 

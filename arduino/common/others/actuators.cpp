@@ -19,10 +19,10 @@ ros::NodeHandle* node_handle_regulated_actuators = NULL;
 void interrupt_regulated_actuators();
 void reset_internal_values();
 
-unsigned long ticks_counter = 0;
+unsigned long long ticks_counter = 0;
 uint8_t regulation_activated = 0;
 float regulation_reference_value = 0;
-unsigned long last_ticks = 0;
+unsigned long long last_ticks = 0;
 float sum_speed_error = 0.0;
 float last_speed_error = 0.0;
 unsigned long last_control_time = 0;
@@ -36,11 +36,12 @@ void init_regulated_actuators(ros::NodeHandle* nh) {
 
 void loop_regulated_actuators() {
     unsigned long current_control_time = millis();
-    unsigned long delta_time = current_control_time - last_control_time;
-    last_control_time = current_control_time;
     if (regulation_activated > 0) {
+        unsigned long delta_time = current_control_time - last_control_time;
         if (delta_time >= REGULATED_ACTUATORS_CONTROL_LOOP_MS) {
-            float wheel_speed = ((ticks_counter - last_ticks) / float(REGULATED_ACTUATORS_TICS_PER_REVOLUTION)) / (delta_time / 1000.0);
+            last_control_time = current_control_time;
+            float nbr_revolution = (float)((float)(ticks_counter - last_ticks) / float(REGULATED_ACTUATORS_TICS_PER_REVOLUTION));
+            float wheel_speed = (float)(nbr_revolution / (float)((float)delta_time / 1000.0));
             last_ticks = ticks_counter;
             float speed_error = regulation_reference_value - wheel_speed;
             sum_speed_error += speed_error;
@@ -63,8 +64,8 @@ void loop_regulated_actuators() {
                 pwm_to_apply = 0;
             }
             analogWrite(REGULATED_ACTUATORS_PIN, pwm_to_apply);
-            String debug("t:" + String(delta_time) + " pwm:" + String(pwm_to_apply) + " spd:" + String(wheel_speed) + " p:" + String(pwm_p) + " i:" + String(pwm_i));
-            node_handle_regulated_actuators->loginfo(debug.c_str());
+//            String debug("pwm:" + String(pwm_to_apply) + " spd:" + String(wheel_speed) + " p:" + String(pwm_p) + " i:" + String(pwm_i) + " rev:" + String(nbr_revolution));
+//            node_handle_regulated_actuators->loginfo(debug.c_str());
         }
     } else {
         analogWrite(REGULATED_ACTUATORS_PIN, 0);
@@ -87,11 +88,10 @@ void interrupt_regulated_actuators() {
 }
 
 void reset_internal_values() {
-//    ticks_counter = 0;
     last_ticks = 0;
     sum_speed_error = 0.0;
     last_speed_error = 0.0;
-//    last_control_time = 0;
+    last_control_time = 0;
 }
 
 #endif

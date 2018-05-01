@@ -246,7 +246,7 @@ void loop_actuators() {
     loop_stepper_actuators();
 }
 
-Timer actuators_loop_timer = Timer(100, &loop_actuators);
+Timer actuators_loop_timer = Timer(50, &loop_actuators);
 
 void init_actuators() {
     init_digital_actuators();

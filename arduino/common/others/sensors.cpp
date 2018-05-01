@@ -45,7 +45,8 @@ void init_belt_sensors(ros::NodeHandle* nh) {
 
     for(uint8_t i = 0; i < NUM_BELT_SENSORS; i++) {
         belt_sensors[i].setTimeout(500);
-        belt_sensors[i].setMeasurementTimingBudget(200000);
+        // Do not use this as the time of first measurement will be too big
+//        belt_sensors[i].setMeasurementTimingBudget(200000);
         belt_sensors[i].startContinuous();
     }
 }
@@ -53,10 +54,13 @@ void init_belt_sensors(ros::NodeHandle* nh) {
 void loop_belt_sensors() {
     for(uint8_t i = 0; i < NUM_BELT_SENSORS; i++) {
         belt_range_msg.sensor_id = belt_sensors_names[i].c_str();
+        unsigned long now = millis();
         belt_range_msg.range = belt_sensors[i].readRangeContinuousMillimeters() / 1000.0; //in meters
+        unsigned long diff = millis() - now;
         if (belt_range_msg.range > 65534)
             belt_range_msg.range = -1;
         belt_ranges_pub.publish(&belt_range_msg);
+//        node_handle_belt_sensor->loginfo(String("Belt : " + String(diff)).c_str());
     }
 }
 

@@ -13,15 +13,15 @@
 //
 //********************************************************************************************************************//
 
-#define REGULATED_ACTUATORS_INTERRUPT_PIN   2
-#define REGULATED_ACTUATORS_PIN             8
-#define REGULATED_ACTUATORS_PID_P           15.0
-#define REGULATED_ACTUATORS_PID_I           5.0
-#define REGULATED_ACTUATORS_PID_D           0.0
-#define REGULATED_ACTUATORS_CONTROL_LOOP_MS 100
-#define REGULATED_ACTUATORS_TICS_PER_REVOLUTION           10
-#define REGULATED_ACTUATORS_PWM_MIN         10
-#define REGULATED_ACTUATORS_PWM_MAX         255
+#define REGULATED_ACTUATORS_INTERRUPT_PIN       2
+#define REGULATED_ACTUATORS_PIN                 8
+#define REGULATED_ACTUATORS_PID_P               15.0f
+#define REGULATED_ACTUATORS_PID_I               5.0f
+#define REGULATED_ACTUATORS_PID_D               0.0f
+#define REGULATED_ACTUATORS_CONTROL_LOOP_MS     100
+#define REGULATED_ACTUATORS_TICS_PER_REVOLUTION 10.0f
+#define REGULATED_ACTUATORS_PWM_MIN             10
+#define REGULATED_ACTUATORS_PWM_MAX             255
 
 
 #endif //ARDUINO_CONFIG_ACTUATORS_H
