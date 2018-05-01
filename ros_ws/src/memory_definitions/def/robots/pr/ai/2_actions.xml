@@ -47,7 +47,7 @@
 		</actions>
 	</action>
 
-	<action ref="load_unicolor_distributor" name="Load unicolor distributor">
+	<action ref="load_unicolor_distributor" name="Load unicolor distributor" reward="10">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -93,6 +93,8 @@
 
 			<orderref ref="navigator_goto_waypoint" name="accost distributor">
 				<waypoint_name>way_multi_distrib_accost</waypoint_name>
+				<direction>0</direction>
+				<disable_collisions>1</disable_collisions>
 			</orderref>
 
 			<orderref ref="actuator_set" name="activate button with servo">
@@ -116,17 +118,20 @@
 		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<orderref ref="navigator_goto_waypoint" name="goto fire position">
-				<waypoint_name>way_fire_station</waypoint_name>
-				<direction>0</direction>
+				<waypoint_name>way_fire_unicolor</waypoint_name>
+				<direction>1</direction>
 			</orderref>
 
 			<orderref ref="do_canon_action" name="activate canon">
-				<!--fire_distance>2.23</fire_distance-->
+				<fire_distance>1.0</fire_distance>
 			</orderref>
 
-			<actionlist repeat="9">
+			<actionlist repeat="13">
 				<orderref ref="do_barrel_action">
 					<sort>0</sort> <!-- TODO: 1 -->
+				</orderref>
+				<orderref ref="delay">
+					<duration>0.5</duration>
 				</orderref>
 			</actionlist>
 
@@ -141,17 +146,20 @@
 		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<orderref ref="navigator_goto_waypoint" name="goto fire position">
-				<waypoint_name>way_fire</waypoint_name>
-				<direction>0</direction>
+				<waypoint_name>way_fire_unicolor</waypoint_name>
+				<direction>1</direction>
 			</orderref>
 
 			<orderref ref="do_canon_action" name="activate canon">
-				<!--fire_distance>1.10</fire_distance-->
+				<fire_distance>0.9</fire_distance>
 			</orderref>
 
-			<actionlist repeat="9">
+			<actionlist repeat="13">
 				<orderref ref="do_barrel_action">
 					<sort>0</sort>
+				</orderref>
+				<orderref ref="delay">
+					<duration>0.5</duration>
 				</orderref>
 			</actionlist>
 
