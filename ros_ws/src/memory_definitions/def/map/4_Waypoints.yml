@@ -55,7 +55,7 @@ waypoints:
     way_uni_distrib_accost:
         position:
             frame_id: /map
-            x: 0.105
+            x: 0.115
             y: 1.16
             a: 0.0
             type: fixed
@@ -70,7 +70,7 @@ waypoints:
         position:
             frame_id: /map
             x: 2.390
-            y: 0.09
+            y: 0.115
             a: -1.57079
             type: fixed
 
@@ -89,6 +89,14 @@ waypoints:
               x: 1.514
               y: 0.6
               a: 5.442
+              type: fixed
+
+    way_fire_unicolor:
+          position:
+              frame_id: /map
+              x: 0.4
+              y: 1.16
+              a: 1.75
               type: fixed
 
     way_station_approach:
