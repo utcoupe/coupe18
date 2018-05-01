@@ -94,7 +94,4 @@
 			<param name="direction" type="int" optional="true">1</param>
 		</message>
 	</order>
-
-
-
 </orders>
