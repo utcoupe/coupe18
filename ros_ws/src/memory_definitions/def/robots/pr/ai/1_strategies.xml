@@ -40,18 +40,16 @@
 			<actionref ref="game_start"/>
 
 			<actionlist name="Main actions">
-				<orderref ref="actuator_set" name="activate button with servo">
-					<name>canon</name>
-					<preset>ON</preset>
+				<orderref ref="do_canon_action" name="activate canon">
+					<fire_distance>2</fire_distance>
 				</orderref>
 				<actionlist repeat="10">
 					<orderref ref="do_barrel_action">
 						<sort>0</sort>
 					</orderref>
 				</actionlist>
-				<orderref ref="actuator_set" name="activate button with servo">
-					<name>canon</name>
-					<preset>OFF</preset>
+				<orderref ref="do_canon_action" name="deactivate canon">
+					<fire_distance>-1</fire_distance>
 				</orderref>
 			</actionlist>
 		</actions>

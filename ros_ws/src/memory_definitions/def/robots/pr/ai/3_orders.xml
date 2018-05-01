@@ -51,6 +51,13 @@
 		</message>
 	</order>
 
+	<order ref="do_canon_action" duration="2">
+		<message dest="/movement/actuators/activate_canon">
+			<param name="fire_distance" type="float" optional="false"/>
+		</message>
+	</order>
+
+
 
 	<!-- AI Specific -->
 	<order ref="delay" duration="1">
