@@ -32,6 +32,9 @@ void MapSubscriber::subscribe(ros::NodeHandle& nodeHandle, std::size_t sizeMaxQu
 
 void MapSubscriber::fetchOccupancyData(const uint& widthGrid, const uint& heightGrid)
 {
+    if(_occupancyGrid.size() == heightGrid)
+        return;
+
     memory_map::MapGetObjects srv;
     srv.request.collisions_only = true;
     if (!_srvGetMapObjects.call(srv) || !srv.response.success)

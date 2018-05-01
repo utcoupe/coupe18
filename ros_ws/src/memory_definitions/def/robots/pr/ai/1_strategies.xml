@@ -9,8 +9,8 @@
 			<actionref ref="game_start"/>
 			<actionlist name="Main actions">
 				<actionlist name="Do unicolor distributor">
-					<actionref ref="load_unicolor_distributor"/>
-					<actionref ref="fire_unicolor_balls"/>
+					<actionref ref="load_unicolor_distributor" reward="10"/>
+					<actionref ref="fire_unicolor_balls" reward="40"/>
 				</actionlist>
 				<actionlist name="Do multicolor distributor">
 					<actionref ref="load_multicolor_distributor"/>
