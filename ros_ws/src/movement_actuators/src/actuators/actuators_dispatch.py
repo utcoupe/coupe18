@@ -116,7 +116,7 @@ class ActuatorsDispatch(ActuatorsAbstract):
                 'pwm': msg.TYPE_PWM,
                 'servo': msg.TYPE_SERVO
             }[ard_type]
-        msg.dest_value = param
+        msg.dest_value = int(param)
         msg.order_nb = self._get_order_id()
         self._pub_ard_move.publish(msg)
         return msg.order_nb
@@ -172,4 +172,3 @@ class ActuatorsDispatch(ActuatorsAbstract):
                         self._send_to_arduino(actuator.id, actuator.type, actuator.preset["OFF"])
                         continue
                     # TODO stop AX12 ?
-        

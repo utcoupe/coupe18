@@ -11,11 +11,17 @@ find_package(catkin REQUIRED COMPONENTS
     ai_game_status
 )
 
+# Generate services in the 'srv' folder
+add_service_files(
+    FILES
+    ActivateCanon.srv
+)
+
 ## Generate actions in the 'action' folder
 add_action_files(DIRECTORY action FILES
-        Dispatch.action
-        Arm.action
-        Barrel.action
+    Dispatch.action
+    Arm.action
+    Barrel.action
 )
 
 ## Generate added messages and services with any dependencies listed here

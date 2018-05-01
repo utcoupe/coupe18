@@ -22,6 +22,7 @@ class ActuatorsNode:
             self.arm_instance = actuators.ActuatorsArm()
         elif self._robot.lower() == "pr":
             self.barrel_instance = actuators.ActuatorsBarrel()
+            self.canon_instance = actuators.ActuatorsCanon()
 
         self._isHalted = False
 
