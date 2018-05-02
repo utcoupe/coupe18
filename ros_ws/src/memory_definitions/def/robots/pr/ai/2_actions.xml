@@ -57,7 +57,7 @@
 
 			<orderref ref="actuator_set" name="activate button with servo">
 				<name>servo_lock</name>
-				<preset>LEFT</preset>
+				<preset>RIGHT</preset>
 			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="accost distributor">
@@ -66,7 +66,7 @@
 
 			<orderref ref="actuator_set" name="activate button with servo">
 				<name>servo_lock</name>
-				<preset>RIGHT</preset>
+				<preset>LEFT</preset>
 			</orderref>
 
 			<orderref ref="delay">
@@ -90,7 +90,7 @@
 
 			<orderref ref="actuator_set" name="activate button with servo">
 				<name>servo_lock</name>
-				<preset>LEFT</preset>
+				<preset>RIGHT</preset>
 			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="accost distributor">
@@ -99,7 +99,7 @@
 
 			<orderref ref="actuator_set" name="activate button with servo">
 				<name>servo_lock</name>
-				<preset>RIGHT</preset>
+				<preset>LEFT</preset>
 			</orderref>
 
 			<orderref ref="delay">
