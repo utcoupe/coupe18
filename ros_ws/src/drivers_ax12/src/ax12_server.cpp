@@ -129,7 +129,7 @@ bool Ax12Server::handle_joint_goal(GoalHandle goal_handle) {
         }
     }
 
-    num_frames_loaded[motor_id] = 0;
+    num_frames_stopped[motor_id] = 0;
 
     bool success = true;
 
@@ -192,13 +192,13 @@ void Ax12Server::main_loop(const ros::TimerEvent &) {
     uint8_t motor_id = 0;
     uint16_t curr_position = 0;
     uint32_t goal_position = 0;
-    uint16_t curr_load = 0;
+    uint16_t curr_speed = 0;
 
     for (auto it = joint_goals_.begin(); it != joint_goals_.end();) {
         motor_id = it->getGoal()->motor_id;
         driver_.read_register(motor_id, PRESENT_POSITION, curr_position);
-        driver_.read_register(motor_id, PRESENT_LOAD, curr_load);
-        curr_load %= 1024;
+        driver_.read_register(motor_id, PRESENT_SPEED, curr_speed);
+        curr_speed %= 1024;
 
         ROS_DEBUG("Motor %d : position %d", motor_id, curr_position);
 
@@ -223,16 +223,17 @@ void Ax12Server::main_loop(const ros::TimerEvent &) {
             result_.success = 0;
             it->setAborted(result_);
             it = joint_goals_.erase(it);
-        } else if (curr_load >= LOAD_THRESHOLD) {
-            num_frames_loaded[motor_id]++;
-            if(num_frames_loaded[motor_id] > LOAD_FRAMES_ALLOWED){
-                ROS_WARN("Motor has exceeded the maximum load for %d frames! (load : %d)",
-                         LOAD_FRAMES_ALLOWED + 1, curr_load);
+        } else if (curr_speed == 0) {
+            num_frames_stopped[motor_id]++;
+            if(num_frames_stopped[motor_id] > STOP_FRAMES_ALLOWED){
+                ROS_WARN("Motor is stuck for %d frames",
+                         STOP_FRAMES_ALLOWED + 1);
                 result_.success = 0;
                 it->setAborted(result_);
                 it = joint_goals_.erase(it);
             }
         } else {
+            num_frames_stopped[motor_id] = 0;
             feedback_.position = curr_position;
             it->publishFeedback(feedback_);
             it++;
