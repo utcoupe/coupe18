@@ -21,7 +21,6 @@
 const double MAX_STOP_TIME = 3; // timeout (secs)
 const double MAIN_FREQUENCY = 15;
 const uint8_t POSITION_MARGIN = 6;
-const uint8_t STOP_FRAMES_ALLOWED = 5; // allowed number of frames stopped without aborting goal
 const std::string PORT_FINDER_SERVICE = "/drivers/port_finder/get_port";
 const std::string GAME_STATUS_TOPIC = "/ai/game_status/status";
 
@@ -37,7 +36,6 @@ protected:
     ros::ServiceServer set_param_service;
     ros::Subscriber game_status_sub_;
     std::list <GoalHandle> joint_goals_;
-    std::map <uint8_t, uint8_t> num_frames_stopped; // <motor_id, num_frames>
 
     // create messages that are used to published feedback/result
     drivers_ax12::Ax12CommandFeedback feedback_;
