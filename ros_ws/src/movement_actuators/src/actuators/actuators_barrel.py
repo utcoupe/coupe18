@@ -68,11 +68,8 @@ class ActuatorsBarrel(ActuatorsAbstract):
         self._curr_goal_id = goal_id
         self._curr_pause = goal.pause
 
-
-
         if goal.timeout > 0:
             self._curr_timeout = goal.timeout*1000
-            self._timer = rospy.Timer(rospy.Duration(goal.timeout), self._start_back, oneshot=True)
         else:
             self._curr_timeout = 5000
             rospy.logwarn('No timeout is set, setting dispatcher timeout to 5s')
@@ -143,6 +140,8 @@ class ActuatorsBarrel(ActuatorsAbstract):
 
 
     def _start_goal_chain(self, preset):
+        self._timer = rospy.Timer(rospy.Duration(self._curr_timeout), self._start_back, oneshot=True)
+
         g = DispatchGoal()
         g.name = self.BARREL_NAME
         g.order = 'JOINT'
