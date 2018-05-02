@@ -10,7 +10,7 @@ class Ax12Driver {
 public:
 
     const static uint8_t SCAN_RANGE = 10; // the scan pings motors with id 1 to SCAN_RANGE
-    const static uint8_t PING_PASS_NBR = 3; // number of times a motor is pinged to make sure it is connected
+    const static uint8_t PING_PASS_NBR = 6; // number of times a motor is pinged to make sure it is connected
     const static uint8_t BAUD_RATE_INDEX = 1; // baudrate = 2000000 / (index + 1)
     const static uint16_t PING_SLEEP = 100; // microsec to sleep between pings
 

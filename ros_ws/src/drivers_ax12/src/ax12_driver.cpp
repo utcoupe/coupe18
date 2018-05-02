@@ -99,7 +99,7 @@ bool Ax12Driver::motor_id_connected(uint8_t motor_id) {
         result = packet_handler->ping(port_handler.get(), motor_id, &err);
 
         if (err != 0) {
-            ROS_WARN("Could not ping motor %d because of an hardware error : %s",
+            ROS_DEBUG("Could not ping motor %d because of an hardware error : %s",
                      motor_id, packet_handler->getRxPacketError(err));
         }
 
