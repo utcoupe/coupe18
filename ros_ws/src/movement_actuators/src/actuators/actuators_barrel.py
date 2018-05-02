@@ -72,7 +72,7 @@ class ActuatorsBarrel(ActuatorsAbstract):
 
         if goal.timeout > 0:
             self._curr_timeout = goal.timeout*1000
-            self._timer = rospy.Timer(rospy.Duration(goal.timeout), self._trigger_timeout, oneshot=True)
+            self._timer = rospy.Timer(rospy.Duration(goal.timeout), self._start_back, oneshot=True)
         else:
             self._curr_timeout = 5000
             rospy.logwarn('No timeout is set, setting dispatcher timeout to 5s')
@@ -84,6 +84,8 @@ class ActuatorsBarrel(ActuatorsAbstract):
         return True
 
     def _start_back(self, e=None):
+        self._timer = rospy.Timer(rospy.Duration(self._curr_timeout), lambda e: self._finish_action(False), oneshot=True)
+
         g = DispatchGoal()
         g.name = self.BARREL_NAME
         g.order = 'JOINT'
@@ -97,6 +99,10 @@ class ActuatorsBarrel(ActuatorsAbstract):
 
     def _forth_done_cb(self, state, result):
         rospy.logdebug('forth_done, waiting %d seconds' % self._curr_pause)
+        if self._timer:
+            self._timer.shutdown()
+            self._timer = None
+
         if self._curr_pause > 0:
             self._pause_timer = rospy.Timer(rospy.Duration(self._curr_pause), self._start_back, oneshot=True)
         else:
@@ -105,10 +111,6 @@ class ActuatorsBarrel(ActuatorsAbstract):
     def _back_done_cb(self, state, result):
         rospy.logdebug('back_done')
         self._finish_action(result.success)
-
-    def _trigger_timeout(self, event):
-        # TODO cancel goals
-        self._finish_action(False)
 
     def _color_callback(self, msg):
 
