@@ -118,7 +118,7 @@ bool Ax12Driver::toggle_torque(bool enable) {
     bool success = true;
 
     for (uint8_t i : motor_ids) {
-        success &= write_register(motor_ids[i], TORQUE_ENABLE, static_cast<uint16_t>(enable));
+        success &= write_register(i, TORQUE_ENABLE, static_cast<uint16_t>(enable));
     }
 
     return success;
