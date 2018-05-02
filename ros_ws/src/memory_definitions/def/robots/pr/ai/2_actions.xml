@@ -70,7 +70,7 @@
 			</orderref>
 
 			<orderref ref="delay">
-				<duration>2</duration>
+				<duration>1.5</duration>
 			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="go back to approach">>
@@ -103,7 +103,7 @@
 			</orderref>
 
 			<orderref ref="delay">
-				<duration>2</duration>
+				<duration>1.5</duration>
 			</orderref>
 
 			<orderref ref="asserv_goto_waypoint" name="go back to approach">
