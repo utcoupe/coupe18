@@ -15,8 +15,9 @@
 
 #define REGULATED_ACTUATORS_INTERRUPT_PIN       2
 #define REGULATED_ACTUATORS_PIN                 8
-#define REGULATED_ACTUATORS_PID_P               15.0f
-#define REGULATED_ACTUATORS_PID_I               5.0f
+// other coeff for control with integral instead of proportional : P = 25 and I = 0.15
+#define REGULATED_ACTUATORS_PID_P               50.0f
+#define REGULATED_ACTUATORS_PID_I               0.08f
 #define REGULATED_ACTUATORS_PID_D               0.0f
 #define REGULATED_ACTUATORS_CONTROL_LOOP_MS     100
 #define REGULATED_ACTUATORS_TICS_PER_REVOLUTION 10.0f
