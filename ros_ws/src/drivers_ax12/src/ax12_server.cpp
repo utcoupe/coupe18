@@ -190,10 +190,13 @@ void Ax12Server::main_loop(const ros::TimerEvent &) {
     uint8_t motor_id = 0;
     uint16_t curr_position = 0;
     uint32_t goal_position = 0;
+    uint16_t curr_load = 0;
 
     for (auto it = joint_goals_.begin(); it != joint_goals_.end();) {
         motor_id = it->getGoal()->motor_id;
         driver_.read_register(motor_id, PRESENT_POSITION, curr_position);
+        driver_.read_register(motor_id, PRESENT_LOAD, curr_load);
+        curr_load %= 1024;
 
         ROS_DEBUG("Motor %d : position %d", motor_id, curr_position);
 
@@ -215,6 +218,11 @@ void Ax12Server::main_loop(const ros::TimerEvent &) {
             driver_.write_register(motor_id, TORQUE_ENABLE, 0);
             driver_.write_register(motor_id, TORQUE_ENABLE, 1);
 
+            result_.success = 0;
+            it->setAborted(result_);
+            it = joint_goals_.erase(it);
+        } else if (curr_load >= LOAD_THRESHOLD) {
+            ROS_WARN("Motor has exceeded the maximum load ! (load : %d)", curr_load);
             result_.success = 0;
             it->setAborted(result_);
             it = joint_goals_.erase(it);
