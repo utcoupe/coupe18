@@ -45,6 +45,7 @@ class ActuatorsNode:
                 self.arm_instance.setHalted(self._isHalted)
             elif self._robot.lower() == "pr":
                 self.barrel_instance.setHalted(self._isHalted)
+                self.canon_instance.set_halted(self._isHalted)
 
 
 if __name__ == '__main__':

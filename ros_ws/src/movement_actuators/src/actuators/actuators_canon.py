@@ -25,6 +25,7 @@ class ActuatorsCanon:
         self._srv_canon = rospy.Service("/movement/actuators/activate_canon", ActivateCanon, self._callback_activate_canon)
         # Boolean used for flipper toggle values, as they just flip on 2 values
         self._flipper_state = False
+        self._is_halted = False
 
     def _callback_activate_canon(self, request):
         response = True
@@ -82,3 +83,9 @@ class ActuatorsCanon:
             goal_flipper_bin.preset = preset
             goal_flipper_bin.timeout = DEFAULT_ACTUATORS_TIMEOUT
             self._client.send_goal(goal_flipper_bin)
+
+    def set_halted(self, is_halted):
+        self._is_halted = is_halted
+        if is_halted:
+            self._canon_stop()
+            self._flipper_stop()
