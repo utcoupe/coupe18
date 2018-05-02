@@ -40,17 +40,10 @@
 			<actionref ref="game_start"/>
 
 			<actionlist name="Main actions">
-				<orderref ref="do_canon_action" name="activate canon">
-					<fire_distance>2</fire_distance>
-				</orderref>
-				<actionlist repeat="10">
-					<orderref ref="do_barrel_action">
-						<sort>0</sort>
-					</orderref>
+				<actionlist name="Do unicolor distributor">
+					<actionref ref="load_unicolor_distributor"/>
+					<actionref ref="fire_full_clean_balls"/>
 				</actionlist>
-				<orderref ref="do_canon_action" name="deactivate canon">
-					<fire_distance>-1</fire_distance>
-				</orderref>
 			</actionlist>
 		</actions>
 		<actions_onfinish name="After-Game Actions">

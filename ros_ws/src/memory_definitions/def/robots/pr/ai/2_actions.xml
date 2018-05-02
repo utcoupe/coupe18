@@ -118,23 +118,21 @@
 		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<orderref ref="asserv_goto_waypoint" name="goto fire position">
-				<waypoint_name>way_fire</waypoint_name>
+				<waypoint_name>way_fire_station</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_set" name="activate button with servo">
-				<name>canon</name>
-				<preset>ON</preset>
+			<orderref ref="do_canon_action" name="activate canon">
+				<fire_distance>2.5</fire_distance>
 			</orderref>
 
-			<actionlist repeat="10">
+			<actionlist repeat="9">
 				<orderref ref="do_barrel_action">
 					<sort>0</sort>
 				</orderref>
 			</actionlist>
 
-			<orderref ref="actuator_set" name="activate button with servo">
-				<name>canon</name>
-				<preset>OFF</preset>
+			<orderref ref="do_canon_action" name="deactivate canon">
+				<fire_distance>-1</fire_distance>
 			</orderref>
 		</actions>
 	</action>
