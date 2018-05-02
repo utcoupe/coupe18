@@ -72,7 +72,7 @@ class ActuatorsBarrel(ActuatorsAbstract):
 
         if goal.timeout > 0:
             self._curr_timeout = goal.timeout*1000
-            self._timer = rospy.Timer(rospy.Duration(goal.timeout), self._client.cancel_all_goals, oneshot=True)
+            self._timer = rospy.Timer(rospy.Duration(goal.timeout), self._start_back, oneshot=True)
         else:
             self._curr_timeout = 5000
             rospy.logwarn('No timeout is set, setting dispatcher timeout to 5s')
