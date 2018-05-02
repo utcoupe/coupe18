@@ -70,7 +70,7 @@ waypoints:
               frame_id: /map
               x: 2.17
               y: 0.41
-              a: -0.7854
+              a: -0.7254
               type: fixed
 
     way_station_approach:
