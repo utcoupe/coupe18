@@ -129,6 +129,8 @@ bool Ax12Server::handle_joint_goal(GoalHandle goal_handle) {
         }
     }
 
+    num_frames_loaded[motor_id] = 0;
+
     bool success = true;
 
     success &= driver_.joint_mode(motor_id);
@@ -222,10 +224,14 @@ void Ax12Server::main_loop(const ros::TimerEvent &) {
             it->setAborted(result_);
             it = joint_goals_.erase(it);
         } else if (curr_load >= LOAD_THRESHOLD) {
-            ROS_WARN("Motor has exceeded the maximum load ! (load : %d)", curr_load);
-            result_.success = 0;
-            it->setAborted(result_);
-            it = joint_goals_.erase(it);
+            num_frames_loaded[motor_id]++;
+            if(num_frames_loaded[motor_id] > LOAD_FRAMES_ALLOWED){
+                ROS_WARN("Motor has exceeded the maximum load for %d frames! (load : %d)",
+                         LOAD_FRAMES_ALLOWED + 1, curr_load);
+                result_.success = 0;
+                it->setAborted(result_);
+                it = joint_goals_.erase(it);
+            }
         } else {
             feedback_.position = curr_position;
             it->publishFeedback(feedback_);
