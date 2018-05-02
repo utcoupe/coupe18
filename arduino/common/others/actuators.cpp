@@ -19,10 +19,10 @@ ros::NodeHandle* node_handle_regulated_actuators = NULL;
 void interrupt_regulated_actuators();
 void reset_internal_values();
 
-unsigned long long ticks_counter = 0;
+unsigned long ticks_counter = 0;
 uint8_t regulation_activated = 0;
 float regulation_reference_value = 0;
-unsigned long long last_ticks = 0;
+unsigned long last_ticks = 0;
 float sum_speed_error = 0.0;
 float last_speed_error = 0.0;
 unsigned long last_control_time = 0;
@@ -64,7 +64,7 @@ void loop_regulated_actuators() {
                 pwm_to_apply = 0;
             }
             analogWrite(REGULATED_ACTUATORS_PIN, pwm_to_apply);
-//            String debug("pwm:" + String(pwm_to_apply) + " spd:" + String(wheel_speed) + " p:" + String(pwm_p) + " i:" + String(pwm_i) + " rev:" + String(nbr_revolution));
+//            String debug("pwm:" + String(pwm_to_apply) + " spd:" + String(wheel_speed) + " p:" + String(pwm_p) + " i:" + String(pwm_i) + " rev:" + String(nbr_revolution) + " tick:" + String(ticks_counter));
 //            node_handle_regulated_actuators->loginfo(debug.c_str());
         }
     } else {
