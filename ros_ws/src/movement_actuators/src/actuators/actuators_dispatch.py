@@ -75,10 +75,10 @@ class ActuatorsDispatch(ActuatorsAbstract):
         return to_return
 
     def _callback_move_response(self, msg):
-        if msg.order_nb in self._active_goals.values():
+        if msg.order_nb in filter(lambda e: isinstance(e, int), self._active_goals.values()):
             received_goal_id = None
             for goal_id in self._active_goals.iterkeys():
-                if self._active_goals[goal_id] == msg.order_nb:
+                if isinstance(self._active_goals[goal_id], int) and self._active_goals[goal_id] == msg.order_nb:
                     received_goal_id = goal_id
             if received_goal_id is not None:
                 self._goal_reached(received_goal_id, msg.success)
@@ -87,9 +87,9 @@ class ActuatorsDispatch(ActuatorsAbstract):
 
     def _callback_ax12_client(self, goal_handle):
         received_goal_id = goal_handle.comm_state_machine.action_goal.goal_id.id
-        if goal_handle in self._active_goals.values():
+        if goal_handle in filter(lambda e: not isinstance(e, int), self._active_goals.values()):
             for goal_id, goal in self._active_goals.iteritems():
-                if goal.comm_state_machine.action_goal.goal_id.id == received_goal_id:
+                if not isinstance(goal, int) and goal.comm_state_machine.action_goal.goal_id.id == received_goal_id:
                     goal_status = goal_handle.get_goal_status()
 
                     if goal_status == GoalStatus.SUCCEEDED:

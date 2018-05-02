@@ -18,7 +18,7 @@
 #include "ax12_driver.h"
 
 
-const double MAX_STOP_TIME = 3; //number of seconds to wait not moving before confirming the goal is not reached
+const double MAX_STOP_TIME = 3; // timeout (secs)
 const double MAIN_FREQUENCY = 15;
 const uint8_t POSITION_MARGIN = 6;
 const std::string PORT_FINDER_SERVICE = "/drivers/port_finder/get_port";
