@@ -26,9 +26,9 @@ class ActuatorsAbstract:
     def _action_reached(self, goal_id, reached, result):
         # Result is passed as parameter to avoid retrieving the goal result type in abstract class, maybe a TODO ?
         if reached:
-            rospy.loginfo("Goal id {}, has been reached.".format(goal_id))
+            rospy.loginfo("Goal id {}, has been reached.".format(goal_id.id))
         else:
-            rospy.logwarn("Goal id {}, has NOT been reached.".format(goal_id))
+            rospy.logwarn("Goal id {}, has NOT been reached.".format(goal_id.id))
         if goal_id in self._goals_handler_dictionary:
             self._goals_handler_dictionary[goal_id].set_succeeded(result)
             del self._goals_handler_dictionary[goal_id]
