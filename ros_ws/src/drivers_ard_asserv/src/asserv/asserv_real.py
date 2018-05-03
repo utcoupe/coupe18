@@ -68,7 +68,7 @@ class AsservReal(AsservAbstract):
         self._halt()
 
     def goto(self, goal_id, x, y, direction):
-        if self._check_reached_position(self, x, y):
+        if self._check_reached_position(x, y):
             self._node.goal_reached(goal_id, True)
             return True
 
@@ -80,7 +80,7 @@ class AsservReal(AsservAbstract):
         return True
 
     def gotoa(self, goal_id, x, y, a, direction):
-        if self._check_reached_angle(self, a) and self._check_reached_position(self, x, y):
+        if self._check_reached_angle(a) and self._check_reached_position(x, y):
             self._node.goal_reached(goal_id, True)
             return True
 
@@ -92,7 +92,7 @@ class AsservReal(AsservAbstract):
         return True
 
     def rot(self, goal_id, a, no_modulo):
-        if self._check_reached_angle(self, a):
+        if self._check_reached_angle(a):
             self._node.goal_reached(goal_id, True)
             return True
 
