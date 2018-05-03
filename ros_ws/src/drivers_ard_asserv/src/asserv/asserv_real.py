@@ -68,6 +68,10 @@ class AsservReal(AsservAbstract):
         self._halt()
 
     def goto(self, goal_id, x, y, direction):
+        if self._check_reached_position(self, x, y):
+            self._node.goal_reached(goal_id, True)
+            return True
+
         if direction == 0: # bugfix: -1 = BACKWARD, 0 = ANY
             direction = -1
         self._send_serial_data(self._orders_dictionary['GOTO'], [str(int(round(x * 1000))), str(int(round(y * 1000))), str(direction)])
@@ -76,6 +80,10 @@ class AsservReal(AsservAbstract):
         return True
 
     def gotoa(self, goal_id, x, y, a, direction):
+        if self._check_reached_angle(self, a) and self._check_reached_position(self, x, y):
+            self._node.goal_reached(goal_id, True)
+            return True
+
         if direction == 0: # bugfix: -1 = BACKWARD, 0 = ANY
             direction = -1
         self._send_serial_data(self._orders_dictionary['GOTOA'], [str(int(round(x * 1000))), str(int(round(y * 1000))), str(int(round(a * 1000))), str(direction)])
@@ -84,6 +92,10 @@ class AsservReal(AsservAbstract):
         return True
 
     def rot(self, goal_id, a, no_modulo):
+        if self._check_reached_angle(self, a):
+            self._node.goal_reached(goal_id, True)
+            return True
+
         if no_modulo:
             self._send_serial_data(self._orders_dictionary['ROTNOMODULO'], [str(int(round(a * 1000)))])
         else:
