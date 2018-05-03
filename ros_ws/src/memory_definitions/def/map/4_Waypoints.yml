@@ -61,31 +61,35 @@ waypoints:
     way_fire:
         position:
             frame_id: /map
-            x: 1.75
-            y: 0.85
-            a: -0.7854
+            x: 0.4
+            y: 1.16
+            a: 4.952
             type: fixed
+
+
     way_fire_station:
           position:
               frame_id: /map
-              x: 2.17
-              y: 0.41
-              a: -0.7254
+              x: 1.514
+              y: 0.6
+              a: 5.442
               type: fixed
 
     way_station_approach:
         position:
             frame_id: /map
-            x: 1.2
-            y: 0.72
-            a: 1.57079
+            x: 1.514
+            y: 0.6
+            a: 1.570
             type: fixed
+
+    # mesured with PR on 03/05
     way_station_accost:
         position:
             frame_id: /map
-            x: 1.2
-            y: 0.6
-            a: 1.57079
+            x: 1.514
+            y: 0.373
+            a: 1.570
             type: fixed
 
     way_bee_approach:
