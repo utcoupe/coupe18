@@ -4,6 +4,8 @@ This code was developed with a Wemos D1 Mini (ESP8266) and a 128x64 i2c OLED.
 Author: Pierre LACLAU, December 2017, UTCoupe.
 */
 
+#include "pins.h"
+
 // Including rosserial
 #include <ros.h>
 #include <drivers_ard_hmi/SetStrategies.h>  // ROS sets strategy names for displaying on hmi.
@@ -19,7 +21,7 @@ ros::NodeHandle nh;
 #include <Wire.h>    // Only needed for Arduino 1.6.5 and earlier
 #include "SSD1306.h" // alias for `#include "SSD1306Wire.h"`
 #include "OLEDDisplayUi.h"
-SSD1306  display(0x3c, D2, D1);
+SSD1306  display(0x3c, LCD_SDA, LCD_SCK);
 OLEDDisplayUi ui(&display);
 
 //Component variables
@@ -68,11 +70,11 @@ bool _is_arming = false;
 bool _is_launching = false;
 
 //Input
-#define PIN_BTN_VCC_1 D8 // to L2
-#define PIN_BTN_VCC_2 D7 // to L1
-#define PIN_BTN_IN_1  D6 // to R1 (with 1k resistor to GND)
-#define PIN_BTN_IN_2  D5 // to R1 (with 1k resistor to GND)
-#define PIN_JACK      D5 // to the Jack switch
+#define PIN_BTN_VCC_1 BTN_L2
+#define PIN_BTN_VCC_2 BTN_L1
+#define PIN_BTN_IN_1  BTN_R1
+#define PIN_BTN_IN_2  BTN_R2
+#define PIN_JACK      BTN_R2
 
 bool _prev_up_state    = false;
 bool _prev_down_state  = false;
@@ -108,8 +110,8 @@ void check_input() {
 }
 
 //LEDs
-#define PIN_LED_ALIVE D0
-#define PIN_LED_INIT D3
+#define PIN_LED_ALIVE LED_BLUE
+#define PIN_LED_INIT LED_RED
 
 void update_leds() {
     digitalWrite(PIN_LED_ALIVE, game_status != -1);
@@ -165,7 +167,7 @@ void on_ros_event(const drivers_ard_hmi::ROSEvent& msg){
         ui.switchToFrame(4);
 }
 
-ros::Subscriber<drivers_ard_hmi::SetStrategies> sub_strats("/feedback/ard_hmi/set_strategies", &on_set_strategies);
+ros::Subscriber<drivers_ard_hmi::SetStrategies> sub_strats     ("/feedback/ard_hmi/set_strategies", &on_set_strategies);
 ros::Subscriber<drivers_ard_hmi::SetTeams>      sub_teams      ("/feedback/ard_hmi/set_teams", &on_set_teams);
 ros::Subscriber<drivers_ard_hmi::ROSEvent>      sub_ros_events ("/feedback/ard_hmi/ros_event", &on_ros_event);
 ros::Subscriber<ai_game_status::GameStatus>     sub_game_status("/ai/game_status/status",      &on_game_status);
