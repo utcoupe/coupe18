@@ -20,6 +20,7 @@ class ActuatorsNode:
         self._robot = rospy.get_param('/robot')
         if self._robot.lower() == "gr":
             self.arm_instance = actuators.ActuatorsArm()
+            self.cubePicker_instance = actuators.ActuatorsCubePicker()
         elif self._robot.lower() == "pr":
             self.barrel_instance = actuators.ActuatorsBarrel()
             self.canon_instance = actuators.ActuatorsCanon()
