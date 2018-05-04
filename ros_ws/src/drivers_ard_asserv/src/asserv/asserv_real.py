@@ -18,6 +18,7 @@ __date__ = 16/12/2017
 ASSERV_ERROR_POSITION = 0.01  # in meters
 ASSERV_ERROR_ANGLE = 0.15  # in radians
 POSITION_REACHED_CHECK_DELAY = 0.25  # in seconds
+GOTOA_POS_ERROR_MULTIPLIER = 5
 
 
 class AsservReal(AsservAbstract):
@@ -80,7 +81,7 @@ class AsservReal(AsservAbstract):
         return True
 
     def gotoa(self, goal_id, x, y, a, direction):
-        if self._check_reached_angle(a) and self._check_reached_position(x, y):
+        if self._check_reached_angle(a) and self._check_reached_position(x, y, GOTOA_POS_ERROR_MULTIPLIER):
             self._node.goal_reached(goal_id, True)
             return True
 
@@ -302,7 +303,7 @@ class AsservReal(AsservAbstract):
             elif len(goal_data) == 3:
                 reached = self._check_reached_position(goal_data[1], goal_data[2])
             elif len(goal_data) == 4:
-                reached = self._check_reached_position(goal_data[1], goal_data[2], 2)
+                reached = self._check_reached_position(goal_data[1], goal_data[2], GOTOA_POS_ERROR_MULTIPLIER)
                 reached &= self._check_reached_angle(goal_data[3])
             else:
                 rospy.logwarn("Goal id ack but not corresponding goal data...")
