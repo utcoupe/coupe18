@@ -86,10 +86,6 @@
 				<direction>0</direction>
 			</orderref>
 
-			<orderref ref="map_set" name="disable grape collisions">
-				<request_path>/objects/container_grape_1/collisions=0</request_path>
-			</orderref>
-
 			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
 				<waypoint_name>way_grape_1_accost</waypoint_name>
 			</orderref>
@@ -102,12 +98,6 @@
 			<orderref ref="navigator_goto_waypoint" name="push them to the zone">
 				<waypoint_name>way_grape_1_released</waypoint_name>
 			</orderref>
-
-			<orderref ref="map_set" name="enable grape collisions back">
-				<request_path>/objects/container_grape_1/collisions=1</request_path>
-			</orderref>
-
-
 		</actions>
 	</action>
 
@@ -116,29 +106,21 @@
 		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
-                                <waypoint_name>way_grape_2_approach</waypoint_name>
-                        </orderref>
-
-			<orderref ref="map_set" name="disable grape collisions">
-				<request_path>/objects/container_grape_2/collisions=0</request_path>
+				<waypoint_name>way_grape_2_approach</waypoint_name>
 			</orderref>
 
-                        <orderref ref="navigator_goto_waypoint" name="go behind the cubes">
-                                <waypoint_name>way_grape_2_accost</waypoint_name>
+			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
+				<waypoint_name>way_grape_2_accost</waypoint_name>
 				<direction>0</direction>
-                        </orderref>
+			</orderref>
 
 			<orderref ref="navigator_goto_waypoint" name="push them to the zone">
-                                <waypoint_name>way_grape_2_pushed</waypoint_name>
-                                <direction>0</direction>
-                        </orderref>
+				<waypoint_name>way_grape_2_pushed</waypoint_name>
+				<direction>0</direction>
+			</orderref>
 
-                        <orderref ref="navigator_goto_waypoint" name="release">
-                                <waypoint_name>way_grape_2_released</waypoint_name>
-                        </orderref>
-
-			<orderref ref="map_set" name="enable grape collisions back">
-				<request_path>/objects/container_grape_2/collisions=1</request_path>
+			<orderref ref="navigator_goto_waypoint" name="release">
+				<waypoint_name>way_grape_2_released</waypoint_name>
 			</orderref>
 		</actions>
 	</action>
