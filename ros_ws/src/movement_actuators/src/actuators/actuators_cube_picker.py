@@ -7,13 +7,18 @@ from actionlib_msgs.msg import GoalStatus
 from geometry_msgs.msg import Pose2D
 from movement_actuators.srv import *
 from recognition_cube.srv import *
-from movement_actuators.msg import CubePickerAction, ArmGoal, ArmAction, CubePickerResult
+from movement_actuators.msg import CubePickerAction, ArmGoal, ArmAction, CubePickerResult, DispatchAction, DispatchGoal
 from geometry_msgs.msg import PointStamped
+
+STEPPER_ELEVATOR_NAME = 'arm_elevator'
+DEFAULT_ELEVATOR_TIMEOUT = 1000
 
 class ActuatorsCubePicker(ActuatorsAbstract):
     def __init__(self):
         self._client_arm = actionlib.SimpleActionClient('/movement/actuators/arm', ArmAction)
         self._client_arm.wait_for_server()
+        self._client_act = actionlib.SimpleActionClient('/movement/actuators/dispatch', DispatchAction)
+        self._client_act.wait_for_server()
         #self._srv_cube_picker = rospy.Service("/movement/actuators/pick_cube", CubePicker, self._callback_pick_cube)
         ActuatorsAbstract.__init__(self,
                                    action_name='cubePicker',
@@ -35,6 +40,7 @@ class ActuatorsCubePicker(ActuatorsAbstract):
             self._quit_action(goal_id, False)
             return False
 
+        self._move_elevator('GO_UP')
         # Move arm to the cube center position
         self._move_arm(cube_p)
 
@@ -44,6 +50,9 @@ class ActuatorsCubePicker(ActuatorsAbstract):
             self._client_arm.wait_for_result(rospy.Duration(2))
         except rospy.ROSException as e:
             rospy.logerr('Erreur  : ' + str(e))
+
+
+        self._move_elevator('GO_DOWN')
 
         #rospy.loginfo('Result : ' + str(self._client_arm.get_result()))
         if self._client_arm.get_result().success == False:
@@ -89,6 +98,11 @@ class ActuatorsCubePicker(ActuatorsAbstract):
         goal.y = cube_p.position.y
         self._client_arm.send_goal(goal)
 
-    def _callback(self):
-        time.sleep(1)
+    def _move_elevator(self, direction):
+        goal_arm_elevator = DispatchGoal()
+        goal_arm_elevator.id = 0
+        goal_arm_elevator.name = STEPPER_ELEVATOR_NAME
+        goal_arm_elevator.preset = direction
+        goal_arm_elevator.timeout = DEFAULT_ELEVATOR_TIMEOUT
+        self._client_act.send_goal(goal_arm_elevator)
 
