@@ -40,6 +40,7 @@ class ActuatorsCubePicker(ActuatorsAbstract):
 
         # Elevator should move now
         try:
+            # Wait for arm to finish movement
             self._client_arm.wait_for_result(rospy.Duration(2))
         except rospy.ROSException as e:
             rospy.logerr('Erreur  : ' + str(e))

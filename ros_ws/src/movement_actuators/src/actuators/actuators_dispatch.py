@@ -114,7 +114,8 @@ class ActuatorsDispatch(ActuatorsAbstract):
         msg.type = {
                 'digital': msg.TYPE_DIGITAL,
                 'pwm': msg.TYPE_PWM,
-                'servo': msg.TYPE_SERVO
+                'servo': msg.TYPE_SERVO,
+                'stepper': msg.TYPE_STEPPER
             }[ard_type]
         msg.dest_value = int(param)
         msg.order_nb = self._get_order_id()

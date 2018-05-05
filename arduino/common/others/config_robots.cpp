@@ -46,8 +46,8 @@ String belt_sensors_names[NUM_BELT_SENSORS]             = {"sensor1", "sensor2"}
 
 #if defined(GR_ROBOT) && !defined(PR_ROBOT)
 
-uint8_t pins_digital_actuators[NUM_DIGITAL_ACTUATORS]   = {};
-bool digital_actuators_states[NUM_DIGITAL_ACTUATORS]    = {};
+uint8_t pins_digital_actuators[NUM_DIGITAL_ACTUATORS]   = {2};
+bool digital_actuators_states[NUM_DIGITAL_ACTUATORS]    = {false};
 // Names :
 
 uint8_t pins_pwm_actuators_pwm[NUM_PWM_ACTUATORS]       = {};
@@ -58,7 +58,7 @@ uint8_t pins_servo_actuators_pwm[NUM_SERVO_ACTUATORS]   = {37};
 int16_t servo_actuators_states[NUM_SERVO_ACTUATORS]     = {10};
 // Names :
 
-int16_t stepper_actuators_states[NUM_STEPPER_ACTUATORS] = {0};
+int16_t stepper_actuators_states[NUM_STEPPER_ACTUATORS] = {0, 1};
 // Names :
 
 uint8_t pins_belt_sensors_shut[NUM_BELT_SENSORS]        = {40, 42};

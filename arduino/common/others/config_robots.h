@@ -6,8 +6,8 @@
 #define ARDUINO_CONFIG_ROBOTS_H
 
 // You have to select a robot and only one !!!
-#define PR_ROBOT
-//#define GR_ROBOT
+//#define PR_ROBOT
+#define GR_ROBOT
 
 /*
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -64,7 +64,7 @@
 #if defined(GR_ROBOT) && !defined(PR_ROBOT)
 
 // ---- DIGITAL ACTUATORS ----
-#define NUM_DIGITAL_ACTUATORS 0
+#define NUM_DIGITAL_ACTUATORS 1
 
 // ---- PWM ACTUATORS ----
 #define NUM_PWM_ACTUATORS 0
@@ -73,7 +73,7 @@
 #define NUM_SERVO_ACTUATORS 1
 
 // ---- STEPPER ACTUATORS ----
-#define NUM_STEPPER_ACTUATORS 1
+#define NUM_STEPPER_ACTUATORS 2
 
 // ---- BELT SENSOR ----
 #define SENSOR_BELT_ENABLED

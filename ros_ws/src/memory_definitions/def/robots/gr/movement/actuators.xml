@@ -60,4 +60,25 @@
             <preset name="BIN" value="250" />
         </positions>
     </act>
+    <act name="vacum_pump" id="0" type="digital" family="arduino">
+        <timeout value="500"/> <!-- Default timeout -->
+        <positions default="0">
+            <preset name="OFF" value="0" />
+            <preset name="ON" value="1" />
+        </positions>
+    </act>
+    <act name="solenoid" id="0" type="digital" family="arduino"> <!--- eletrovanne en francais -->
+        <timeout value="500"/> <!-- Default timeout -->
+        <positions default="0">
+            <preset name="OFF" value="0" />
+            <preset name="ON" value="1" />
+        </positions>
+    </act>
+    <act name="arm_elevator" id="0" type="stepper" family="arduino">
+        <timeout value="1000"/> <!-- Default timeout -->
+        <positions default="0">
+            <preset name="GO_UP" value="1000" />
+            <preset name="GO_DOWN" value="-1000" />
+        </positions>
+    </act>
 </actuators>
