@@ -119,7 +119,7 @@
 			</orderref>
 
 			<orderref ref="do_canon_action" name="activate canon">
-				<fire_distance>2.23</fire_distance>
+				<!--fire_distance>2.23</fire_distance-->
 			</orderref>
 
 			<actionlist repeat="9">
@@ -144,7 +144,7 @@
 			</orderref>
 
 			<orderref ref="do_canon_action" name="activate canon">
-				<fire_distance>1.10</fire_distance>
+				<!--fire_distance>1.10</fire_distance-->
 			</orderref>
 
 			<actionlist repeat="9">
