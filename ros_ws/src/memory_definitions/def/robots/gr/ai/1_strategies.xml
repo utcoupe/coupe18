@@ -5,15 +5,15 @@
 	</teams>
 
 	<!-- STRATEGY real game actions ! -->
-	<strategy name="push_grape_1">
+	<strategy name="button_bee_cube">
 		<actions name="In-Game Actions">
 			<actionref ref="game_start"/>
 
 			<actionlist name="Main actions">
 				<actionref ref="activate_button"/>
+				<actionref ref="activate_bee"/>
 				<actionref ref="push_grape_1"/>
 				<actionref ref="push_grape_2"/>
-				<actionref ref="activate_bee"/>
 			</actionlist>
 		</actions>
 		<actions_onfinish name="After-Game Actions">

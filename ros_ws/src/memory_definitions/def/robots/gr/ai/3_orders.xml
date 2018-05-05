@@ -75,14 +75,14 @@
 		</message>
 	</order>
 
-	<order ref="asserv_goto_pos">
+	<order ref="navigator_goto_pos">
 		<message dest="/navigation/navigator/goto_action">
 			<param name="target_pos" type="pose2d"/>
 			<param name="direction" type="int" optional="true">1</param>
 		</message>
 	</order>
 
-	<order ref="asserv_goto_waypoint">
+	<order ref="navigator_goto_waypoint">
 		<message dest="/navigation/navigator/gotowaypoint_action">
 			<param name="mode" type="int" preset="true">1</param> <!-- 0 = GOTO, 1 = GOTOA -->
 			<param name="waypoint_name" type="string"/>
