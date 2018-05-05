@@ -50,7 +50,6 @@ def poseCallback(msg):
 if __name__ == "__main__":
     rospy.init_node("asserv_interactive_marker")
 
-    rospy.Subscriber("/drivers/ard_asserv/pose2d", Pose2D, poseCallback)
     server = InteractiveMarkerServer("asserv_marker")
 
     int_marker = InteractiveMarker()
@@ -103,18 +102,14 @@ if __name__ == "__main__":
 
     int_marker.controls.append(rotate_control)
 
-
-
     # add the interactive marker to our collection &
     # tell the server to call processFeedback() when feedback arrives for it
     server.insert(int_marker, processFeedback)
 
-
-
-
-
     # 'commit' changes and send to all clients
     server.applyChanges()
+
+    rospy.Subscriber("/drivers/ard_asserv/pose2d", Pose2D, poseCallback)
 
     rospy.spin()
 
