@@ -2,8 +2,10 @@
 
 import rospy
 import actionlib
+from math import sqrt, pow
 from movement_actuators.srv import *
 from movement_actuators.msg import DispatchAction, DispatchGoal
+from geometry_msgs.msg import Pose2D
 
 __author__ = "Thomas Fuhrmann"
 __date__ = 1/05/2018
@@ -13,16 +15,22 @@ FLIPPER_PERIOD = 1  # in seconds
 FLIPPER_NAME_CANON = "servo_flipper_side_canon"
 FLIPPER_NAME_BIN = "servo_flipper_side_bin"
 CANON_NAME = "canon"
-DEFAULT_ACTUATORS_TIMEOUT = 1000
+DEFAULT_ACTUATORS_TIMEOUT = 1000  # in ms
 
 
 class ActuatorsCanon:
+    # We consider to be at 66% on the diagonal starting from the bottom corner located in (370, 2000).
+    WATER_TOWER_POSITION = Pose2D(0.125, 2.267, 0.0)
+
     def __init__(self):
         self._client = actionlib.SimpleActionClient('/movement/actuators/dispatch', DispatchAction)
         self._client.wait_for_server(rospy.Duration(DISPATCH_SERVER_TIMEOUT))
         self._tmr_flipper_activate = False
         self._tmr_flipper = rospy.Timer(rospy.Duration(FLIPPER_PERIOD), self._callback_timer_flipper)
         self._srv_canon = rospy.Service("/movement/actuators/activate_canon", ActivateCanon, self._callback_activate_canon)
+        # Subscribe to Pose2D for asserv in order to compute distance to the goal
+        self._sub_asserv = rospy.Subscriber("/drivers/ard_asserv/pose2d", Pose2D, self._callback_position)
+        self._data_asserv = None
         # Boolean used for flipper toggle values, as they just flip on 2 values
         self._flipper_state = False
         self._is_halted = False
@@ -48,10 +56,8 @@ class ActuatorsCanon:
     def _canon_start(self, distance):
         recv_distance = distance
         if recv_distance == 0:
-            rospy.logwarn("Automatic distance computation is not implemented yet. Use default value (1m)")
-            recv_distance = 1
+            recv_distance = self._compute_water_tower_distance()
         ref_value = 16*recv_distance + 32
-        rospy.loginfo("Computed ref value : " + str(ref_value))
         goal_canon = DispatchGoal()
         goal_canon.name = CANON_NAME
         goal_canon.param = str(int(ref_value))
@@ -89,3 +95,10 @@ class ActuatorsCanon:
         if is_halted:
             self._canon_stop()
             self._flipper_stop()
+
+    def _callback_position(self, data):
+        self._data_asserv = data
+
+    def _compute_water_tower_distance(self):
+        return sqrt(pow(self._data_asserv.x - self.WATER_TOWER_POSITION.x, 2) + pow(self._data_asserv.y - self.WATER_TOWER_POSITION.y, 2))
+

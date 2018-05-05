@@ -138,12 +138,13 @@ class MapServices():
             w.has_angle = req.waypoint.has_angle
             if req.waypoint.has_angle and "a" in filled_waypoint.Dict["position"].Dict:
                 w.pose.theta = filled_waypoint.get("position/a")
-            rospy.logdebug("    Responding: {} ({}, {}{})".format(filled_waypoint_name, filled_waypoint.get("position/x"), filled_waypoint.get("position/y"),
+            rospy.loginfo("FILL_WAYPOINT: {} ({}, {}{})".format(str(w.name),
+                                                                w.pose.x, w.pose.y,
+                                                                ", {}".format(
+                                                                    w.pose.theta) if w.has_angle else ""))
+
+        rospy.logdebug("    Responding: {} ({}, {}{})".format(filled_waypoint_name, filled_waypoint.get("position/x"), filled_waypoint.get("position/y"),
                                                                   ", {}".format(w.pose.theta) if w.has_angle else ""))
 
         rospy.logdebug("    Process took {0:.2f}ms".format(time.time() * 1000 - s))
-        rospy.loginfo("FILL_WAYPOINT: {} ({}, {}{})".format(str(req.waypoint.name if req.waypoint.name else "<no name>"),
-                                                  req.waypoint.pose.x, req.waypoint.pose.y,
-                                                  ", {}".format(
-                                                      req.waypoint.pose.theta) if req.waypoint.has_angle else ""))
         return memory_map.srv.FillWaypointResponse(success, w)

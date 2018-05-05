@@ -21,6 +21,7 @@ NODE_NAME = "ard_asserv"
 GET_PORT_SERVICE_NAME = "/drivers/port_finder/get_port"
 GET_MAP_SERVICE_NAME = "/memory/map/fill_waypoint"
 GET_PORT_SERVICE_TIMEOUT = 25  # in seconds
+GET_MAP_SERVICE_TIMEOUT = 15  # in seconds
 
 
 class Asserv:
@@ -73,12 +74,11 @@ class Asserv:
             rospy.loginfo("[ASSERV] Creation of the real asserv.")
             self._asserv_instance = asserv.AsservReal(self, arduino_port)
         try:
-            rospy.wait_for_service(GET_MAP_SERVICE_NAME, GET_PORT_SERVICE_TIMEOUT)
+            rospy.wait_for_service(GET_MAP_SERVICE_NAME, GET_MAP_SERVICE_TIMEOUT)
             self._srv_client_map_fill_waypoints = rospy.ServiceProxy(GET_MAP_SERVICE_NAME, FillWaypoint)
             rospy.logdebug("Memory_map has been found.")
         except rospy.ROSException as exc:
             rospy.logwarn("Memory_map has not been launched...")
-
         # Tell ai/game_status the node initialized successfuly.
         StatusServices("drivers", "ard_asserv", None, self._callback_game_status).ready(True)
 
