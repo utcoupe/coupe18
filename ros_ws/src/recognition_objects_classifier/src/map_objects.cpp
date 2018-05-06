@@ -50,7 +50,7 @@ void MapObjects::fetch_map_objects() {
 
         }
 
-        ROS_INFO("Fetched %lu map shapes successfully", map_shapes_.size());
+        ROS_INFO_STREAM("Fetched " << map_shapes_.size() << " map shapes successfully");
 
     } else {
         ROS_ERROR("Failed to contact memory_map, static objects not fetched");

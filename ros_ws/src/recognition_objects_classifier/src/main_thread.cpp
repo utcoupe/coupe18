@@ -107,7 +107,7 @@ void MainThread::classify_and_publish_rects(processing_belt_interpreter::BeltRec
 
     time = ros::Time::now().toSec() - time;
 
-    ROS_DEBUG("Took %f secs to process %lu rects, %d points", time, rects.rects.size(), point_idx);
+    ROS_DEBUG_STREAM("Took " << time << " secs to process " << rects.rects.size() << " rects, " << point_idx << " points");
 }
 
 std::pair<float, float> MainThread::compute_division_steps(
@@ -160,7 +160,7 @@ bool MainThread::fetch_transform_and_adjust_stamp(
         transform_out = tf_buffer_.lookupTransform("map", rect.header.frame_id, rect.header.stamp);
 
     } catch (tf2::TransformException &ex) {
-        ROS_WARN("%s", ex.what());
+        ROS_WARN_STREAM(ex.what());
         return false;
     }
 
@@ -287,14 +287,14 @@ void MainThread::classify_and_publish_lidar_objects(processing_lidar_objects::Ob
 
     time = ros::Time::now().toSec() - time;
 
-    ROS_DEBUG("Took %f secs to process lidar data", time);
+    ROS_DEBUG_STREAM("Took " << time << " secs to process lidar data");
 
 }
 
 void MainThread::reconfigure_callback(recognition_objects_classifier::ObjectsClassifierConfig &config, uint32_t level) {
     MIN_MAP_FRAC = config.MIN_MAP_FRAC;
     map_objects_.WALLS_MARGIN = config.WALLS_MARGIN;
-    ROS_INFO("Setting MIN_MAP_FRAC to %f and WALLS_MARGIN to %f", MIN_MAP_FRAC, map_objects_.WALLS_MARGIN);
+    ROS_INFO_STREAM("Setting MIN_MAP_FRAC to " << MIN_MAP_FRAC << " and WALLS_MARGIN to " << map_objects_.WALLS_MARGIN);
 }
 
 MainThread::MainThread(ros::NodeHandle &nh) :
