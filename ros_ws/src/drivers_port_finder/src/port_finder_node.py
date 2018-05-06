@@ -44,15 +44,15 @@ class PortFinder:
         rospy.loginfo("Port_finder ready, found : " + str(self._associated_port_list))
         self._srv_goto = rospy.Service("/drivers/" + NODE_NAME + "/get_port", GetPort, self._callback_get_port)
 
-        # Tell ai/game_status the node initialized successfuly.
-        StatusServices("drivers", "port_finder").ready(True)
-
         # TODO find an other way ?
         # Launch urg_node directly from port_finder to have the correct port
         hokuyo_subprocess = None
         hokuyo_port = self.get_port("hokuyo")
         if hokuyo_port is not "":
             hokuyo_subprocess = subprocess.Popen(["rosrun", "urg_node", "urg_node", "_serial_port:=" + hokuyo_port, "__ns:=sensors", "scan:=/processing/lidar_objects/scan"])
+            StatusServices("drivers", "port_finder").ready(True)
+        else:
+            StatusServices("drivers", "port_finder").ready(False)
 
         rospy.spin()
         for rosserial_fd in self._rosserial_call_list:

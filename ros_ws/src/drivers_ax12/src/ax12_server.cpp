@@ -11,6 +11,7 @@ void Ax12Server::init_driver(const std::string &port) {
 
     if (!driver_.initialize(port)) {
         ROS_FATAL("Unable to initialize the AX-12 SDK, shutting down !");
+        status_services_->setReady(false);
         ros::shutdown();
         return;
     }
@@ -249,6 +250,7 @@ std::string Ax12Server::fetch_port(const std::string &service_name) {
 
     if (port.length() == 0) {
         ROS_FATAL("The AX-12 port is not set, shutting down...");
+        status_services_->setReady(false);
         ros::shutdown();
         return "";
     }
@@ -359,6 +361,12 @@ Ax12Server::Ax12Server(const std::string &action_name, const std::string &servic
 
     as_.start();
 
+    status_services_ = std::make_unique<StatusServices>(
+        "drivers", "ax12", [this](const ai_game_status::ArmRequest::ConstPtr &){
+            driver_.scan_motors();
+            driver_.toggle_torque(true);
+        });
+
     std::string port = fetch_port(PORT_FINDER_SERVICE);
 
     init_driver(port);
@@ -366,12 +374,6 @@ Ax12Server::Ax12Server(const std::string &action_name, const std::string &servic
     ROS_INFO_STREAM("AX-12 action server initialized for port " << port << ", waiting for goals");
 
     timer_ = nh_.createTimer(ros::Duration(1.0 / MAIN_FREQUENCY), &Ax12Server::main_loop, this);
-
-    status_services_ = std::make_unique<StatusServices>(
-        "drivers", "ax12", [this](const ai_game_status::ArmRequest::ConstPtr &){
-            driver_.scan_motors();
-            driver_.toggle_torque(true);
-        });
 
     status_services_->setReady(true);
 }
