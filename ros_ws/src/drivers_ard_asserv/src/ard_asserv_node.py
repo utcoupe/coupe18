@@ -67,9 +67,12 @@ class Asserv:
             rospy.loginfo("Port_finder has not been launched...")
             arduino_port = ""
         rospy.loginfo("Port_finder returns value : " + arduino_port)
+
+        is_simu = False
         if arduino_port == "":
             rospy.logwarn("[ASSERV] Creation of the simu asserv.")
             self._asserv_instance = asserv.AsservSimu(self)
+            is_simu = True
         else:
             rospy.loginfo("[ASSERV] Creation of the real asserv.")
             self._asserv_instance = asserv.AsservReal(self, arduino_port)
@@ -80,7 +83,7 @@ class Asserv:
         except rospy.ROSException as exc:
             rospy.logwarn("Memory_map has not been launched...")
         # Tell ai/game_status the node initialized successfuly.
-        StatusServices("drivers", "ard_asserv", None, self._callback_game_status).ready(True)
+        StatusServices("drivers", "ard_asserv", None, self._callback_game_status).ready(not is_simu)
 
         self._asserv_instance.start()
 
