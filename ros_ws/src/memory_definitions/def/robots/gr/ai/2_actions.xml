@@ -14,24 +14,9 @@
 		<params></params>
 		<conditions></conditions>
 		<actions>
-			<team name="green">
-				<orderref ref="set_robot_pos">
-					<position>
-						<x>0.114</x>
-						<y>1.785</y>
-						<theta>3.141592</theta>
-					</position>
-				</orderref>
-			</team>
-			<team name="orange">
-				<orderref ref="set_robot_pos">
-					<position>
-						<x>2.886</x>
-						<y>1.785</y>
-						<theta>0.0</theta>
-					</position>
-				</orderref>
-			</team>
+			<orderref ref="set_robot_pos">
+				<position_waypoint>way_spawn_gr</position_waypoint>
+			</orderref>
 
 			<actionref ref="jack"/>
 
@@ -49,7 +34,7 @@
 		<actions exec="all" order="linear">
 			<orderref ref="navigator_goto_waypoint" name="approach button">
 				<waypoint_name>way_button_approach</waypoint_name>
-				<direction>0</direction>
+				<direction>1</direction>
 			</orderref>
 
 			<orderref ref="navigator_goto_waypoint" name="accost button">
