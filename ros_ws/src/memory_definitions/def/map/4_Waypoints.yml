@@ -41,7 +41,7 @@ waypoints:
         position:
             frame_id: /map
             x: 1.13
-            y: 1.838 #1.895 PR
+            y: 1.812 #1.895 PR
             a: 1.57079
             type: fixed
 
@@ -119,7 +119,7 @@ waypoints:
         position:
             frame_id: /map
             x: 0.22
-            y: 0.12 #0.15 PR
+            y: 0.188 #0.15 PR
             a: -1.57079
             type: fixed
 
