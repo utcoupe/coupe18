@@ -364,7 +364,7 @@ Ax12Server::Ax12Server(const std::string &action_name, const std::string &servic
 
     status_services_ = std::make_unique<StatusServices>(
         "drivers", "ax12", [this](const ai_game_status::ArmRequest::ConstPtr &){
-            driver_.scan_motors();
+            // driver_.scan_motors(); TODO: uncomment and test if arm can be called while in game ???
             driver_.toggle_torque(true);
         });
 

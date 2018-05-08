@@ -54,7 +54,7 @@
 			<param name="frame_id" type="string"/>
 			<param name="x" type="float"/>
 			<param name="y" type="float"/>
-			<param name="timeout" type="float">2.0</param>
+			<param name="timeout" type="float">10.0</param>
 		</message>
 	</order>
 
