@@ -67,6 +67,7 @@ class AICommunication():
 
     def __init__(self):
         RequestTypes.init()
+        self._cached_publishers = {}
 
     def SendRequest(self, dest, params, callback = None):
         start_time = time.time()
@@ -91,8 +92,11 @@ class AICommunication():
 
     def _pub_msg(self, dest, msg_class, params):
         try:
-            pub = rospy.Publisher(dest, msg_class, queue_size=10)
-            time.sleep(0.3)
+            if dest not in self._cached_publishers:
+                self._cached_publishers[dest] = rospy.Publisher(dest, msg_class, queue_size=10)
+
+            pub = self._cached_publishers[dest]
+            # time.sleep(0.3)
             pub.publish(**params)
             return TaskResult(0, "")
         except Exception as e:

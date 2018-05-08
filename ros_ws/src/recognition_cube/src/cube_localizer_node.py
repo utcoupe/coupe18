@@ -46,12 +46,16 @@ class Localizer(object):
 
     def process_segments(self):
         min = 2000
+        closest = None
         for segment in self._to_process['segments']:
             seg = segment_properties(segment)
             #rospy.loginfo('center_y : ' + str(seg.center_y) + ' norm : ' + str(seg.norm))
             if seg.distance < min and seg.distance < 0.4 and seg.norm > 0.015:
                 min = seg.distance
                 closest = seg
+
+        if closest == None:
+            return ('laser', Pose2D(float(0), float(0), 0))
 
         closest = self.calculate_cube_center(closest)
         # rospy.loginfo(
@@ -60,8 +64,8 @@ class Localizer(object):
         #     + '\nLpoint X : ' + str(closest.segment.last_point.x) + ' Y : ' + str(closest.segment.last_point.y)
         #     + '\nCube X : ' + str(closest.orth_x) + ' Y : ' + str(closest.orth_y))
         #ret = str(min)
-        ret = Pose2D(float(closest.orth_x), float(closest.orth_y), 0)
-        return ret
+        pos = Pose2D(float(closest.orth_x), float(closest.orth_y), 0)
+        return ('laser', pos)
 
     def run(self):
         rospy.loginfo("Cube localizer node started")

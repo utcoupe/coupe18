@@ -25,7 +25,7 @@ bool MapSubscriber::hasBarrier(const geometry_msgs::Pose2D& pos)
     return _occupancyGrid[pos.y][pos.x];
 }
 
-void MapSubscriber::subscribe(ros::NodeHandle& nodeHandle, [[maybe_unused]] std::size_t sizeMaxQueue, std::string topic)
+void MapSubscriber::subscribe(ros::NodeHandle& nodeHandle, std::size_t sizeMaxQueue, std::string topic)
 {
     _srvGetMapObjects = nodeHandle.serviceClient<memory_map::MapGetObjects>(topic);
 }

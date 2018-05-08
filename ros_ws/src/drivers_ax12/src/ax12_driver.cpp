@@ -11,25 +11,25 @@ bool Ax12Driver::initialize(const std::string &port_name) {
             dynamixel::PacketHandler::getPacketHandler(1.0));
 
     if (!port_handler->openPort()) {
-        ROS_ERROR("SDK could not open the port '%s'", port_name.c_str());
+        ROS_ERROR_STREAM("SDK could not open the port '" << port_name << "'");
         return false;
     }
 
     int baud_rate = 2000000 / (BAUD_RATE_INDEX + 1);
     if (!port_handler->setBaudRate(baud_rate)) {
-        ROS_ERROR("SDK could not set the baud rate at %d", baud_rate);
+        ROS_ERROR_STREAM("SDK could not set the baud rate at " << baud_rate);
         return false;
     }
 
-    ROS_INFO("SDK successfully initialized on port '%s' with baud rate %d",
-             port_name.c_str(), baud_rate);
+    ROS_INFO_STREAM("SDK successfully initialized on port '" << port_name
+                    << "' with baud rate " << baud_rate);
 
     return true;
 }
 
 void Ax12Driver::scan_motors() {
-    ROS_DEBUG("Scanning motors with IDs from 1 to %d, pinging %d times each",
-              SCAN_RANGE, PING_PASS_NBR);
+    ROS_DEBUG_STREAM("Scanning motors with IDs from 1 to " << SCAN_RANGE
+                    <<", pinging " << PING_PASS_NBR << " times each");
 
     motor_ids.clear();
 
@@ -40,12 +40,12 @@ void Ax12Driver::scan_motors() {
         }
     }
 
-    ROS_INFO("Found %lu motors while scanning", motor_ids.size());
+    ROS_INFO_STREAM("Found " << motor_ids.size() << " motors while scanning");
 }
 
 bool Ax12Driver::write_register(uint8_t motor_id, const Register reg, uint16_t value) {
     if (reg.access == READ) {
-        ROS_WARN("Cannot write value %d to a read-only register for motor %d", value, motor_id);
+        ROS_WARN_STREAM("Cannot write value " << value << " to a read-only register for motor " << static_cast<unsigned>(motor_id));
         return false;
     }
 
@@ -58,8 +58,8 @@ bool Ax12Driver::write_register(uint8_t motor_id, const Register reg, uint16_t v
         result = packet_handler->write2ByteTxRx(port_handler.get(), motor_id, reg.address, value);
 
     if (result != COMM_SUCCESS) {
-        ROS_WARN("Could not write value %d to register for motor %d : %s",
-                 value, motor_id, packet_handler->getTxRxResult(result));
+        ROS_WARN_STREAM("Could not write value " << value << " to register for motor " << static_cast<unsigned>(motor_id)
+                        << " : " << packet_handler->getTxRxResult(result));
         return false;
     }
 
@@ -80,7 +80,7 @@ bool Ax12Driver::read_register(uint8_t motor_id, const Register reg, uint16_t &v
     }
 
     if (result != COMM_SUCCESS) {
-        ROS_WARN("Could not read register for motor %d : %s", motor_id, packet_handler->getTxRxResult(result));
+        ROS_WARN_STREAM("Could not read register for motor " << static_cast<unsigned>(motor_id) << " : " << packet_handler->getTxRxResult(result));
         return false;
     }
 
@@ -99,8 +99,7 @@ bool Ax12Driver::motor_id_connected(uint8_t motor_id) {
         result = packet_handler->ping(port_handler.get(), motor_id, &err);
 
         if (err != 0) {
-            ROS_DEBUG("Could not ping motor %d because of an hardware error : %s",
-                     motor_id, packet_handler->getRxPacketError(err));
+            ROS_DEBUG_STREAM("Could not ping motor " << static_cast<unsigned>(motor_id) << " because of an hardware error : " << packet_handler->getRxPacketError(err));
         }
 
         if (result == COMM_SUCCESS) {
@@ -114,7 +113,7 @@ bool Ax12Driver::motor_id_connected(uint8_t motor_id) {
 }
 
 bool Ax12Driver::toggle_torque(bool enable) {
-    ROS_DEBUG("Toggling torque %s for all motors", enable ? "on" : "off");
+    ROS_DEBUG_STREAM("Toggling torque " << (enable ? "on" : "off") << " for all motors");
     bool success = true;
 
     for (uint8_t i : motor_ids) {

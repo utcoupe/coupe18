@@ -14,18 +14,34 @@ waypoints:
             a: -1.57079
             type: fixed
 
+    way_spawn_gr:
+        position:
+            frame_id: /map
+            x: 0.082 # TODO: get from CAO
+            y: 1.800 # TODO: get from CAO
+            a: 0
+            type: fixed
+
+    way_spawn_pr:
+        position:
+            frame_id: /map
+            x: 0.132
+            y: 0.482
+            a: -0.5266
+            type: fixed
+
     way_button_approach:
         position:
             frame_id: /map
             x: 1.13
-            y: 1.785 #1.65 PR
+            y: 1.65 #1.65 PR
             a: 1.57079
             type: fixed
     way_button_accost:
         position:
             frame_id: /map
             x: 1.13
-            y: 1.838 #1.895 PR
+            y: 1.812 #1.895 PR
             a: 1.57079
             type: fixed
 
@@ -54,7 +70,7 @@ waypoints:
         position:
             frame_id: /map
             x: 2.390
-            y: 0.105
+            y: 0.09
             a: -1.57079
             type: fixed
 
@@ -103,7 +119,7 @@ waypoints:
         position:
             frame_id: /map
             x: 0.22
-            y: 0.12 #0.15 PR
+            y: 0.188 #0.15 PR
             a: -1.57079
             type: fixed
 

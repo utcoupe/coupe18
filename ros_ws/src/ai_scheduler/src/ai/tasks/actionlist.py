@@ -16,6 +16,7 @@ class ActionList(Task):
         self.executionMode  = ExecutionMode.fromText( xml.attrib["exec"])   if "exec"  in xml.attrib else ExecutionMode.ALL
         self.repeatMode     = RepeatMode.fromText(    xml.attrib["repeat"]) if "repeat"in xml.attrib else RepeatMode.ONCE
         self._repeats = 0 # used to track how many times the list already repeated
+        self._successful_repeats = 0
         self._repeats_max = ActionList.MAX_REPEATS
         if self.repeatMode == RepeatMode.ONCE: self._repeats_max = 1
         if self.repeatMode == RepeatMode.FOR:  self._repeats_max = int(xml.attrib["repeat"])
@@ -122,10 +123,15 @@ class ActionList(Task):
         if self.repeatMode != RepeatMode.ONCE:
             if self.repeatMode == RepeatMode.WHILE or self.repeatMode == RepeatMode.FOR:
                 self._repeats += 1
+                self._successful_repeats += 1
                 if self._repeats < self._repeats_max: # if repeat limit not reached yet, mark everything as free
                     print "resetting status of task and children"
                     self.resetStatus(refresh_parent=True)
                     return
+                elif self._successful_repeats < self._repeats_max:
+                    self.setStatus(TaskStatus.ERROR)
+                    return
+
         self.setStatus(TaskStatus.SUCCESS)
 
     def refreshStatus(self):
@@ -170,9 +176,20 @@ class ActionList(Task):
                 self._markSuccess();return
 
         if TaskStatus.ERROR in child_statuses:
-            self.setStatus(TaskStatus.ERROR)
-            #TODO Block all dependent nodes
-            return
+            if self.repeatMode == RepeatMode.WHILE or self.repeatMode == RepeatMode.FOR:
+                self._repeats += 1
+                if self._repeats < self._repeats_max: # if repeat limit not reached yet, mark everything as free
+                    print "resetting status of task and children"
+                    self.resetStatus(refresh_parent=True)
+                    self.setStatus(TaskStatus.PENDING)
+                    return
+                elif self._successful_repeats < self._repeats_max:
+                    self.setStatus(TaskStatus.ERROR)
+                    return
+            else:
+                self.setStatus(TaskStatus.ERROR)
+                #TODO Block all dependent nodes
+                return
 
     def prettyprint(self, indentlevel, hide = False):
         if not hide:

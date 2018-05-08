@@ -14,24 +14,9 @@
 		<params></params>
 		<conditions></conditions>
 		<actions>
-			<team name="green">
-				<orderref ref="set_robot_pos">
-					<position>
-						<x>0.114</x>
-						<y>1.785</y>
-						<theta>3.141592</theta>
-					</position>
-				</orderref>
-			</team>
-			<team name="orange">
-				<orderref ref="set_robot_pos">
-					<position>
-						<x>2.886</x>
-						<y>1.785</y>
-						<theta>0.0</theta>
-					</position>
-				</orderref>
-			</team>
+			<orderref ref="set_robot_pos">
+				<position_waypoint>way_spawn_gr</position_waypoint>
+			</orderref>
 
 			<actionref ref="jack"/>
 
@@ -47,16 +32,30 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="approach button">
+			<orderref ref="navigator_goto_waypoint" name="approach button">
 				<waypoint_name>way_button_approach</waypoint_name>
-				<direction>0</direction>
+				<direction>1</direction>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="accost button">
+			<orderref ref="navigator_goto_waypoint" name="accost button">
 				<waypoint_name>way_button_accost</waypoint_name>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="go back to approach">
+			<orderref ref="actuator_set" name="activate button with servo">
+				<name>servo_button</name>
+				<preset>OPEN</preset>
+			</orderref>
+
+			<orderref ref="delay">
+				<duration>1</duration>
+			</orderref>
+
+			<orderref ref="actuator_set" name="close servo">
+				<name>servo_button</name>
+				<preset>CLOSE</preset>
+			</orderref>
+
+			<orderref ref="navigator_goto_waypoint" name="go back to approach">
 				<waypoint_name>way_button_approach</waypoint_name>
 				<direction>0</direction>
 			</orderref>
@@ -67,33 +66,23 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="go behind the cubes">
+			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
 				<waypoint_name>way_grape_1_approach</waypoint_name>
 				<direction>0</direction>
 			</orderref>
 
-			<orderref ref="map_set" name="disable grape collisions">
-				<request_path>/objects/container_grape_1/collisions=0</request_path>
-			</orderref>
-
-			<orderref ref="asserv_goto_waypoint" name="go behind the cubes">
+			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
 				<waypoint_name>way_grape_1_accost</waypoint_name>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="push them to the zone">
+			<orderref ref="navigator_goto_waypoint" name="push them to the zone">
 				<waypoint_name>way_grape_1_pushed</waypoint_name>
 				<direction>0</direction>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="push them to the zone">
+			<orderref ref="navigator_goto_waypoint" name="push them to the zone">
 				<waypoint_name>way_grape_1_released</waypoint_name>
 			</orderref>
-
-			<orderref ref="map_set" name="enable grape collisions back">
-				<request_path>/objects/container_grape_1/collisions=1</request_path>
-			</orderref>
-
-
 		</actions>
 	</action>
 
@@ -101,50 +90,93 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="asserv_goto_waypoint" name="go behind the cubes">
-                                <waypoint_name>way_grape_2_approach</waypoint_name>
-                        </orderref>
-
-			<orderref ref="map_set" name="disable grape collisions">
-				<request_path>/objects/container_grape_2/collisions=0</request_path>
+			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
+				<waypoint_name>way_grape_2_approach</waypoint_name>
 			</orderref>
 
-                        <orderref ref="asserv_goto_waypoint" name="go behind the cubes">
-                                <waypoint_name>way_grape_2_accost</waypoint_name>
+			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
+				<waypoint_name>way_grape_2_accost</waypoint_name>
 				<direction>0</direction>
-                        </orderref>
+			</orderref>
 
-			<orderref ref="asserv_goto_waypoint" name="push them to the zone">
-                                <waypoint_name>way_grape_2_pushed</waypoint_name>
-                                <direction>0</direction>
-                        </orderref>
+			<orderref ref="navigator_goto_waypoint" name="push them to the zone">
+				<waypoint_name>way_grape_2_pushed</waypoint_name>
+				<direction>0</direction>
+			</orderref>
 
-                        <orderref ref="asserv_goto_waypoint" name="release">
-                                <waypoint_name>way_grape_2_released</waypoint_name>
-                        </orderref>
-
-			<orderref ref="map_set" name="enable grape collisions back">
-				<request_path>/objects/container_grape_2/collisions=1</request_path>
+			<orderref ref="navigator_goto_waypoint" name="release">
+				<waypoint_name>way_grape_2_released</waypoint_name>
 			</orderref>
 		</actions>
 	</action>
 
-	<action ref="activate_bee" name="activate bee">
+	<action ref="activate_bee" name="Activate bee" reward="50">
 		<params></params>
 		<conditions></conditions>
-		<actions>
-			<orderref ref="asserv_goto_waypoint" name="goto bee approach">
-                                <waypoint_name>way_bee_approach</waypoint_name>
-                        </orderref>
+		<actions exec="all" order="linear">
 
-			<orderref ref="asserv_goto_waypoint" name="goto bee accost">
-                                <waypoint_name>way_bee_accost</waypoint_name>
-                        </orderref>
 
-                        <orderref ref="asserv_goto_waypoint" name="goto bee accost">
-                                <waypoint_name>way_bee_approach</waypoint_name>
+			<orderref ref="navigator_goto_waypoint" name="approach bee">
+				<waypoint_name>way_bee_approach</waypoint_name>
+			</orderref>
+
+			<team name="green">
+				<actionref ref="open_arm" name="open arm" />
+			</team>
+
+			<orderref ref="actuator_set" name="lift arm">
+				<name>arm_elevator</name>
+				<preset>GO_UP</preset>
+			</orderref>
+
+			<orderref ref="navigator_goto_waypoint" name="accost bee">
+				<waypoint_name>way_bee_accost</waypoint_name>
+			</orderref>
+
+			<team name="green">
+				<actionref ref="close_arm" name="close arm" />
+			</team>
+
+			<team name="orange">
+				<actionref ref="open_arm" name="open arm" />
+			</team>
+
+			<orderref ref="navigator_goto_waypoint" name="approach bee">
+				<waypoint_name>way_bee_approach</waypoint_name>
 				<direction>0</direction>
-                        </orderref>
+			</orderref>
+		</actions>
+	</action>
+
+	<action ref="open_arm" name="Open arm">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="actuator_ax12_set_pos">
+				<motor_id>3</motor_id>
+				<position>512</position>
+			</orderref>
+
+			<orderref ref="actuator_ax12_set_pos">
+				<motor_id>1</motor_id>
+				<position>512</position>
+			</orderref>
+		</actions>
+	</action>
+
+	<action ref="close_arm" name="Close arm">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="actuator_ax12_set_pos">
+				<motor_id>1</motor_id>
+				<position>819</position>
+			</orderref>
+
+			<orderref ref="actuator_ax12_set_pos">
+				<motor_id>3</motor_id>
+				<position>819</position>
+			</orderref>
 		</actions>
 	</action>
 </actions>

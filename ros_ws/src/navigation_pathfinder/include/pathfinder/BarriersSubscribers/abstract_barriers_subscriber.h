@@ -16,7 +16,7 @@ public:
     virtual void subscribe(ros::NodeHandle& nodeHandle, std::size_t sizeMaxQueue, std::string topic) = 0;
     void setSafetyMargin(const double& safetyMargin) { _safetyMargin = safetyMargin; }
     
-    virtual void fetchOccupancyData([[maybe_unused]] const uint& widthGrid, [[maybe_unused]] const uint& heightGrid) {};
+    virtual void fetchOccupancyData(const uint& widthGrid, const uint& heightGrid) {};
     const virtual bool needConversionBefore() const { return true; };
 
 protected:
