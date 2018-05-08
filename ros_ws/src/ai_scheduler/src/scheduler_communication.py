@@ -94,9 +94,9 @@ class AICommunication():
         try:
             if dest not in self._cached_publishers:
                 self._cached_publishers[dest] = rospy.Publisher(dest, msg_class, queue_size=10)
+            	time.sleep(0.1)
 
             pub = self._cached_publishers[dest]
-            # time.sleep(0.3)
             pub.publish(**params)
             return TaskResult(0, "")
         except Exception as e:
