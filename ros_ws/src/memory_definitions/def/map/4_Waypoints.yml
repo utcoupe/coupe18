@@ -25,8 +25,8 @@ waypoints:
     way_spawn_pr:
         position:
             frame_id: /map
-            x: 0 # TODO
-            y: 0 # TODO
+            x: 0.132
+            y: 0.482
             a: -0.5266
             type: fixed
 
