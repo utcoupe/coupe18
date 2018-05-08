@@ -58,7 +58,7 @@
 		<actions name="In-Game Actions">
 			<actionref ref="game_start"/>
 
-			<actionlist name="Main actions" repeat="5">
+			<actionlist name="Main actions">
 				<actionref ref="open_arm" duration="1.5"/>
 
 				<orderref ref="delay">

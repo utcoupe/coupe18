@@ -48,6 +48,15 @@
 		</message>
 	</order>
 
+	<order ref="arm_goto" duration="1.5">
+		<message dest="/movement/actuators/arm">
+			<param name="frame_id" type="string"/>
+			<param name="x" type="float"/>
+			<param name="y" type="float"/>
+			<param name="timeout" type="float">2.0</param>
+		</message>
+	</order>
+
 
 	<!-- AI Specific -->
 	<order ref="delay" duration="1">
