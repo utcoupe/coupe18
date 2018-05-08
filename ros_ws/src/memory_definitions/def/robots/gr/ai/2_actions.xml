@@ -114,32 +114,68 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
+
+
 			<orderref ref="navigator_goto_waypoint" name="approach bee">
 				<waypoint_name>way_bee_approach</waypoint_name>
-				<direction>0</direction>
+			</orderref>
+
+			<team name="green">
+				<actionref ref="open_arm" name="open arm" />
+			</team>
+
+			<orderref ref="actuator_set" name="lift arm">
+				<name>arm_elevator</name>
+				<preset>GO_UP</preset>
 			</orderref>
 
 			<orderref ref="navigator_goto_waypoint" name="accost bee">
 				<waypoint_name>way_bee_accost</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_set" name="activate button with servo">
-				<name>servo_button</name>
-				<preset>OPEN</preset>
-			</orderref>
+			<team name="green">
+				<actionref ref="close_arm" name="close arm" />
+			</team>
 
-			<orderref ref="delay">
-				<duration>1</duration>
-			</orderref>
-
-			<orderref ref="actuator_set" name="close servo">
-				<name>servo_button</name>
-				<preset>CLOSE</preset>
-			</orderref>
+			<team name="orange">
+				<actionref ref="open_arm" name="open arm" />
+			</team>
 
 			<orderref ref="navigator_goto_waypoint" name="approach bee">
 				<waypoint_name>way_bee_approach</waypoint_name>
 				<direction>0</direction>
+			</orderref>
+		</actions>
+	</action>
+
+	<action ref="open_arm" name="Open arm">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="actuator_ax12_set_pos">
+				<motor_id>3</motor_id>
+				<position>512</position>
+			</orderref>
+
+			<orderref ref="actuator_ax12_set_pos">
+				<motor_id>1</motor_id>
+				<position>512</position>
+			</orderref>
+		</actions>
+	</action>
+
+	<action ref="close_arm" name="Close arm">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="actuator_ax12_set_pos">
+				<motor_id>1</motor_id>
+				<position>819</position>
+			</orderref>
+
+			<orderref ref="actuator_ax12_set_pos">
+				<motor_id>3</motor_id>
+				<position>819</position>
 			</orderref>
 		</actions>
 	</action>
