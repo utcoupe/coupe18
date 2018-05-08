@@ -110,6 +110,40 @@
 		</actions>
 	</action>
 
+
+
+	<action ref="open_arm" name="Open arm">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="actuator_ax12_set_pos">
+				<motor_id>3</motor_id>
+				<position>512</position>
+			</orderref>
+
+			<orderref ref="actuator_ax12_set_pos">
+				<motor_id>1</motor_id>
+				<position>512</position>
+			</orderref>
+		</actions>
+	</action>
+
+	<action ref="close_arm" name="Close arm">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="actuator_ax12_set_pos">
+				<motor_id>1</motor_id>
+				<position>819</position>
+			</orderref>
+
+			<orderref ref="actuator_ax12_set_pos">
+				<motor_id>3</motor_id>
+				<position>819</position>
+			</orderref>
+		</actions>
+	</action>
+
 	<action ref="activate_bee" name="Activate bee" reward="50">
 		<params></params>
 		<conditions></conditions>
