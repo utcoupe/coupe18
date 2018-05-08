@@ -139,7 +139,7 @@
 
 			<orderref ref="actuator_ax12_set_pos">
 				<motor_id>3</motor_id>
-				<position>819</position>
+				<position>760</position>
 			</orderref>
 		</actions>
 	</action>
