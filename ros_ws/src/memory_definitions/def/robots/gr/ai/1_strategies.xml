@@ -39,4 +39,18 @@
 		<actions_onfinish name="After-Game Actions">
 		</actions_onfinish>
 	</strategy>
+
+	<strategy name="test_arm">
+		<actions name="In-Game Actions">
+			<actionref ref="game_start"/>
+
+			<actionlist name="Main actions" repeat="100">
+				<actionref ref="open_arm" duration="1.5"/>
+
+				<actionref ref="close_arm" duration="1.5"/>
+			</actionlist>
+		</actions>
+		<actions_onfinish name="After-Game Actions">
+		</actions_onfinish>
+	</strategy>
 </strategies>

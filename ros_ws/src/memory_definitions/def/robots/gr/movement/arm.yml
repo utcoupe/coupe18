@@ -2,16 +2,16 @@
 motor1:
     id: 3         # id of the ax12
     center: 512   # value at which the angle is 0
-    min: 150      # min value that is reacheable
-    max: 750      # you get it
+    min: 100      # min value that is reacheable
+    max: 900      # you get it
     length: 0.091 # length of the arm attached to this motor
 
 # the other one
 motor2:
     id: 1
     center: 512
-    min: 200
-    max: 800
+    min: 100
+    max: 900
     length: 0.106
 
 # origin of the arm relative to the robot
