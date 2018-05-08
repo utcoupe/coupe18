@@ -191,6 +191,7 @@ void Ax12Server::main_loop(const ros::TimerEvent &) {
     uint8_t motor_id = 0;
     uint16_t curr_position = 0;
     uint32_t goal_position = 0;
+    uint16_t curr_speed = 0;
 
     for (auto it = joint_goals_.begin(); it != joint_goals_.end();) {
         motor_id = it->getGoal()->motor_id;
@@ -208,7 +209,7 @@ void Ax12Server::main_loop(const ros::TimerEvent &) {
             it = joint_goals_.erase(it);
             ROS_INFO_STREAM("AX-12 position goal " << goal_position << " succeeded for motor ID " << static_cast<unsigned>(motor_id));
 
-        } else if (ros::Time::now().toSec() - it->getGoalID().stamp.toSec() > MAX_STOP_TIME) {
+        } else if (ros::Time::now().toSec() - it->getGoalID().stamp.toSec() > MAX_STOP_TIME && it->getGoal()->speed == 0) {
             ROS_ERROR_STREAM("Motor has not reached the goal position, timeout reached ! curr_pos : " << curr_position
                     << ", goal_pos : " << goal_position);
 
