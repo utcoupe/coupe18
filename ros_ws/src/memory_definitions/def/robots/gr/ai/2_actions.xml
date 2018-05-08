@@ -118,7 +118,7 @@
 		<actions exec="all" order="linear">
 			<orderref ref="arm_goto">
 				<frame_id>arm_origin</frame_id>
-				<x>0.196</x>
+				<x>0.197</x>
 				<y>0</y>
 			</orderref>
 		</actions>
@@ -149,25 +149,27 @@
 
 			<team name="green">
 				<orderref ref="actuator_ax12_set_pos">
-					<motor_id>3</motor_id>
-					<position>380</position>
+					<motor_id>1</motor_id>
+					<position>612</position>
 				</orderref>
 
 				<orderref ref="actuator_ax12_set_pos">
-					<motor_id>1</motor_id>
-					<position>440</position>
+					<motor_id>3</motor_id>
+					<position>250</position>
+					<speed>40</speed>
 				</orderref>
 			</team>
 
 			<team name="orange">
 				<orderref ref="actuator_ax12_set_pos">
-					<motor_id>3</motor_id>
-					<position>530</position>
+					<motor_id>1</motor_id>
+					<position>412</position>
 				</orderref>
 
 				<orderref ref="actuator_ax12_set_pos">
-					<motor_id>1</motor_id>
-					<position>584</position>
+					<motor_id>3</motor_id>
+					<position>660</position>
+					<speed>40</speed>
 				</orderref>
 			</team>
 		</actions>
