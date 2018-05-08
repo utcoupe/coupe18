@@ -144,6 +144,39 @@
 		</actions>
 	</action>
 
+
+
+	<action ref="push_bee" name="Push bee">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+
+			<team name="green">
+				<orderref ref="actuator_ax12_set_pos">
+					<motor_id>3</motor_id>
+					<position>380</position>
+				</orderref>
+
+				<orderref ref="actuator_ax12_set_pos">
+					<motor_id>1</motor_id>
+					<position>440</position>
+				</orderref>
+			</team>
+
+			<team name="orange">
+				<orderref ref="actuator_ax12_set_pos">
+					<motor_id>3</motor_id>
+					<position>530</position>
+				</orderref>
+
+				<orderref ref="actuator_ax12_set_pos">
+					<motor_id>1</motor_id>
+					<position>584</position>
+				</orderref>
+			</team>
+		</actions>
+	</action>
+
 	<action ref="activate_bee" name="Activate bee" reward="50">
 		<params></params>
 		<conditions></conditions>
