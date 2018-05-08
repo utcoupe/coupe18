@@ -69,7 +69,7 @@ class AsservReal(AsservAbstract):
         self._halt()
 
     def goto(self, goal_id, x, y, direction):
-        if self._check_reached_position(x, y):
+        if self._check_reached_position(x, y, False):
             self._node.goal_reached(goal_id, True)
             return True
 
@@ -81,7 +81,7 @@ class AsservReal(AsservAbstract):
         return True
 
     def gotoa(self, goal_id, x, y, a, direction):
-        if self._check_reached_angle(a) and self._check_reached_position(x, y, GOTOA_POS_ERROR_MULTIPLIER):
+        if self._check_reached_angle(a, False) and self._check_reached_position(x, y, GOTOA_POS_ERROR_MULTIPLIER, False):
             self._node.goal_reached(goal_id, True)
             return True
 
@@ -93,7 +93,7 @@ class AsservReal(AsservAbstract):
         return True
 
     def rot(self, goal_id, a, no_modulo):
-        if self._check_reached_angle(a):
+        if self._check_reached_angle(a, False):
             self._node.goal_reached(goal_id, True)
             return True
 
@@ -272,21 +272,21 @@ class AsservReal(AsservAbstract):
             self._serial_com.write(data_to_send)
             self._sending_queue.task_done()
 
-    def _check_reached_angle(self, a):
+    def _check_reached_angle(self, a, log=True):
         result = (self._robot_raw_position.theta % (2 * math.pi) + 2 * math.pi < a % (2 * math.pi) + 2 * math.pi + ASSERV_ERROR_ANGLE) and \
                  (self._robot_raw_position.theta % (2 * math.pi) + 2 * math.pi > a % (2 * math.pi) + 2 * math.pi - ASSERV_ERROR_ANGLE)
-        if result:
+        if result and log:
             rospy.loginfo("Angle reached, own angle = {}, check angle  = {}".format(self._robot_raw_position.theta, a))
-        else:
+        elif log:
             rospy.logwarn("Angle not reached, own angle = {}, check angle  = {}".format(self._robot_raw_position.theta, a))
         return result
 
-    def _check_reached_position(self, x, y, ratio=1):
+    def _check_reached_position(self, x, y, ratio=1, log=True):
         position_error = math.sqrt(math.pow(self._robot_raw_position.x - x, 2) + math.pow(self._robot_raw_position.y - y, 2))
         result = position_error < ASSERV_ERROR_POSITION * ratio
-        if result:
+        if result and log:
             rospy.loginfo("Position reached, own pos = {}, {}, check pos  = {}, {}".format(self._robot_raw_position.x, self._robot_raw_position.y, x, y))
-        else:
+        elif log:
             rospy.logwarn("Position not reached, own pos = {}, {}, check pos  = {}, {}".format(self._robot_raw_position.x, self._robot_raw_position.y, x, y))
         return result
 
