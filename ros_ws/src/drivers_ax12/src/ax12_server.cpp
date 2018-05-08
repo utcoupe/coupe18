@@ -24,14 +24,14 @@ void Ax12Server::init_driver(const std::string &port) {
 void Ax12Server::cancel_goal_cb(GoalHandle goal_handle) {
     uint8_t motor_id = goal_handle.getGoal()->motor_id;
 
-    ROS_INFO_STREAM("Received a cancel request, stopping movement of motor " << motor_id);
+    ROS_INFO_STREAM("Received a cancel request, stopping movement of motor " << static_cast<unsigned>(motor_id));
 
     uint16_t moving;
 
     driver_.read_register(motor_id, MOVING, moving);
 
     if (!moving) {
-        ROS_WARN_STREAM("Received a cancel request but motor " << motor_id << " is not moving");
+        ROS_WARN_STREAM("Received a cancel request but motor " << static_cast<unsigned>(motor_id) << " is not moving");
         return;
     }
 
@@ -43,7 +43,7 @@ void Ax12Server::cancel_goal_cb(GoalHandle goal_handle) {
     for (auto it = joint_goals_.begin(); it != joint_goals_.end(); it++) {
         if (goal_handle.getGoalID().id == it->getGoalID().id) {
             joint_goals_.erase(it);
-            ROS_DEBUG_STREAM("Erased joint goal of motor " << motor_id << " from the list");
+            ROS_DEBUG_STREAM("Erased joint goal of motor " << static_cast<unsigned>(motor_id) << " from the list");
             return;
         }
     }
@@ -74,14 +74,14 @@ void Ax12Server::execute_goal_cb(GoalHandle goal_handle) {
     }
 
     if (!driver_.motor_id_exists(motor_id)) {
-        ROS_ERROR_STREAM("AX-12 action server received a goal for motor ID " << motor_id << ", but no such motor was detected");
+        ROS_ERROR_STREAM("AX-12 action server received a goal for motor ID " << static_cast<unsigned>(motor_id) << ", but no such motor was detected");
         result_.success = 0;
         goal_handle.setRejected(result_);
         return;
     }
 
     if (!driver_.motor_id_connected(motor_id)) {
-        ROS_ERROR_STREAM("AX-12 action server received a goal for motor ID " << motor_id << ", but the motor was disconnected");
+        ROS_ERROR_STREAM("AX-12 action server received a goal for motor ID " << static_cast<unsigned>(motor_id) << ", but the motor was disconnected");
         result_.success = 0;
         goal_handle.setRejected(result_);
         return;
@@ -99,7 +99,7 @@ bool Ax12Server::handle_joint_goal(GoalHandle goal_handle) {
     uint16_t position = goal->position;
 
     if (position <= 0 || position > 1023) {
-        ROS_ERROR_STREAM("AX-12 action server received a joint goal for motor ID " << motor_id
+        ROS_ERROR_STREAM("AX-12 action server received a joint goal for motor ID " << static_cast<unsigned>(motor_id)
                         << ", but with an invalid position: " << position);
         result_.success = 0;
         goal_handle.setRejected(result_);
@@ -108,7 +108,7 @@ bool Ax12Server::handle_joint_goal(GoalHandle goal_handle) {
 
     uint16_t speed = goal->speed;
     if (speed < 0 || speed > 1023) {
-        ROS_ERROR_STREAM("AX-12 action server received a joint goal for motor ID " << motor_id 
+        ROS_ERROR_STREAM("AX-12 action server received a joint goal for motor ID " << static_cast<unsigned>(motor_id) 
                 << ", but with an invalid speed: " << speed);
         result_.success = 0;
         goal_handle.setRejected(result_);
@@ -121,7 +121,7 @@ bool Ax12Server::handle_joint_goal(GoalHandle goal_handle) {
         if (it->getGoal()->motor_id == motor_id) {
             it->setCanceled();
             ROS_WARN_STREAM("AX-12 action server received a joint goal for motor ID "
-                    << motor_id << " while another joint goal was running for that motor."
+                    << static_cast<unsigned>(motor_id) << " while another joint goal was running for that motor."
                     << " The old goal was canceled.");
 
             it = joint_goals_.erase(it);
@@ -138,7 +138,7 @@ bool Ax12Server::handle_joint_goal(GoalHandle goal_handle) {
     success &= driver_.write_register(motor_id, MOVING_SPEED, speed);
 
     joint_goals_.push_back(goal_handle);
-    ROS_DEBUG_STREAM("Success setting goal and speed for motor " << motor_id << ", adding the goal to the list");
+    ROS_DEBUG_STREAM("Success setting goal and speed for motor " << static_cast<unsigned>(motor_id) << ", adding the goal to the list");
 
     return success;
 }
@@ -149,7 +149,7 @@ bool Ax12Server::handle_wheel_goal(GoalHandle goal_handle) {
     uint16_t speed = goal->speed;
 
     if (speed < 0 || speed > 2047) {
-        ROS_ERROR_STREAM("AX-12 action server received a joint goal for motor ID " << motor_id 
+        ROS_ERROR_STREAM("AX-12 action server received a joint goal for motor ID " << static_cast<unsigned>(motor_id) 
                 << ", but with an invalid speed: " << speed);
         result_.success = 0;
         goal_handle.setRejected(result_);
@@ -162,7 +162,7 @@ bool Ax12Server::handle_wheel_goal(GoalHandle goal_handle) {
         if (it->getGoal()->motor_id == motor_id) {
             result_.success = 0;
             it->setCanceled(result_);
-            ROS_INFO_STREAM("AX-12 action server received a wheel goal for motor ID " << motor_id
+            ROS_INFO_STREAM("AX-12 action server received a wheel goal for motor ID " << static_cast<unsigned>(motor_id)
                     << " while another joint goal was running for that motor. "
                     << "The old goal was canceled.");
             it = joint_goals_.erase(it);
@@ -196,7 +196,7 @@ void Ax12Server::main_loop(const ros::TimerEvent &) {
         motor_id = it->getGoal()->motor_id;
         driver_.read_register(motor_id, PRESENT_POSITION, curr_position);
 
-        ROS_DEBUG_STREAM("Motor " << motor_id << " : position " << curr_position);
+        ROS_DEBUG_STREAM("Motor " << static_cast<unsigned>(motor_id) << " : position " << curr_position);
 
         goal_position = it->getGoal()->position;
 
@@ -206,7 +206,7 @@ void Ax12Server::main_loop(const ros::TimerEvent &) {
             result_.success = 1;
             it->setSucceeded(result_);
             it = joint_goals_.erase(it);
-            ROS_INFO_STREAM("AX-12 position goal " << goal_position << " succeeded for motor ID " << motor_id);
+            ROS_INFO_STREAM("AX-12 position goal " << goal_position << " succeeded for motor ID " << static_cast<unsigned>(motor_id));
 
         } else if (ros::Time::now().toSec() - it->getGoalID().stamp.toSec() > MAX_STOP_TIME) {
             ROS_ERROR_STREAM("Motor has not reached the goal position, timeout reached ! curr_pos : " << curr_position

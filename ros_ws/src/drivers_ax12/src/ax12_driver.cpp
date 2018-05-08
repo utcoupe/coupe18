@@ -45,7 +45,7 @@ void Ax12Driver::scan_motors() {
 
 bool Ax12Driver::write_register(uint8_t motor_id, const Register reg, uint16_t value) {
     if (reg.access == READ) {
-        ROS_WARN_STREAM("Cannot write value " << value << " to a read-only register for motor " << motor_id);
+        ROS_WARN_STREAM("Cannot write value " << value << " to a read-only register for motor " << static_cast<unsigned>(motor_id));
         return false;
     }
 
@@ -58,7 +58,7 @@ bool Ax12Driver::write_register(uint8_t motor_id, const Register reg, uint16_t v
         result = packet_handler->write2ByteTxRx(port_handler.get(), motor_id, reg.address, value);
 
     if (result != COMM_SUCCESS) {
-        ROS_WARN_STREAM("Could not write value " << value << " to register for motor " << motor_id
+        ROS_WARN_STREAM("Could not write value " << value << " to register for motor " << static_cast<unsigned>(motor_id)
                         << " : " << packet_handler->getTxRxResult(result));
         return false;
     }
@@ -80,7 +80,7 @@ bool Ax12Driver::read_register(uint8_t motor_id, const Register reg, uint16_t &v
     }
 
     if (result != COMM_SUCCESS) {
-        ROS_WARN_STREAM("Could not read register for motor " << motor_id << " : " << packet_handler->getTxRxResult(result));
+        ROS_WARN_STREAM("Could not read register for motor " << static_cast<unsigned>(motor_id) << " : " << packet_handler->getTxRxResult(result));
         return false;
     }
 
@@ -99,7 +99,7 @@ bool Ax12Driver::motor_id_connected(uint8_t motor_id) {
         result = packet_handler->ping(port_handler.get(), motor_id, &err);
 
         if (err != 0) {
-            ROS_DEBUG_STREAM("Could not ping motor " << motor_id << " because of an hardware error : " << packet_handler->getRxPacketError(err));
+            ROS_DEBUG_STREAM("Could not ping motor " << static_cast<unsigned>(motor_id) << " because of an hardware error : " << packet_handler->getRxPacketError(err));
         }
 
         if (result == COMM_SUCCESS) {
