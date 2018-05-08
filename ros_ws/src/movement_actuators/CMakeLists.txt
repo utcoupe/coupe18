@@ -22,6 +22,7 @@ add_action_files(DIRECTORY action FILES
     Dispatch.action
     Arm.action
     Barrel.action
+    CubePicker.action
 )
 
 ## Generate added messages and services with any dependencies listed here

@@ -137,7 +137,7 @@ void on_move(const drivers_ard_others::Move& msg){
                     stepper_actuators_objects[msg.id].release();
                 }
                 if (msg.dest_value < 0) {
-                    stepper_actuators_objects[msg.id].setSpeed(60);
+                    stepper_actuators_objects[msg.id].setSpeed(120);
                     stepper_actuators_objects[msg.id].step(-msg.dest_value, FORWARD, SINGLE);
                 }
                 else {
