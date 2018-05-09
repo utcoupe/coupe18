@@ -134,11 +134,11 @@ bool Ax12Server::handle_joint_goal(GoalHandle goal_handle) {
 
     success &= driver_.joint_mode(motor_id);
 
-    success &= driver_.write_register(motor_id, GOAL_POSITION, position);
     success &= driver_.write_register(motor_id, MOVING_SPEED, speed);
+    success &= driver_.write_register(motor_id, GOAL_POSITION, position);
 
     joint_goals_.push_back(goal_handle);
-    ROS_DEBUG_STREAM("Success setting goal and speed for motor " << static_cast<unsigned>(motor_id) << ", adding the goal to the list");
+    ROS_DEBUG_STREAM("Success " << success << " setting goal and speed for motor " << static_cast<unsigned>(motor_id) << ", adding the goal to the list");
 
     return success;
 }
