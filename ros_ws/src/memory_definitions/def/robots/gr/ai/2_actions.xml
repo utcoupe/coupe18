@@ -67,6 +67,15 @@
 				<position_waypoint>way_grape_1_pushed</position_waypoint>
 				<direction>0</direction>
 			</orderref>
+			<orderref ref="asserv_pwm">
+				<left>-200</left>
+				<right>-200</right>
+				<duration>500</duration>
+			</orderref>
+
+			<orderref ref="delay">
+				<duration>0.5</duration>
+			</orderref>
 		</actions>
 	</action>
 

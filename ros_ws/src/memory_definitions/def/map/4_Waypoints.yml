@@ -183,8 +183,8 @@ waypoints:
     way_grape_1_pushed:
         position:
             frame_id: /map
-            x: 0.850
-            y: 1.78
+            x: 0.680
+            y: 1.83
             a: -1.57079
             type: fixed
     way_grape_1_released:
