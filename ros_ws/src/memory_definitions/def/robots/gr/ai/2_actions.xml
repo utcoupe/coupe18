@@ -140,7 +140,7 @@
 			<orderref ref="actuator_ax12_set_pos">
 				<motor_id>3</motor_id>
 				<position>610</position>
-				<speed>250</speed>
+				<speed>180</speed>
 			</orderref>
 		</actions>
 	</action>
