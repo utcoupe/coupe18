@@ -39,6 +39,7 @@
 
 			<orderref ref="navigator_goto_waypoint" name="accost button">
 				<waypoint_name>way_button_accost</waypoint_name>
+				<direction>0</direction>
 			</orderref>
 
 			<orderref ref="actuator_set" name="activate button with servo">
@@ -57,7 +58,7 @@
 
 			<orderref ref="navigator_goto_waypoint" name="go back to approach">
 				<waypoint_name>way_button_approach</waypoint_name>
-				<direction>0</direction>
+				<direction>1</direction>
 			</orderref>
 		</actions>
 	</action>
@@ -156,7 +157,7 @@
 				<orderref ref="actuator_ax12_set_pos">
 					<motor_id>3</motor_id>
 					<position>250</position>
-					<speed>40</speed>
+					<speed>150</speed>
 				</orderref>
 			</team>
 
@@ -169,7 +170,7 @@
 				<orderref ref="actuator_ax12_set_pos">
 					<motor_id>3</motor_id>
 					<position>660</position>
-					<speed>40</speed>
+					<speed>150</speed>
 				</orderref>
 			</team>
 		</actions>
