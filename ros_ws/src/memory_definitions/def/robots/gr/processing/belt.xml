@@ -14,25 +14,20 @@
     </param>
   </params>
   <sensors>
-    <sensor id="sensor1" type="pololu"> <!-- x, y in meters, a in rad -->
-      <x>0.074</x>
-      <y>0.05</y>
-      <a>0.0</a>
+    <sensor id="sensor_ar_1" type="pololu"> <!-- x, y in meters, a in rad -->
+      <x>-0.06</x>
+      <y>0.091</y>
+      <a>3.14159</a>
     </sensor>
-    <sensor id="sensor2" type="pololu"> <!-- x, y in meters, a in rad -->
-      <x>0.074</x>
-      <y>-0.05</y>
-      <a>0.0</a>
+    <sensor id="sensor_ar_2" type="pololu"> <!-- x, y in meters, a in rad -->
+      <x>-0.06</x>
+      <y>-0.104</y>
+      <a>3.14159</a>
     </sensor>
-    <sensor id="sensor_tera1" type="teraranger"> <!-- x, y in meters, a in rad -->
-      <x>0.085</x>
+    <sensor id="sensor_tera" type="teraranger"> <!-- x, y in meters, a in rad -->
+      <x>0</x>
       <y>0</y>
       <a>0</a>
     </sensor>
-    <!-- <sensor id="non">
-      <x>-0.1</x>
-      <y>-0.1</y>
-      <a>-3.1415</a>
-    </sensor> -->
   </sensors>
 </belt>
