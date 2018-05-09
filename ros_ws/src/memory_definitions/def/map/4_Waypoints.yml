@@ -34,7 +34,7 @@ waypoints:
         position:
             frame_id: /map
             x: 1.13
-            y: 1.800 #1.65 PR
+            y: 1.780 #1.65 PR
             a: -1.57079
             type: fixed
     way_button_accost:
@@ -182,7 +182,7 @@ waypoints:
         position:
             frame_id: /map
             x: 0.850
-            y: 1.58
+            y: 1.78
             a: -1.57079
             type: fixed
     way_grape_1_released:
@@ -211,7 +211,7 @@ waypoints:
         position:
             frame_id: /map
             x: 0.6
-            y: 1.58
+            y: 1.78
             a: -1.57079
             type: fixed
     way_grape_2_released:
