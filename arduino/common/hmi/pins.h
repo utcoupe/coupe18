@@ -17,7 +17,9 @@
 
 // LED pins
 #define LED_RED     D3
-#define LED_BLUE    D4
+//#define LED_BLUE    D4
 #define LED_GREEN   D8
+
+#define JACK	D4
 
 #endif //ARDUINO_PINS_H

@@ -109,7 +109,7 @@ class AICommunication():
         rospy.loginfo("waiting for message on topic '{}'...".format(dest))
         self._sub_msg_success = False
         rospy.Subscriber(dest, msg_class, self._sub_msg_callback)
-        timeout = 30 #seconds
+        timeout = 10000 #seconds
 
         s = time.time()
         while not self._sub_msg_success and (time.time() - s < timeout): #TODO customizable timeout
