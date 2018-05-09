@@ -20,64 +20,36 @@
 		</actions_onfinish>
 	</strategy>
 
-	<strategy name="test_ax12">
-		<actions name="In-Game Actions">
-			<actionref ref="game_start"/>
-
-			<actionlist name="Main actions" repeat="100">
-				<orderref ref="actuator_ax12_set_pos" duration="1.5">
-					<motor_id>3</motor_id>
-					<position>600</position>
-				</orderref>
-
-				<orderref ref="actuator_ax12_set_pos" duration="1.5">
-					<motor_id>3</motor_id>
-					<position>700</position>
-				</orderref>
-			</actionlist>
-		</actions>
-		<actions_onfinish name="After-Game Actions">
-		</actions_onfinish>
-	</strategy>
-
-	<strategy name="test_arm">
-		<actions name="In-Game Actions">
-			<actionref ref="game_start"/>
-
-			<actionlist name="Main actions" repeat="5">
-				<actionref ref="open_arm" duration="1.5"/>
-
-				<actionref ref="close_arm" duration="1.5"/>
-			</actionlist>
-		</actions>
-		<actions_onfinish name="After-Game Actions">
-		</actions_onfinish>
-	</strategy>
-
-	<strategy name="test_bee">
-		<actions name="In-Game Actions">
-			<actionref ref="game_start"/>
-
-			<actionlist name="Main actions">
-				<actionref ref="open_arm" duration="1.5"/>
-
-				<orderref ref="delay">
-					<duration>3</duration>
-				</orderref>
-
-				<actionref ref="push_bee" duration="1.5"/>
-			</actionlist>
-		</actions>
-		<actions_onfinish name="After-Game Actions">
-		</actions_onfinish>
-	</strategy>
-
 	<strategy name="test_button">
 		<actions name="In-Game Actions">
 			<actionref ref="game_start"/>
 
 			<actionlist name="Main actions">
 				<actionref ref="activate_button"/>
+			</actionlist>
+		</actions>
+		<actions_onfinish name="After-Game Actions">
+		</actions_onfinish>
+	</strategy>
+
+	<strategy name="test_button_bee">
+		<actions name="In-Game Actions">
+			<actionref ref="game_start"/>
+
+			<actionlist name="Main actions">
+				<actionref ref="activate_button"/>
+
+				<actionref ref="open_arm"/>
+
+				<orderref ref="navigator_goto_waypoint">
+					<waypoint_name>way_spawn_gr</waypoint_name>
+					<mode>0</mode>
+					<direction>0</direction>
+				</orderref>
+
+				<actionref ref="push_bee"/>
+
+				<actionref ref="close_arm"/>
 			</actionlist>
 		</actions>
 		<actions_onfinish name="After-Game Actions">

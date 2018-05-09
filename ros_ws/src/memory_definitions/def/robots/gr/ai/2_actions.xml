@@ -141,13 +141,10 @@
 		</actions>
 	</action>
 
-
-
 	<action ref="push_bee" name="Push bee">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-
 			<team name="green">
 				<orderref ref="actuator_ax12_set_pos">
 					<motor_id>1</motor_id>
@@ -180,15 +177,11 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-
-
 			<orderref ref="navigator_goto_waypoint" name="approach bee">
 				<waypoint_name>way_bee_approach</waypoint_name>
 			</orderref>
 
-			<team name="green">
-				<actionref ref="open_arm" name="open arm" />
-			</team>
+			<actionref ref="open_arm" name="open arm" />
 
 			<orderref ref="actuator_set" name="lift arm">
 				<name>arm_elevator</name>
@@ -199,13 +192,9 @@
 				<waypoint_name>way_bee_accost</waypoint_name>
 			</orderref>
 
-			<team name="green">
-				<actionref ref="close_arm" name="close arm" />
-			</team>
+			<actionref ref="push_bee" duration="1.5"/>
 
-			<team name="orange">
-				<actionref ref="open_arm" name="open arm" />
-			</team>
+			<actionref ref="close_arm" name="open arm" />
 
 			<orderref ref="navigator_goto_waypoint" name="approach bee">
 				<waypoint_name>way_bee_approach</waypoint_name>
