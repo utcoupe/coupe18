@@ -29,7 +29,7 @@ NODE_NAME       = "navigator"
 NODE_NAMESPACE  = "navigation"
 FULL_NODE_NAME  = "/" + NODE_NAMESPACE + "/" + NODE_NAME
 
-NB_MAX_TRY      = 3
+NB_MAX_TRY      = 7
 TIME_MAX_STOP   = 1 # sec
 
 # Constants used for the status of goto requests

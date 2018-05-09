@@ -37,6 +37,13 @@ waypoints:
             y: 1.772 #1.65 PR
             a: -1.57079
             type: fixed
+    way_button_approach_back:
+        position:
+            frame_id: /map
+            x: 1.13
+            y: 1.72 #1.65 PR
+            a: -1.57079
+            type: fixed
     way_button_accost: # not used (pwm)
         position:
             frame_id: /map
@@ -249,3 +256,4 @@ waypoints:
             y: 1.84
             a: 0
             type: fixed
+
