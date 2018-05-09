@@ -54,7 +54,7 @@
 		</actions>
 	</action>
 
-	<action ref="push_grape_1" name="Simply push grape 1 cubes to the zone" reward="25">
+	<action ref="push_grape_1" name="Simply push grape 1 cubes to the zone" reward="5">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -83,7 +83,7 @@
 		</actions>
 	</action>
 
-	<action ref="push_grape_2" name="Simply push grape 2 cubes to the zone" reward="25">
+	<action ref="push_grape_2" name="Simply push grape 2 cubes to the zone" reward="5">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
