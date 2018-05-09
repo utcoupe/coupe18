@@ -7,6 +7,9 @@
 	<!-- STRATEGY real game actions ! -->
 	<strategy name="button_bee_cube">
 		<actions name="In-Game Actions">
+			<orderref ref="delay" name="5 points bee loaded" reward="5"/>
+			<orderref ref="delay" name="5 points home installed" reward="5"/>
+
 			<actionref ref="game_start"/>
 
 			<actionlist name="Main actions">
@@ -21,10 +24,13 @@
 
 	<strategy name="test_button">
 		<actions name="In-Game Actions">
+			<orderref ref="delay" name="5 points bee loaded" reward="5"/>
+			<orderref ref="delay" name="5 points home installed" reward="5"/>
+
 			<actionref ref="game_start"/>
 
 			<actionlist name="Main actions">
-				<actionref ref="activate_button"/>
+				<actionref ref="activate_button" reward="25"/>
 			</actionlist>
 		</actions>
 		<actions_onfinish name="After-Game Actions">
