@@ -177,20 +177,35 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="navigator_goto_waypoint" name="approach bee">
-				<waypoint_name>way_bee_approach</waypoint_name>
-			</orderref>
+			<team name="green">
+				<orderref ref="navigator_goto_waypoint" name="approach bee">
+					<waypoint_name>way_bee_approach_green</waypoint_name>
+				</orderref>
+			</team>
+			<team name="orange">
+				<orderref ref="navigator_goto_waypoint" name="approach bee">
+					<waypoint_name>way_bee_approach_orange</waypoint_name>
+				</orderref>
+			</team>
 
 			<actionref ref="open_arm" name="open arm" />
 
-			<orderref ref="actuator_set" name="lift arm">
-				<name>arm_elevator</name>
-				<preset>GO_UP</preset>
-			</orderref>
+			<!--<orderref ref="actuator_set" name="lift arm">-->
+				<!--<name>arm_elevator</name>-->
+				<!--<preset>GO_UP</preset>-->
+			<!--</orderref>-->
 
-			<orderref ref="navigator_goto_waypoint" name="accost bee">
-				<waypoint_name>way_bee_accost</waypoint_name>
-			</orderref>
+			<team name="green">
+				<orderref ref="navigator_goto_waypoint" name="accost bee">
+					<waypoint_name>way_bee_accost_green</waypoint_name>
+				</orderref>
+			</team>
+
+			<team name="orange">
+				<orderref ref="navigator_goto_waypoint" name="accost bee">
+					<waypoint_name>way_bee_accost_orange</waypoint_name>
+				</orderref>
+			</team>
 
 			<actionref ref="push_bee" duration="1.5"/>
 
