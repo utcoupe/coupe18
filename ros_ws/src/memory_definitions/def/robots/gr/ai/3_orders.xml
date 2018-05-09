@@ -44,7 +44,7 @@
 		<message dest="/drivers/ax12">
 			<param name="motor_id" type="int"/>
 			<param name="position" type="int"/> <!-- Set either a preset or param-->
-			<param name="speed" type="int">0</param>
+			<param name="speed" type="int" optional="true">0</param>
 			<param name="mode" type="int" preset="true">0</param>
 		</message>
 	</order>
