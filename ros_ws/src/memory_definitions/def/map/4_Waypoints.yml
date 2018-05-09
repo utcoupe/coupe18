@@ -143,8 +143,8 @@ waypoints:
     way_bee_approach_green:
         position:
             frame_id: /map
-            x: 0.2665
-            y: 0.5
+            x: 0.2665 #0.2665
+            y: 0.7 #0.5
             a: -1.57079
             type: fixed
     way_bee_accost_green:
@@ -252,8 +252,8 @@ waypoints:
     way_past_cube_2:
         position:
             frame_id: /map
-            x: 0.6
-            y: 1.84
+            x: 0.68
+            y: 1.635
             a: 0
             type: fixed
 
