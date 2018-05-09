@@ -15,7 +15,7 @@
 		<conditions></conditions>
 		<actions>
 			<orderref ref="set_robot_pos">
-				<position_waypoint>way_spawn</position_waypoint>
+				<position_waypoint>way_spawn_pr</position_waypoint>
 			</orderref>
 
 			<actionref ref="jack"/>
