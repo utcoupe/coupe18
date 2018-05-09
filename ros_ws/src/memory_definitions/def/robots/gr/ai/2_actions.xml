@@ -156,22 +156,22 @@
 				<orderref ref="actuator_ax12_set_pos">
 					<motor_id>3</motor_id>
 					<position>250</position>
-					<speed>20</speed>
+					<speed>40</speed>
 				</orderref>
 			</team>
 
-			<!--<team name="orange">-->
-				<!--<orderref ref="actuator_ax12_set_pos">-->
-					<!--<motor_id>1</motor_id>-->
-					<!--<position>412</position>-->
-				<!--</orderref>-->
+			<team name="orange">
+				<orderref ref="actuator_ax12_set_pos">
+					<motor_id>1</motor_id>
+					<position>412</position>
+				</orderref>
 
-				<!--<orderref ref="actuator_ax12_set_pos">-->
-					<!--<motor_id>3</motor_id>-->
-					<!--<position>660</position>-->
-					<!--<speed>20</speed>-->
-				<!--</orderref>-->
-			<!--</team>-->
+				<orderref ref="actuator_ax12_set_pos">
+					<motor_id>3</motor_id>
+					<position>660</position>
+					<speed>40</speed>
+				</orderref>
+			</team>
 		</actions>
 	</action>
 

@@ -172,8 +172,8 @@ bool Ax12Server::handle_wheel_goal(GoalHandle goal_handle) {
     }
 
     bool success = true;
-    success &= driver_.wheel_mode(motor_id);
     success &= driver_.write_register(motor_id, MOVING_SPEED, speed);
+    success &= driver_.wheel_mode(motor_id);
 
 
     result_.success = static_cast<unsigned char>(success);
@@ -364,8 +364,8 @@ Ax12Server::Ax12Server(const std::string &action_name, const std::string &servic
 
     status_services_ = std::make_unique<StatusServices>(
         "drivers", "ax12", [this](const ai_game_status::ArmRequest::ConstPtr &){
-            // driver_.scan_motors(); TODO: uncomment and test if arm can be called while in game ???
-            driver_.toggle_torque(true);
+            driver_.scan_motors(); // TODO: uncomment and test if arm can be called while in game ???
+            // driver_.toggle_torque(true);
         });
 
     std::string port = fetch_port(PORT_FINDER_SERVICE);
