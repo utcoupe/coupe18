@@ -14,7 +14,7 @@ entities:
             ns: robots
             id: 0
             type: cube
-            scale: [0.2, 0.3, 0.35]
+            scale: [0.2, 0.22, 0.35]
             z: 0.175
             orientation: [0, 0, 0]
             color: purple
@@ -32,12 +32,12 @@ entities:
         shape:
             type: rect
             width: 0.2
-            height: 0.15
+            height: 0.22
         _marker:
             ns: robots
             id: 1
             type: cube
-            scale: [0.4, 0.4, 0.35]
+            scale: [0.2, 0.22, 0.35]
             z: 0.175
             orientation: [0, 0, 0]
             color: purple
