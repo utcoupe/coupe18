@@ -279,10 +279,22 @@ class Asserv:
         @param goal_handled:    Goal handler corresponding to the received action
         @type goal_handled:     ServerGoalHandle
         """
-        rospy.logdebug("[ASSERV] Received a request (dogoto action).")
         if not self._is_halted:
+            pos = Pose2D(0, 0, 0)
+            if goal_handled.get_goal().position_waypoint == "":
+                rospy.logdebug("[ASSERV] Received a request (dogoto action).")
+                pos = goal_handled.get_goal().position
+            else:
+                rospy.logdebug("[ASSERV] Received a request (dogoto action), using waypoint")
+                if self._srv_client_map_fill_waypoints is not None:
+                    wpt = Waypoint(name=goal_handled.get_goal().position_waypoint)
+                    wpt.has_angle = True
+                    pos = self._srv_client_map_fill_waypoints.call(wpt).filled_waypoint.pose
+                else:
+                    rospy.logwarn("[ASSERV] Received a waypoint request but memory_map seems not to be launched...")
+
             if self._process_goto_order(self._goal_id_counter, goal_handled.get_goal().mode,
-                                        goal_handled.get_goal().position.x, goal_handled.get_goal().position.y, goal_handled.get_goal().position.theta,
+                                        pos.x, pos.y, pos.theta,
                                         goal_handled.get_goal().direction):
                 goal_handled.set_accepted()
                 self._goals_dictionary[self._goal_id_counter] = goal_handled

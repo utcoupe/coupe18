@@ -12,6 +12,7 @@ uint8 DIRECTION_FORWARD  = 1
 uint8 direction
 
 geometry_msgs/Pose2D position
+string position_waypoint
 ---
 # Result : true if arrived, false if not
 bool result
