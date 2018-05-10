@@ -76,7 +76,7 @@
 
 			<actionlist name="Main actions">
 				<orderref ref="navigator_goto_waypoint">
-					<waypoint_name>way_grape_1_accost</waypoint_name>
+					<waypoint_name>way_grape_1_accost2</waypoint_name>
 					<mode>0</mode>
 					<direction>1</direction>
 				</orderref>
