@@ -47,7 +47,7 @@
 					<direction>0</direction>
 				</orderref>
 
-				<actionref ref="push_bee"/>
+				<actionref ref="activate_bee"/>
 
 				<actionref ref="close_arm"/>
 			</actionlist>
@@ -61,7 +61,7 @@
 			<actionref ref="game_start"/>
 
 			<actionlist name="Main actions">
-				<actionref ref="push_bee"/>
+				<actionref ref="activate_bee"/>
 			</actionlist>
 		</actions>
 		<actions_onfinish name="After-Game Actions">
