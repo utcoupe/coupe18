@@ -35,7 +35,7 @@
         <timeout value="500"/> <!-- Default timeout -->
         <positions default="0">
             <preset name="LEFT" value="10" />
-            <preset name="RIGHT" value="125" />
+            <preset name="RIGHT" value="110" />
         </positions>
     </act>
     <act name="servo_flipper_side_canon" id="3" type="servo" family="arduino">
