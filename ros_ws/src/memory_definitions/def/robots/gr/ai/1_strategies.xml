@@ -20,6 +20,20 @@
 		</actions_onfinish>
 	</strategy>
 
+	<strategy name="button_cube">
+		<actions name="In-Game Actions">
+			<actionref ref="game_start"/>
+
+			<actionlist name="Main actions">
+				<actionref ref="activate_button"/>
+				<actionref ref="push_grape_1"/>
+				<actionref ref="push_grape_2"/>
+			</actionlist>
+		</actions>
+		<actions_onfinish name="After-Game Actions">
+		</actions_onfinish>
+	</strategy>
+
 	<strategy name="test_button">
 		<actions name="In-Game Actions">
 			<actionref ref="game_start"/>
