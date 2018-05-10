@@ -70,11 +70,16 @@
 		</actions_onfinish>
 	</strategy>
 
-	<strategy name="push_bee">
+	<strategy name="bee">
 		<actions name="In-Game Actions">
 			<actionref ref="game_start"/>
 
 			<actionlist name="Main actions">
+				<orderref ref="navigator_goto_waypoint">
+					<waypoint_name>way_grape_1_accost</waypoint_name>
+					<mode>0</mode>
+					<direction>1</direction>
+				</orderref>
 				<actionref ref="activate_bee"/>
 			</actionlist>
 		</actions>
