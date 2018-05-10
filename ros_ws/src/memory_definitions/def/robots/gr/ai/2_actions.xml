@@ -40,7 +40,7 @@
 			<orderref ref="asserv_goto_waypoint" name="accost button">
 				<position_waypoint>way_button_accost</position_waypoint>
 				<direction>0</direction>
-				<mode>0</mode> <!-- GOTO -->
+				<mode>0</mode> <!-- GOTO so more precise -->
 			</orderref>
 
 			<orderref ref="navigator_goto_waypoint" name="go back to approach">
