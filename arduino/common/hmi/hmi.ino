@@ -74,7 +74,7 @@ bool _is_launching = false;
 #define PIN_BTN_VCC_2 BTN_L1
 #define PIN_BTN_IN_1  BTN_R1
 #define PIN_BTN_IN_2  BTN_R2
-#define PIN_JACK      BTN_R2
+#define PIN_JACK      JACK
 
 bool _prev_up_state    = false;
 bool _prev_down_state  = false;
@@ -97,7 +97,13 @@ void check_input() {
     down_pressed = digitalRead(PIN_BTN_IN_2) && !_prev_down_state;
     _prev_down_state = digitalRead(PIN_BTN_IN_2);
 
-    jack_pulled = !digitalRead(PIN_JACK) && _prev_jack_state; // 1 when inserted
+//    if (digitalRead(PIN_JACK) == 0) {
+//        nh.loginfo("bas");
+//    } else if (digitalRead(PIN_JACK) == 1) {
+//        nh.loginfo("haut");
+//    }
+
+    jack_pulled = digitalRead(PIN_JACK) && !_prev_jack_state; // 1 when inserted
     _prev_jack_state = digitalRead(PIN_JACK);
   
     digitalWrite(PIN_BTN_VCC_1, LOW);
@@ -110,7 +116,7 @@ void check_input() {
 }
 
 //LEDs
-#define PIN_LED_ALIVE LED_BLUE
+#define PIN_LED_ALIVE LED_GREEN
 #define PIN_LED_INIT LED_RED
 
 void update_leds() {
