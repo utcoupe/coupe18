@@ -134,7 +134,6 @@ class AICommunication():
             rospy.logdebug("    Waiting for action server...")
             client.wait_for_server(timeout = rospy.Duration(2.0))
             rospy.logdebug("    Sending goal...")
-            rospy.logerr(params)
             client.send_goal(goal_class(**params))
             rospy.logdebug("    Waiting for result...")
             client.wait_for_result()
