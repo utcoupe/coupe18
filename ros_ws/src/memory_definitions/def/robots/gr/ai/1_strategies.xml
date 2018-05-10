@@ -26,11 +26,6 @@
 
 			<actionlist name="Main actions">
 				<actionref ref="activate_button"/>
-
-				<orderref ref="navigator_goto_waypoint">
-					<waypoint_name>way_spawn_gr</waypoint_name>
-					<direction>0</direction>
-				</orderref>
 			</actionlist>
 		</actions>
 		<actions_onfinish name="After-Game Actions">
