@@ -144,11 +144,11 @@
 			<team name="green">
 				<orderref ref="navigator_goto_waypoint" name="approach bee">
 					<waypoint_name>way_bee_approach_green</waypoint_name>
-					<direction>0</direction>
+					<direction>1</direction>
 				</orderref>
 				<orderref ref="navigator_goto_waypoint" name="accost bee">
 					<waypoint_name>way_bee_accost_green</waypoint_name>
-					<direction>0</direction>
+					<direction>1</direction>
 				</orderref>
 				<orderref ref="actuator_ax12_set_pos">
 					<motor_id>1</motor_id>
@@ -165,11 +165,11 @@
 			<team name="orange">
 				<orderref ref="navigator_goto_waypoint" name="approach bee">
 					<waypoint_name>way_bee_approach_orange</waypoint_name>
-					<direction>0</direction>
+					<direction>1</direction>
 				</orderref>
 				<orderref ref="navigator_goto_waypoint" name="accost bee">
 					<waypoint_name>way_bee_accost_orange</waypoint_name>
-					<direction>0</direction>
+					<direction>1</direction>
 				</orderref>
 				<orderref ref="actuator_ax12_set_pos">
 					<motor_id>1</motor_id>
