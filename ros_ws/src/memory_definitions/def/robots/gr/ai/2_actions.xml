@@ -37,15 +37,11 @@
 				<direction>1</direction>
 			</orderref>
 
-			<orderref ref="navigator_goto_waypoint" name="accost button">
-				<waypoint_name>way_button_accost</waypoint_name>
+			<orderref ref="asserv_goto_waypoint" name="accost button">
+				<position_waypoint>way_button_accost</position_waypoint>
 				<direction>0</direction>
+				<mode>0</mode> <!-- GOTO -->
 			</orderref>
-
-			<orderref ref="delay">
-				<duration>1</duration>
-			</orderref>
-			
 
 			<orderref ref="navigator_goto_waypoint" name="go back to approach">
 				<waypoint_name>way_button_approach</waypoint_name>

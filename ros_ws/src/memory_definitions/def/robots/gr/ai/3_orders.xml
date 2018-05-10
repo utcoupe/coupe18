@@ -101,4 +101,12 @@
 			<param name="direction" type="int" optional="true">1</param>
 		</message>
 	</order>
+
+	<order ref="asserv_goto_waypoint">
+		<message dest="/drivers/ard_asserv/goto_action">
+			<param name="mode" type="int" preset="true">1</param>
+			<param name="position_waypoint" type="string"/>
+			<param name="direction" type="int">1</param>
+		</message>
+	</order>
 </orders>
