@@ -59,6 +59,8 @@ class Order(Task):
             except: pass
             try: result = res.response
             except: pass
+            try: result = res.result
+            except: pass
 
             try: reason = res.verbose_reason
             except: reason = ""

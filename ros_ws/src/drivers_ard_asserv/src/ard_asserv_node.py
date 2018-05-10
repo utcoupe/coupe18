@@ -292,6 +292,8 @@ class Asserv:
                     pos = self._srv_client_map_fill_waypoints.call(wpt).filled_waypoint.pose
                 else:
                     rospy.logwarn("[ASSERV] Received a waypoint request but memory_map seems not to be launched...")
+                    goal_handled.set_rejected()
+                    return
 
             if self._process_goto_order(self._goal_id_counter, goal_handled.get_goal().mode,
                                         pos.x, pos.y, pos.theta,
