@@ -158,9 +158,15 @@ waypoints:
     # ------------------
 
 
+    way_grape_1_approach1:
+        position:
+            frame_id: /map
+            x: 1.5
+            y: 1.25
+            a: 3.141592
+            type: fixed
 
-
-    way_grape_1_approach:
+    way_grape_1_approach2:
         position:
             frame_id: /map
             x: 1.13

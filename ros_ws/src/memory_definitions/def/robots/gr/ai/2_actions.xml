@@ -64,12 +64,17 @@
 		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
-				<waypoint_name>way_grape_1_approach</waypoint_name>
+				<waypoint_name>way_grape_1_approach1</waypoint_name>
+				<direction>0</direction>
+			</orderref>
+			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
+				<waypoint_name>way_grape_1_approach2</waypoint_name>
 				<direction>0</direction>
 			</orderref>
 
 			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
 				<waypoint_name>way_grape_1_accost</waypoint_name>
+				<direction>0</direction>
 			</orderref>
 
 			<orderref ref="navigator_goto_waypoint" name="push them to the zone">
