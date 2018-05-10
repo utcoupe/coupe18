@@ -157,40 +157,38 @@ waypoints:
 
     # ------------------
 
-
-    way_grape_1_approach1:
-        position:
-            frame_id: /map
-            x: 1.5
-            y: 1.25
-            a: 3.141592
-            type: fixed
-
-    way_grape_1_approach2:
+    way_grape_1_approach_1:
         position:
             frame_id: /map
             x: 1.13
-            y: 0.8
+            y: 1.5
+            a: 3.141592
+            type: fixed
+    way_grape_1_approach_2:
+        position:
+            frame_id: /map
+            x: 1.13
+            y: 1.0
             a: 3.141592
             type: fixed
     way_grape_1_accost:
         position:
             frame_id: /map
-            x: 0.95
-            y: 0.8
+            x: 0.850
+            y: 1.0
             a: -1.57079
             type: fixed
     way_grape_1_pushed:
         position:
             frame_id: /map
-            x: 0.75
+            x: 0.850
             y: 1.58
             a: -1.57079
             type: fixed
     way_grape_1_released:
         position:
             frame_id: /map
-            x: 0.75
+            x: 0.850
             y: 1.48
             a: -1.57079
             type: fixed
@@ -199,14 +197,14 @@ waypoints:
         position:
             frame_id: /map
             x: 0.75
-            y: 0.36
+            y: 0.46
             a: 0.0
             type: fixed
     way_grape_2_accost:
         position:
             frame_id: /map
-            x: 0.28
-            y: 0.36
+            x: 0.3
+            y: 0.56
             a: -1.57079
             type: fixed
     way_grape_2_pushed:

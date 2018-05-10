@@ -64,12 +64,13 @@
 		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
-				<waypoint_name>way_grape_1_approach1</waypoint_name>
-				<direction>0</direction>
+				<waypoint_name>way_grape_1_approach_1</waypoint_name>
+				<disable_collisions>1</disable_collisions>
+				<mode>0</mode>
 			</orderref>
 			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
-				<waypoint_name>way_grape_1_approach2</waypoint_name>
-				<direction>0</direction>
+				<waypoint_name>way_grape_1_approach_2</waypoint_name>
+				<mode>0</mode>
 			</orderref>
 
 			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
@@ -94,6 +95,7 @@
 		<actions exec="all" order="linear">
 			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
 				<waypoint_name>way_grape_2_approach</waypoint_name>
+				<mode>0</mode>
 			</orderref>
 
 			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">

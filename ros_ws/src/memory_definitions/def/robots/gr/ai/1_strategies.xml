@@ -55,12 +55,6 @@
 
 				<actionref ref="open_arm"/>
 
-				<orderref ref="navigator_goto_waypoint">
-					<waypoint_name>way_spawn_gr</waypoint_name>
-					<mode>0</mode>
-					<direction>0</direction>
-				</orderref>
-
 				<actionref ref="activate_bee"/>
 
 				<actionref ref="close_arm"/>
