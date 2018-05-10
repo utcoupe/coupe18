@@ -164,14 +164,14 @@ waypoints:
         position:
             frame_id: /map
             x: 1.13
-            y: 1.0
+            y: 0.8
             a: 3.141592
             type: fixed
     way_grape_1_accost:
         position:
             frame_id: /map
             x: 0.95
-            y: 1.0
+            y: 0.8
             a: -1.57079
             type: fixed
     way_grape_1_pushed:
@@ -193,14 +193,14 @@ waypoints:
         position:
             frame_id: /map
             x: 0.75
-            y: 0.46
+            y: 0.36
             a: 0.0
             type: fixed
     way_grape_2_accost:
         position:
             frame_id: /map
             x: 0.28
-            y: 0.46
+            y: 0.36
             a: -1.57079
             type: fixed
     way_grape_2_pushed:
