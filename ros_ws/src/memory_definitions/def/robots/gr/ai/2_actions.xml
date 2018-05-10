@@ -40,11 +40,11 @@
 			<orderref ref="asserv_pwm" name="accost button">
 				<left>-100</left>
 				<right>-100</right>
-				<duration>2000</duration>
+				<duration>1200</duration>
 			</orderref>
 
 			<orderref ref="delay">
-				<duration>2</duration>
+				<duration>1.2</duration>
 			</orderref>
 
 			<orderref ref="navigator_goto_waypoint" name="go back to approach">
@@ -59,8 +59,13 @@
 		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
-				<waypoint_name>way_grape_1_approach</waypoint_name>
-				<direction>0</direction>
+				<waypoint_name>way_grape_1_approach_1</waypoint_name>
+				<disable_collisions>1</disable_collisions>
+				<mode>0</mode>
+			</orderref>
+			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
+				<waypoint_name>way_grape_1_approach_2</waypoint_name>
+				<mode>0</mode>
 			</orderref>
 
 			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
@@ -84,6 +89,7 @@
 		<actions exec="all" order="linear">
 			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
 				<waypoint_name>way_grape_2_approach</waypoint_name>
+				<mode>0</mode>
 			</orderref>
 
 			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
@@ -104,14 +110,37 @@
 
 
 
-	<action ref="open_arm" name="Open arm">
+	<action ref="open_arm_wide" name="Open arm wide">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="arm_goto">
-				<frame_id>arm_origin</frame_id>
-				<x>0.1965</x>
-				<y>0</y>
+			<orderref ref="actuator_ax12_set_pos">
+				<motor_id>3</motor_id>
+				<position>530</position>
+			</orderref>
+		</actions>
+	</action>
+
+	<action ref="close_arm_slow" name="Close arm slow">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="actuator_ax12_set_pos">
+				<motor_id>3</motor_id>
+				<position>120</position>
+				<speed>250</speed>
+			</orderref>
+		</actions>
+	</action>
+
+	<action ref="open_arm_slow" name="Open arm slow">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="actuator_ax12_set_pos">
+				<motor_id>3</motor_id>
+				<position>530</position>
+				<speed>250</speed>
 			</orderref>
 		</actions>
 	</action>
@@ -121,48 +150,43 @@
 		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<orderref ref="actuator_ax12_set_pos">
-				<motor_id>1</motor_id>
-				<position>64</position>
-			</orderref>
-
-			<orderref ref="actuator_ax12_set_pos">
 				<motor_id>3</motor_id>
-				<position>314</position>
+				<position>120</position>
 			</orderref>
 		</actions>
 	</action>
 
-	<action ref="push_bee" name="Push bee">
-		<params></params>
-		<conditions></conditions>
-		<actions exec="all" order="linear">
-			<team name="green">
-				<orderref ref="actuator_ax12_set_pos">
-					<motor_id>1</motor_id>
-					<position>612</position>
-				</orderref>
+	<!--<action ref="push_bee" name="Push bee">-->
+		<!--<params></params>-->
+		<!--<conditions></conditions>-->
+		<!--<actions exec="all" order="linear">-->
+			<!--<team name="green">-->
+				<!--<orderref ref="actuator_ax12_set_pos">-->
+					<!--<motor_id>1</motor_id>-->
+					<!--<position>612</position>-->
+				<!--</orderref>-->
 
-				<orderref ref="actuator_ax12_set_pos">
-					<motor_id>3</motor_id>
-					<position>250</position>
-					<speed>150</speed>
-				</orderref>
-			</team>
+				<!--<orderref ref="actuator_ax12_set_pos">-->
+					<!--<motor_id>3</motor_id>-->
+					<!--<position>250</position>-->
+					<!--<speed>150</speed>-->
+				<!--</orderref>-->
+			<!--</team>-->
 
-			<team name="orange">
-				<orderref ref="actuator_ax12_set_pos">
-					<motor_id>1</motor_id>
-					<position>412</position>
-				</orderref>
+			<!--<team name="orange">-->
+				<!--<orderref ref="actuator_ax12_set_pos">-->
+					<!--<motor_id>1</motor_id>-->
+					<!--<position>412</position>-->
+				<!--</orderref>-->
 
-				<orderref ref="actuator_ax12_set_pos">
-					<motor_id>3</motor_id>
-					<position>660</position>
-					<speed>150</speed>
-				</orderref>
-			</team>
-		</actions>
-	</action>
+				<!--<orderref ref="actuator_ax12_set_pos">-->
+					<!--<motor_id>3</motor_id>-->
+					<!--<position>660</position>-->
+					<!--<speed>150</speed>-->
+				<!--</orderref>-->
+			<!--</team>-->
+		<!--</actions>-->
+	<!--</action>-->
 
 	<action ref="activate_bee" name="Activate bee" reward="50">
 		<params></params>
@@ -172,40 +196,48 @@
 				<orderref ref="navigator_goto_waypoint" name="approach bee">
 					<waypoint_name>way_bee_approach_green</waypoint_name>
 				</orderref>
+
+				<actionref ref="open_arm_wide" name="open arm" />
+
+				<orderref ref="navigator_goto_waypoint" name="accost bee">
+					<waypoint_name>way_bee_accost_green</waypoint_name>
+				</orderref>
+
+				<actionref ref="close_arm_slow" name="close arm" />
+
+				<orderref ref="navigator_goto_waypoint" name="accost bee">
+					<waypoint_name>way_bee_approach_green</waypoint_name>
+					<direction>0</direction>
+				</orderref>
 			</team>
 			<team name="orange">
 				<orderref ref="navigator_goto_waypoint" name="approach bee">
 					<waypoint_name>way_bee_approach_orange</waypoint_name>
 				</orderref>
-			</team>
 
-			<actionref ref="open_arm" name="open arm" />
-
-			<!--<orderref ref="actuator_set" name="lift arm">-->
-				<!--<name>arm_elevator</name>-->
-				<!--<preset>GO_UP</preset>-->
-			<!--</orderref>-->
-
-			<team name="green">
-				<orderref ref="navigator_goto_waypoint" name="accost bee">
-					<waypoint_name>way_bee_accost_green</waypoint_name>
-				</orderref>
-			</team>
-
-			<team name="orange">
 				<orderref ref="navigator_goto_waypoint" name="accost bee">
 					<waypoint_name>way_bee_accost_orange</waypoint_name>
 				</orderref>
+
+				<actionref ref="open_arm_slow" name="open arm" />
+
+				<orderref ref="delay">
+					<duration>0.5</duration>
+				</orderref>
+
+				<actionref ref="close_arm" name="close arm" />
+
+				<orderref ref="navigator_goto_waypoint" name="accost bee">
+					<waypoint_name>way_bee_approach_orange</waypoint_name>
+					<direction>0</direction>
+				</orderref>
 			</team>
 
-			<actionref ref="push_bee" duration="1.5"/>
-
-			<actionref ref="close_arm" name="open arm" />
-
-			<orderref ref="navigator_goto_waypoint" name="approach bee">
-				<waypoint_name>way_bee_approach</waypoint_name>
-				<direction>0</direction>
-			</orderref>
+			<!--<orderref ref="asserv_pwm" name="accost button">-->
+				<!--<left>150</left>-->
+				<!--<right>150</right>-->
+				<!--<duration>3000</duration>-->
+			<!--</orderref>-->
 		</actions>
 	</action>
 </actions>

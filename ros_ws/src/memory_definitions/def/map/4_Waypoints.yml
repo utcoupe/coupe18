@@ -17,8 +17,8 @@ waypoints:
     way_spawn_gr:
         position:
             frame_id: /map
-            x: 0.082 # TODO: get from CAO
-            y: 1.800 # TODO: get from CAO
+            x: 0.082
+            y: 1.800
             a: 0
             type: fixed
 
@@ -128,31 +128,31 @@ waypoints:
     way_bee_approach_green:
         position:
             frame_id: /map
-            x: 0.22
-            y: 0.4
+            x: 0.2665
+            y: 0.5
             a: -1.57079
             type: fixed
     way_bee_accost_green:
         position:
             frame_id: /map
-            x: 0.22
-            y: 0.188 #0.15 PR
+            x: 0.2665
+            y: 0.25
             a: -1.57079
             type: fixed
 
     way_bee_approach_orange:
         position:
             frame_id: /map
-            x: 2.78
-            y: 0.4
-            a: -1.57079
+            x: 0.74
+            y: 0.74
+            a: -2.356
             type: fixed
     way_bee_accost_orange:
         position:
             frame_id: /map
-            x: 2.78
-            y: 0.188 #0.15 PR
-            a: -1.57079
+            x: 0.305
+            y: 0.305
+            a: -2.356
             type: fixed
 
     # ------------------
