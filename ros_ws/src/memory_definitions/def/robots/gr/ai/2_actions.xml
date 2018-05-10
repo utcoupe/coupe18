@@ -18,6 +18,11 @@
 				<position_waypoint>way_spawn_gr</position_waypoint>
 			</orderref>
 
+			<orderref ref="actuator_set">
+				<name>arm_elevator</name>
+				<preset>GO_UP</preset>
+			</orderref>
+
 			<actionref ref="jack"/>
 
 			<orderref ref="timer_start">
@@ -137,6 +142,14 @@
 		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<team name="green">
+				<orderref ref="navigator_goto_waypoint" name="approach bee">
+					<waypoint_name>way_bee_approach_green</waypoint_name>
+					<direction>0</direction>
+				</orderref>
+				<orderref ref="navigator_goto_waypoint" name="accost bee">
+					<waypoint_name>way_bee_accost_green</waypoint_name>
+					<direction>0</direction>
+				</orderref>
 				<orderref ref="actuator_ax12_set_pos">
 					<motor_id>1</motor_id>
 					<position>612</position>
@@ -150,6 +163,14 @@
 			</team>
 
 			<team name="orange">
+				<orderref ref="navigator_goto_waypoint" name="approach bee">
+					<waypoint_name>way_bee_approach_orange</waypoint_name>
+					<direction>0</direction>
+				</orderref>
+				<orderref ref="navigator_goto_waypoint" name="accost bee">
+					<waypoint_name>way_bee_accost_orange</waypoint_name>
+					<direction>0</direction>
+				</orderref>
 				<orderref ref="actuator_ax12_set_pos">
 					<motor_id>1</motor_id>
 					<position>412</position>
