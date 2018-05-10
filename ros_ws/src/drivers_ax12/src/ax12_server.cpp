@@ -134,11 +134,11 @@ bool Ax12Server::handle_joint_goal(GoalHandle goal_handle) {
 
     success &= driver_.joint_mode(motor_id);
 
-    success &= driver_.write_register(motor_id, GOAL_POSITION, position);
     success &= driver_.write_register(motor_id, MOVING_SPEED, speed);
+    success &= driver_.write_register(motor_id, GOAL_POSITION, position);
 
     joint_goals_.push_back(goal_handle);
-    ROS_DEBUG_STREAM("Success setting goal and speed for motor " << static_cast<unsigned>(motor_id) << ", adding the goal to the list");
+    ROS_DEBUG_STREAM("Success " << success << " setting goal and speed for motor " << static_cast<unsigned>(motor_id) << ", adding the goal to the list");
 
     return success;
 }
@@ -172,8 +172,8 @@ bool Ax12Server::handle_wheel_goal(GoalHandle goal_handle) {
     }
 
     bool success = true;
-    success &= driver_.wheel_mode(motor_id);
     success &= driver_.write_register(motor_id, MOVING_SPEED, speed);
+    success &= driver_.wheel_mode(motor_id);
 
 
     result_.success = static_cast<unsigned char>(success);
@@ -191,6 +191,7 @@ void Ax12Server::main_loop(const ros::TimerEvent &) {
     uint8_t motor_id = 0;
     uint16_t curr_position = 0;
     uint32_t goal_position = 0;
+    uint16_t curr_speed = 0;
 
     for (auto it = joint_goals_.begin(); it != joint_goals_.end();) {
         motor_id = it->getGoal()->motor_id;
@@ -208,7 +209,7 @@ void Ax12Server::main_loop(const ros::TimerEvent &) {
             it = joint_goals_.erase(it);
             ROS_INFO_STREAM("AX-12 position goal " << goal_position << " succeeded for motor ID " << static_cast<unsigned>(motor_id));
 
-        } else if (ros::Time::now().toSec() - it->getGoalID().stamp.toSec() > MAX_STOP_TIME) {
+        } else if (ros::Time::now().toSec() - it->getGoalID().stamp.toSec() > MAX_STOP_TIME && it->getGoal()->speed == 0) {
             ROS_ERROR_STREAM("Motor has not reached the goal position, timeout reached ! curr_pos : " << curr_position
                     << ", goal_pos : " << goal_position);
 
@@ -363,8 +364,8 @@ Ax12Server::Ax12Server(const std::string &action_name, const std::string &servic
 
     status_services_ = std::make_unique<StatusServices>(
         "drivers", "ax12", [this](const ai_game_status::ArmRequest::ConstPtr &){
-            driver_.scan_motors();
-            driver_.toggle_torque(true);
+            driver_.scan_motors(); // TODO: uncomment and test if arm can be called while in game ???
+            // driver_.toggle_torque(true);
         });
 
     std::string port = fetch_port(PORT_FINDER_SERVICE);

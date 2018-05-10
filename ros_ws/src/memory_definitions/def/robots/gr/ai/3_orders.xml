@@ -44,7 +44,17 @@
 		<message dest="/drivers/ax12">
 			<param name="motor_id" type="int"/>
 			<param name="position" type="int"/> <!-- Set either a preset or param-->
+			<param name="speed" type="int" optional="true">0</param>
 			<param name="mode" type="int" preset="true">0</param>
+		</message>
+	</order>
+
+	<order ref="arm_goto" duration="1.5">
+		<message dest="/movement/actuators/arm">
+			<param name="frame_id" type="string"/>
+			<param name="x" type="float"/>
+			<param name="y" type="float"/>
+			<param name="timeout" type="float">10.0</param>
 		</message>
 	</order>
 
@@ -85,10 +95,26 @@
 
 	<order ref="navigator_goto_waypoint">
 		<message dest="/navigation/navigator/gotowaypoint_action">
-			<param name="mode" type="int" preset="true">1</param> <!-- 0 = GOTO, 1 = GOTOA -->
+			<param name="mode" type="int">1</param> <!-- 0 = GOTO, 1 = GOTOA -->
 			<param name="waypoint_name" type="string"/>
 			<param name="disable_collisions" type="bool" optional="true">0</param>
 			<param name="direction" type="int" optional="true">1</param>
+		</message>
+	</order>
+
+	<order ref="asserv_goto_waypoint">
+		<message dest="/drivers/ard_asserv/goto_action">
+			<param name="mode" type="int">1</param>
+			<param name="position_waypoint" type="string"/>
+			<param name="direction" type="int">1</param>
+		</message>
+	</order>
+
+	<order ref="asserv_pwm">
+		<message dest="/drivers/ard_asserv/pwm">
+			<param name="left" type="int"/>
+			<param name="right" type="int"/>
+			<param name="duration" type="int"/>
 		</message>
 	</order>
 </orders>

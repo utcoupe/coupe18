@@ -20,19 +20,16 @@
 		</actions_onfinish>
 	</strategy>
 
-	<strategy name="test_ax12">
+	<strategy name="test_button">
 		<actions name="In-Game Actions">
 			<actionref ref="game_start"/>
 
-			<actionlist name="Main actions" repeat="100">
-				<orderref ref="actuator_ax12_set_pos" duration="1.5">
-					<motor_id>3</motor_id>
-					<position>600</position>
-				</orderref>
+			<actionlist name="Main actions">
+				<actionref ref="activate_button"/>
 
-				<orderref ref="actuator_ax12_set_pos" duration="1.5">
-					<motor_id>3</motor_id>
-					<position>700</position>
+				<orderref ref="navigator_goto_waypoint">
+					<waypoint_name>way_spawn_gr</waypoint_name>
+					<direction>0</direction>
 				</orderref>
 			</actionlist>
 		</actions>
@@ -40,14 +37,24 @@
 		</actions_onfinish>
 	</strategy>
 
-	<strategy name="test_arm">
+	<strategy name="test_button_bee">
 		<actions name="In-Game Actions">
 			<actionref ref="game_start"/>
 
-			<actionlist name="Main actions" repeat="5">
-				<actionref ref="open_arm" duration="1.5"/>
+			<actionlist name="Main actions">
+				<actionref ref="activate_button"/>
 
-				<actionref ref="close_arm" duration="1.5"/>
+				<actionref ref="open_arm"/>
+
+				<orderref ref="navigator_goto_waypoint">
+					<waypoint_name>way_spawn_gr</waypoint_name>
+					<mode>0</mode>
+					<direction>0</direction>
+				</orderref>
+
+				<actionref ref="push_bee"/>
+
+				<actionref ref="close_arm"/>
 			</actionlist>
 		</actions>
 		<actions_onfinish name="After-Game Actions">

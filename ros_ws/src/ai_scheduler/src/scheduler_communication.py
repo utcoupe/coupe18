@@ -14,6 +14,7 @@ import ai_game_status.srv
 import ai_timer.srv
 import drivers_ard_hmi.msg
 import drivers_ard_asserv.srv
+import drivers_ard_asserv.msg
 import drivers_ax12.msg
 
 class RequestTypes(object):
@@ -44,6 +45,8 @@ class RequestTypes(object):
             "/movement/actuators/activate_canon":        (RequestTypes.SERVICE, movement_actuators.srv.ActivateCanon),
 
             "/drivers/ard_asserv/set_pos":       (RequestTypes.SERVICE, drivers_ard_asserv.srv.SetPos),
+            "/drivers/ard_asserv/pwm": (RequestTypes.SERVICE, drivers_ard_asserv.srv.Pwm),
+            "/drivers/ard_asserv/goto_action": (RequestTypes.ACTION, drivers_ard_asserv.msg.DoGotoAction, drivers_ard_asserv.msg.DoGotoGoal),
             "/drivers/ax12":                (RequestTypes.ACTION, drivers_ax12.msg.Ax12CommandAction, drivers_ax12.msg.Ax12CommandGoal),
 
             "/feedback/ard_hmi/ros_event":       (RequestTypes.PUB_MSG, drivers_ard_hmi.msg.ROSEvent),

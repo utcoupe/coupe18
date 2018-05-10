@@ -77,8 +77,8 @@
     <act name="arm_elevator" id="0" type="stepper" family="arduino">
         <timeout value="1000"/> <!-- Default timeout -->
         <positions default="0">
-            <preset name="GO_UP" value="1000" />
-            <preset name="GO_DOWN" value="-1000" />
+            <preset name="GO_UP" value="900 " />
+            <preset name="GO_DOWN" value="-900" />
         </positions>
     </act>
 </actuators>
