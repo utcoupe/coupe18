@@ -38,13 +38,13 @@
 			</orderref>
 
 			<orderref ref="asserv_pwm" name="accost button">
-				<left>100</left>
-				<right>100</right>
+				<left>-100</left>
+				<right>-100</right>
 				<duration>2000</duration>
 			</orderref>
 
 			<orderref ref="delay">
-				<duration>2.5</duration>
+				<duration>2</duration>
 			</orderref>
 
 			<orderref ref="navigator_goto_waypoint" name="go back to approach">
