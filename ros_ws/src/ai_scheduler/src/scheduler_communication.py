@@ -45,7 +45,7 @@ class RequestTypes(object):
             "/movement/actuators/activate_canon":        (RequestTypes.SERVICE, movement_actuators.srv.ActivateCanon),
 
             "/drivers/ard_asserv/set_pos":       (RequestTypes.SERVICE, drivers_ard_asserv.srv.SetPos),
-            "/drivers/ard_asserv/goto_action": (RequestTypes.ACTION, drivers_ard_asserv.msg.DoGotoAction, drivers_ard_asserv.msg.DoGotoActionGoal),
+            "/drivers/ard_asserv/goto_action": (RequestTypes.ACTION, drivers_ard_asserv.msg.DoGotoAction, drivers_ard_asserv.msg.DoGotoGoal),
             "/drivers/ax12":                (RequestTypes.ACTION, drivers_ax12.msg.Ax12CommandAction, drivers_ax12.msg.Ax12CommandGoal),
 
             "/feedback/ard_hmi/ros_event":       (RequestTypes.PUB_MSG, drivers_ard_hmi.msg.ROSEvent),
@@ -134,6 +134,7 @@ class AICommunication():
             rospy.logdebug("    Waiting for action server...")
             client.wait_for_server(timeout = rospy.Duration(2.0))
             rospy.logdebug("    Sending goal...")
+            rospy.logerr(params)
             client.send_goal(goal_class(**params))
             rospy.logdebug("    Waiting for result...")
             client.wait_for_result()
