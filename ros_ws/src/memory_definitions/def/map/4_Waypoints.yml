@@ -143,16 +143,16 @@ waypoints:
     way_bee_approach_orange:
         position:
             frame_id: /map
-            x: 0.2065
-            y: 0.4
-            a: -1.57079
+            x: 0.74
+            y: 0.74
+            a: -2.356
             type: fixed
     way_bee_accost_orange:
         position:
             frame_id: /map
-            x: 0.2065
-            y: 0.18
-            a: -1.57079
+            x: 0.305
+            y: 0.305
+            a: -2.356
             type: fixed
 
     # ------------------

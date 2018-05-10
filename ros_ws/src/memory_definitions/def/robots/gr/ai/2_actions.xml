@@ -206,11 +206,11 @@
 			</team>
 			<team name="orange">
 				<orderref ref="navigator_goto_waypoint" name="approach bee">
-					<waypoint_name>way_bee_approach_green</waypoint_name>
+					<waypoint_name>way_bee_approach_orange</waypoint_name>
 				</orderref>
 
 				<orderref ref="navigator_goto_waypoint" name="accost bee">
-					<waypoint_name>way_bee_accost_green</waypoint_name>
+					<waypoint_name>way_bee_accost_orange</waypoint_name>
 				</orderref>
 
 				<actionref ref="open_arm_slow" name="open arm" />
@@ -222,7 +222,7 @@
 				<actionref ref="close_arm" name="close arm" />
 
 				<orderref ref="navigator_goto_waypoint" name="accost bee">
-					<waypoint_name>way_bee_approach_green</waypoint_name>
+					<waypoint_name>way_bee_approach_orange</waypoint_name>
 					<direction>0</direction>
 				</orderref>
 			</team>
