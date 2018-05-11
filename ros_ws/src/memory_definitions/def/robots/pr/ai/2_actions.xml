@@ -115,13 +115,13 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<!--orderref ref="navigator_goto_waypoint" name="goto fire position">
-				<waypoint_name>way_fire_station</waypoint_name>
+			<orderref ref="navigator_goto_waypoint" name="goto fire position">
+				<waypoint_name>way_fire_unicolor</waypoint_name>
 				<direction>0</direction>
-			</orderref-->
+			</orderref>
 
 			<orderref ref="do_canon_action" name="activate canon">
-				<fire_distance>2.0</fire_distance>
+				<fire_distance>1.0</fire_distance>
 			</orderref>
 
 			<actionlist repeat="13">

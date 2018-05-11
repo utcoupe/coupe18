@@ -91,6 +91,14 @@ waypoints:
               a: 5.442
               type: fixed
 
+    way_fire_uni:
+          position:
+              frame_id: /map
+              x: 0.83
+              y: 1.67
+              a: 1.75
+              type: fixed
+
     way_station_approach:
         position:
             frame_id: /map
