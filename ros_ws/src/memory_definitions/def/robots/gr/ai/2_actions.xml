@@ -58,8 +58,8 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="navigator_goto_waypoint">
-				<waypoint_name>way_grape_1_approach</waypoint_name>
+			<orderref ref="asserv_goto_waypoint">
+				<position_waypoint>way_grape_1_approach</position_waypoint>
 				<direction>0</direction>
 			</orderref>
 

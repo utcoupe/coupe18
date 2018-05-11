@@ -52,4 +52,19 @@
 		<actions_onfinish name="After-Game Actions">
 		</actions_onfinish>
 	</strategy>
+
+	<strategy name="cube">
+		<actions name="In-Game Actions">
+			<orderref ref="delay" name="5 points bee loaded" reward="5"/>
+			<orderref ref="delay" name="5 points home installed" reward="5"/>
+
+			<actionref ref="game_start"/>
+
+			<actionlist name="Main actions">
+				<actionref ref="push_grape_1"/>
+			</actionlist>
+		</actions>
+		<actions_onfinish name="After-Game Actions">
+		</actions_onfinish>
+	</strategy>
 </strategies>
