@@ -25,7 +25,7 @@ uint8_t pins_pwm_actuators_pwm[NUM_PWM_ACTUATORS]       = {8};
 uint8_t pwm_actuators_states[NUM_PWM_ACTUATORS]         = {0};
 // Names : canon
 
-uint8_t pins_servo_actuators_pwm[NUM_SERVO_ACTUATORS]   = {9,  10, 11, 5, 6};
+uint8_t pins_servo_actuators_pwm[NUM_SERVO_ACTUATORS]   = {9,  10, 3, 5, 6};
 int16_t servo_actuators_states[NUM_SERVO_ACTUATORS]     = {10, 10, 10, 70, 100};
 // Names : servo_front_lift, servo_back_lift, servo_lock, servo_flipper_side_canon, servo_flipper_side_bin
 

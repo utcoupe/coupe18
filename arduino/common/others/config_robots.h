@@ -6,8 +6,8 @@
 #define ARDUINO_CONFIG_ROBOTS_H
 
 // You have to select a robot and only one !!!
-//#define PR_ROBOT
-#define GR_ROBOT
+#define PR_ROBOT
+//#define GR_ROBOT
 
 /*
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
