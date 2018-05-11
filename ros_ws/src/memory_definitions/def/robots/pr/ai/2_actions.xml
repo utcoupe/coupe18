@@ -208,10 +208,17 @@
 
 			<orderref ref="do_barrel_action">
 					<sort>1</sort>
-				</orderref>
+			</orderref>
+			<!-- add a tempo to let the ball go in the bin-->
+			<orderref ref="delay">
+				<duration>0.5</duration>
+			</orderref>
 			<orderref ref="actuator_set" name="front lift bin">
 				<name>servo_front_lift</name>
 				<preset>OPEN</preset>
+			</orderref>
+			<orderref ref="delay">
+				<duration>0.1</duration>
 			</orderref>
 			<orderref ref="actuator_set" name="back lift bin">
 				<name>servo_back_lift</name>
@@ -223,6 +230,9 @@
 			<orderref ref="actuator_set" name="front lift bin">
 				<name>servo_front_lift</name>
 				<preset>CLOSE</preset>
+			</orderref>
+			<orderref ref="delay">
+				<duration>0.1</duration>
 			</orderref>
 			<orderref ref="actuator_set" name="back lift bin">
 				<name>servo_back_lift</name>
