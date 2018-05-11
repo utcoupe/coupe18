@@ -69,8 +69,8 @@
     </act>
     <act name="barrel" id="6" type="ax12" family="ax12">
         <timeout value="1500"/> <!-- Default timeout -->
-        <positions default="450">
-            <preset name="HIGH" value="450" />
+        <positions default="500">
+            <preset name="HIGH" value="500" />
             <preset name="CANON" value="850" />
             <preset name="BIN" value="250" />
         </positions>

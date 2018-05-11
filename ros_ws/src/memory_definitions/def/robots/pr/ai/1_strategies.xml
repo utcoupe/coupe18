@@ -38,7 +38,7 @@
 
 			<actionlist name="Main actions">
 				<actionlist name="Do unicolor distributor">
-					<actionref ref="load_unicolor_distributor"/>
+					<!--actionref ref="load_unicolor_distributor"/-->
 					<actionref ref="fire_full_clean_balls"/>
 				</actionlist>
 			</actionlist>
