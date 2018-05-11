@@ -154,7 +154,7 @@
 				<fire_distance>0.9</fire_distance>
 			</orderref>
 
-			<actionlist repeat="13">
+			<actionlist repeat="10">
 				<orderref ref="do_barrel_action">
 					<sort>0</sort>
 				</orderref>
