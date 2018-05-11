@@ -199,6 +199,39 @@
 		</actions>
 	</action>
 
+	<!-- this action supposes that the robot is already near a station -->
+	<action ref="unload_ball_in_station" name="Unload one ball to the station" reward="5">
+		<!--reward is set to 5 because we unload all balls (good and bad ones) so the mean value of unloading one ball is 5 points-->
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+
+			<orderref ref="do_barrel_action">
+					<sort>1</sort>
+				</orderref>
+			<orderref ref="actuator_set" name="front lift bin">
+				<name>servo_front_lift</name>
+				<preset>OPEN</preset>
+			</orderref>
+			<orderref ref="actuator_set" name="back lift bin">
+				<name>servo_back_lift</name>
+				<preset>OPEN</preset>
+			</orderref>
+			<orderref ref="delay">
+				<duration>1</duration>
+			</orderref>
+			<orderref ref="actuator_set" name="front lift bin">
+				<name>servo_front_lift</name>
+				<preset>CLOSE</preset>
+			</orderref>
+			<orderref ref="actuator_set" name="back lift bin">
+				<name>servo_back_lift</name>
+				<preset>CLOSE</preset>
+			</orderref>
+
+		</actions>
+	</action>
+
 	<action ref="activate_bee" name="Activate bee" reward="50">
 		<params></params>
 		<conditions></conditions>

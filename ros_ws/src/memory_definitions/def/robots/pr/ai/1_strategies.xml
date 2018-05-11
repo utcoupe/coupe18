@@ -53,4 +53,18 @@
 		<actions_onfinish name="After-Game Actions">
 		</actions_onfinish>
 	</strategy>
+
+	<strategy name="bin_test">
+		<actions name="In-Game Actions">
+			<actionref ref="game_start"/>
+			<actionlist name="Main actions">
+				<actionlist name="Do unload a ball in bin">
+					<actionref ref="unload_ball_in_station"/>
+				</actionlist>
+			</actionlist>
+		</actions>
+		<actions_onfinish name="After-Game Actions">
+		</actions_onfinish>
+	</strategy>
+
 </strategies>

@@ -77,6 +77,9 @@ class ActuatorsBarrel(ActuatorsAbstract):
         if not goal.sort:
             rospy.logdebug('Starting goal chain with no sort')
             self._start_goal_chain(self.PRESET_CANON)
+        else:
+            rospy.logdebug('Starting goal chain for the bin')
+            self._start_goal_chain(self.PRESET_BIN)
 
         return True
 
