@@ -22,6 +22,7 @@ Pathfinder::Pathfinder(const string& mapFileName, shared_ptr<PosConvertor> conve
         _convertor = convertor;
         _convertor->setSizes(tableSize, make_pair<double,double>(_allowedPositions.front().size(), _allowedPositions.size()));
         _dynBarriersMng->setConvertor(_convertor);
+        _dynBarriersMng->fetchOccupancyDatas(_allowedPositions.front().size(), _allowedPositions.size());
     }
 }
 
@@ -36,7 +37,7 @@ bool Pathfinder::findPath(const Point& startPos, const Point& endPos, Path& path
         ROS_ERROR("Allowed positions is empty. Did you load the file?");
         return false;
     }
-    
+
     _dynBarriersMng->fetchOccupancyDatas(_allowedPositions.front().size(), _allowedPositions.size());
     
     auto startTime = chrono::high_resolution_clock::now();

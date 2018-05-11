@@ -54,36 +54,23 @@
 		</actions>
 	</action>
 
-	<action ref="push_grape_1" name="Simply push grape 1 cubes to the zone" reward="25">
+	<action ref="push_grape_1" name="Simply push grape 1 cubes to the zone" reward="5">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
-				<waypoint_name>way_grape_1_approach_1</waypoint_name>
-				<disable_collisions>1</disable_collisions>
-				<mode>0</mode>
-			</orderref>
-			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
-				<waypoint_name>way_grape_1_approach_2</waypoint_name>
-				<mode>0</mode>
-			</orderref>
-
-			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
-				<waypoint_name>way_grape_1_accost</waypoint_name>
-			</orderref>
-
-			<orderref ref="navigator_goto_waypoint" name="push them to the zone">
-				<waypoint_name>way_grape_1_pushed</waypoint_name>
+			<orderref ref="asserv_goto_waypoint">
+				<position_waypoint>way_grape_1_approach</position_waypoint>
 				<direction>0</direction>
 			</orderref>
 
-			<orderref ref="navigator_goto_waypoint" name="push them to the zone">
-				<waypoint_name>way_grape_1_released</waypoint_name>
+			<orderref ref="asserv_goto_waypoint">
+				<position_waypoint>way_grape_1_accost</position_waypoint>
+				<direction>0</direction>
 			</orderref>
 		</actions>
 	</action>
 
-	<action ref="push_grape_2" name="Simply push grape 2 cubes to the zone" reward="25">
+	<action ref="push_grape_2" name="Simply push grape 2 cubes to the zone" reward="5">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -128,7 +115,7 @@
 			<orderref ref="actuator_ax12_set_pos">
 				<motor_id>3</motor_id>
 				<position>120</position>
-				<speed>250</speed>
+				<speed>170</speed>
 			</orderref>
 		</actions>
 	</action>
@@ -139,8 +126,8 @@
 		<actions exec="all" order="linear">
 			<orderref ref="actuator_ax12_set_pos">
 				<motor_id>3</motor_id>
-				<position>530</position>
-				<speed>250</speed>
+				<position>610</position>
+				<speed>180</speed>
 			</orderref>
 		</actions>
 	</action>

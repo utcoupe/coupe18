@@ -17,7 +17,7 @@ waypoints:
     way_spawn_gr:
         position:
             frame_id: /map
-            x: 0.082
+            x: 0.088
             y: 1.800
             a: 0
             type: fixed
@@ -25,7 +25,7 @@ waypoints:
     way_spawn_pr:
         position:
             frame_id: /map
-            x: 0.155
+            x: 0.161
             y: 1.515
             a: -1.5707
             type: fixed
@@ -34,10 +34,10 @@ waypoints:
         position:
             frame_id: /map
             x: 1.13
-            y: 1.800 #1.65 PR
+            y: 1.772 #1.65 PR
             a: -1.57079
             type: fixed
-    way_button_accost:
+    way_button_accost: # not used (pwm)
         position:
             frame_id: /map
             x: 1.13
@@ -158,39 +158,33 @@ waypoints:
     way_bee_accost_orange:
         position:
             frame_id: /map
-            x: 0.305
-            y: 0.305
+            x: 0.285
+            y: 0.285
             a: -2.356
             type: fixed
 
     # ------------------
 
-    way_grape_1_approach_1:
+    way_grape_1_approach:
         position:
             frame_id: /map
-            x: 1.13
-            y: 1.5
-            a: 3.141592
+            x: 0.850
+            y: 0.8
+            a: -1.57079
             type: fixed
-    way_grape_1_approach_2:
-        position:
-            frame_id: /map
-            x: 1.13
-            y: 1.0
-            a: 3.141592
-            type: fixed
+
     way_grape_1_accost:
         position:
             frame_id: /map
             x: 0.850
-            y: 1.0
+            y: 0.83
             a: -1.57079
             type: fixed
     way_grape_1_pushed:
         position:
             frame_id: /map
             x: 0.850
-            y: 1.58
+            y: 1.78
             a: -1.57079
             type: fixed
     way_grape_1_released:
@@ -219,7 +213,7 @@ waypoints:
         position:
             frame_id: /map
             x: 0.6
-            y: 1.58
+            y: 1.78
             a: -1.57079
             type: fixed
     way_grape_2_released:
