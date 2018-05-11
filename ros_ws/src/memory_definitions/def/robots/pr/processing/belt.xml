@@ -17,12 +17,12 @@
     <sensor id="sensor1" type="pololu"> <!-- x, y in meters, a in rad -->
       <x>0.125</x>
       <y>0.073</y>
-      <a>0.0</a>
+      <a>3.1415</a>
     </sensor>
     <sensor id="sensor2" type="pololu"> <!-- x, y in meters, a in rad -->
       <x>0.125</x>
       <y>-0.047</y>
-      <a>0.0</a>
+      <a>3.1415</a>
     </sensor>
   </sensors>
 </belt>

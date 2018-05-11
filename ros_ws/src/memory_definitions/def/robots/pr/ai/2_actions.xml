@@ -53,7 +53,7 @@
 		<actions exec="all" order="linear">
 			<orderref ref="navigator_goto_waypoint" name="approach distributor">>
 				<waypoint_name>way_uni_distrib_approach</waypoint_name>
-				<direction>0</direction>
+				<direction>1</direction>
 			</orderref>
 
 			<orderref ref="actuator_set" name="activate button with servo">
@@ -63,6 +63,8 @@
 
 			<orderref ref="navigator_goto_waypoint" name="accost distributor">
 				<waypoint_name>way_uni_distrib_accost</waypoint_name>
+				<direction>0</direction>
+				<disable_collisions>1</disable_collisions>
 			</orderref>
 
 			<orderref ref="actuator_set" name="activate button with servo">

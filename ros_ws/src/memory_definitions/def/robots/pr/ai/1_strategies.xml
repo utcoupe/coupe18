@@ -47,4 +47,17 @@
 		<actions_onfinish name="After-Game Actions">
 		</actions_onfinish>
 	</strategy>
+
+	<strategy name="Load unidistrib =)">
+		<actions name="In-Game Actions">
+			<actionref ref="game_start"/>
+			<actionlist name="Main actions">
+				<actionlist name="Do unicolor distributor">
+					<actionref ref="load_unicolor_distributor"/>
+				</actionlist>
+			</actionlist>
+		</actions>
+		<actions_onfinish name="After-Game Actions">
+		</actions_onfinish>
+	</strategy>
 </strategies>
