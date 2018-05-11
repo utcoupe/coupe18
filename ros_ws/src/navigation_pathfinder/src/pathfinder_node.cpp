@@ -47,9 +47,9 @@ int main (int argc, char* argv[])
     convertor->setInvertedY(true);
     
     auto dynBarriersMng = make_shared<DynamicBarriersManager>();
-    auto mapSubscriber = constructSubscriber<MapSubscriber>(nodeHandle, MAP_GET_OBJECTS_SERVER);
-    mapSubscriber->setConvertor(convertor);
-    dynBarriersMng->addBarrierSubscriber(std::move(mapSubscriber));
+    // auto mapSubscriber = constructSubscriber<MapSubscriber>(nodeHandle, MAP_GET_OBJECTS_SERVER);
+    // mapSubscriber->setConvertor(convertor);
+    // dynBarriersMng->addBarrierSubscriber(std::move(mapSubscriber));
     dynBarriersMng->addBarrierSubscriber(constructSubscriber<ObjectsClassifierSubscriber>(nodeHandle, OBJECTS_CLASSIFIER_TOPIC));
     
     Pathfinder pathfinder(MAP_FILE_NAME, convertor, TABLE_SIZE, dynBarriersMng);
