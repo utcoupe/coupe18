@@ -70,7 +70,7 @@ class AsservReal(AsservAbstract):
 
     def goto(self, goal_id, x, y, direction):
         if self._check_reached_position(x, y, False):
-            self._node.goal_reached(goal_id, True)
+            self._oneshot_timer = rospy.Timer(rospy.Duration(0.1), lambda: self._node.goal_reached(goal_id, True), oneshot=True)
             return True
 
         if direction == 0: # bugfix: -1 = BACKWARD, 0 = ANY
@@ -82,7 +82,7 @@ class AsservReal(AsservAbstract):
 
     def gotoa(self, goal_id, x, y, a, direction):
         if self._check_reached_angle(a, False) and self._check_reached_position(x, y, GOTOA_POS_ERROR_MULTIPLIER, False):
-            self._node.goal_reached(goal_id, True)
+            self._oneshot_timer = rospy.Timer(rospy.Duration(0.1), lambda: self._node.goal_reached(goal_id, True), oneshot=True)
             return True
 
         if direction == 0: # bugfix: -1 = BACKWARD, 0 = ANY
@@ -94,7 +94,7 @@ class AsservReal(AsservAbstract):
 
     def rot(self, goal_id, a, no_modulo):
         if self._check_reached_angle(a, False):
-            self._node.goal_reached(goal_id, True)
+            self._oneshot_timer = rospy.Timer(rospy.Duration(0.1), lambda: self._node.goal_reached(goal_id, True), oneshot=True)
             return True
 
         if no_modulo:

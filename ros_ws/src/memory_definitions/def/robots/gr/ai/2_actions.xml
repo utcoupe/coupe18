@@ -67,11 +67,6 @@
 				<position_waypoint>way_grape_1_accost</position_waypoint>
 				<direction>0</direction>
 			</orderref>
-
-			<orderref ref="asserv_goto_waypoint">
-				<position_waypoint>way_grape_1_pushed</position_waypoint>
-				<direction>0</direction>
-			</orderref>
 		</actions>
 	</action>
 
