@@ -91,7 +91,7 @@ waypoints:
               a: 5.442
               type: fixed
 
-    way_fire_uni:
+    way_fire_unicolor:
           position:
               frame_id: /map
               x: 0.83
