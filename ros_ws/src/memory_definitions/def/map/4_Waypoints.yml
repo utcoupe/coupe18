@@ -150,8 +150,8 @@ waypoints:
     way_bee_accost_orange:
         position:
             frame_id: /map
-            x: 0.305
-            y: 0.305
+            x: 0.285
+            y: 0.285
             a: -2.356
             type: fixed
 
