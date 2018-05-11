@@ -13,8 +13,8 @@
 			<actionref ref="game_start"/>
 
 			<actionlist name="Main actions">
-				<actionref ref="activate_button"/>
-				<actionref ref="activate_bee"/>
+				<!--<actionref ref="activate_button"/>-->
+				<!--<actionref ref="activate_bee"/>-->
 				<actionref ref="get_cubes"/>
 			</actionlist>
 		</actions>
