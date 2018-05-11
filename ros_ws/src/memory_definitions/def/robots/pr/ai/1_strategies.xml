@@ -6,22 +6,17 @@
 
 	<strategy name="load_fire_bin_then_load_fire">
 		<actions name="In-Game Actions">
-
-
 			<actionref ref="game_start"/>
-
 			<actionlist name="Main actions">
 				<actionlist name="Do unicolor distributor">
 					<actionref ref="load_unicolor_distributor"/>
 					<actionref ref="fire_unicolor_balls"/>
 				</actionlist>
 				<actionlist name="Do multicolor distributor">
-                                        <actionref ref="load_multicolor_distributor"/>
-                                        <!--actionref ref="fire_full_clean_balls"/-->
-                                        <!--actionref ref="unload_dirty_balls"/-->
-                                </actionlist>
-
-
+					<actionref ref="load_multicolor_distributor"/>
+					<!--actionref ref="fire_full_clean_balls"/-->
+					<!--actionref ref="unload_dirty_balls"/-->
+				</actionlist>
 				<orderref ref="delay" name="10 points no game over" reward="10"/>
 				<actionref ref="goto_spawn"/>
 			</actionlist>
