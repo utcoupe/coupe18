@@ -13,7 +13,6 @@
 				<actionref ref="activate_button"/>
 				<actionref ref="activate_bee"/>
 				<actionref ref="push_grape_1"/>
-				<actionref ref="push_grape_2"/>
 			</actionlist>
 		</actions>
 		<actions_onfinish name="After-Game Actions">

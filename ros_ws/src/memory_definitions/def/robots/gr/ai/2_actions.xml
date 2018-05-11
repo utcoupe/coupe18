@@ -58,27 +58,19 @@
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
-				<waypoint_name>way_grape_1_approach_1</waypoint_name>
-				<disable_collisions>1</disable_collisions>
-				<mode>0</mode>
-			</orderref>
-			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
-				<waypoint_name>way_grape_1_approach_2</waypoint_name>
-				<mode>0</mode>
-			</orderref>
-
-			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
-				<waypoint_name>way_grape_1_accost</waypoint_name>
-			</orderref>
-
-			<orderref ref="navigator_goto_waypoint" name="push them to the zone">
-				<waypoint_name>way_grape_1_pushed</waypoint_name>
+			<orderref ref="navigator_goto_waypoint">
+				<waypoint_name>way_grape_1_approach</waypoint_name>
 				<direction>0</direction>
 			</orderref>
 
-			<orderref ref="navigator_goto_waypoint" name="push them to the zone">
-				<waypoint_name>way_grape_1_released</waypoint_name>
+			<orderref ref="navigator_goto_waypoint">
+				<waypoint_name>way_grape_1_accost</waypoint_name>
+				<direction>0</direction>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint">
+				<position_waypoint>way_grape_1_pushed</position_waypoint>
+				<direction>0</direction>
 			</orderref>
 		</actions>
 	</action>
@@ -197,13 +189,13 @@
 					<waypoint_name>way_bee_approach_green</waypoint_name>
 				</orderref>
 
-				<actionref ref="open_arm_wide" name="open arm" />
+				<!--<actionref ref="open_arm_wide" name="open arm" />-->
 
 				<orderref ref="navigator_goto_waypoint" name="accost bee">
 					<waypoint_name>way_bee_accost_green</waypoint_name>
 				</orderref>
 
-				<actionref ref="close_arm_slow" name="close arm" />
+				<!--<actionref ref="close_arm_slow" name="close arm" />-->
 
 				<orderref ref="navigator_goto_waypoint" name="accost bee">
 					<waypoint_name>way_bee_approach_green</waypoint_name>
@@ -219,13 +211,13 @@
 					<waypoint_name>way_bee_accost_orange</waypoint_name>
 				</orderref>
 
-				<actionref ref="open_arm_slow" name="open arm" />
+				<!--<actionref ref="open_arm_slow" name="open arm" />-->
 
 				<orderref ref="delay">
 					<duration>0.5</duration>
 				</orderref>
 
-				<actionref ref="close_arm" name="close arm" />
+				<!--<actionref ref="close_arm" name="close arm" />-->
 
 				<orderref ref="navigator_goto_waypoint" name="accost bee">
 					<waypoint_name>way_bee_approach_orange</waypoint_name>
