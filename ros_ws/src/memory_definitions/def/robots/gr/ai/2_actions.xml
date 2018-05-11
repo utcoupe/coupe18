@@ -63,8 +63,8 @@
 				<direction>0</direction>
 			</orderref>
 
-			<orderref ref="navigator_goto_waypoint">
-				<waypoint_name>way_grape_1_accost</waypoint_name>
+			<orderref ref="asserv_goto_waypoint">
+				<position_waypoint>way_grape_1_accost</position_waypoint>
 				<direction>0</direction>
 			</orderref>
 
@@ -189,13 +189,13 @@
 					<waypoint_name>way_bee_approach_green</waypoint_name>
 				</orderref>
 
-				<!--<actionref ref="open_arm_wide" name="open arm" />-->
+				<actionref ref="open_arm_wide" name="open arm" />
 
 				<orderref ref="navigator_goto_waypoint" name="accost bee">
 					<waypoint_name>way_bee_accost_green</waypoint_name>
 				</orderref>
 
-				<!--<actionref ref="close_arm_slow" name="close arm" />-->
+				<actionref ref="close_arm_slow" name="close arm" />
 
 				<orderref ref="navigator_goto_waypoint" name="accost bee">
 					<waypoint_name>way_bee_approach_green</waypoint_name>
@@ -211,13 +211,13 @@
 					<waypoint_name>way_bee_accost_orange</waypoint_name>
 				</orderref>
 
-				<!--<actionref ref="open_arm_slow" name="open arm" />-->
+				<actionref ref="open_arm_slow" name="open arm" />
 
 				<orderref ref="delay">
 					<duration>0.5</duration>
 				</orderref>
 
-				<!--<actionref ref="close_arm" name="close arm" />-->
+				<actionref ref="close_arm" name="close arm" />
 
 				<orderref ref="navigator_goto_waypoint" name="accost bee">
 					<waypoint_name>way_bee_approach_orange</waypoint_name>
