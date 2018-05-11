@@ -40,9 +40,9 @@
     </act>
     <act name="servo_flipper_side_canon" id="3" type="servo" family="arduino">
         <timeout value="500"/> <!-- Default timeout -->
-        <positions default="70">
-            <preset name="MIN" value="70" />
-            <preset name="MAX" value="150" />
+        <positions default="15">
+            <preset name="MIN" value="15" />
+            <preset name="MAX" value="90" />
         </positions>
     </act>
     <act name="servo_flipper_side_bin" id="4" type="servo" family="arduino">
