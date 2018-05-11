@@ -24,7 +24,8 @@ const string                NODE_NAME                   = "pathfinder";
 
 const string                FINDPATH_SERVICE_NAME       = "/" + NAMESPACE_NAME + "/" + NODE_NAME + "/find_path";
 const pair<double, double>  TABLE_SIZE                  = {3.0, 2.0}; // Scale corresponding to messages received by the node
-const string                MAP_FILE_NAME               = string(getenv ("UTCOUPE_WORKSPACE")) + "/ros_ws/src/memory_map/src/occupancy/img/layer_pathfinder.bmp"; //"/ros_ws/src/navigation_pathfinder/def/map.bmp";
+const string                PR_MAP_FILE_NAME               = string(getenv ("UTCOUPE_WORKSPACE")) + "/ros_ws/src/memory_map/src/occupancy/img/layer_ground.bmp"; //"/ros_ws/src/navigation_pathfinder
+const string                GR_MAP_FILE_NAME               = string(getenv ("UTCOUPE_WORKSPACE")) + "/ros_ws/src/memory_map/src/occupancy/img/layer_pathfinder.bmp"; //"/ros_ws/src/navigation_pathfinder/def/map.bmp";
 
 const size_t                SIZE_MAX_QUEUE              = 10;
 const double                SAFETY_MARGIN               = 0.15;
@@ -34,14 +35,21 @@ const string                OBJECTS_CLASSIFIER_TOPIC    = "/recognition/objects_
 template<typename T>
 unique_ptr<T> constructSubscriber(ros::NodeHandle& nodeHandle, const string& topic);
 
+string fetchRobotName(ros::NodeHandle& nodeHandle);
+
 int main (int argc, char* argv[])
 {
     ros::init(argc, argv, "pathfinder_node");
     
-    ROS_INFO_STREAM("Starting pathfinder with map \"" + MAP_FILE_NAME + "\"...");
-    
 //     ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
     ros::NodeHandle nodeHandle;
+    
+    auto robotName = fetchRobotName(nodeHandle);
+    string mapPath = GR_MAP_FILE_NAME;
+    if (robotName == "pr")
+        mapPath = PR_MAP_FILE_NAME;
+    
+    ROS_INFO_STREAM("Starting pathfinder with map \"" + mapPath + "\"...");
     
     auto convertor = make_shared<PosConvertor>();
     convertor->setInvertedY(true);
@@ -54,7 +62,7 @@ int main (int argc, char* argv[])
 
     ros::service::waitForService(MAP_GET_OBJECTS_SERVER, 20000);
 
-    Pathfinder pathfinder(MAP_FILE_NAME, convertor, TABLE_SIZE, dynBarriersMng);
+    Pathfinder pathfinder(mapPath, convertor, TABLE_SIZE, dynBarriersMng);
     ros::ServiceServer findPathServer = nodeHandle.advertiseService(FINDPATH_SERVICE_NAME, &Pathfinder::findPathCallback, &pathfinder);
     
     dynamic_reconfigure::Server<navigation_pathfinder::PathfinderNodeConfig> server;
@@ -79,3 +87,14 @@ unique_ptr<T> constructSubscriber(ros::NodeHandle& nodeHandle, const string& top
     return subscriber;
 }
 
+
+string fetchRobotName(ros::NodeHandle& nodeHandle)
+{
+    string robot_name; // TODO use C++17 init in if statement
+    if (!nodeHandle.getParam("/robot", robot_name))
+    {
+        ROS_WARN("Error when trying to get '/robot' param. Falling back to default name \"gr\".");
+        return "gr";
+    }
+    return robot_name;
+}
