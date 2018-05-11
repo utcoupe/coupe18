@@ -199,8 +199,23 @@
 		</actions>
 	</action>
 
+	<action ref="accost_station" name="Accost the station in prevision to unload">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="navigator_goto_waypoint" name="approach station">
+				<waypoint_name>way_station_approach</waypoint_name>
+			</orderref>
+
+			<orderref ref="navigator_goto_waypoint" name="accost station">
+				<waypoint_name>way_station_accost</waypoint_name>
+				<direction>1</direction>
+			</orderref>
+		</actions>
+	</action>
+
 	<!-- this action supposes that the robot is already near a station -->
-	<action ref="unload_ball_in_station" name="Unload one ball to the station" reward="5">
+	<action ref="unload_ball_in_station" name="Unload one ball to the station">
 		<!--reward is set to 5 because we unload all balls (good and bad ones) so the mean value of unloading one ball is 5 points-->
 		<params></params>
 		<conditions></conditions>
@@ -209,35 +224,36 @@
 			<orderref ref="do_barrel_action">
 					<sort>1</sort>
 			</orderref>
-			<!-- add a tempo to let the ball go in the bin-->
-			<orderref ref="delay">
-				<duration>0.5</duration>
-			</orderref>
-			<orderref ref="actuator_set" name="front lift bin">
-				<name>servo_front_lift</name>
-				<preset>OPEN</preset>
-			</orderref>
-			<orderref ref="delay">
-				<duration>0.1</duration>
-			</orderref>
-			<orderref ref="actuator_set" name="back lift bin">
-				<name>servo_back_lift</name>
-				<preset>OPEN</preset>
-			</orderref>
-			<orderref ref="delay">
-				<duration>1</duration>
-			</orderref>
-			<orderref ref="actuator_set" name="front lift bin">
-				<name>servo_front_lift</name>
-				<preset>CLOSE</preset>
-			</orderref>
-			<orderref ref="delay">
-				<duration>0.1</duration>
-			</orderref>
-			<orderref ref="actuator_set" name="back lift bin">
-				<name>servo_back_lift</name>
-				<preset>CLOSE</preset>
-			</orderref>
+			<!-- useless because the bin has been removed ! -->
+			<!--&lt;!&ndash; add a tempo to let the ball go in the bin&ndash;&gt;-->
+			<!--<orderref ref="delay">-->
+				<!--<duration>0.5</duration>-->
+			<!--</orderref>-->
+			<!--<orderref ref="actuator_set" name="front lift bin">-->
+				<!--<name>servo_front_lift</name>-->
+				<!--<preset>OPEN</preset>-->
+			<!--</orderref>-->
+			<!--<orderref ref="delay">-->
+				<!--<duration>0.1</duration>-->
+			<!--</orderref>-->
+			<!--<orderref ref="actuator_set" name="back lift bin">-->
+				<!--<name>servo_back_lift</name>-->
+				<!--<preset>OPEN</preset>-->
+			<!--</orderref>-->
+			<!--<orderref ref="delay">-->
+				<!--<duration>1</duration>-->
+			<!--</orderref>-->
+			<!--<orderref ref="actuator_set" name="front lift bin">-->
+				<!--<name>servo_front_lift</name>-->
+				<!--<preset>CLOSE</preset>-->
+			<!--</orderref>-->
+			<!--<orderref ref="delay">-->
+				<!--<duration>0.1</duration>-->
+			<!--</orderref>-->
+			<!--<orderref ref="actuator_set" name="back lift bin">-->
+				<!--<name>servo_back_lift</name>-->
+				<!--<preset>CLOSE</preset>-->
+			<!--</orderref>-->
 
 		</actions>
 	</action>
