@@ -51,7 +51,9 @@ int main (int argc, char* argv[])
     mapSubscriber->setConvertor(convertor);
     dynBarriersMng->addBarrierSubscriber(std::move(mapSubscriber));
     dynBarriersMng->addBarrierSubscriber(constructSubscriber<ObjectsClassifierSubscriber>(nodeHandle, OBJECTS_CLASSIFIER_TOPIC));
-    
+
+    ros::service::waitForService(MAP_GET_OBJECTS_SERVER, 5000);
+
     Pathfinder pathfinder(MAP_FILE_NAME, convertor, TABLE_SIZE, dynBarriersMng);
     ros::ServiceServer findPathServer = nodeHandle.advertiseService(FINDPATH_SERVICE_NAME, &Pathfinder::findPathCallback, &pathfinder);
     
