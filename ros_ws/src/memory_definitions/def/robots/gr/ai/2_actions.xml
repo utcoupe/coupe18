@@ -236,4 +236,27 @@
 			<!--</orderref>-->
 		</actions>
 	</action>
+
+	<action ref="get_cubes">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="asserv_goto_waypoint">
+				<position_waypoint>way_cube_close_bee</position_waypoint>
+				<direction>0</direction>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint">
+				<position_waypoint>way_past_cube_1</position_waypoint>
+				<direction>1</direction>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint">
+				<position_waypoint>way_past_cube_2</position_waypoint>
+				<direction>1</direction>
+			</orderref>
+		</actions>
+	</action>
+
+
 </actions>

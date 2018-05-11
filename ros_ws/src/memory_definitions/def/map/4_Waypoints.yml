@@ -223,3 +223,29 @@ waypoints:
             y: 1.48
             a: -1.57079
             type: fixed
+
+
+
+    way_cube_close_bee:
+        position:
+            frame_id: /map
+            x: 0.3
+            y: 0.5
+            a: 0
+            type: fixed
+
+    way_past_cube_1:
+        position:
+            frame_id: /map
+            x: 0.3
+            y: 1.35
+            a: 0
+            type: fixed
+
+    way_past_cube_2:
+        position:
+            frame_id: /map
+            x: 0.6
+            y: 1.84
+            a: 0
+            type: fixed

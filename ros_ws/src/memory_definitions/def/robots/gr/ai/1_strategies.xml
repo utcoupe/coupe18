@@ -15,7 +15,7 @@
 			<actionlist name="Main actions">
 				<actionref ref="activate_button"/>
 				<actionref ref="activate_bee"/>
-				<actionref ref="push_grape_1"/>
+				<actionref ref="get_cubes"/>
 			</actionlist>
 		</actions>
 		<actions_onfinish name="After-Game Actions">
@@ -61,7 +61,7 @@
 			<actionref ref="game_start"/>
 
 			<actionlist name="Main actions">
-				<actionref ref="push_grape_1"/>
+				<actionref ref="get_cubes" reward="5"/>
 			</actionlist>
 		</actions>
 		<actions_onfinish name="After-Game Actions">
