@@ -126,15 +126,15 @@ waypoints:
     way_bee_approach:
         position:
             frame_id: /map
-            x: 0.22
+            x: 0.24 #0.22
             y: 0.4
             a: -1.57079
             type: fixed
     way_bee_accost:
         position:
             frame_id: /map
-            x: 0.22
-            y: 0.188 #0.15 PR
+            x: 0.24 #0.22
+            y: 0.188
             a: -1.57079
             type: fixed
 
@@ -258,10 +258,36 @@ waypoints:
             type: fixed
 
     way_cube_2:
-      position:
-          frame_id: /map
-          x: 0.85
-          y: 1.46
-          a: 0
-          type: fixed
+        position:
+            frame_id: /map
+            x: 0.85
+            y: 1.46
+            a: 1.57079
+            type: fixed
+
+    way_approach_cube_3:
+        position:
+            frame_id: /map
+            x: 0.85
+            y: 0.81
+            a: 0
+            type: fixed
+
+    way_past_cube_3:
+        position:
+            frame_id: /map
+            x: 0.85
+            y: 0.3
+            a: 0
+            type: fixed
+
+    way_next_cube_3:
+        position:
+            frame_id: /map
+            x: 0.85
+            y: 0.81
+            a: 1.57079
+            type: fixed
+
+
 

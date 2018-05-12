@@ -112,7 +112,7 @@
 		<actions exec="all" order="linear">
 			<orderref ref="actuator_ax12_set_pos">
 				<motor_id>3</motor_id>
-				<position>530</position>
+				<position>610</position>
 			</orderref>
 		</actions>
 	</action>
@@ -252,11 +252,7 @@
 				<mode>0</mode>
 			</orderref>
 
-			<orderref ref="asserv_goto_waypoint">
-				<position_waypoint>way_cube_2</position_waypoint>
-				<direction>0</direction>
-				<mode>0</mode>
-			</orderref>
+
 			<orderref ref="asserv_pwm" name="accost button">
 				<left>200</left>
 				<right>200</right>
@@ -267,8 +263,45 @@
 				<duration>1</duration>
 			</orderref>
 
-		
+			<orderref ref="asserv_goto_waypoint">
+				<position_waypoint>way_cube_2</position_waypoint>
+				<direction>0</direction>
+				<mode>0</mode>
+			</orderref>
 
+
+
+			<orderref ref="asserv_goto_waypoint">
+				<position_waypoint>way_approach_cube_3</position_waypoint>
+				<direction>1</direction>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint">
+				<position_waypoint>way_past_cube_3</position_waypoint>
+				<direction>1</direction>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint">
+				<position_waypoint>way_next_cube_3</position_waypoint>
+				<direction>1</direction>
+				<mode>0</mode>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint">
+				<position_waypoint>way_cube_2</position_waypoint>
+				<direction>1</direction>
+				<mode>0</mode>
+			</orderref>
+
+			<orderref ref="asserv_pwm" name="accost button">
+				<left>200</left>
+				<right>200</right>
+				<duration>1000</duration>
+			</orderref>
+
+			<orderref ref="delay">
+				<duration>1</duration>
+			</orderref>
 		</actions>
 	</action>
 
