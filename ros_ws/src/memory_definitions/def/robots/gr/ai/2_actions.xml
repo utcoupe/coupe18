@@ -257,6 +257,18 @@
 				<direction>0</direction>
 				<mode>0</mode>
 			</orderref>
+			<orderref ref="asserv_pwm" name="accost button">
+				<left>200</left>
+				<right>200</right>
+				<duration>1000</duration>
+			</orderref>
+	
+			<orderref ref="delay">
+				<duration>1</duration>
+			</orderref>
+
+		
+
 		</actions>
 	</action>
 
