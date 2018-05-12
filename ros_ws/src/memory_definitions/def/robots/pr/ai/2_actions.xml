@@ -78,7 +78,7 @@
 		</actions>
 	</action>
 
-	<action ref="load_multicolor_distributor" name="Load multicolor distributor">
+	<action ref="load_multicolor_distributor" name="Load multicolor distributor" reward="10">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
