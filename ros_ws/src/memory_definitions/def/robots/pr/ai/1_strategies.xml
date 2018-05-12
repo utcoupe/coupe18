@@ -9,13 +9,15 @@
 			<actionref ref="game_start"/>
 			<actionlist name="Main actions">
 				<actionlist name="Do unicolor distributor">
-					<actionref ref="load_unicolor_distributor"/>
-					<actionref ref="fire_unicolor_balls"/>
+					<actionref ref="load_unicolor_distributor" reward="10"/>
+					<actionref ref="fire_unicolor_balls" reward="40"/>
 				</actionlist>
 				<actionlist name="Do multicolor distributor">
 					<actionref ref="load_multicolor_distributor"/>
-					<!--actionref ref="fire_full_clean_balls"/-->
-					<!--actionref ref="unload_dirty_balls"/-->
+					<actionref ref="accost_station"/>
+				</actionlist>
+				<actionlist repeat="8">
+					<actionref ref="unload_ball_in_station" reward="40"/>
 				</actionlist>
 				<orderref ref="delay" name="10 points no game over" reward="10"/>
 				<actionref ref="goto_spawn"/>
@@ -53,4 +55,18 @@
 		<actions_onfinish name="After-Game Actions">
 		</actions_onfinish>
 	</strategy>
+
+	<strategy name="bin_test">
+		<actions name="In-Game Actions">
+			<actionref ref="game_start"/>
+			<actionlist name="Main actions">
+				<actionlist name="Do unload a ball in bin">
+					<actionref ref="unload_ball_in_station"/>
+				</actionlist>
+			</actionlist>
+		</actions>
+		<actions_onfinish name="After-Game Actions">
+		</actions_onfinish>
+	</strategy>
+
 </strategies>
