@@ -237,7 +237,7 @@
 		</actions>
 	</action>
 
-	<action ref="get_cubes">
+	<action ref="get_cubes" reward="8">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -254,6 +254,13 @@
 			<orderref ref="asserv_goto_waypoint">
 				<position_waypoint>way_past_cube_2</position_waypoint>
 				<direction>1</direction>
+				<mode>0</mode>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint">
+				<position_waypoint>way_cube_2</position_waypoint>
+				<direction>0</direction>
+				<mode>0</mode>
 			</orderref>
 		</actions>
 	</action>

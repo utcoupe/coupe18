@@ -257,3 +257,11 @@ waypoints:
             a: 0
             type: fixed
 
+    way_cube_2:
+      position:
+          frame_id: /map
+          x: 0.85
+          y: 1.46
+          a: 0
+          type: fixed
+
