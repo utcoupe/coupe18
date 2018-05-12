@@ -265,27 +265,27 @@ waypoints:
             a: 1.57079
             type: fixed
 
-    way_approach_cube_3:
+    way_cube_3:
         position:
             frame_id: /map
             x: 0.85
-            y: 0.81
+            y: 1.46
             a: 0
             type: fixed
 
     way_past_cube_3:
         position:
             frame_id: /map
-            x: 0.85
-            y: 0.3
+            x: 0.3
+            y: 1.46
             a: 0
             type: fixed
 
     way_next_cube_3:
         position:
             frame_id: /map
-            x: 0.85
-            y: 0.81
+            x: 0.3
+            y: 1.55
             a: 1.57079
             type: fixed
 
