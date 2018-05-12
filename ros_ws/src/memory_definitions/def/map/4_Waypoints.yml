@@ -252,7 +252,7 @@ waypoints:
     way_past_cube_2:
         position:
             frame_id: /map
-            x: 0.55
+            x: 0.69
             y: 1.635
             a: 0
             type: fixed
