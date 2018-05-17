@@ -47,7 +47,7 @@ class AINode():
 
     def on_game_status(self, msg):
         if msg.game_status == msg.STATUS_HALT:
-            rospy.logwarn("[AI] HMI Asked to stop ! Stopping strategy execution.")
+            rospy.logwarn_throttle(20, "[AI] HMI Asked to stop ! Stopping strategy execution.")
             self.AI.halt()
 
     def on_hmi_event(self, req):
