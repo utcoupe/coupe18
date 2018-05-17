@@ -76,7 +76,9 @@ class NavigatorNode(object):
         self._isCanceling = False
         if result == True or self._idCurrentTry == NB_MAX_TRY:
             if self._idCurrentTry == NB_MAX_TRY and not result:
-                rospy.logwarn("Something wrong happenned with our goal, abording")
+                rospy.logerr("Something wrong happened with our goal, aborting")
+            else:
+                rospy.loginfo("Goal successful")
             self._currentStatus = NavigatorStatuses.NAV_IDLE
             self._collisionsClient.setEnabled(False)
             self._updateStatus()
@@ -101,6 +103,9 @@ class NavigatorNode(object):
         hasAngle = False
         if handledGoal.get_goal().mode == handledGoal.get_goal().GOTOA:
             hasAngle = True
+
+        if handledGoal.get_goal().disable_collisions:
+            rospy.loginfo("Collisions disabled")
         self._executeGoto(posStart, posEnd, hasAngle, handledGoal)
 
     def _handleDoGotoWaypointRequest(self, handledGoal):
@@ -117,6 +122,12 @@ class NavigatorNode(object):
         self._currentStatus = NavigatorStatuses.NAV_NAVIGATING
         self._collisionsClient.setEnabled(not handledGoal.get_goal().disable_collisions)
         handledGoal.set_accepted()
+
+        if hasAngle:
+            rospy.loginfo("Received a request to (" + str(endPos.x) + ", " + str(endPos.y) + ", " + str(endPos.theta) + ")")
+        else:
+            rospy.loginfo("Received a request to (" + str(endPos.x) + ", " + str(endPos.y) + ")")
+
         self._currentGoal = handledGoal
         self._idCurrentTry = 1
         rospy.loginfo("Try 1")

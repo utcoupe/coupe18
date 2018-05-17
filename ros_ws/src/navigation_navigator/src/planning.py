@@ -75,7 +75,7 @@ class Plan(object):
                 rospy.logdebug(key)
             self._updateCallback() # needed ?
         except Exception as e:
-            rospy.logdebug("Navigation failed: " + e.message)
+            rospy.logerr("Navigation failed: " + e.message)
             if len(self._currentPath) > 0:
                 self.cancelAsservGoals()
             else:
