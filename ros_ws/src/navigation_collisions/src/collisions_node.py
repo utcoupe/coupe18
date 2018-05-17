@@ -56,11 +56,11 @@ class CollisionsNode():
         m.danger_level = collision.level
 
         if collision.level == CollisionLevel.LEVEL_STOP:
-            rospy.logwarn("[COLLISION] Found freaking close collision, please stop !!")
+            rospy.logwarn_throttle(0.2, "[COLLISION] Found freaking close collision, please stop !!")
         elif collision.level == CollisionLevel.LEVEL_DANGER:
-            rospy.logwarn("[COLLISION] Found close collision intersecting with the path.")
+            rospy.logwarn_throttle(0.5, "[COLLISION] Found close collision intersecting with the path.")
         elif collision.level == CollisionLevel.LEVEL_POTENTIAL:
-            rospy.loginfo("[COLLISION] Found far-off collision intersecting with the path.")
+            rospy.loginfo_throttle(1, "[COLLISION] Found far-off collision intersecting with the path.")
 
         obs = collision.obstacle
         m.obstacle_pos = Pose2D(obs.position.x, obs.position.y, obs.position.a)
