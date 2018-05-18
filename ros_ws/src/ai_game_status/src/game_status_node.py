@@ -69,12 +69,12 @@ class GameStatusNode():
         while not rospy.is_shutdown():
             if self.init_status == Status.INIT_INITIALIZING:
                 self.check_init_checklist()
-                if time.time() - self._init_start_time > GameStatusNode.INIT_TIMEOUT:
+                if time.time() - self._init_start_time > self.INIT_TIMEOUT:
+                    rospy.logdebug("Waited %d seconds" % self.INIT_TIMEOUT)
                     if len([n for n in Status.INIT_CHECKLIST if Status.INIT_CHECKLIST[n] in [None, False]]) > 0:
                         self.set_init_status(Status.INIT_FAILED)
                     else:
                         self.set_init_status(Status.INIT_INITIALIZED)
-                        rospy.loginfo("All nodes initialized successfully, ready to start !")
             self.publish_statuses() # publish game status at 5Hz.
 
             r.sleep()
@@ -130,6 +130,7 @@ class GameStatusNode():
 
     def on_hmi_event(self, req):
         if req.event == req.EVENT_START:
+            rospy.loginfo("Received HMI event, publishing arm request")
             self._arm_pub.publish(ArmRequest())
         elif req.event == req.EVENT_GAME_CANCEL:
             self.game_status = GameStatus.STATUS_HALT

@@ -97,7 +97,7 @@ class AICommunication():
         try:
             if dest not in self._cached_publishers:
                 self._cached_publishers[dest] = rospy.Publisher(dest, msg_class, queue_size=10)
-            	time.sleep(0.1)
+                time.sleep(0.05)
 
             pub = self._cached_publishers[dest]
             pub.publish(**params)
@@ -120,7 +120,9 @@ class AICommunication():
 
     def _send_service(self, dest, srv_class, params):
         try: # Handle a timeout in case one node doesn't respond
-            rospy.wait_for_service(dest, timeout = 2)
+            timeout = 2
+            rospy.logdebug("Waiting for service %s for %d seconds" % (dest, timeout))
+            rospy.wait_for_service(dest, timeout=timeout)
         except rospy.ROSException:
             res = TaskResult()
             res.result = res.RESULT_FAIL
@@ -132,8 +134,9 @@ class AICommunication():
     def _send_blocking_action(self, dest, action_class, goal_class, params):
         client = actionlib.SimpleActionClient(dest, action_class)
         try: # Handle a timeout in case one node doesn't respond
-            rospy.logdebug("    Waiting for action server...")
-            client.wait_for_server(timeout = rospy.Duration(2.0))
+            timeout = 2
+            rospy.logdebug("    Waiting for action server for %d seconds..." % timeout)
+            client.wait_for_server(timeout = rospy.Duration(timeout))
             rospy.logdebug("    Sending goal...")
             client.send_goal(goal_class(**params))
             rospy.logdebug("    Waiting for result...")
