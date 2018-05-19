@@ -84,8 +84,6 @@ class AICommunication():
             elif RequestTypes.getRequestType(dest) == RequestTypes.ACTION:
                 response = self._send_blocking_action(dest, RequestTypes.getRequestClass(dest),
                                                       RequestTypes.getActionGoalClass(dest), params)
-            # response = TaskResult() # DEBUG Force success response
-            # response.result = response.RESULT_SUCCESS if bool(input("success ?")) else response.RESULT_FAIL
             if callback is not None:
                 callback(response, time.time() - start_time)
             else:
@@ -96,24 +94,31 @@ class AICommunication():
     def _pub_msg(self, dest, msg_class, params):
         try:
             if dest not in self._cached_publishers:
+                rospy.loginfo("Creating and caching new publisher to '{}'.".format(dest))
                 self._cached_publishers[dest] = rospy.Publisher(dest, msg_class, queue_size=10)
                 time.sleep(0.05)
 
             pub = self._cached_publishers[dest]
             pub.publish(**params)
+            rospy.loginfo("Published to topic '{}'.".format(dest))
             return TaskResult(0, "")
         except Exception as e:
+            rospy.logerr("Publishing to topic '{}' failed.".format(dest))
             return TaskResult(2, "scheduler_communication.py could not send message to topic '{}': {}".format(dest, e))
 
     def _sub_msg(self, dest, msg_class):
-        rospy.loginfo("waiting for message on topic '{}'...".format(dest))
+        rospy.loginfo("Waiting for message on topic '{}'...".format(dest))
         self._sub_msg_success = False
         rospy.Subscriber(dest, msg_class, self._sub_msg_callback)
-        timeout = 10000 #seconds
+        timeout = 10000 #seconds TODO customizable timeout
 
         s = time.time()
-        while not self._sub_msg_success and (time.time() - s < timeout): #TODO customizable timeout
+        while not self._sub_msg_success and (time.time() - s < timeout):
             time.sleep(0.02)
+        if self._sub_msg_success:
+            rospy.loginfo("Got message from topic '{}'.".format(dest))
+        else:
+            rospy.logerr("Didn't receive any message from '{}' in {} seconds.".format(dest, timeout))
         return TaskResult(0, "") if self._sub_msg_success else TaskResult(1, "Didn't receive any message in {} seconds.".format(timeout))
     def _sub_msg_callback(self, msg):
         self._sub_msg_success = True
@@ -128,23 +133,30 @@ class AICommunication():
             res.result = res.RESULT_FAIL
             res.verbose_reason = "wait_for_service request timeout exceeded."
             return res
+        rospy.loginfo("Sending service request to '{}'...".format(dest))
         service = rospy.ServiceProxy(dest, srv_class)
-        return service(srv_class._request_class(**params))
+        response = service(srv_class._request_class(**params))
+        if response is not None:
+            rospy.loginfo("Got service response from '{}'.".format(dest))
+        else:
+            rospy.logerr("Service call response from '{}' is null.".format(dest))
+        return response
 
     def _send_blocking_action(self, dest, action_class, goal_class, params):
         client = actionlib.SimpleActionClient(dest, action_class)
         try: # Handle a timeout in case one node doesn't respond
             timeout = 2
-            rospy.logdebug("    Waiting for action server for %d seconds..." % timeout)
+            rospy.loginfo("Waiting for action server for {} seconds on '{}'...".format(timeout, dest))
             client.wait_for_server(timeout = rospy.Duration(timeout))
-            rospy.logdebug("    Sending goal...")
+            rospy.loginfo("Sending action goal...")
             client.send_goal(goal_class(**params))
-            rospy.logdebug("    Waiting for result...")
+            rospy.loginfo("Waiting for action result...")
             client.wait_for_result()
-            rospy.logdebug("    Got result!")
+            rospy.loginfo("Got action result.")
             return client.get_result()
         except:
             res = TaskResult()
             res.result = res.RESULT_FAIL
-            res.verbose_reason = "wait_for_server request timeout exceeded."
+            res.verbose_reason = "Action task execution failed. wait_for_server timeout reached?"
+            rospy.logerr("Action task execution failed. wait_for_server timeout reached?")
             return res

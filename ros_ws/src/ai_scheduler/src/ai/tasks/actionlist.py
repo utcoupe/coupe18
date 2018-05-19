@@ -125,7 +125,6 @@ class ActionList(Task):
                 self._repeats += 1
                 self._successful_repeats += 1
                 if self._repeats < self._repeats_max: # if repeat limit not reached yet, mark everything as free
-                    print "resetting status of task and children"
                     self.resetStatus(refresh_parent=True)
                     return
                 elif self._successful_repeats < self._repeats_max:
@@ -179,7 +178,6 @@ class ActionList(Task):
             if self.repeatMode == RepeatMode.WHILE or self.repeatMode == RepeatMode.FOR:
                 self._repeats += 1
                 if self._repeats < self._repeats_max: # if repeat limit not reached yet, mark everything as free
-                    print "resetting status of task and children"
                     self.resetStatus(refresh_parent=True)
                     self.setStatus(TaskStatus.PENDING)
                     return
