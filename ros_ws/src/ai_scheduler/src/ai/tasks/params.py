@@ -24,6 +24,8 @@ import std_msgs.msg
 import geometry_msgs.msg
 import memory_map.msg
 
+import rospy
+
 
 class Param(object):    # base class for parsing xml to param object
     TYPE_NAME = ""      # name used in the xml (<param type="XX" ...)
@@ -36,6 +38,8 @@ class Param(object):    # base class for parsing xml to param object
 
             if self.preset:
                 self.checkValues()
+
+            self.condition = xml.attrib["condition"] if "condition" in xml.attrib else None # used for comparing
         else:                           # if in the struct of another parser
             self.optional = False
             self.name = self.TYPE_NAME
@@ -113,6 +117,13 @@ class Param(object):    # base class for parsing xml to param object
             raise KeyError("Parameter {} cannot be preset and optional !"
                            .format(self.name))
 
+    def compare(self, obj_ros): # only used in orders response checks
+        for child in self.value: #TOBETESTED
+            if not self.value[child].compare(getattr(obj_ros, child)):
+                return False
+        return True
+
+
 
 def ParamCreator(xml):  # factory : give parser given the type as string
     if "type" not in xml.attrib:
@@ -123,8 +134,7 @@ def ParamCreator(xml):  # factory : give parser given the type as string
             return cls(xml)
 
     raise ValueError("No parser defined for type '{}' ! Please add a subclass"
-                     "of 'Param' in the file ai_params.py"
-                     .format(xml.attrib["type"]))
+                     "of 'Param' in the file ai_params.py".format(xml.attrib["type"]))
 
 
 # Child classes - one for each type of param
@@ -148,6 +158,14 @@ class BoolParser(Param):
     def getRos(self):
         return self.value["data"]
 
+    def compare(self, obj_ros):
+        if self.condition == "==":
+            return self.value["data"] == bool(obj_ros)
+        elif self.condition == "!=":
+            return self.value["data"] != bool(obj_ros)
+        else:
+            rospy.logerr("Error : message response check has no '{}' condition in '{}' type.".format(self.condition, self.TYPE_NAME))
+
 class StringParser(Param):
     TYPE_NAME = "string"
     TYPE_ROS = std_msgs.msg.String
@@ -165,6 +183,12 @@ class StringParser(Param):
 
     def getRos(self):
         return self.value["data"]
+
+    def compare(self, obj_ros):
+        if self.condition == "==":
+            return self.value["data"] == str(obj_ros)
+        else:
+            rospy.logerr("Error : message response check has no '{}' condition in '{}' type.".format(self.condition, self.TYPE_NAME))
 
 
 class IntParser(Param):
@@ -185,6 +209,13 @@ class IntParser(Param):
     def getRos(self):
         return self.value["data"]
 
+    def compare(self, obj_ros):
+        if self.condition in ["==", "!=", "<=", ">=", "<", ">"]:
+            exec("result = self.value[data] {} int(obj_ros)".format(self.condition))
+            return result
+        else:
+            rospy.logerr("Error : message response check has no '{}' condition in '{}' type.".format(self.condition, self.TYPE_NAME))
+
 
 class FloatParser(Param):
     TYPE_NAME = "float"
@@ -203,6 +234,13 @@ class FloatParser(Param):
 
     def getRos(self):
         return self.value["data"]
+
+    def compare(self, obj_ros):
+        if self.condition in ["==", "!=", "<=", ">=", "<", ">"]:
+            exec("result = self.value[data] {} float(obj_ros)".format(self.condition))
+            return result
+        else:
+            rospy.logerr("Error : message response check has no '{}' condition in '{}' type.".format(self.condition, self.TYPE_NAME))
 
 
 # complex classes
