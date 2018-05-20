@@ -4,37 +4,33 @@
 This is where the robot is told what to do.
 
 ## 1. Files
-- `1_Strategies.xml`
+- `1_strategies.xml`
 
 File basic structure :
 ```xml
 <strategies>
 	<strategy name="utcoupe_ftw">
-	...
+	... actionrefs and orderrefs
 	</strategy>
 	<strategy name="hithere">
-	...
+	... actionrefs and orderrefs
 	</strategy>
 </strategies>
 ```
 
-- `2_Actions.xml`
+- `2_actions.xml`
 
 File basic structure :
 ```xml
-<actionsstrategies>
+<actions>
 	<action name="sth", ref="actuator_open">
-	...
+	... actionrefs and orderrefs
 	</action>
 	<action name="sth", ref="actuator_close">
-	...
+	... actionrefs and orderrefs
 	</action>
 </actions>
 ```
-
-
-- `3_HardwareActions.xml`
-
 
 
 
@@ -44,23 +40,6 @@ File basic structure :
 ### 1. Strategies
 The `1_Strategies.json` file is a JSON dictionary of several Strategy objects. When the whole system is launched, the user selects which strategy the robot has to follow.
 This lets the user create several ways ("strategies") of achieving the final objective, and quickly execute the one he wants at each execution time.
-
-Strategy basic structure:
-
-```xml
-<strategy>
-	<game>
-		<duration>90</duration>
-	</game>
-	<actions>
-	...
-	</actions>
-	<actions_onfinish>
-	...
-	</actions_onfinish>
-</strategy>
-```
-
 
 
 ### 2. ActionLists
@@ -79,8 +58,8 @@ When a group is executed, the conditions to consider it is successful or not can
 Properties :
 - `reward`: If the whole group execution is considered successful, this is the amount of reward points given.
 
-### 2. Actions
-Actiosn are almost the same as ActionLists, except they are necessarily defined in the file `2_Actions.xml` and can be referenced by other actions.
+### 3. Actions
+Actions are almost the same as ActionLists, except they are necessarily defined in the file `2_actions.xml` and can be referenced by other actions.
 An Action object is a group of `Orders`, `Actions` and `ActionLists`.
 
 
@@ -100,7 +79,3 @@ Supported embedded actions that can be used in actions:
 	- `actuator_close`: Set the actuator to the `open` position set in the `robot.json` description file.
 	- `actuator_toggle`: Toggle between open/close position.
 	- `actuator_setpos`: Manually set a position to the actuator.
-
-
-### 4. Actions execution
-The last layer, `HardareActions.json`,

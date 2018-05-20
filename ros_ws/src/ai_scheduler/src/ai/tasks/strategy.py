@@ -13,8 +13,7 @@ class Strategy(Task):
         self.loadxml(xml, actions, orders)
 
     def loadxml(self, xml, actions, orders):
-        self.TASKS = ActionList(xml.find("actions"), actions, orders)
-        self.TASKS_ONFINISH = ActionList(xml.find("actions_onfinish"), actions, orders)
+        self.TASKS = ActionList(xml, actions, orders)
 
     def canContinue(self):
         return self.getStatus() in [TaskStatus.FREE, TaskStatus.PENDING, TaskStatus.WAITINGFORRESPONSE]
@@ -25,13 +24,12 @@ class Strategy(Task):
     def sendReward(self, communicator):
         communicator.SendRequest("/ai/scheduler/score", {"score": self.TASKS.getActiveReward()})
 
-    def getStatus(self):
-        return self.TASKS.getStatus()
+    def getStatus(self, text_version=False):
+        return self.TASKS.getStatus(text_version)
 
     def PrettyPrint(self):
         rospy.loginfo("[STRATEGY {}⚡ ACTIVE] {}".format(self.TASKS.getActiveReward(), self.__repr__()))
         self.TASKS.prettyprint(1)
-        self.TASKS_ONFINISH.prettyprint(1)
 
     def __repr__(self):
         return self.Name

@@ -1,4 +1,5 @@
 <actions>
+	<!-- Game Management actions -->
 	<action ref="jack">
 		<params/>
 		<conditions/>
@@ -28,6 +29,7 @@
 		</actions>
 	</action>
 
+	<!-- Game actions -->
 	<action ref="activate_button" name="Go and activate Home Button" reward="25">
 		<params></params>
 		<conditions></conditions>

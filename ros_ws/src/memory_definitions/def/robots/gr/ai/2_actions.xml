@@ -1,4 +1,5 @@
 <actions>
+	<!-- Game Management routines -->
 	<action ref="jack">
 		<params/>
 		<conditions/>
@@ -11,8 +12,8 @@
 	</action>
 
 	<action ref="game_start" name="Game start routine actions">
-		<params></params>
-		<conditions></conditions>
+		<params/>
+		<conditions/>
 		<actions>
 			<orderref ref="set_robot_pos">
 				<position_waypoint>way_spawn_gr</position_waypoint>
@@ -21,13 +22,72 @@
 			<actionref ref="jack"/>
 
 			<orderref ref="timer_start">
-				<duration>97</duration>
+				<duration>98</duration>
 			</orderref>
 
 			<orderref ref="set_game_status_ingame"/>
 		</actions>
 	</action>
 
+	<action ref="game_setup" name="Game setup">
+		<params/>
+		<conditions/>
+		<actions>
+			<orderref ref="delay" name="5 points bee loaded" reward="5"/>
+			<orderref ref="delay" name="5 points home installed" reward="5"/>
+		</actions>
+	</action>
+
+
+	<!-- Actuators macros -->
+	<action ref="open_arm_wide" name="Open arm wide">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="actuator_ax12_set_pos">
+				<motor_id>3</motor_id>
+				<position>620</position>
+			</orderref>
+		</actions>
+	</action>
+
+	<action ref="close_arm_slow" name="Close arm slow">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="actuator_ax12_set_pos">
+				<motor_id>3</motor_id>
+				<position>120</position>
+				<speed>170</speed>
+			</orderref>
+		</actions>
+	</action>
+
+	<action ref="open_arm_slow" name="Open arm slow">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="actuator_ax12_set_pos">
+				<motor_id>3</motor_id>
+				<position>610</position>
+				<speed>180</speed>
+			</orderref>
+		</actions>
+	</action>
+
+	<action ref="close_arm" name="Close arm">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="actuator_ax12_set_pos">
+				<motor_id>3</motor_id>
+				<position>120</position>
+			</orderref>
+		</actions>
+	</action>
+
+
+	<!-- Game actions -->
 	<action ref="activate_button" name="Go and activate Home Button" reward="25">
 		<params></params>
 		<conditions></conditions>
@@ -100,54 +160,6 @@
 
 			<orderref ref="navigator_goto_waypoint" name="release">
 				<waypoint_name>way_grape_2_released</waypoint_name>
-			</orderref>
-		</actions>
-	</action>
-
-
-
-	<action ref="open_arm_wide" name="Open arm wide">
-		<params></params>
-		<conditions></conditions>
-		<actions exec="all" order="linear">
-			<orderref ref="actuator_ax12_set_pos">
-				<motor_id>3</motor_id>
-				<position>620</position>
-			</orderref>
-		</actions>
-	</action>
-
-	<action ref="close_arm_slow" name="Close arm slow">
-		<params></params>
-		<conditions></conditions>
-		<actions exec="all" order="linear">
-			<orderref ref="actuator_ax12_set_pos">
-				<motor_id>3</motor_id>
-				<position>120</position>
-				<speed>170</speed>
-			</orderref>
-		</actions>
-	</action>
-
-	<action ref="open_arm_slow" name="Open arm slow">
-		<params></params>
-		<conditions></conditions>
-		<actions exec="all" order="linear">
-			<orderref ref="actuator_ax12_set_pos">
-				<motor_id>3</motor_id>
-				<position>610</position>
-				<speed>180</speed>
-			</orderref>
-		</actions>
-	</action>
-
-	<action ref="close_arm" name="Close arm">
-		<params></params>
-		<conditions></conditions>
-		<actions exec="all" order="linear">
-			<orderref ref="actuator_ax12_set_pos">
-				<motor_id>3</motor_id>
-				<position>120</position>
 			</orderref>
 		</actions>
 	</action>

@@ -4,67 +4,44 @@
 		<team name="orange"/>
 	</teams>
 
-	<!-- STRATEGY real game actions ! -->
+	<!-- Real game strategies -->
 	<strategy name="button_bee_cube">
-		<actions name="In-Game Actions">
-			<orderref ref="delay" name="5 points bee loaded" reward="5"/>
-			<orderref ref="delay" name="5 points home installed" reward="5"/>
+		<actionref ref="game_setup"/>
+		<actionref ref="game_start"/>
 
-			<actionref ref="game_start"/>
-
-			<actionlist name="Main actions">
-				<actionref ref="activate_button"/>
-				<actionref ref="activate_bee"/>
-				<actionref ref="get_cubes"/>
-			</actionlist>
-		</actions>
-		<actions_onfinish name="After-Game Actions">
-		</actions_onfinish>
+		<actionlist name="Main actions">
+			<actionref ref="activate_button"/>
+			<actionref ref="activate_bee"/>
+			<actionref ref="get_cubes"/>
+		</actionlist>
 	</strategy>
 
+	<!-- Test strategies -->
 	<strategy name="test_button">
-		<actions name="In-Game Actions">
-			<orderref ref="delay" name="5 points bee loaded" reward="5"/>
-			<orderref ref="delay" name="5 points home installed" reward="5"/>
+		<actionref ref="game_setup"/>
+		<actionref ref="game_start"/>
 
-			<actionref ref="game_start"/>
-
-			<actionlist name="Main actions">
-				<actionref ref="activate_button" reward="25"/>
-			</actionlist>
-		</actions>
-		<actions_onfinish name="After-Game Actions">
-		</actions_onfinish>
+		<actionlist name="Main actions">
+			<actionref ref="activate_button" reward="25"/>
+		</actionlist>
 	</strategy>
 
 	<strategy name="test_button_bee">
-		<actions name="In-Game Actions">
-			<orderref ref="delay" name="5 points bee loaded" reward="5"/>
-			<orderref ref="delay" name="5 points home installed" reward="5"/>
+		<actionref ref="game_setup"/>
+		<actionref ref="game_start"/>
 
-			<actionref ref="game_start"/>
-
-			<actionlist name="Main actions">
-				<actionref ref="activate_button" reward="25"/>
-				<actionref ref="activate_bee" reward="50"/>
-			</actionlist>
-		</actions>
-		<actions_onfinish name="After-Game Actions">
-		</actions_onfinish>
+		<actionlist name="Main actions">
+			<actionref ref="activate_button" reward="25"/>
+			<actionref ref="activate_bee" reward="50"/>
+		</actionlist>
 	</strategy>
 
 	<strategy name="cube">
-		<actions name="In-Game Actions">
-			<orderref ref="delay" name="5 points bee loaded" reward="5"/>
-			<orderref ref="delay" name="5 points home installed" reward="5"/>
+		<actionref ref="game_setup"/>
+		<actionref ref="game_start"/>
 
-			<actionref ref="game_start"/>
-
-			<actionlist name="Main actions">
-				<actionref ref="get_cubes" reward="5"/>
-			</actionlist>
-		</actions>
-		<actions_onfinish name="After-Game Actions">
-		</actions_onfinish>
+		<actionlist name="Main actions">
+			<actionref ref="get_cubes" reward="5"/>
+		</actionlist>
 	</strategy>
 </strategies>
