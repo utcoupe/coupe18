@@ -33,5 +33,6 @@ class RobotAI():
                 strategy.getNext().execute(strategy.communicator)
             else:
                 rospy.loginfo("[AI] In-Game actions finished!")
+                strategy.PrettyPrint()
                 break
             strategy.sendReward(strategy.communicator)

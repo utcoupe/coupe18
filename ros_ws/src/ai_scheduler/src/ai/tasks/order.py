@@ -92,6 +92,7 @@ class Message():
             raise KeyError("PARSE ERROR ! Messages need a 'dest' attribute")
 
         self.Destination = xml.attrib["dest"]
+        self.Timeout = int(xml.attrib["timeout"]) if "timeout" in xml.attrib else None
         self.Parameters = []
         paramsNames = []
 
@@ -108,9 +109,9 @@ class Message():
 
     def send(self, communicator, callback):
         ros_params = {p.name: p.getRos() for p in self.Parameters}
-        communicator.SendRequest(self.Destination, ros_params, callback)
+        communicator.SendRequest(self.Destination, ros_params, self.Timeout, callback)
 
-    def setParameters(self, xml_list):  # populate values of params
+    def setParameters(self, xml_list): # populate values of params
         for child in xml_list:
             name = child.tag
             params = [p for p in self.Parameters if p.name == name]
