@@ -9,7 +9,6 @@ class RobotAI():
         self.timer = TimerClient() # Timer client.
         self.game_status = GameStatusClient()
         self._loader = AILoader()
-        self._halt_request = False
 
     def load_game_properties(self):
         return self._loader.load_game_properties()
@@ -17,9 +16,6 @@ class RobotAI():
     def start(self, communicator):
         strategy = self._loader.load(communicator)
         self.execute(strategy)
-
-    def halt(self):
-        self._halt_request = True
 
     def execute(self, strategy):
         strategy.PrettyPrint()
@@ -33,6 +29,6 @@ class RobotAI():
                 strategy.getNext().execute(strategy.communicator)
             else:
                 rospy.loginfo("[AI] In-Game actions finished!")
-                strategy.PrettyPrint()
                 break
             strategy.sendReward(strategy.communicator)
+        strategy.PrettyPrint()

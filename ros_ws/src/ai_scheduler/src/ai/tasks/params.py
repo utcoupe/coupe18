@@ -211,7 +211,7 @@ class IntParser(Param):
 
     def compare(self, obj_ros):
         if self.condition in ["==", "!=", "<=", ">=", "<", ">"]:
-            exec("result = self.value['data'] {} int(obj_ros)".format(self.condition))
+            exec("result = int(obj_ros) {} self.value['data']".format(self.condition))
             return result
         else:
             rospy.logerr("Error : message response check has no '{}' condition in '{}' type.".format(self.condition, self.TYPE_NAME))
@@ -237,7 +237,7 @@ class FloatParser(Param):
 
     def compare(self, obj_ros):
         if self.condition in ["==", "!=", "<=", ">=", "<", ">"]:
-            exec("result = self.value['data'] {} float(obj_ros)".format(self.condition))
+            exec("result = float(obj_ros) {} self.value['data']".format(self.condition))
             return result
         else:
             rospy.logerr("Error : message response check has no '{}' condition in '{}' type.".format(self.condition, self.TYPE_NAME))

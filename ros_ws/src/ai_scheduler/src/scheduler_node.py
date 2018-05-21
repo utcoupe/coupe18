@@ -26,7 +26,7 @@ class AINode():
         rospy.Subscriber("/feedback/ard_hmi/hmi_event", HMIEvent, self.on_hmi_event)
 
         # Sending init status to ai/game_status, subscribing to game_status status pub.
-        status_services = StatusServices(self.DepartmentName, self.PackageName, self.on_arm, self.on_game_status)
+        status_services = StatusServices(self.DepartmentName, self.PackageName, self.on_arm)
         status_services.ready(True) # Tell ai/game_status the node initialized successfuly.
 
         r = rospy.Rate(10)
@@ -44,11 +44,6 @@ class AINode():
 
     def send_teams(self):
         self._teams_publisher.publish(GameProperties.AVAILABLE_TEAMS)
-
-    def on_game_status(self, msg):
-        if msg.game_status == msg.STATUS_HALT:
-            rospy.logwarn_throttle(20, "[AI] HMI Asked to stop ! Stopping strategy execution.")
-            self.AI.halt()
 
     def on_hmi_event(self, req):
         if req.event == req.EVENT_HMI_INITIALIZED:

@@ -46,6 +46,8 @@ class Order(Task):
         self.TimeTaken = time_taken
         if isinstance(res, bool):
             new_status = TaskStatus.SUCCESS if res else TaskStatus.ERROR
+        elif res is None: #occurs in timeout situations
+            return False
         else:
             ranks = [TaskStatus.SUCCESS, TaskStatus.ERROR, TaskStatus.PAUSED] # defines which valid response gets prioritized.
                                                                             # last is most important.
@@ -141,6 +143,8 @@ class Response(object):
 
     def compare(self, response):
         for param in self.Parameters:
+            if not hasattr(response, param.name):
+                raise ValueError("PARSE ERROR! Response message has no variable named '{}'.".format(param.name))
             if not param.compare(getattr(response, param.name)):
                 return False
         return True
