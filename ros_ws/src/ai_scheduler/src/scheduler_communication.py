@@ -66,7 +66,7 @@ class AICommunication():
     DEFAULT_SUB_MSG_TIMEOUT = 5
     DEFAULT_ACTION_TIMEOUT  = 20
 
-    _sub_msg_success = False
+    _sub_msg_res = None
 
     def __init__(self):
         RequestTypes.init()
@@ -107,7 +107,7 @@ class AICommunication():
             return False
 
     def _sub_msg(self, dest, msg_class, timeout=None):
-        self._sub_msg_success = False
+        self._sub_msg_res = None
         rospy.Subscriber(dest, msg_class, self._sub_msg_callback)
 
         if timeout is None:
@@ -115,15 +115,15 @@ class AICommunication():
         rospy.loginfo("Waiting for message on topic '{}' for {}s...".format(dest, timeout))
 
         s = time.time()
-        while not self._sub_msg_success and (time.time() - s < timeout):
+        while not self._sub_msg_res and (time.time() - s < timeout): #TODO continue to search until response condition matches
             time.sleep(0.02)
-        if self._sub_msg_success:
+        if self._sub_msg_res:
             rospy.loginfo("Got message from topic '{}'.".format(dest))
         else:
             rospy.logerr("Didn't receive any message from '{}' in {} seconds.".format(dest, timeout))
-        return self._sub_msg_success
+        return self._sub_msg_res
     def _sub_msg_callback(self, msg):
-        self._sub_msg_success = True
+        self._sub_msg_res = msg
 
     def _send_service(self, dest, srv_class, params):
         try: # Handle a timeout in case one node doesn't respond
@@ -135,7 +135,7 @@ class AICommunication():
 
         rospy.loginfo("Sending service request to '{}'...".format(dest))
         service = rospy.ServiceProxy(dest, srv_class)
-        response = service(srv_class._request_class(**params)) #TODO handle timeout
+        response = service(srv_class._request_class(**params)) #TODO rospy can't handle timeout, solution?
         if response is not None:
             rospy.loginfo("Got service response from '{}'.".format(dest))
         else:
@@ -161,4 +161,5 @@ class AICommunication():
             else: rospy.logerr("Action response timeout reached!")
             return response
         else:
+            rospy.logerr("Action wait_for_server timeout reached!")
             return False

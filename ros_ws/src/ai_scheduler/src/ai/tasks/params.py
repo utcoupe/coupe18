@@ -39,7 +39,7 @@ class Param(object):    # base class for parsing xml to param object
             if self.preset:
                 self.checkValues()
 
-            self.condition = xml.attrib["condition"] if "condition" in xml.attrib else None # used for comparing
+            self.condition = xml.attrib["condition"] if "condition" in xml.attrib else "==" # used for comparing
         else:                           # if in the struct of another parser
             self.optional = False
             self.name = self.TYPE_NAME
@@ -211,7 +211,7 @@ class IntParser(Param):
 
     def compare(self, obj_ros):
         if self.condition in ["==", "!=", "<=", ">=", "<", ">"]:
-            exec("result = self.value[data] {} int(obj_ros)".format(self.condition))
+            exec("result = self.value['data'] {} int(obj_ros)".format(self.condition))
             return result
         else:
             rospy.logerr("Error : message response check has no '{}' condition in '{}' type.".format(self.condition, self.TYPE_NAME))
@@ -237,7 +237,7 @@ class FloatParser(Param):
 
     def compare(self, obj_ros):
         if self.condition in ["==", "!=", "<=", ">=", "<", ">"]:
-            exec("result = self.value[data] {} float(obj_ros)".format(self.condition))
+            exec("result = self.value['data'] {} float(obj_ros)".format(self.condition))
             return result
         else:
             rospy.logerr("Error : message response check has no '{}' condition in '{}' type.".format(self.condition, self.TYPE_NAME))

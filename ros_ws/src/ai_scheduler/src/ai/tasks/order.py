@@ -13,7 +13,10 @@ class Order(Task):
 
         self.Duration = float(xml.attrib["duration"]) if "duration" in xml.attrib else 0.0  # Manually estimated time to execute this action
         self.Message = Message(xml.find("message"))
-        self.Response = Response(xml.find("response"))
+
+        self.Responses = [Response(res) for res in xml.findall("response")]
+        #TODO check if at least one node exists, except if message is PUB_MSG type
+
         self.TimeTaken = None
 
     def setParameters(self, orderref_xml):
@@ -41,29 +44,24 @@ class Order(Task):
 
     def callback(self, res, time_taken):
         self.TimeTaken = time_taken
-        # try:
-        #     if res.result == res.RESULT_SUCCESS:
-        #         result = True
-        #     elif res.result in [res.RESULT_PAUSE, res.RESULT_FAIL]:
-        #         pass
-        # except AttributeError: # Otherwise, look for a bool type
-        #     try: result = res.success
-        #     except: pass
-        #     try: result = res.response
-        #     except: pass
-        #     try: result = res.result
-        #     except: pass
-
-        #     try: reason = res.verbose_reason
-        #     except: reason = ""
-        result = self.Response.compare(res)
-
-        if result is True:
-            self.setStatus(TaskStatus.SUCCESS)
-            rospy.loginfo("Task succeeded: {}".format(self.__repr__()))
+        if isinstance(res, bool):
+            new_status = TaskStatus.SUCCESS if res else TaskStatus.ERROR
         else:
-            self.setStatus(TaskStatus.ERROR)
+            ranks = [TaskStatus.SUCCESS, TaskStatus.ERROR, TaskStatus.PAUSED] # defines which valid response gets prioritized.
+                                                                            # last is most important.
+            results = [response.Result for response in self.Responses if response.compare(res)]
+            if results: # If one/several responses checks succeed, take the max ranked status.
+                new_status = ranks[max([ranks.index(r) for r in results])]
+            else: # if the response corresponds to nothing in the XML, default to failed.
+                new_status = TaskStatus.ERROR
+        self.setStatus(new_status)
+
+        if new_status == TaskStatus.SUCCESS:
+            rospy.loginfo("Task succeeded: {}".format(self.__repr__()))
+        elif new_status == TaskStatus.ERROR:
             rospy.logerr("Task failed: {}".format(self.__repr__()))
+        elif new_status == TaskStatus.PAUSED:
+            rospy.logwarn("Task paused: {}. Will eventually try again later.".format(self.__repr__()))
 
     def __repr__(self):
         c = Console()
@@ -124,26 +122,24 @@ class Response(object):
             "pause": TaskStatus.PAUSED,
             "error": TaskStatus.ERROR
         }
-        self.Result = results[xml.attrib["result"]] #TODO not used yet
-        self.Parameters = []
+        if "result" in xml.attrib and xml.attrib["result"] not in results.keys():
+            raise ValueError("PARSE ERROR! Order response must have a valid 'result' attribute.")
+        self.Result = results[xml.attrib["result"]] if "result" in xml.attrib else TaskStatus.SUCCESS
 
-        # parse declaration of parameters
+        self.Parameters = [] # TODO recursive params from actions/strategies?
         _param_names = []
         for param in xml.findall("param"):
             p = params.ParamCreator(param)
-            self.Parameters.append(p)
-            if p.condition is None:
-                raise KeyError("PARSE ERROR ! Param {} needs a 'condition' attribute.".format(p.name))
             if p.name in _param_names:
                 raise KeyError("PARSE ERROR ! Param {} already defined here.".format(p.name))
+            self.Parameters.append(p)
             _param_names.append(p.name)
 
-        # if not self.Parameters:
-        #     raise ValueError("PARSE ERROR! Order response must have at least one param to be checked.")
+        if not self.Parameters:
+            raise ValueError("PARSE ERROR! Order response must have at least one param to be checked.")
+        #TODO implement relations (and/or between params)
 
     def compare(self, response):
-        if response in [False, None]:
-            return False
         for param in self.Parameters:
             if not param.compare(getattr(response, param.name)):
                 return False
