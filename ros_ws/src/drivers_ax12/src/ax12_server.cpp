@@ -138,6 +138,11 @@ bool Ax12Server::handle_joint_goal(GoalHandle goal_handle) {
     success &= driver_.write_register(motor_id, GOAL_POSITION, position);
 
     joint_goals_.push_back(goal_handle);
+    ROS_INFO_STREAM("Received a joint goal for motor " << static_cast<unsigned>(motor_id));
+
+    if(!success)
+        ROS_WARN("At least one of the register writes was not successful, be careful");
+
     ROS_DEBUG_STREAM("Success " << success << " setting goal and speed for motor " << static_cast<unsigned>(motor_id) << ", adding the goal to the list");
 
     return success;
@@ -162,7 +167,7 @@ bool Ax12Server::handle_wheel_goal(GoalHandle goal_handle) {
         if (it->getGoal()->motor_id == motor_id) {
             result_.success = 0;
             it->setCanceled(result_);
-            ROS_INFO_STREAM("AX-12 action server received a wheel goal for motor ID " << static_cast<unsigned>(motor_id)
+            ROS_WARN_STREAM("AX-12 action server received a wheel goal for motor ID " << static_cast<unsigned>(motor_id)
                     << " while another joint goal was running for that motor. "
                     << "The old goal was canceled.");
             it = joint_goals_.erase(it);
@@ -178,6 +183,13 @@ bool Ax12Server::handle_wheel_goal(GoalHandle goal_handle) {
 
     result_.success = static_cast<unsigned char>(success);
     goal_handle.setSucceeded(result_);
+
+    ROS_INFO_STREAM("Received a wheel goal for motor " << static_cast<unsigned>(motor_id));
+    if(!success)
+        ROS_WARN("Returning a bad result, as one of the register writes was not successful");
+    else
+        ROS_INFO("Setting the goal as succeeded, all register writes successful");
+
 
     return success;
 }
@@ -343,9 +355,12 @@ void Ax12Server::game_status_cb(const ai_game_status::GameStatusConstPtr &status
     if (!is_halted && status->game_status == status->STATUS_HALT) {
         is_halted = true;
         driver_.toggle_torque(false);
+        ROS_WARN("Halt request, stopping the motors");
     } else if (is_halted && status->game_status != status->STATUS_HALT) {
         is_halted = false;
         driver_.toggle_torque(true);
+        ROS_INFO("Halt finished, running the motors");
+
     }
 }
 

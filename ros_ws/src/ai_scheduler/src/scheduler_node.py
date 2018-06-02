@@ -47,7 +47,7 @@ class AINode():
 
     def on_game_status(self, msg):
         if msg.game_status == msg.STATUS_HALT:
-            rospy.logwarn("[AI] HMI Asked to stop ! Stopping strategy execution.")
+            rospy.logwarn_throttle(20, "[AI] HMI Asked to stop ! Stopping strategy execution.")
             self.AI.halt()
 
     def on_hmi_event(self, req):
@@ -59,6 +59,7 @@ class AINode():
             GameProperties.CURRENT_TEAM     = GameProperties.AVAILABLE_TEAMS[req.chosen_team_id]
             rospy.set_param("/current_strategy", GameProperties.CURRENT_STRATEGY)
             rospy.set_param("/current_team",     GameProperties.CURRENT_TEAM)
+            rospy.logdebug("Strategy (%s) and team (%s) params set !" % (GameProperties.CURRENT_STRATEGY, GameProperties.CURRENT_TEAM))
         #     rospy.loginfo("[AI] Starting actions ! Strategy '{}' and team '{}'.".format(GameProperties.CURRENT_STRATEGY, GameProperties.CURRENT_TEAM))
         # elif req.event == req.EVENT_GAME_CANCEL: # TODO remove ? Should be trigerred by a game_status HALT
         #     rospy.logwarn("[AI] HMI Asked to stop ! Stopping strategy execution.")

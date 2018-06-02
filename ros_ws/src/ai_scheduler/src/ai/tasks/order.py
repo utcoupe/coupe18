@@ -38,23 +38,20 @@ class Order(Task):
 
     def execute(self, communicator):
         self.setStatus(TaskStatus.WAITINGFORRESPONSE)
-        rospy.loginfo("Executing task : {}...".format(self.__repr__()))
+        rospy.loginfo("Executing task: {}...".format(self.__repr__()))
 
         self.Message.send(communicator, self.callback)
 
 
     def callback(self, res, time_taken):
         self.TimeTaken = time_taken
-        try: #TODO do a better way # For TaskRestul responses
+        result = False
+        try: #TODO MOCHE do a better way # For TaskResult responses
             if res.result == res.RESULT_SUCCESS:
-                rospy.logdebug("    Order succeeded!")
-                self.setStatus(TaskStatus.SUCCESS)
-                #GameProperties.REWARD_POINTS += self.getReward() #TODO
+                result = True
             elif res.result in [res.RESULT_PAUSE, res.RESULT_FAIL]: # TODO implement pause
-                rospy.logerr("    Order failed: {}".format(res.verbose_reason))
-                self.setStatus(TaskStatus.ERROR)
-        except AttributeError: # Otherwise, look for a bool 'success'
-            result = False
+                pass
+        except AttributeError: # Otherwise, look for a bool type
             try: result = res.success
             except: pass
             try: result = res.response
@@ -65,12 +62,12 @@ class Order(Task):
             try: reason = res.verbose_reason
             except: reason = ""
 
-            if result is True:
-                rospy.logdebug("    Order succeeded!")
-                self.setStatus(TaskStatus.SUCCESS)
-            else:
-                rospy.logerr("    Order failed: {}".format(reason))
-                self.setStatus(TaskStatus.ERROR)
+        if result is True:
+            self.setStatus(TaskStatus.SUCCESS)
+            rospy.loginfo("Task succeeded: {}".format(self.__repr__()))
+        else:
+            self.setStatus(TaskStatus.ERROR)
+            rospy.logerr("Task failed: {}".format(self.__repr__()))
 
 
     def __repr__(self):

@@ -64,9 +64,11 @@ class TimerNode():
         while not rospy.is_shutdown():
             if self.timer.started:
                 if self.timer.time_left() <= 0:
-                    rospy.logwarn("Timer ended! setting HALT to ai/game_status, stopping timer.")
+                    rospy.logwarn_throttle(20, "Timer ended! setting HALT to ai/game_status, stopping timer.")
                     self.set_game_status(GameStatus.STATUS_HALT)
                     self.timer.stop()
+                else:
+                    rospy.loginfo_throttle(20, "Timer seconds left : {}".format(int(round(self.timer.time_left()))) + " s")
             self.publish_timer()
             r.sleep()
 

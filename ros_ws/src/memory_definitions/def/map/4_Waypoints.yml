@@ -37,6 +37,13 @@ waypoints:
             y: 1.772 #1.65 PR
             a: -1.57079
             type: fixed
+    way_button_approach_back:
+        position:
+            frame_id: /map
+            x: 1.13
+            y: 1.72 #1.65 PR
+            a: -1.57079
+            type: fixed
     way_button_accost: # not used (pwm)
         position:
             frame_id: /map
@@ -119,15 +126,15 @@ waypoints:
     way_bee_approach:
         position:
             frame_id: /map
-            x: 0.22
+            x: 0.24 #0.22
             y: 0.4
             a: -1.57079
             type: fixed
     way_bee_accost:
         position:
             frame_id: /map
-            x: 0.22
-            y: 0.188 #0.15 PR
+            x: 0.24 #0.22
+            y: 0.188
             a: -1.57079
             type: fixed
 
@@ -136,8 +143,8 @@ waypoints:
     way_bee_approach_green:
         position:
             frame_id: /map
-            x: 0.2665
-            y: 0.5
+            x: 0.2665 #0.2665
+            y: 0.7 #0.5
             a: -1.57079
             type: fixed
     way_bee_accost_green:
@@ -183,8 +190,8 @@ waypoints:
     way_grape_1_pushed:
         position:
             frame_id: /map
-            x: 0.850
-            y: 1.78
+            x: 0.680
+            y: 1.83
             a: -1.57079
             type: fixed
     way_grape_1_released:
@@ -223,3 +230,64 @@ waypoints:
             y: 1.48
             a: -1.57079
             type: fixed
+
+
+
+    way_cube_close_bee:
+        position:
+            frame_id: /map
+            x: 0.3
+            y: 0.5
+            a: 0
+            type: fixed
+
+    way_past_cube_1:
+        position:
+            frame_id: /map
+            x: 1.35
+            y: 0.5
+            a: 0
+            type: fixed
+
+    way_past_cube_2:
+        position:
+            frame_id: /map
+            x: 0.58
+            y: 1.635
+            a: 0
+            type: fixed
+
+    way_cube_2:
+        position:
+            frame_id: /map
+            x: 0.85
+            y: 1.46
+            a: 1.57079
+            type: fixed
+
+    way_cube_3:
+        position:
+            frame_id: /map
+            x: 0.13
+            y: 0.86
+            a: 0
+            type: fixed
+
+    way_past_cube_3:
+        position:
+            frame_id: /map
+            x: 0.65
+            y: 0.86
+            a: 0
+            type: fixed
+
+    way_next_cube_3:
+        position:
+            frame_id: /map
+            x: 0.65
+            y: 1.55
+            a: 1.57079
+            type: fixed
+
+
+

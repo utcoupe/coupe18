@@ -47,9 +47,9 @@
 				<duration>1.2</duration>
 			</orderref>
 
-			<orderref ref="navigator_goto_waypoint" name="go back to approach">
-				<waypoint_name>way_button_approach</waypoint_name>
-				<direction>1</direction>
+			<orderref ref="asserv_goto_waypoint" name="go back to approach">
+				<position_waypoint>way_button_approach_back</position_waypoint>
+                		<direction>1</direction>
 			</orderref>
 		</actions>
 	</action>
@@ -64,8 +64,17 @@
 			</orderref>
 
 			<orderref ref="asserv_goto_waypoint">
-				<position_waypoint>way_grape_1_accost</position_waypoint>
+				<position_waypoint>way_grape_1_pushed</position_waypoint>
 				<direction>0</direction>
+			</orderref>
+			<orderref ref="asserv_pwm">
+				<left>-200</left>
+				<right>-200</right>
+				<duration>500</duration>
+			</orderref>
+
+			<orderref ref="delay">
+				<duration>0.5</duration>
 			</orderref>
 		</actions>
 	</action>
@@ -103,7 +112,7 @@
 		<actions exec="all" order="linear">
 			<orderref ref="actuator_ax12_set_pos">
 				<motor_id>3</motor_id>
-				<position>530</position>
+				<position>620</position>
 			</orderref>
 		</actions>
 	</action>
@@ -191,11 +200,6 @@
 				</orderref>
 
 				<actionref ref="close_arm_slow" name="close arm" />
-
-				<orderref ref="navigator_goto_waypoint" name="accost bee">
-					<waypoint_name>way_bee_approach_green</waypoint_name>
-					<direction>0</direction>
-				</orderref>
 			</team>
 			<team name="orange">
 				<orderref ref="navigator_goto_waypoint" name="approach bee">
@@ -227,4 +231,74 @@
 			<!--</orderref>-->
 		</actions>
 	</action>
+
+	<action ref="get_cubes" reward="8">
+		<params></params>
+		<conditions></conditions>
+		<actions exec="all" order="linear">
+			<orderref ref="asserv_goto_waypoint">
+				<position_waypoint>way_cube_close_bee</position_waypoint>
+				<direction>0</direction>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint">
+				<position_waypoint>way_past_cube_1</position_waypoint>
+				<direction>1</direction>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint">
+				<position_waypoint>way_past_cube_2</position_waypoint>
+				<direction>1</direction>
+				<mode>0</mode>
+			</orderref>
+
+
+			<orderref ref="asserv_pwm" name="accost button">
+				<left>200</left>
+				<right>200</right>
+				<duration>1000</duration>
+			</orderref>
+	
+			<orderref ref="delay">
+				<duration>1</duration>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint">
+				<position_waypoint>way_cube_2</position_waypoint>
+				<direction>0</direction>
+				<mode>0</mode>
+			</orderref>
+
+
+
+			<orderref ref="asserv_goto_waypoint">
+				<position_waypoint>way_cube_3</position_waypoint>
+				<direction>1</direction>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint">
+				<position_waypoint>way_past_cube_3</position_waypoint>
+				<direction>1</direction>
+			</orderref>
+
+			<orderref ref="asserv_goto_waypoint">
+				<position_waypoint>way_next_cube_3</position_waypoint>
+				<direction>1</direction>
+				<mode>0</mode>
+			</orderref>
+
+
+			<orderref ref="asserv_pwm" name="accost button">
+				<left>200</left>
+				<right>200</right>
+				<duration>1000</duration>
+			</orderref>
+
+			<orderref ref="delay">
+				<duration>1</duration>
+			</orderref>
+		</actions>
+	</action>
+
+
 </actions>

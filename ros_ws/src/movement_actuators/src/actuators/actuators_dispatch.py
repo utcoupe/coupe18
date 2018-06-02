@@ -48,12 +48,14 @@ class ActuatorsDispatch(ActuatorsAbstract):
                 rospy.logwarn("Received goal ({}) as no param nor preset, reject the goal.".format(goal_id))
                 return False
         if actuator_properties.family.lower() == 'arduino':
+            rospy.loginfo("Received an arduino goal")
             result = self._send_to_arduino(actuator_properties.id, actuator_properties.type, param)
             if result >= 0:
                 with self._lock:
                     self._active_goals[goal_id] = result
                 to_return = True
         elif actuator_properties.family.lower() == 'ax12':
+            rospy.loginfo("Received an ax12 goal")
             goal_handle = self._send_to_ax12(actuator_properties.id, goal.order, param)
             if goal_handle is not None:
                 with self._lock:
@@ -64,8 +66,8 @@ class ActuatorsDispatch(ActuatorsAbstract):
         if to_return:
             timeout = goal.timeout
             if goal.timeout == 0:
-                rospy.logwarn("No timeout given to dispatch goal, use default xml value.")
                 timeout = actuator_properties.default_timeout
+                rospy.logwarn("No timeout given to dispatch goal, use default xml value %d ms" % timeout)
                 if timeout == 0:
                     rospy.logerr("Goal {} has no timeout nor default timeout, reject it.".format(goal_id))
                     return False

@@ -64,6 +64,9 @@ class BeltInterpreter(object):
         self._previous_rects = []
         self._previous_statuses = []
 
+        self._same_bad_value_counter = {s: 0 for s in self._belt_parser.Sensors.keys()}
+        self._last_bad_value = {s: 0 for s in self._belt_parser.Sensors.keys()}
+
         rospy.loginfo("Belt interpreter is ready. Listening for sensor data on '{}'.".format(self.SENSORS_TOPIC)) # TODO duplicate log with status_services.ready()
         # Tell ai/game_status the node initialized successfuly.
         StatusServices("processing", "belt_interpreter").ready(True)
@@ -109,6 +112,15 @@ class BeltInterpreter(object):
 
             if data.range > params["max_range"] or data.range <= 0:
                 self._current_statuses.update({data.sensor_id: False})
+                if data.range == self._last_bad_value[data.sensor_id]:
+                    self._same_bad_value_counter[data.sensor_id] += 1
+                else:
+                    self._same_bad_value_counter[data.sensor_id] = 0
+                    self._last_bad_value[data.sensor_id] = data.range
+
+                if self._same_bad_value_counter[data.sensor_id] > 100:
+                    rospy.logwarn_throttle(1, "Sensor %s might be disconnected !" % data.sensor_id)
+
                 # If we published this sensor most of the time and its bad, publish the last one we got
                 l = [data.sensor_id in d and d[data.sensor_id] for d in self._previous_statuses]
                 if sum(l) > math.ceil((self.PREVIOUS_DATA_SIZE + 1) / 2):
@@ -121,6 +133,7 @@ class BeltInterpreter(object):
                             return
                 return
 
+            self._same_bad_value_counter[data.sensor_id] = 0
 
             if params["scale_responsive"]:
                 width = self.get_rect_width(data.range, params) * self.RECT_SCALE_WIDTH

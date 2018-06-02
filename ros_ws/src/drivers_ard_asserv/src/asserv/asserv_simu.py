@@ -63,17 +63,17 @@ class AsservSimu(AsservAbstract):
         rospy.spin()
 
     def goto(self, goal_id, x, y, direction):
-        rospy.loginfo("[ASSERV] Accepting goal (x = " + str(x) + ", y = " + str(y) + ").")
+        #rospy.loginfo("[ASSERV] Accepting goal (x = " + str(x) + ", y = " + str(y) + ").")
         self._start_trajectory(goal_id, x, y, 0, direction)
         return True
 
     def gotoa(self, goal_id, x, y, a, direction):
-        rospy.loginfo("[ASSERV] Accepting goal (x = " + str(x) + ", y = " + str(y) + ", a = " + str(a) + ").")
+        #rospy.loginfo("[ASSERV] Accepting goal (x = " + str(x) + ", y = " + str(y) + ", a = " + str(a) + ").")
         self._start_trajectory(goal_id, x, y, a, direction, has_angle=True)
         return True
 
     def rot(self, goal_id, a, no_modulo):
-        rospy.loginfo("[ASSERV] Accepting goal (a = " + str(a) + ").")
+        #rospy.loginfo("[ASSERV] Accepting goal (a = " + str(a) + ").")
         self._current_pose.theta = a
         self._node.goal_reached(goal_id, True)
         return True
@@ -87,7 +87,7 @@ class AsservSimu(AsservAbstract):
         return False
 
     def set_emergency_stop(self, stop):
-        rospy.loginfo("[ASSERV] Emergency stop called : " + str(stop))
+        #rospy.loginfo("[ASSERV] Emergency stop called : " + str(stop))
         self._emergency_stop = stop
         if stop:
             self._states.stop_movement()
@@ -150,9 +150,6 @@ class AsservSimu(AsservAbstract):
 
             self._current_goal_initial_angle = math.atan2(self._current_goal.pose.y - self._current_pose.y,
                                                           self._current_goal.pose.x - self._current_pose.x)
-
-            rospy.loginfo('initial angle : %f' % self._current_goal_initial_angle)
-            rospy.loginfo('current angle : %f' % self._current_pose.theta)
 
             self._states.start_movement()
 

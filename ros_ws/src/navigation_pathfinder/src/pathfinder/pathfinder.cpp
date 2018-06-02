@@ -20,6 +20,11 @@ Pathfinder::Pathfinder(const string& mapFileName, shared_ptr<PosConvertor> conve
     else
     {
         _convertor = convertor;
+
+        if (_allowedPositions.front().size() * _allowedPositions.size() > 200000) {
+            ROS_WARN("Map image is big, the pathfinder may be very slow ! (150x100px works fine)");
+        }
+
         _convertor->setSizes(tableSize, make_pair<double,double>(_allowedPositions.front().size(), _allowedPositions.size()));
         _dynBarriersMng->setConvertor(_convertor);
         _dynBarriersMng->fetchOccupancyDatas(_allowedPositions.front().size(), _allowedPositions.size());
@@ -31,7 +36,7 @@ bool Pathfinder::findPath(const Point& startPos, const Point& endPos, Path& path
 {
     ROS_DEBUG_STREAM("START: " << startPos);
     ROS_DEBUG_STREAM("END: " << endPos);
-    
+
     if (_allowedPositions.size() == 0 || _allowedPositions.front().size() == 0)
     {
         ROS_ERROR("Allowed positions is empty. Did you load the file?");
@@ -50,7 +55,7 @@ bool Pathfinder::findPath(const Point& startPos, const Point& endPos, Path& path
     {
         if (_renderAfterComputing)
             _mapStorage.saveMapToFile(_renderFile, _allowedPositions, _dynBarriersMng, Path(), Path());
-        ROS_DEBUG("Pathfinder: No path found!");
+        ROS_ERROR_STREAM("No path found !");
         return true;
     }
     
@@ -58,11 +63,9 @@ bool Pathfinder::findPath(const Point& startPos, const Point& endPos, Path& path
     path = smoothPath(rawPath);
     
     auto endTime = chrono::high_resolution_clock::now();
-    ROS_DEBUG_STREAM("DONE, path contains " << path.size() << " waypoints");
-    ROS_DEBUG_STREAM("Path: " << pathMapToStr(path));
     chrono::duration<double, std::milli> elapsedSeconds = endTime - startTime;
-    ROS_DEBUG_STREAM("Computing time: " << elapsedSeconds.count() << "ms");
-    
+
+    ROS_INFO_STREAM("Found a path with " << path.size() << " points (took " << elapsedSeconds.count() << " ms)");
     
     if (_renderAfterComputing)
         _mapStorage.saveMapToFile(_renderFile, _allowedPositions, _dynBarriersMng, rawPath, path);
@@ -74,7 +77,7 @@ bool Pathfinder::findPathCallback(navigation_pathfinder::FindPath::Request& req,
 {
     Path path;
     
-    ROS_DEBUG_STREAM("FindPath: I heard (" << req.posStart.x << "," << req.posStart.y << "), (" << req.posEnd.x << ", " << req.posEnd.y << ")");
+    ROS_INFO_STREAM("Received request from (" << req.posStart.x << "," << req.posStart.y << ") to (" << req.posEnd.x << ", " << req.posEnd.y << ")");
     
     auto startPos = pose2DToPoint(req.posStart);
     auto endPos = pose2DToPoint(req.posEnd);
@@ -116,7 +119,7 @@ bool Pathfinder::exploreGraph(Vect2DShort& distMap, const Point& startPos, const
     
     if (!isValid(startPos) || !isValid(endPos))
     {
-        ROS_DEBUG("Start or end position is not valid!");
+        ROS_ERROR("Start or end position is not valid!");
         return false;
     }
     
