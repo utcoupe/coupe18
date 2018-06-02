@@ -84,11 +84,12 @@ class ActuatorsCanon:
             goal_flipper_canon.preset = preset
             goal_flipper_canon.timeout = DEFAULT_ACTUATORS_TIMEOUT
             self._client.send_goal(goal_flipper_canon)
-            goal_flipper_bin = DispatchGoal()
-            goal_flipper_bin.name = FLIPPER_NAME_BIN
-            goal_flipper_bin.preset = preset
-            goal_flipper_bin.timeout = DEFAULT_ACTUATORS_TIMEOUT
-            self._client.send_goal(goal_flipper_bin)
+            # Flipper bin side has been physically removed...
+            # goal_flipper_bin = DispatchGoal()
+            # goal_flipper_bin.name = FLIPPER_NAME_BIN
+            # goal_flipper_bin.preset = preset
+            # goal_flipper_bin.timeout = DEFAULT_ACTUATORS_TIMEOUT
+            # self._client.send_goal(goal_flipper_bin)
 
     def set_halted(self, is_halted):
         self._is_halted = is_halted
