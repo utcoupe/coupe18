@@ -6,7 +6,7 @@ class TaskStatus():
     NEEDSPREVIOUS       = ('NEEDSPREVIOUS'      , '↳')                 # Task can't execute yet because it needs the previous task to be at SUCCESS still.
     PENDING             = ('PENDING'            , '⋯')                 # For lists only. Active when one or not all child tasks are still active.
     FREE                = ('FREE'               , '⬜')                # Free task, not activated yet.
-    PAUSED              = ('PAUSED'             , '🔶')                # TODO implement entire pause engine
+    PAUSED              = ('PAUSED'             , '')                # TODO implement entire pause engine
     ERROR               = ('ERROR'              , '⛔', "error_msg")   # Error. Order couldn't be done, AI will try to find an alternative path of orders in the tree.
     BLOCKED             = ('BLOCKED'            , '◼')                 # Node can't execute because conditions aren't fully satisfied.
     SUCCESS             = ('SUCCESS'            , '🆗', 0.0)           # Order and lists complete.

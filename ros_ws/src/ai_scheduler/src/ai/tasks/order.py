@@ -10,6 +10,8 @@ class Order(Task):
         self.Ref = xml.attrib["ref"]
         if not self.Name:
             self.Name = self.Ref
+        
+        self._prev_status = self.getStatus()
 
         self.Duration = float(xml.attrib["duration"]) if "duration" in xml.attrib else 0.0  # Manually estimated time to execute this action
         self.Message = Message(xml.find("message"))
@@ -37,6 +39,7 @@ class Order(Task):
         self.setStatus(TaskStatus.FREE, refresh_parent) #TODO on all types of tasks, reset to needsprevious if it was like that at init
 
     def execute(self, communicator):
+        self._prev_status = self.getStatus()
         self.setStatus(TaskStatus.WAITINGFORRESPONSE)
         rospy.loginfo("Executing task: {}...".format(self.__repr__()))
 
@@ -50,12 +53,16 @@ class Order(Task):
             return False
         else:
             ranks = [TaskStatus.SUCCESS, TaskStatus.ERROR, TaskStatus.PAUSED] # defines which valid response gets prioritized.
-                                                                            # last is most important.
+                                                                              # last is most important.
             results = [response.Result for response in self.Responses if response.compare(res)]
             if results: # If one/several responses checks succeed, take the max ranked status.
                 new_status = ranks[max([ranks.index(r) for r in results])]
             else: # if the response corresponds to nothing in the XML, default to failed.
                 new_status = TaskStatus.ERROR
+
+        if self._prev_status == TaskStatus.PAUSED and new_status == TaskStatus.PAUSED:
+            new_status = TaskStatus.BLOCKED # do not let a paused action go back to paused (potential infinite loop)
+
         self.setStatus(new_status)
 
         if new_status == TaskStatus.SUCCESS:

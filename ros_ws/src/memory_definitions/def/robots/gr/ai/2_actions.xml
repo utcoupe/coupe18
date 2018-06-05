@@ -40,7 +40,7 @@
 
 
 	<!-- Actuators macros -->
-	<action ref="open_arm_wide" name="Open arm wide">
+	<action ref="open_arm_wide" name="Open arm wide"> <!-- Should be replaced with a call to actuators (and set a PRESET named CLOSE)-->
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -51,7 +51,7 @@
 		</actions>
 	</action>
 
-	<action ref="close_arm_slow" name="Close arm slow">
+	<action ref="close_arm_slow" name="Close arm slow"> <!-- Should be replaced with a call to actuators (and set a PRESET named CLOSE)-->
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -63,7 +63,7 @@
 		</actions>
 	</action>
 
-	<action ref="open_arm_slow" name="Open arm slow">
+	<action ref="open_arm_slow" name="Open arm slow"> <!-- Should be replaced with a call to actuators (and set a PRESET named CLOSE)-->
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -75,7 +75,7 @@
 		</actions>
 	</action>
 
-	<action ref="close_arm" name="Close arm">
+	<action ref="close_arm" name="Close arm"> <!-- Should be replaced with a call to actuators (and set a PRESET named CLOSE)-->
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -88,7 +88,7 @@
 
 
 	<!-- Game actions -->
-	<action ref="activate_button" name="Go and activate Home Button" reward="25">
+	<action ref="activate_button" name="Go and activate Home Button">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -103,7 +103,7 @@
 				<duration>1200</duration>
 			</orderref>
 
-			<orderref ref="delay">
+			<orderref ref="delay" reward="25">
 				<duration>1.2</duration>
 			</orderref>
 
@@ -222,13 +222,13 @@
 					<waypoint_name>way_bee_accost_orange</waypoint_name>
 				</orderref>
 
-				<actionref ref="open_arm_slow" name="open arm" />
+				<actionref ref="open_arm_slow" name="open arm"/>
 
 				<orderref ref="delay">
 					<duration>0.5</duration>
 				</orderref>
 
-				<actionref ref="close_arm" name="close arm" />
+				<actionref ref="close_arm" name="close arm"/>
 
 				<orderref ref="navigator_goto_waypoint" name="accost bee">
 					<waypoint_name>way_bee_approach_orange</waypoint_name>

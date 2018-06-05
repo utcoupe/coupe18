@@ -80,7 +80,7 @@ class Action(Task):
         self.setStatus(self.TASKS.getStatus())
 
     def execute(self, communicator):
-        if self.getStatus() in [TaskStatus.FREE, TaskStatus.PENDING]:
+        if self.getStatus() in [TaskStatus.FREE, TaskStatus.PENDING, TaskStatus.PAUSED]:
             next_tasks = self.getNext()
             if type(next_tasks) is list:
                 raise NotImplementedError, "Simultaneous task launches aren't supported yet !" #TODO

@@ -82,32 +82,43 @@ class ActionList(Task):
         if   self.executionOrder == ExecutionOrder.LINEAR:
             for task in self.TASKS:
                 if task.getStatus() in [TaskStatus.FREE, TaskStatus.PENDING]: return task
+            for task in self.TASKS:
+                if task.getStatus() == TaskStatus.PAUSED: return task
+
 
         elif self.executionOrder == ExecutionOrder.RANDOM:
-            free_tasks = [task for task in self.TASKS if task.getStatus() == TaskStatus.FREE]
-            return free_tasks[random.randint(0, len(free_tasks) - 1)]
+            tasks = [task for task in self.TASKS if task.getStatus() == TaskStatus.FREE]
+            if not tasks:
+                tasks = [task for task in self.TASKS if task.getStatus() == TaskStatus.PAUSED]
+            return tasks[random.randint(0, len(tasks) - 1)]
 
         elif self.executionOrder == ExecutionOrder.SIMULTANEOUS:
-            return [task for task in self.TASKS if task.getStatus() in [TaskStatus.FREE, TaskStatus.PENDING]] #TODO#1
+            return [task for task in self.TASKS if task.getStatus() in [TaskStatus.FREE, TaskStatus.PENDING, TaskStatus.PAUSED]] #TODO#1
 
         elif self.executionOrder == ExecutionOrder.FASTEST:
-            record, result = 10000000, None
-            for task in self.TASKS:
+            record, next_task = 10000000, None
+            tasks = [task for task in self.TASKS if task.getStatus() == TaskStatus.FREE]
+            if not tasks:
+                tasks = [task for task in self.TASKS if task.getStatus() == TaskStatus.PAUSED]
+            for task in tasks:
                 if task.getDuration() < record:
                     record = task.getDuration()
-                    result = task
-            return result
+                    next_task = task
+            return next_task
 
         elif self.executionOrder == ExecutionOrder.MOSTREWARD:
             record, result = -1, None
-            for task in [task for task in self.TASKS if task.getStatus() == TaskStatus.FREE]:
+            tasks = [task for task in self.TASKS if task.getStatus() == TaskStatus.FREE]
+            if not tasks:
+                tasks = [task for task in self.TASKS if task.getStatus() == TaskStatus.PAUSED]
+            for task in tasks:
                 if task.getReward() > record:
                     record = task.getReward()
                     result = task
             return result
 
     def execute(self, communicator):
-        if self.getStatus() in [TaskStatus.FREE, TaskStatus.PENDING]:
+        if self.getStatus() in [TaskStatus.FREE, TaskStatus.PENDING, TaskStatus.PAUSED]:
             self.getNext().execute(communicator)
         else:
             rospy.logerr("ERROR asked to execute a task that's not free")
@@ -160,12 +171,12 @@ class ActionList(Task):
                         task.setStatus(TaskStatus.BLOCKED)
                 return
 
-        if TaskStatus.PAUSED in child_statuses:
-            self.setStatus(TaskStatus.PAUSED);return
         if TaskStatus.PENDING in child_statuses:
             self.setStatus(TaskStatus.PENDING);return
         if TaskStatus.FREE in child_statuses:
             self.setStatus(TaskStatus.PENDING);return
+        if TaskStatus.PAUSED in child_statuses:
+            self.setStatus(TaskStatus.PAUSED);return
 
         if self.executionMode == ExecutionMode.ALL:
             if len([1 for c in child_statuses if c == TaskStatus.SUCCESS]) == len(child_statuses):

@@ -27,6 +27,7 @@ class RobotAI():
 
             if strategy.canContinue():
                 strategy.getNext().execute(strategy.communicator)
+                strategy.PrettyPrint()
             else:
                 rospy.loginfo("[AI] In-Game actions finished!")
                 break
