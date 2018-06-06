@@ -80,14 +80,14 @@ function env_setup() {
 		if [ "$SHELL" = "/bin/zsh" ]; then
 			echo "export UTCOUPE_WORKSPACE=$PWD" >> $HOME/.zshrc
 			echo "export ROS_LANG_DISABLE=genlisp:geneus" >> $HOME/.zshrc
-			echo "export ROSCONSOLE_FORMAT='[${node}:${severity}] [${time}] : ${message}'" >> $HOME/.zshrc
+			echo "export ROSCONSOLE_FORMAT='[\${node}:\${severity}] [\${time}] : \${message}'" >> $HOME/.zshrc
 			red_echo "Warning :\n"
 			red_echo "Please \"source ~/.zshrc\" and run again this script if necessary\n"
 			exit 1
 		else
 			echo "export UTCOUPE_WORKSPACE=$PWD" >> $HOME/.bashrc
 			echo "export ROS_LANG_DISABLE=genlisp:geneus" >> $HOME/.bashrc
-			echo "export ROSCONSOLE_FORMAT='[${node}:${severity}] [${time}] : ${message}'" >> $HOME/.bashrc
+			echo "export ROSCONSOLE_FORMAT='[\${node}:\${severity}] [\${time}] : \${message}'" >> $HOME/.bashrc
             		source $HOME/.bashrc
 		fi
 	fi
