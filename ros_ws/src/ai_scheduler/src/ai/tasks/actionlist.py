@@ -200,6 +200,9 @@ class ActionList(Task):
                 #TODO Block all dependent nodes
                 return
 
+        if TaskStatus.BLOCKED in child_statuses:
+            self.setStatus(TaskStatus.BLOCKED)
+
     def prettyprint(self, indentlevel, hide = False):
         if not hide:
             super(ActionList, self).prettyprint(indentlevel)

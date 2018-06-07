@@ -8,7 +8,7 @@ class TaskStatus():
     FREE                = ('FREE'               , '⬜')                # Free task, not activated yet.
     PAUSED              = ('PAUSED'             , '')                # TODO implement entire pause engine
     ERROR               = ('ERROR'              , '⛔', "error_msg")   # Error. Order couldn't be done, AI will try to find an alternative path of orders in the tree.
-    BLOCKED             = ('BLOCKED'            , '◼')                 # Node can't execute because conditions aren't fully satisfied.
+    BLOCKED             = ('BLOCKED'            , '')                 # Node can't execute because conditions aren't fully satisfied.
     SUCCESS             = ('SUCCESS'            , '🆗', 0.0)           # Order and lists complete.
     @staticmethod
     def toEmoji(status):

@@ -49,7 +49,7 @@
 		</actions>
 	</action>
 
-	<action ref="load_unicolor_distributor" name="Load unicolor distributor" reward="10">
+	<action ref="load_unicolor_distributor" name="Load unicolor distributor">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -58,7 +58,7 @@
 				<direction>1</direction>
 			</orderref>
 
-			<orderref ref="actuator_set" name="activate button with servo">
+			<orderref ref="actuator_set" name="prepare servo">
 				<name>servo_lock</name>
 				<preset>RIGHT</preset>
 			</orderref>
@@ -69,7 +69,7 @@
 				<disable_collisions>1</disable_collisions>
 			</orderref>
 
-			<orderref ref="actuator_set" name="activate button with servo">
+			<orderref ref="actuator_set" name="open distributor with servo" reward="10">
 				<name>servo_lock</name>
 				<preset>LEFT</preset>
 			</orderref>
@@ -77,18 +77,23 @@
 			<orderref ref="delay">
 				<duration>0.5</duration>
 			</orderref>
+
+			<orderref ref="navigator_goto_waypoint" name="go back to approach">
+				<waypoint_name>way_uni_distrib_approach</waypoint_name>
+				<direction>0</direction>
+			</orderref>
 		</actions>
 	</action>
 
-	<action ref="load_multicolor_distributor" name="Load multicolor distributor" reward="10">
+	<action ref="load_multicolor_distributor" name="Load multicolor distributor">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
-			<orderref ref="navigator_goto_waypoint" name="approach distributor">>
+			<orderref ref="navigator_goto_waypoint" name="approach distributor">
 				<waypoint_name>way_multi_distrib_approach</waypoint_name>
 			</orderref>
 
-			<orderref ref="actuator_set" name="activate button with servo">
+			<orderref ref="actuator_set" name="prepare servo">
 				<name>servo_lock</name>
 				<preset>RIGHT</preset>
 			</orderref>
@@ -99,7 +104,7 @@
 				<disable_collisions>1</disable_collisions>
 			</orderref>
 
-			<orderref ref="actuator_set" name="activate button with servo">
+			<orderref ref="actuator_set" name="open distributor with servo" reward="10">
 				<name>servo_lock</name>
 				<preset>LEFT</preset>
 			</orderref>
@@ -115,35 +120,7 @@
 		</actions>
 	</action>
 
-	<action ref="fire_full_clean_balls" name="Fire clean balls to water tower" reward="40">
-		<params></params>
-		<conditions></conditions>
-		<actions exec="all" order="linear">
-			<orderref ref="navigator_goto_waypoint" name="goto fire position">
-				<waypoint_name>way_fire_unicolor</waypoint_name>
-				<direction>1</direction>
-			</orderref>
-
-			<orderref ref="do_canon_action" name="activate canon">
-				<fire_distance>1.0</fire_distance>
-			</orderref>
-
-			<actionlist repeat="13">
-				<orderref ref="do_barrel_action">
-					<sort>0</sort> <!-- TODO: 1 -->
-				</orderref>
-				<orderref ref="delay">
-					<duration>0.5</duration>
-				</orderref>
-			</actionlist>
-
-			<orderref ref="do_canon_action" name="deactivate canon">
-				<fire_distance>-1</fire_distance>
-			</orderref>
-		</actions>
-	</action>
-
-	<action ref="fire_unicolor_balls" name="Fire uni balls to water tower" reward="40">
+	<action ref="fire_unicolor_balls" name="Fire uni balls to water tower">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -156,7 +133,7 @@
 				<fire_distance>0.9</fire_distance>
 			</orderref>
 
-			<actionlist repeat="10">
+			<actionlist repeat="10" exec="+" reward="40">
 				<orderref ref="do_barrel_action">
 					<sort>0</sort>
 				</orderref>
@@ -201,7 +178,7 @@
 		</actions>
 	</action>
 
-	<action ref="accost_station" name="Accost the station in prevision to unload">
+	<action ref="unload_multicolor_distributor" name="Unload balls to station">
 		<params></params>
 		<conditions></conditions>
 		<actions exec="all" order="linear">
@@ -213,50 +190,12 @@
 				<waypoint_name>way_station_accost</waypoint_name>
 				<direction>1</direction>
 			</orderref>
-		</actions>
-	</action>
 
-	<!-- this action supposes that the robot is already near a station -->
-	<action ref="unload_ball_in_station" name="Unload one ball to the station">
-		<!--reward is set to 5 because we unload all balls (good and bad ones) so the mean value of unloading one ball is 5 points-->
-		<params></params>
-		<conditions></conditions>
-		<actions exec="all" order="linear">
-
-			<orderref ref="do_barrel_action">
+			<actionlist name="unload balls" repeat="8" exec="+" reward="40">
+				<orderref ref="do_barrel_action">
 					<sort>1</sort>
-			</orderref>
-			<!-- useless because the bin has been removed ! -->
-			<!--&lt;!&ndash; add a tempo to let the ball go in the bin&ndash;&gt;-->
-			<!--<orderref ref="delay">-->
-				<!--<duration>0.5</duration>-->
-			<!--</orderref>-->
-			<!--<orderref ref="actuator_set" name="front lift bin">-->
-				<!--<name>servo_front_lift</name>-->
-				<!--<preset>OPEN</preset>-->
-			<!--</orderref>-->
-			<!--<orderref ref="delay">-->
-				<!--<duration>0.1</duration>-->
-			<!--</orderref>-->
-			<!--<orderref ref="actuator_set" name="back lift bin">-->
-				<!--<name>servo_back_lift</name>-->
-				<!--<preset>OPEN</preset>-->
-			<!--</orderref>-->
-			<!--<orderref ref="delay">-->
-				<!--<duration>1</duration>-->
-			<!--</orderref>-->
-			<!--<orderref ref="actuator_set" name="front lift bin">-->
-				<!--<name>servo_front_lift</name>-->
-				<!--<preset>CLOSE</preset>-->
-			<!--</orderref>-->
-			<!--<orderref ref="delay">-->
-				<!--<duration>0.1</duration>-->
-			<!--</orderref>-->
-			<!--<orderref ref="actuator_set" name="back lift bin">-->
-				<!--<name>servo_back_lift</name>-->
-				<!--<preset>CLOSE</preset>-->
-			<!--</orderref>-->
-
+				</orderref>
+			</actionlist>
 		</actions>
 	</action>
 

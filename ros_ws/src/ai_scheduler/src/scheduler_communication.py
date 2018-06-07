@@ -158,7 +158,8 @@ class AICommunication():
             response =  client.get_result()
             if response is not None:
                 rospy.loginfo("Got action result.")
-            else: rospy.logerr("Action response timeout reached!")
+            else: 
+                rospy.logerr("Action response timeout reached!")
             return response
         else:
             rospy.logerr("Action wait_for_server timeout reached!")

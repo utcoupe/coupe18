@@ -50,7 +50,7 @@ class Order(Task):
         if isinstance(res, bool):
             new_status = TaskStatus.SUCCESS if res else TaskStatus.ERROR
         elif res is None: #occurs in timeout situations
-            return False
+            new_status = TaskStatus.PAUSED
         else:
             ranks = [TaskStatus.SUCCESS, TaskStatus.ERROR, TaskStatus.PAUSED] # defines which valid response gets prioritized.
                                                                               # last is most important.
@@ -61,13 +61,15 @@ class Order(Task):
                 new_status = TaskStatus.ERROR
 
         if self._prev_status == TaskStatus.PAUSED and new_status == TaskStatus.PAUSED:
+            rospy.logwarn("Order was resumed but failed again, blocking it.")
             new_status = TaskStatus.BLOCKED # do not let a paused action go back to paused (potential infinite loop)
 
+        print "setting new status " + str(new_status)
         self.setStatus(new_status)
 
         if new_status == TaskStatus.SUCCESS:
             rospy.loginfo("Task succeeded: {}".format(self.__repr__()))
-        elif new_status == TaskStatus.ERROR:
+        elif new_status in [TaskStatus.ERROR, TaskStatus.BLOCKED]:
             rospy.logerr("Task failed: {}".format(self.__repr__()))
         elif new_status == TaskStatus.PAUSED:
             rospy.logwarn("Task paused: {}. Will eventually try again later.".format(self.__repr__()))
