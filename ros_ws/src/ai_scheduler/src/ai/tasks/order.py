@@ -40,7 +40,7 @@ class Order(Task):
 
     def execute(self, communicator):
         self._prev_status = self.getStatus()
-        self.setStatus(TaskStatus.WAITINGFORRESPONSE)
+        self.setStatus(TaskStatus.PENDING)
         rospy.loginfo("Executing task: {}...".format(self.__repr__()))
 
         self.Message.send(communicator, self.callback)

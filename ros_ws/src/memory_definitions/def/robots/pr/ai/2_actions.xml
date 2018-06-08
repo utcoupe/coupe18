@@ -240,7 +240,7 @@
 				<waypoint_name>way_spawn_approach</waypoint_name>
 			</orderref-->
 
-			<orderref ref="navigator_goto_waypoint" name="goto spawn">
+			<orderref ref="navigator_goto_waypoint" name="goto spawn" timeout="40">
 				<waypoint_name>way_spawn</waypoint_name>
 			</orderref>
 		</actions>

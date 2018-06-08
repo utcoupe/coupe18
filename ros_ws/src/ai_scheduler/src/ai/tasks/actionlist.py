@@ -39,7 +39,7 @@ class ActionList(Task):
                 instances = [action for action in actions if action.Ref == node_xml.attrib["ref"]] if tag == "actionref" else \
                             [order  for order  in orders  if order.Ref  == node_xml.attrib["ref"]]
                 if len(instances) != 1:
-                    raise KeyError, "{} action instance(s) found with the name '{}'.".format(len(instances), node_xml.attrib["ref"])
+                    raise KeyError, "{} action or order instance(s) found with the name '{}'.".format(len(instances), node_xml.attrib["ref"])
                 i = copy.deepcopy(instances[0])
                 i.setParent(self)
                 i.Reward = int(node_xml.attrib["reward"]) if "reward" in node_xml.attrib else i.Reward
@@ -48,6 +48,8 @@ class ActionList(Task):
                     i.Status = TaskStatus.NEEDSPREVIOUS
                 if "name" in node_xml.attrib:
                     i.Name = node_xml.attrib["name"]
+                if tag == "orderref":
+                    i.Message.Timeout = float(node_xml.attrib["timeout"]) if "timeout" in node_xml.attrib else i.Message.Timeout
                 tasks.append(i)
             elif tag == "conditions":
                 self.loadConditions(node_xml)
@@ -160,8 +162,6 @@ class ActionList(Task):
         # CAUTION The order of conditions do count!
         if TaskStatus.CRITICAL in child_statuses:
             self.setStatus(TaskStatus.CRITICAL);return
-        if TaskStatus.WAITINGFORRESPONSE in child_statuses:
-            self.setStatus(TaskStatus.WAITINGFORRESPONSE);return
 
         if self.executionMode == ExecutionMode.ONE:
             if len([1 for c in child_statuses if c == TaskStatus.SUCCESS]) == 1:

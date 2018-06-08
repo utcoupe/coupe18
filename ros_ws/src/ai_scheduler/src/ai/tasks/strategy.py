@@ -16,7 +16,7 @@ class Strategy(Task):
         self.TASKS = ActionList(xml, actions, orders)
 
     def canContinue(self):
-        return self.getStatus() in [TaskStatus.FREE, TaskStatus.PENDING, TaskStatus.WAITINGFORRESPONSE, TaskStatus.PAUSED]
+        return self.getStatus() in [TaskStatus.FREE, TaskStatus.PENDING, TaskStatus.PAUSED]
 
     def getNext(self): # Returns the next free task (ActionList, Action or Order).
         return self.TASKS.getNext()
