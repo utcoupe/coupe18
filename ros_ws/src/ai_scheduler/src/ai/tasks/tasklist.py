@@ -7,30 +7,28 @@ from task import Task
 from order import Order
 
 
-class ActionList(Task):
+class TaskList(Task):
     MAX_REPEATS = 50 # If repeat mode is 'while', this will be the repeat limit.
 
     def __init__(self, xml, actions, orders):
-        super(ActionList, self).__init__(xml)
-        self.Name = xml.attrib["name"] if "name" in xml.attrib else xml.tag
+        super(TaskList, self).__init__(xml)
         self.executionMode  = ExecutionMode.fromText( xml.attrib["exec"])   if "exec"  in xml.attrib else ExecutionMode.ALL
         self.repeatMode     = RepeatMode.fromText(    xml.attrib["repeat"]) if "repeat"in xml.attrib else RepeatMode.ONCE
         self._repeats = 0 # used to track how many times the list already repeated
         self._successful_repeats = 0
-        self._repeats_max = ActionList.MAX_REPEATS
+        self._repeats_max = TaskList.MAX_REPEATS
         if self.repeatMode == RepeatMode.ONCE: self._repeats_max = 1
         if self.repeatMode == RepeatMode.FOR:  self._repeats_max = int(xml.attrib["repeat"])
 
         self.executionOrder = ExecutionOrder.fromText(xml.attrib["order"])  if "order" in xml.attrib else ExecutionOrder.LINEAR
-        self.Conditions = xml.find("conditions") if "conditions" in xml else None # Conditions that must be true before executing the actions.
         self.TASKS = self.loadxml(xml, actions, orders)
 
     def loadxml(self, xml, actions, orders):
         tasks = []
         for node_xml in xml:
             tag = node_xml.tag
-            if tag == "actionlist":
-                i = ActionList(node_xml, actions, orders)
+            if tag == "tasklist":
+                i = TaskList(node_xml, actions, orders)
                 i.setParent(self)
                 if "needsprevious" in node_xml.attrib and node_xml.attrib["needsprevious"] == 'true':
                     i.Status = TaskStatus.NEEDSPREVIOUS
@@ -51,21 +49,12 @@ class ActionList(Task):
                 if tag == "orderref":
                     i.Message.Timeout = float(node_xml.attrib["timeout"]) if "timeout" in node_xml.attrib else i.Message.Timeout
                 tasks.append(i)
-            elif tag == "conditions":
-                self.loadConditions(node_xml)
             elif tag == "team":
                 if node_xml.attrib["name"] == GameProperties.CURRENT_TEAM:
                     tasks += self.loadxml(node_xml, actions, orders)
             else:
                 rospy.logwarn("WARNING Element skipped at init because '{}' type was not recognized.".format(tag))
         return tasks
-
-    def loadConditions(self, xml):
-        #Conditions definition
-        for conditions_xml in xml:
-            if conditions_xml.tag == "needsprevious":
-                #TODO check if it's possible (if there's a valid task before)
-                self.NeedsPrevious = True
 
     def getReward(self):
         return self.Reward + sum([task.getReward() for task in self.TASKS])
@@ -121,9 +110,12 @@ class ActionList(Task):
 
     def execute(self, communicator):
         if self.getStatus() in [TaskStatus.FREE, TaskStatus.PENDING, TaskStatus.PAUSED]:
-            self.getNext().execute(communicator)
+            next_tasks = self.getNext()
+            if type(next_tasks) is list:
+                raise NotImplementedError, "Simultaneous task launches aren't supported yet !" #TODO
+            next_tasks.execute(communicator)
         else:
-            rospy.logerr("ERROR asked to execute a task that's not free")
+            raise ValueError, "ERROR asked to execute '{}' task that's not free".format(self.__repr__())
 
     def resetStatus(self, refresh_parent=False): # wipes all progress of this list and all descendent tasks.
         self.setStatus(TaskStatus.FREE, refresh_parent)
@@ -203,15 +195,14 @@ class ActionList(Task):
         if TaskStatus.BLOCKED in child_statuses:
             self.setStatus(TaskStatus.BLOCKED)
 
-    def prettyprint(self, indentlevel, hide = False):
-        if not hide:
-            super(ActionList, self).prettyprint(indentlevel)
+    def prettyprint(self, indentlevel):
+        super(TaskList, self).prettyprint(indentlevel)
         for task in self.TASKS:
-            task.prettyprint(indentlevel + (1 if not hide else 0))
+            task.prettyprint(indentlevel + 1)
 
     def __repr__(self):
         c = Console();c.setstyle(Colors.BOLD);c.setstyle(Colors.RED)
-        c.addtext("[{} ActionList] {} ".format(self.getStatusEmoji(), self.Name))
+        c.addtext("[{} TaskList] {} ".format(self.getStatusEmoji(), self.Name))
         c.endstyle();c.setstyle(Colors.GRAY)
         c.addtext("[{}{}{}{}{}]".format(ExecutionMode.toEmoji(self.executionMode),
                                        " " + ExecutionOrder.toEmoji(self.executionOrder),

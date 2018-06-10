@@ -1,5 +1,5 @@
 from definitions import GameProperties
 from strategy import Strategy
-from actionlist import ActionList
+from tasklist import TaskList
 from action import Action
 from order import Order

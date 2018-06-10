@@ -10,7 +10,7 @@ class Order(Task):
         self.Ref = xml.attrib["ref"]
         if not self.Name:
             self.Name = self.Ref
-        
+
         self._prev_status = self.getStatus()
 
         self.Duration = float(xml.attrib["duration"]) if "duration" in xml.attrib else 0.0  # Manually estimated time to execute this action

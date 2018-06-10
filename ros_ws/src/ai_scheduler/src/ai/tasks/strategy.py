@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import rospy
 from definitions import *
-from actionlist import ActionList
+from tasklist import TaskList
 from task import Task
 
 
@@ -13,12 +13,12 @@ class Strategy(Task):
         self.loadxml(xml, actions, orders)
 
     def loadxml(self, xml, actions, orders):
-        self.TASKS = ActionList(xml, actions, orders)
+        self.TASKS = TaskList(xml, actions, orders)
 
     def canContinue(self):
         return self.getStatus() in [TaskStatus.FREE, TaskStatus.PENDING, TaskStatus.PAUSED]
 
-    def getNext(self): # Returns the next free task (ActionList, Action or Order).
+    def getNext(self): # Returns the next free task (TaskList, Action or Order).
         return self.TASKS.getNext()
 
     def sendReward(self, communicator):

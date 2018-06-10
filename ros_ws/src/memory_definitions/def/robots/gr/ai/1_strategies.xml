@@ -9,11 +9,11 @@
 		<actionref ref="game_setup"/>
 		<actionref ref="game_start"/>
 
-		<actionlist name="Main actions">
+		<tasklist name="Main actions">
 			<actionref ref="activate_button"/>
 			<actionref ref="activate_bee"/>
 			<actionref ref="get_cubes"/>
-		</actionlist>
+		</tasklist>
 	</strategy>
 
 	<!-- Test strategies -->
@@ -21,27 +21,27 @@
 		<actionref ref="game_setup"/>
 		<actionref ref="game_start"/>
 
-		<actionlist name="Main actions">
+		<tasklist name="Main actions">
 			<actionref ref="activate_button" reward="25"/>
-		</actionlist>
+		</tasklist>
 	</strategy>
 
 	<strategy name="test_button_bee">
 		<actionref ref="game_setup"/>
 		<actionref ref="game_start"/>
 
-		<actionlist name="Main actions">
+		<tasklist name="Main actions">
 			<actionref ref="activate_button" reward="25"/>
 			<actionref ref="activate_bee" reward="50"/>
-		</actionlist>
+		</tasklist>
 	</strategy>
 
 	<strategy name="cube">
 		<actionref ref="game_setup"/>
 		<actionref ref="game_start"/>
 
-		<actionlist name="Main actions">
+		<tasklist name="Main actions">
 			<actionref ref="get_cubes" reward="5"/>
-		</actionlist>
+		</tasklist>
 	</strategy>
 </strategies>

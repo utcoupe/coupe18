@@ -2,18 +2,16 @@
 	<!-- Game Management routines -->
 	<action ref="jack">
 		<params/>
-		<conditions/>
 		<actions exec="all" order="linear">
-			<actionlist repeat="3">
+			<tasklist repeat="3">
 				<orderref ref="ask_for_jack"/>
-			</actionlist>
+			</tasklist>
 			<orderref ref="wait_for_jack"/>
 		</actions>
 	</action>
 
 	<action ref="game_start" name="Game start routine actions">
 		<params/>
-		<conditions/>
 		<actions>
 			<orderref ref="set_robot_pos">
 				<position_waypoint>way_spawn_gr</position_waypoint>
@@ -31,7 +29,6 @@
 
 	<action ref="game_setup" name="Game setup">
 		<params/>
-		<conditions/>
 		<actions>
 			<orderref ref="delay" name="5 points bee loaded" reward="5"/>
 			<orderref ref="delay" name="5 points home installed" reward="5"/>
@@ -42,7 +39,6 @@
 	<!-- Actuators macros -->
 	<action ref="open_arm_wide" name="Open arm wide"> <!-- Should be replaced with a call to actuators (and set a PRESET named CLOSE)-->
 		<params></params>
-		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<orderref ref="actuator_ax12_set_pos">
 				<motor_id>3</motor_id>
@@ -53,7 +49,6 @@
 
 	<action ref="close_arm_slow" name="Close arm slow"> <!-- Should be replaced with a call to actuators (and set a PRESET named CLOSE)-->
 		<params></params>
-		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<orderref ref="actuator_ax12_set_pos">
 				<motor_id>3</motor_id>
@@ -65,7 +60,6 @@
 
 	<action ref="open_arm_slow" name="Open arm slow"> <!-- Should be replaced with a call to actuators (and set a PRESET named CLOSE)-->
 		<params></params>
-		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<orderref ref="actuator_ax12_set_pos">
 				<motor_id>3</motor_id>
@@ -77,7 +71,6 @@
 
 	<action ref="close_arm" name="Close arm"> <!-- Should be replaced with a call to actuators (and set a PRESET named CLOSE)-->
 		<params></params>
-		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<orderref ref="actuator_ax12_set_pos">
 				<motor_id>3</motor_id>
@@ -90,7 +83,6 @@
 	<!-- Game actions -->
 	<action ref="activate_button" name="Go and activate Home Button">
 		<params></params>
-		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<orderref ref="navigator_goto_waypoint" name="approach button">
 				<waypoint_name>way_button_approach</waypoint_name>
@@ -116,7 +108,6 @@
 
 	<action ref="push_grape_1" name="Simply push grape 1 cubes to the zone" reward="5">
 		<params></params>
-		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<orderref ref="asserv_goto_waypoint">
 				<position_waypoint>way_grape_1_approach</position_waypoint>
@@ -141,7 +132,6 @@
 
 	<action ref="push_grape_2" name="Simply push grape 2 cubes to the zone" reward="5">
 		<params></params>
-		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<orderref ref="navigator_goto_waypoint" name="go behind the cubes">
 				<waypoint_name>way_grape_2_approach</waypoint_name>
@@ -166,7 +156,6 @@
 
 	<!--<action ref="push_bee" name="Push bee">-->
 		<!--<params></params>-->
-		<!--<conditions></conditions>-->
 		<!--<actions exec="all" order="linear">-->
 			<!--<team name="green">-->
 				<!--<orderref ref="actuator_ax12_set_pos">-->
@@ -198,7 +187,6 @@
 
 	<action ref="activate_bee" name="Activate bee" reward="50">
 		<params></params>
-		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<team name="green">
 				<orderref ref="navigator_goto_waypoint" name="approach bee">
@@ -246,7 +234,6 @@
 
 	<action ref="get_cubes" reward="8">
 		<params></params>
-		<conditions></conditions>
 		<actions exec="all" order="linear">
 			<orderref ref="asserv_goto_waypoint">
 				<position_waypoint>way_cube_close_bee</position_waypoint>
