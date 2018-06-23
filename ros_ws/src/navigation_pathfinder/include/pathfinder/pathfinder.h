@@ -16,7 +16,8 @@
 
 
 /**
- * Main class for the pathfinder algorithm. From arrays reprenting the static and dynamic barriers, it looks for a path between two positions and returns the shortest one if at least one exists.
+ * Main class for the pathfinder algorithm.
+ * From arrays reprenting the static and dynamic barriers, it looks for a path between two positions and returns the shortest one if at least one exists.
  */
 class Pathfinder
 {

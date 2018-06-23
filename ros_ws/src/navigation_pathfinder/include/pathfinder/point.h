@@ -6,6 +6,10 @@
 
 #include "geometry_msgs/Pose2D.h"
 
+/**
+ * Class representing a position or a vector.
+ * Have somme basic operators.
+ */
 class Point
 {
 public:

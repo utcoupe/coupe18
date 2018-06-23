@@ -4,11 +4,6 @@
 
 using namespace std;
 
-DynamicBarriersManager::DynamicBarriersManager()
-{
-    //
-}
-
 bool DynamicBarriersManager::hasBarriers(const geometry_msgs::Pose2D& pos)
 {
     for (const auto& subscriber : subscribers)
@@ -35,7 +30,7 @@ bool DynamicBarriersManager::hasBarriers(const Point& pos)
 }
 
 
-void DynamicBarriersManager::addBarrierSubscriber(unique_ptr<AbstractBarriersSubscriber> && subscriber)
+void DynamicBarriersManager::addBarrierSubscriber(BarriersSubscriber && subscriber)
 {
     subscribers.push_back(std::move(subscriber));
 }
