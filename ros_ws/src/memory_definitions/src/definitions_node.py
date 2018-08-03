@@ -17,6 +17,8 @@ def callback(req):
             req_final = ""
         else:
             req_final = "robots/{}/{}".format(rospy.get_param("/robot").lower(), req.request)
+            if req_split[0] == "ai" and req_split[1] == "system_orders.xml": # exception.
+                req_final = req.request
     else:
         req_final = req.request
 

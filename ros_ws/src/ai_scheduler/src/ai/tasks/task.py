@@ -11,14 +11,6 @@ class Task(object):
         self.Parent = None
         self.NeedsPrevious = False
 
-        self.loadConditions(xml)
-
-    def loadConditions(self, xml):
-        self.Conditions = []
-        if not "conditions" in [node.tag for node in xml]: return
-        for condition in xml.find("conditions"):
-            pass#self.Conditions.append()
-
     def getReward(self):
         return self.Reward
 

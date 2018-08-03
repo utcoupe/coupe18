@@ -2,14 +2,15 @@
 import os
 import rospy
 import xml.etree.ElementTree as ET
-from tasks import GameProperties, Strategy, ActionList, Action, Order
+from tasks import GameProperties, Strategy, TaskList, Action, Order
 
 from memory_definitions.srv import GetDefinition
 
 class AILoader():
-    STRATEGIES_FILE = "1_strategies.xml"
-    ACTIONS_FILE    = "2_actions.xml"
-    ORDERS_FILE     = "3_orders.xml"
+    STRATEGIES_FILE    = "1_strategies.xml"
+    ACTIONS_FILE       = "2_actions.xml"
+    SYSTEM_ORDERS_FILE = "system_orders.xml"
+    ORDERS_FILE        = "3_orders.xml"
 
     def __init__(self):
         pass# self.xml_dirpath = os.path.dirname(__file__) + "/../../def/"
@@ -26,10 +27,16 @@ class AILoader():
         return self._load_strategy(self._load_actions(orders), orders, communicator)
 
     def _load_orders(self):
+        xml_system_orders = ET.parse(self._get_path(self.SYSTEM_ORDERS_FILE)).getroot()
         xml_orders = ET.parse(self._get_path(self.ORDERS_FILE)).getroot()
 
         orders = []
-        for order_xml in xml_orders:
+        for order_xml in xml_system_orders.findall("order") + xml_orders.findall("order"):
+            # used for robot orders to override system orders that have the same ref.
+            conflicts = [o for o in orders if o.Ref == order_xml.attrib["ref"]]
+            if conflicts:
+                for c in conflicts:
+                    orders.remove(c)
             orders.append(Order(order_xml))
         return orders
 
