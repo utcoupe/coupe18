@@ -21,7 +21,6 @@ class RobotAI():
         strategy.PrettyPrint()
         # Run the whole AI until there are no orders left to execute
         while not rospy.is_shutdown():
-            break #TODO REMOOOVE
             if self.game_status.status == GameStatusConstants.STATUS_HALT:
                 rospy.logwarn("[AI] detected game_status STATUS_HALT, aborting actions.")
                 break
