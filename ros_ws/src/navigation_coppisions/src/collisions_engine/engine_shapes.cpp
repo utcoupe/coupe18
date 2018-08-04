@@ -1,19 +1,20 @@
 #include "engine_shapes.h"
+#include "engine_check_zone.h"
 #include <math.h>
 
 MapObstacle::MapObstacle() //TODO good c++ ..?
 {
     MapObstacle::position = Position(0, 0, 0);
-    MapObstacle::velocity = Velocity(0, 0);
+    MapObstacle::velocity = Velocity();
     float spawn_time = 0;
 }
-MapObstacle::MapObstacle(Point point, Velocity velocity = nullptr)
+MapObstacle::MapObstacle(Point point, Velocity velocity = Velocity())
 {
     MapObstacle::position = Position(point.x, point.y, 0);
     MapObstacle::velocity = velocity;
     float spawn_time = 0;
 }
-MapObstacle::MapObstacle(Position position, Velocity velocity = nullptr)
+MapObstacle::MapObstacle(Position position, Velocity velocity = Velocity())
 {
     MapObstacle::position = position;
     MapObstacle::velocity = velocity;
@@ -21,7 +22,7 @@ MapObstacle::MapObstacle(Position position, Velocity velocity = nullptr)
 }
 
 
-SegmentObstacle::SegmentObstacle(Point first_point, Point last_point, Velocity velocity = nullptr)
+SegmentObstacle::SegmentObstacle(Point first_point, Point last_point, Velocity velocity = Velocity())
     :MapObstacle(first_point, velocity)
 {
     ObstacleType type = ObstacleType::SEGMENT;
@@ -34,7 +35,7 @@ SegmentObstacle::SegmentObstacle(Point first_point, Point last_point, Velocity v
 }
 
 
-CircleObstacle::CircleObstacle(Position position, float radius, Velocity velocity = nullptr)
+CircleObstacle::CircleObstacle(Position position, float radius, Velocity velocity = Velocity())
     :MapObstacle(position, velocity)
 {
     ObstacleType type = ObstacleType::CIRCLE;
@@ -42,7 +43,7 @@ CircleObstacle::CircleObstacle(Position position, float radius, Velocity velocit
 }
 
 
-RectObstacle::RectObstacle(Position position, float width, float height, Velocity velocity = nullptr)
+RectObstacle::RectObstacle(Position position, float width, float height, Velocity velocity = Velocity())
     :MapObstacle(position, velocity)
 {
     ObstacleType type = ObstacleType::RECT;

@@ -2,6 +2,11 @@
 #include <math>
 
 // Velocity class
+Velocity::Velocity()
+{ // Happens while constructing shapes without velocity.
+    const float DEFAULT_SIZE = 0.1; 
+    _check_zone = VelocityCheckZone(DEFAULT_SIZE, DEFAULT_SIZE, CollisionLevel::LEVEL_STOP);
+}
 Velocity::Velocity(float width, float height, float linear, float angular)
 {
     Velocity::linear = linear;

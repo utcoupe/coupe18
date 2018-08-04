@@ -27,6 +27,6 @@ public:
     static float get_stop_distance(float linear_speed);
 private:
     CollisionThresholds();
-}
+};
 
 #endif
