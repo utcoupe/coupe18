@@ -27,7 +27,10 @@ std::vector<MapObstacle> CollisionsResolver::find_collisions(std::vector<MapObst
 
             if (obstacles_shapes[os_i].velocity != nullptr && !intersecting)
             { // if the obstacle has a velocity, check its velocity zone too
-                std::vector<MapObstacle> vel_shapes = obstacles_shapes[os_i].velocity.get_shapes(obstacles_shapes[os_i].position);
+                VelocityCheckZone _check_zone = new VelocityCheckZone(obstacles_shapes[os_i].velocity.width, 
+                                                                      obstacles_shapes[os_i].velocity.height, 
+                                                                      CollisionLevel::LEVEL_STOP);
+                std::vector<MapObstacle> vel_shapes = _check_zone.get_shapes(obstacles_shapes[os_i].position);
                 for(int vs_i = 0; vs_i < vel_shapes.size(); vs_i++)
                 {
                     if(intersect(robot_shapes[rs_i], vel_shapes[vs_i]))

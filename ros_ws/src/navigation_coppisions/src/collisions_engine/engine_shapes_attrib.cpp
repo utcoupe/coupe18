@@ -22,3 +22,14 @@ Position::Position(float x, float y, float a = 0):Point(x, y)
 {
     Position::a = a;
 }
+
+
+// Velocity class
+Velocity::Velocity(float object_width, float object_height, float linear, float angular)
+{
+    Velocity::object_width = object_width;
+    Velocity::object_height = object_height;
+
+    Velocity::linear = linear;
+    Velocity::angular = angular;
+}

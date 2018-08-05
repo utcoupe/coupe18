@@ -70,8 +70,8 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "collisions");
     ros::NodeHandle n;
 
-    auto subscriptions = CollisionsSubscriptions(n);
-    Map::robot = subscriptions.create_robot();
+    // auto subscriptions = CollisionsSubscriptions(n);
+    //Map::robot = subscriptions.create_robot();
     //auto markers = MarkersPublisher();
 
     srv_activate = n.advertiseService("/navigation/collisions/set_active", on_set_active);
@@ -81,7 +81,7 @@ int main(int argc, char **argv)
     ros::Rate loop_rate(20);
     while (ros::ok())
     {
-        subscriptions.update_robot();
+        // subscriptions.update_robot();
         if(active) {
             std::vector<Collision> collisions = Map::robot.check_collisions(ObstaclesStack::to_list());
             for(int i = 0; i < collisions.size(); i++)

@@ -46,7 +46,8 @@ void Robot::get_path_shapes()
 
 std::vector<Collision> Robot::check_collisions(std::vector<MapObstacle> obstacles)
 {
-    std::vector<Collision> c1 = _velocity.check_collisions(_position, obstacles);
+    VelocityCheckZone _check_zone = new VelocityCheckZone(width, height, CollisionLevel::LEVEL_STOP);
+    std::vector<Collision> c1 = _check_zone.check_collisions(_position, obstacles);
     std::vector<Collision> c2 = _path_check_zone.check_collisions(_position, obstacles);
     // TODO remove duplicate collisions between the two
 

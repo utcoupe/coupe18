@@ -37,4 +37,15 @@ public:
 };
 
 
+class Velocity
+{
+public:
+    float object_width, object_height; // Used for when VelocityCheckZones will be created.
+    float linear, angular;
+
+    Velocity();
+    Velocity(float width, float height, float linear = 0, float angular = 0);
+    ~Velocity();
+};
+
 #endif

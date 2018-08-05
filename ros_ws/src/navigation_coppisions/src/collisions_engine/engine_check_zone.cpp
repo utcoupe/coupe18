@@ -51,31 +51,6 @@ std::vector<Collision> VelocityCheckZone::check_collisions(Position robot_pos, f
 }
 
 
-// Velocity class
-Velocity::Velocity()
-{ // Happens while constructing shapes without velocity.
-    const float DEFAULT_SIZE = 0.1; 
-    _check_zone = VelocityCheckZone(DEFAULT_SIZE, DEFAULT_SIZE, CollisionLevel::LEVEL_STOP);
-}
-Velocity::Velocity(float width, float height, float linear, float angular)
-{
-    Velocity::linear = linear;
-    Velocity::angular = angular;
-
-    _check_zone = VelocityCheckZone(width, height, CollisionLevel::LEVEL_STOP);
-}
-
-std::vector<MapObstacle> Velocity::get_shapes(Position object_pos, float max_dist = -1)
-{
-    return _check_zone.get_shapes(object_pos, linear, angular, max_dist);
-}
-
-std::vector<Collision> Velocity::check_collisions(Position object_pos, std::vector<MapObstacle> obstacles)
-{
-    return _check_zone.check_collisions(object_pos, linear, angular, obstacles)
-}
-
-
 // PathCheckZone class
 PathCheckZone::PathCheckZone(float width, float height, CollisionLevel collision_level)
     :CheckZone(width, height, collision_level) { }

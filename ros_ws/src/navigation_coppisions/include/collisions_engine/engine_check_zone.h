@@ -34,24 +34,6 @@ public:
 };
 
 
-class Velocity
-{
-public:
-    float linear, angular;
-
-    Velocity();
-    Velocity(float width, float height, float linear = 0, float angular = 0);
-    ~Velocity();
-
-    std::vector<MapObstacle> get_shapes(Position object_pos, float max_dist = -1);
-    // Used only for the robot itself, not the obstacles:
-    std::vector<Collision> check_collisions(Position object_pos, std::vector<MapObstacle> obstacles);
-
-private:
-    VelocityCheckZone _check_zone;
-};
-
-
 class PathCheckZone: public CheckZone
 {
 public:
