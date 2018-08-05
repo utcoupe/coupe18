@@ -8,6 +8,8 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   genmsg
   geometry_msgs
+  tf2
+  tf2_ros
   ai_game_status
   memory_map
   recognition_objects_classifier

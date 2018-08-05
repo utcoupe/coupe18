@@ -1,5 +1,7 @@
 #include "engine_shapes_attrib.h"
 
+
+// Point class
 Point::Point() {
     Point::x = 0;
     Point::y = 0;
@@ -11,6 +13,7 @@ Point::Point(float x, float y)
 }
 
 
+// Position class
 Position::Position():Point()
 {
     Position::a = 0;

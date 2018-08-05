@@ -1,29 +1,6 @@
 #include "engine_check_zone.h"
 #include <math>
 
-// Velocity class
-Velocity::Velocity()
-{ // Happens while constructing shapes without velocity.
-    const float DEFAULT_SIZE = 0.1; 
-    _check_zone = VelocityCheckZone(DEFAULT_SIZE, DEFAULT_SIZE, CollisionLevel::LEVEL_STOP);
-}
-Velocity::Velocity(float width, float height, float linear, float angular)
-{
-    Velocity::linear = linear;
-    Velocity::angular = angular;
-
-    _check_zone = VelocityCheckZone(width, height, CollisionLevel::LEVEL_STOP);
-}
-
-std::vector<MapObstacle> Velocity::get_shapes(Position object_pos, float max_dist = -1)
-{
-    return _check_zone.get_shapes(object_pos, linear, angular, max_dist);
-}
-
-std::vector<Collision> Velocity::check_collisions(Position object_pos, std::vector<MapObstacle> obstacles)
-{
-    return _check_zone.check_collisions(object_pos, linear, angular, obstacles)
-}
 
 // CheckZone class
 CheckZone::CheckZone(float width, float height, CollisionLevel collision_level)
@@ -71,6 +48,31 @@ std::vector<Collision> VelocityCheckZone::check_collisions(Position robot_pos, f
         collisions.push_back(Collision(CollisionLevel::LEVEL_STOP, o, approx_d));
     }    
     return collisions;
+}
+
+
+// Velocity class
+Velocity::Velocity()
+{ // Happens while constructing shapes without velocity.
+    const float DEFAULT_SIZE = 0.1; 
+    _check_zone = VelocityCheckZone(DEFAULT_SIZE, DEFAULT_SIZE, CollisionLevel::LEVEL_STOP);
+}
+Velocity::Velocity(float width, float height, float linear, float angular)
+{
+    Velocity::linear = linear;
+    Velocity::angular = angular;
+
+    _check_zone = VelocityCheckZone(width, height, CollisionLevel::LEVEL_STOP);
+}
+
+std::vector<MapObstacle> Velocity::get_shapes(Position object_pos, float max_dist = -1)
+{
+    return _check_zone.get_shapes(object_pos, linear, angular, max_dist);
+}
+
+std::vector<Collision> Velocity::check_collisions(Position object_pos, std::vector<MapObstacle> obstacles)
+{
+    return _check_zone.check_collisions(object_pos, linear, angular, obstacles)
 }
 
 

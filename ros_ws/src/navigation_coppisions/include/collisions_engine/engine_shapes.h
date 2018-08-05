@@ -2,9 +2,9 @@
 #define ENGINE_SHAPES_H
 
 #include "engine_shapes_attrib.h"
-#include "engine_check_zone.h"
 #include <vector>
 #include "stdint.h"
+
 
 class MapObstacle
 {
