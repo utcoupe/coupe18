@@ -1,16 +1,24 @@
 <?xml version="1.0"?>
 <package format="2">
     <name>navigation_collisions</name>
-    <version>0.0.0</version>
+    <version>0.0.1</version>
     <description>The navigation_collisions package</description>
-    <license>GLPv3</license>
+    <maintainer email="utcoupe@assos.utc.fr">UTCoupe Association</maintainer>
+    <license>GPLv3</license>
     <author email="pielaclau@gmail.com">MadeInPierre</author>
-    <maintainer email="utcoupe@assos.utc.fr">UTCoupe</maintainer>
+
     <buildtool_depend>catkin</buildtool_depend>
-    <build_depend>message_generation</build_depend>
-    <depend>rospy</depend>
+
+    <depend>roscpp</depend>
+
     <depend>std_msgs</depend>
+    <depend>message_generation</depend>
+    <depend>geometry_msgs</depend>
+    <depend>tf2</depend>
+    <depend>tf2_ros</depend>
+    <depend>ai_game_status</depend>
+    <depend>memory_map</depend>
+    <depend>recognition_objects_classifier</depend>
     <exec_depend>message_runtime</exec_depend>
-    <export>
-    </export>
+    <export></export>
 </package>

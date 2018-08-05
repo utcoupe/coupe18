@@ -1,6 +1,6 @@
 #include "ros/ros.h"
-#include "navigation_coppisions/PredictedCollision.h"
-#include "navigation_coppisions/ActivateCollisions.h"
+#include "navigation_collisions/PredictedCollision.h"
+#include "navigation_collisions/ActivateCollisions.h"
 
 #include "collisions_subscriptions.h"
 #include "obstacles_stack.h"
@@ -16,8 +16,8 @@ bool active = false;
 ros::ServiceServer srv_activate;
 ros::Publisher warner;
 
-bool on_set_active(navigation_coppisions::ActivateCollisions::Request &req,
-                   navigation_coppisions::ActivateCollisions::Response &res)
+bool on_set_active(navigation_collisions::ActivateCollisions::Request &req,
+                   navigation_collisions::ActivateCollisions::Response &res)
 {
     active = req.active;
     if(active) ROS_INFO("Starting collisions check...");
@@ -27,7 +27,7 @@ bool on_set_active(navigation_coppisions::ActivateCollisions::Request &req,
 }
 
 void publish_collision(Collision collision) {
-    navigation_coppisions::PredictedCollision msg;
+    navigation_collisions::PredictedCollision msg;
 
     switch(collision.level) {
         case CollisionLevel::LEVEL_STOP:
@@ -75,7 +75,7 @@ int main(int argc, char **argv)
     //auto markers = MarkersPublisher();
 
     srv_activate = n.advertiseService("/navigation/collisions/set_active", on_set_active);
-    warner = n.advertise<navigation_coppisions::PredictedCollision>("/navigation/collisions/warner", 10);
+    warner = n.advertise<navigation_collisions::PredictedCollision>("/navigation/collisions/warner", 10);
     StatusServices("navigation", "collisions").setReady(true);
 
     ros::Rate loop_rate(20);
