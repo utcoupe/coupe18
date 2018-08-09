@@ -42,8 +42,8 @@ class StatusManager():
         elif new_status == Status.INIT_FAILED:
             rospy.logerr("Init timeout reached, certain nodes failed ({}) or didn't respond ({}) ! "
                          "System will continue, but be careful..".format(
-                         str([n for n in Status.INIT_CHECKLIST if Status.INIT_CHECKLIST[n] == False]),
-                         str([n for n in Status.INIT_CHECKLIST if Status.INIT_CHECKLIST[n] == None])))
+                         ', '.join([n for n in Status.INIT_CHECKLIST if Status.INIT_CHECKLIST[n] == False]),
+                         ', '.join([n for n in Status.INIT_CHECKLIST if Status.INIT_CHECKLIST[n] == None])))
         self.init_status = new_status
 
     def publish_statuses(self):
