@@ -4,7 +4,7 @@
 #include "navigation_pathfinder/FindPath.h"
 #include "navigation_pathfinder/PathfinderNodeConfig.h"
 
-#include "ai_game_status/init_service.h"
+#include "ai_game_manager/init_service.h"
 
 #include "pathfinder/map_storage.h"
 #include "pathfinder/pathfinder.h"

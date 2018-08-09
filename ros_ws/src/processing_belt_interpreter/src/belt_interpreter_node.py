@@ -11,7 +11,7 @@ from memory_definitions.srv import GetDefinition
 from processing_belt_interpreter.msg import *
 from drivers_ard_others.msg import BeltRange
 from geometry_msgs.msg import Pose2D, TransformStamped, PointStamped
-from ai_game_status import StatusServices
+from ai_game_manager import StatusServices
 from dynamic_reconfigure.server import Server
 from processing_belt_interpreter.cfg import BeltInterpreterConfig
 
@@ -68,7 +68,7 @@ class BeltInterpreter(object):
         self._last_bad_value = {s: 0 for s in self._belt_parser.Sensors.keys()}
 
         rospy.loginfo("Belt interpreter is ready. Listening for sensor data on '{}'.".format(self.SENSORS_TOPIC)) # TODO duplicate log with status_services.ready()
-        # Tell ai/game_status the node initialized successfuly.
+        # Tell ai/game_manager the node initialized successfuly.
         StatusServices("processing", "belt_interpreter").ready(True)
 
         rospy.spin()

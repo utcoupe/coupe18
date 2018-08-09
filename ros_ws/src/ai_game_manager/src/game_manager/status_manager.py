@@ -1,7 +1,7 @@
 import time, rospy
 
-from ai_game_status.msg import GameStatus, NodesStatus, ArmRequest
-from ai_game_status.srv import SetStatus, SetStatusResponse, NodeReady, NodeReadyResponse
+from ai_game_manager.msg import GameStatus, NodesStatus, ArmRequest
+from ai_game_manager.srv import SetStatus, SetStatusResponse, NodeReady, NodeReadyResponse
 from drivers_ard_hmi.msg import HMIEvent
 
 from status_config import Status
@@ -10,11 +10,11 @@ class StatusManager():
     INIT_TIMEOUT = 40 # seconds to wait for the nodes to send their init response before timeout.
 
     def __init__(self):
-        self._node_ready_notif = rospy.Service("/ai/game_status/node_ready", NodeReady, self.on_node_ready)
-        self._set_status_srv   = rospy.Service("/ai/game_status/set_status", SetStatus, self.on_set_status)
-        self._game_status_pub  = rospy.Publisher("/ai/game_status/status", GameStatus,        queue_size = 10)
-        self._arm_pub          = rospy.Publisher("/ai/game_status/arm",    ArmRequest,        queue_size = 1)
-        self._nodes_status_pub = rospy.Publisher("/ai/game_status/nodes_status", NodesStatus, queue_size = 10)
+        self._node_ready_notif = rospy.Service("/ai/game_manager/node_ready", NodeReady, self.on_node_ready)
+        self._set_status_srv   = rospy.Service("/ai/game_manager/set_status", SetStatus, self.on_set_status)
+        self._game_status_pub  = rospy.Publisher("/ai/game_manager/status", GameStatus,        queue_size = 10)
+        self._arm_pub          = rospy.Publisher("/ai/game_manager/arm",    ArmRequest,        queue_size = 1)
+        self._nodes_status_pub = rospy.Publisher("/ai/game_manager/nodes_status", NodesStatus, queue_size = 10)
 
         rospy.Subscriber("/feedback/ard_hmi/hmi_event", HMIEvent, self.on_hmi_event)
 
@@ -76,7 +76,7 @@ class StatusManager():
             Status.INIT_CHECKLIST[msg.node_name] = msg.success
             return NodeReadyResponse()
         else:
-            rospy.logwarn("Node name '{}' not in ai/game_status init checklist, passing.".format(msg.node_name))
+            rospy.logwarn("Node name '{}' not in ai/game_manager init checklist, passing.".format(msg.node_name))
             return NodeReadyResponse()
 
     def on_set_status(self, req):

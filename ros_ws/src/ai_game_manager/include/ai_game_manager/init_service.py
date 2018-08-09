@@ -2,17 +2,17 @@
 import rospy
 
 '''
-Imported from ai/game_status.
+Imported from ai/game_manager.
 '''
 
-from ai_game_status.msg import GameStatus, ArmRequest
-from ai_game_status.srv import NodeReady
+from ai_game_manager.msg import GameStatus, ArmRequest
+from ai_game_manager.srv import NodeReady
 
 
 class StatusServices(object):
-    READY_SRV = "/ai/game_status/node_ready" # Service to call when the node has finished its init phase (successful or not).
-    ARM_SRV   = "/ai/game_status/arm"        # Server the node can use if it needs to be calibrated at one point (called by scheduler before jack)
-    HALT_SRV  = "/ai/game_status/status"     # Topic that can be used to know when HALT is activated (if the node needs to be stopped).
+    READY_SRV = "/ai/game_manager/node_ready" # Service to call when the node has finished its init phase (successful or not).
+    ARM_SRV   = "/ai/game_manager/arm"        # Server the node can use if it needs to be calibrated at one point (called by scheduler before jack)
+    HALT_SRV  = "/ai/game_manager/status"     # Topic that can be used to know when HALT is activated (if the node needs to be stopped).
 
     def __init__(self, namespace, packagename, arm_cb = None, status_cb = None):
         self.node_name = "/{}/{}".format(namespace, packagename)
@@ -28,7 +28,7 @@ class StatusServices(object):
             if success: rospy.loginfo("Node '{}' initialized successfully.".format(self.node_name))
             else:       rospy.logerr( "Node '{}' didn't initialize correctly.".format(self.node_name))
         except:
-            rospy.logerr("status_services couldn't contact ai/game_status to send init notification.")
+            rospy.logerr("status_services couldn't contact ai/game_manager to send init notification.")
 
 
 '''

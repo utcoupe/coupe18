@@ -19,7 +19,7 @@ from map import MapClient
 from planning import Plan
 #
 
-from ai_game_status import StatusServices
+from ai_game_manager import StatusServices
 
 
 __author__ = "Gaëtan Blond"
@@ -185,7 +185,7 @@ class NavigatorNode(object):
         self._currentPlan = Plan(self._asservClient, self._pathfinderClient, self._planResultCallback, self._updateStatus)
         self._updateStatus()
 
-        # Tell ai/game_status the node initialized successfuly.
+        # Tell ai/game_manager the node initialized successfuly.
         StatusServices(NODE_NAMESPACE, NODE_NAME).ready(True)
 
         rospy.spin ()

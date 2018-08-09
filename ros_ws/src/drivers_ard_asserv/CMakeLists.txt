@@ -16,7 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
     actionlib_msgs
     actionlib
     drivers_port_finder
-    ai_game_status
+    ai_game_manager
     memory_map
     tf
     tf2_ros

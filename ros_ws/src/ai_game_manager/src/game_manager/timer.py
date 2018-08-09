@@ -1,11 +1,11 @@
 import time, rospy
 
-from ai_game_status.msg import GameStatus
-from ai_game_status.srv import SetStatus
-from ai_game_status import StatusServices
+from ai_game_manager.msg import GameStatus
+from ai_game_manager.srv import SetStatus
+from ai_game_manager import StatusServices
 
-from ai_timer.srv import SetTimer, SetTimerResponse, Delay, DelayResponse
-from ai_timer.msg import GameTime
+from ai_game_manager.srv import SetTimer, SetTimerResponse, Delay, DelayResponse
+from ai_game_manager.msg import GameTime
 
 class Status():
     STATUS_INIT   = 0
@@ -44,22 +44,19 @@ class Timer():
 
 class TimerManager():
     def __init__(self):
-        self._set_timer_srv = rospy.Service("/ai/timer/set_timer", SetTimer,  self.on_set_timer)
-        self._delay_srv     = rospy.Service("/ai/timer/delay",     Delay,  self.on_delay)
-        self._timer_pub     = rospy.Publisher("/ai/timer/time",    GameTime,  queue_size = 10)
+        self._set_timer_srv = rospy.Service("/ai/game_manager/set_timer", SetTimer,  self.on_set_timer)
+        self._delay_srv     = rospy.Service("/ai/game_manager/delay",     Delay,  self.on_delay)
+        self._timer_pub     = rospy.Publisher("/ai/game_manager/time",    GameTime,  queue_size = 10)
 
-        rospy.Subscriber("/ai/game_status/status", GameStatus, self.on_status)
+        rospy.Subscriber("/ai/game_manager/status", GameStatus, self.on_status)
         self._game_status = Status.STATUS_INIT
 
         self.timer = Timer()
 
-        # Tell ai/game_status the node initialized successfuly.
-        StatusServices("ai", "timer").ready(True)
-
     def update(self):
         if self.timer.started:
             if self.timer.time_left() <= 0:
-                rospy.logwarn_throttle(20, "Timer ended! setting HALT to ai/game_status, stopping timer.")
+                rospy.logwarn_throttle(20, "Timer ended! setting HALT to ai/game_manager, stopping timer.")
                 self.set_game_status(GameStatus.STATUS_HALT)
                 self.timer.stop()
             else:
@@ -104,6 +101,6 @@ class TimerManager():
         self._game_status = req.game_status
 
     def set_game_status(self, status):
-        rospy.wait_for_service("/ai/game_status/set_status", timeout = 2)
-        service = rospy.ServiceProxy("/ai/game_status/set_status", SetStatus)
+        rospy.wait_for_service("/ai/game_manager/set_status", timeout = 2)
+        service = rospy.ServiceProxy("/ai/game_manager/set_status", SetStatus)
         return service(status)

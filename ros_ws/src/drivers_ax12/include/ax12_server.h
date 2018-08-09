@@ -12,8 +12,8 @@
 #include <drivers_ax12/SetAx12Param.h>
 #include <drivers_port_finder/GetPort.h>
 #include <memory_definitions/GetDefinition.h>
-#include <ai_game_status/init_service.h>
-#include <ai_game_status/GameStatus.h>
+#include <ai_game_manager/init_service.h>
+#include <ai_game_manager/GameStatus.h>
 
 #include "ax12_driver.h"
 
@@ -22,7 +22,7 @@ const double MAX_STOP_TIME = 3; // timeout (secs)
 const double MAIN_FREQUENCY = 15;
 const uint8_t POSITION_MARGIN = 6;
 const std::string PORT_FINDER_SERVICE = "/drivers/port_finder/get_port";
-const std::string GAME_STATUS_TOPIC = "/ai/game_status/status";
+const std::string GAME_STATUS_TOPIC = "/ai/game_manager/status";
 
 
 typedef actionlib::ServerGoalHandle <drivers_ax12::Ax12CommandAction> GoalHandle;
@@ -55,7 +55,7 @@ public:
 
     bool execute_set_service_cb(drivers_ax12::SetAx12Param::Request &req, drivers_ax12::SetAx12Param::Response &res);
 
-    void game_status_cb(const ai_game_status::GameStatusConstPtr &status);
+    void game_status_cb(const ai_game_manager::GameStatusConstPtr &status);
 
     std::string fetch_port(const std::string &service_name);
 

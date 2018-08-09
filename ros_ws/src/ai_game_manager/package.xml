@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-    <name>ai_game_status</name>
+    <name>ai_game_manager</name>
     <version>0.0.1</version>
-    <description>The ai_timer package</description>
+    <description>The ai_game_manager package</description>
     <license>GPLv3</license>
     <author email="pielaclau@gmail.com">MadeInPierre</author>
     <author email="mindstan@hotmail.fr">Mindstan</author>

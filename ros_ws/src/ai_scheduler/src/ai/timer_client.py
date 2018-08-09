@@ -1,9 +1,9 @@
 import rospy
-from ai_timer.msg import GameTime
+from ai_game_manager.msg import GameTime
 
 class TimerClient():
     def __init__(self):
-        rospy.Subscriber("/ai/timer/time", GameTime, self.on_new_time)
+        rospy.Subscriber("/ai/game_manager/time", GameTime, self.on_new_time)
         self.is_active = False
         self.game_duration = -1
         self.time_elapsed = -1

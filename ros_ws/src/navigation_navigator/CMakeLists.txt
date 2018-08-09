@@ -14,7 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
     memory_map
     tf
     interactive_markers
-    ai_game_status
+    ai_game_manager
 )
 
 ################################################

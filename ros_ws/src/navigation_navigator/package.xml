@@ -18,7 +18,7 @@
     <depend>navigation_pathfinder</depend>
     <depend>drivers_ard_asserv</depend>
     <depend>memory_map</depend>
-    <depend>ai_game_status</depend>
+    <depend>ai_game_manager</depend>
     <exec_depend>message_runtime</exec_depend>
     <export>
     </export>

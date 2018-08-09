@@ -10,8 +10,8 @@ import movement_actuators.msg
 from src.movement_actuators.src.actuators import actuators_properties
 import drivers_ard_others.msg
 import drivers_ax12.msg
-from ai_game_status import StatusServices
-from ai_game_status.msg import GameStatus
+from ai_game_manager import StatusServices
+from ai_game_manager.msg import GameStatus
 
 
 def current_milli_time(): return int(round(time.time() * 1000))
@@ -36,7 +36,7 @@ class ActuatorsNode():
         self._action_server.start()
 
 
-        # Tell ai/game_status the node initialized successfuly.
+        # Tell ai/game_manager the node initialized successfuly.
         StatusServices("movement", "actuators", None, self.game_status_callback).ready(True)
 
     def dispatch(self, command):

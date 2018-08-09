@@ -9,7 +9,6 @@ class Status():
 
     INIT_CHECKLIST = {  # Please comment the lines instead of deleting them.
         "/ai/scheduler": None,
-        "/ai/timer": None,
 
         "/memory/map": None,
         "/memory/definitions": None,

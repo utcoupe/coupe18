@@ -5,8 +5,8 @@ from scheduler_communication import AICommunication
 from ai import RobotAI, GameProperties
 
 from drivers_ard_hmi.msg import SetStrategies, SetTeams, HMIEvent
-from ai_game_status.srv import SetStatus
-from ai_game_status import StatusServices
+from ai_game_manager.srv import SetStatus
+from ai_game_manager import StatusServices
 
 
 class AINode():
@@ -25,9 +25,9 @@ class AINode():
         self._teams_publisher = rospy.Publisher("/feedback/ard_hmi/set_teams", SetTeams, queue_size=10)
         rospy.Subscriber("/feedback/ard_hmi/hmi_event", HMIEvent, self.on_hmi_event)
 
-        # Sending init status to ai/game_status, subscribing to game_status status pub.
+        # Sending init status to ai/game_manager, subscribing to game_status status pub.
         status_services = StatusServices(self.DepartmentName, self.PackageName, self.on_arm)
-        status_services.ready(True) # Tell ai/game_status the node initialized successfuly.
+        status_services.ready(True) # Tell ai/game_manager the node initialized successfuly.
 
         r = rospy.Rate(5)
         while not rospy.is_shutdown():
@@ -53,7 +53,7 @@ class AINode():
             rospy.set_param("/current_team",     GameProperties.CURRENT_TEAM)
             rospy.logdebug("Strategy ({}) and team ({}) params set !".format(GameProperties.CURRENT_STRATEGY, GameProperties.CURRENT_TEAM))
 
-    def on_arm(self, req): # Happens when 'ai/game_status' launches ARM event (when user clicks on ARM on hmi).
+    def on_arm(self, req): # Happens when 'ai/game_manager' launches ARM event (when user clicks on ARM on hmi).
         rospy.loginfo("[AI] Starting actions ! Strategy '{}' and team '{}'.".format(GameProperties.CURRENT_STRATEGY,
                                                                                     GameProperties.CURRENT_TEAM))
         self._ai_start_request = True # Start the strategy

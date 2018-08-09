@@ -1,7 +1,7 @@
 <orders>
     <!-- AI Specific -->
 	<order ref="delay" duration="1">
-		<message dest="/ai/timer/delay">
+		<message dest="/ai/game_manager/delay">
 			<param name="duration" type="float" optional="true">0</param>
 		</message>
 		<response>
@@ -23,7 +23,7 @@
 	</order>
 
 	<order ref="timer_start">
-		<message dest="/ai/timer/set_timer">
+		<message dest="/ai/game_manager/set_timer">
 			<param name="action" type="int" preset="true">0</param> <!-- start command -->
 			<param name="duration" type="float">100</param>
 		</message>
@@ -33,7 +33,7 @@
 	</order>
 
 	<order ref="set_game_status_ingame" duration="0">
-		<message dest="/ai/game_status/set_status">
+		<message dest="/ai/game_manager/set_status">
 			<param name="new_game_status" type="int" preset="true">1</param>
 		</message>
 		<response>

@@ -7,8 +7,8 @@ from drivers_ard_asserv.srv import *
 from drivers_ard_asserv.msg import *
 from drivers_port_finder.srv import *
 import asserv
-from ai_game_status import StatusServices
-from ai_game_status.msg import GameStatus
+from ai_game_manager import StatusServices
+from ai_game_manager.msg import GameStatus
 from memory_map.srv import FillWaypoint
 from memory_map.msg import Waypoint
 import tf
@@ -82,7 +82,7 @@ class Asserv:
             rospy.logdebug("Memory_map has been found.")
         except rospy.ROSException as exc:
             rospy.logwarn("Memory_map has not been launched...")
-        # Tell ai/game_status the node initialized successfuly.
+        # Tell ai/game_manager the node initialized successfuly.
         StatusServices("drivers", "ard_asserv", None, self._callback_game_status).ready(not is_simu)
 
         self._asserv_instance.start()

@@ -4,7 +4,7 @@ import map_manager
 import map_communication
 from markers import MarkersPublisher
 from occupancy import OccupancyGenerator
-from ai_game_status import StatusServices
+from ai_game_manager import StatusServices
 
 
 class MapNode():
@@ -24,7 +24,7 @@ class MapNode():
         map_communication.MapServices(occupancy)
         rospy.logdebug("[memory/map] Map request servers ready.")
 
-        # Tell ai/game_status the node initialized successfuly.
+        # Tell ai/game_manager the node initialized successfuly.
         StatusServices("memory", "map").ready(True)
 
         self.run()

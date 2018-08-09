@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(ai_game_status)
+project(ai_game_manager)
 
 add_compile_options(-std=c++14)
 
@@ -32,6 +32,7 @@ add_service_files(
     NodeReady.srv
 
     SetTimer.srv
+    Delay.srv
 )
 
 generate_messages(

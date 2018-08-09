@@ -10,8 +10,8 @@ import navigation_navigator.msg
 import movement_actuators.msg
 import movement_actuators.srv
 import memory_map.srv
-import ai_game_status.srv
-import ai_timer.srv
+import ai_game_manager.srv
+import ai_game_manager.srv
 import drivers_ard_hmi.msg
 import drivers_ard_asserv.srv
 import drivers_ard_asserv.msg
@@ -29,9 +29,9 @@ class RequestTypes(object):
     def init():
         RequestTypes.SERVERS = {
             "/ai/scheduler/score":               (RequestTypes.PUB_MSG, ai_scheduler.msg.AIScore),
-            "/ai/game_status/set_status":        (RequestTypes.SERVICE, ai_game_status.srv.SetStatus),
-            "/ai/timer/set_timer":               (RequestTypes.SERVICE, ai_timer.srv.SetTimer),
-            "/ai/timer/delay":                   (RequestTypes.SERVICE, ai_timer.srv.Delay),
+            "/ai/game_manager/set_status":        (RequestTypes.SERVICE, ai_game_manager.srv.SetStatus),
+            "/ai/game_manager/set_timer":               (RequestTypes.SERVICE, ai_game_manager.srv.SetTimer),
+            "/ai/game_manager/delay":                   (RequestTypes.SERVICE, ai_game_manager.srv.Delay),
 
             "/memory/map/get":                   (RequestTypes.SERVICE, memory_map.srv.MapGet),
             "/memory/map/set":                   (RequestTypes.SERVICE, memory_map.srv.MapSet),

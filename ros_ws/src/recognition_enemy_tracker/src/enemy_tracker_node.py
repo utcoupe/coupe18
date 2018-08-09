@@ -6,7 +6,7 @@ from libtools import Rect
 from enemy_tracker_tracker import EnemiesData
 import enemy_tracker_properties
 import rospy
-from ai_game_status import StatusServices
+from ai_game_manager import StatusServices
 
 
 class EnemyTrackerNode():
@@ -20,7 +20,7 @@ class EnemyTrackerNode():
         self.rect = []
         self.data = []
 
-        # Tell ai/game_status the node initialized successfuly.
+        # Tell ai/game_manager the node initialized successfuly.
         StatusServices("recognition", "enemy_tracker").ready(True)
 
     def importPoint(self, data):

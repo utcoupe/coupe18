@@ -1,5 +1,5 @@
 import rospy
-from ai_game_status.msg import GameStatus
+from ai_game_manager.msg import GameStatus
 
 class GameStatusConstants():
     STATUS_INIT   = 0
@@ -8,7 +8,7 @@ class GameStatusConstants():
 
 class GameStatusClient():
     def __init__(self):
-        rospy.Subscriber("/ai/game_status/status", GameStatus, self.on_new_status)
+        rospy.Subscriber("/ai/game_manager/status", GameStatus, self.on_new_status)
         self.status = 0
         self.init_status = 0
 

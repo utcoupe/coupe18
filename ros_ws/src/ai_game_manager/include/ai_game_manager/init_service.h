@@ -3,29 +3,29 @@
 
 #include <ros/ros.h>
 
-#include "ai_game_status/GameStatus.h"
-#include "ai_game_status/ArmRequest.h"
-#include "ai_game_status/NodeReady.h"
+#include "ai_game_manager/GameStatus.h"
+#include "ai_game_manager/ArmRequest.h"
+#include "ai_game_manager/NodeReady.h"
 
 #include <functional>
 
 /**
- * @brief Main class of the lib `ai_game_status`.
+ * @brief Main class of the lib `ai_game_manager`.
  * It implements most of the python script `init_service.py` does.
  */
 class StatusServices
 {
 public:
     /** @brief Type of the callback for the arm request */
-    using ArmCallback_t = std::function<void (const ai_game_status::ArmRequest::ConstPtr &)>;
+    using ArmCallback_t = std::function<void (const ai_game_manager::ArmRequest::ConstPtr &)>;
     /** @brief Type of the callback for the status event */
-    using StatusCallback_t = std::function<void (const ai_game_status::GameStatus::ConstPtr &)>;
+    using StatusCallback_t = std::function<void (const ai_game_manager::GameStatus::ConstPtr &)>;
     
     /**
      * @brief Initialize the status service and saves the callbacks for the future requests and events.
      * 
-     * Creates the service `(nodename)/arm` that will be called by `ai_game_status` main node when all the node in our network must arm.
-     * It subscribes also to the topic `/ai/game_status/status`. To avoid any compatibility problems between std C++ and boost, statusCallback is not directly connected, it will be called through _on_arm member function.
+     * Creates the service `(nodename)/arm` that will be called by `ai_game_manager` main node when all the node in our network must arm.
+     * It subscribes also to the topic `/ai/game_manager/status`. To avoid any compatibility problems between std C++ and boost, statusCallback is not directly connected, it will be called through _on_arm member function.
      * 
      * @param namespaceName The name of the node namespace.
      * @param packageName The name of the package or node.
@@ -35,9 +35,9 @@ public:
     StatusServices(const std::string& namespaceName, const std::string& packageName, ArmCallback_t armCallback = nullptr, StatusCallback_t statusCallback = nullptr);
     
     /**
-     * @brief Notify the `ai/game_status` main node that the current node tried to launch and say if it succeeded.
+     * @brief Notify the `ai/game_manager` main node that the current node tried to launch and say if it succeeded.
      * 
-     * Calls the service `/ai/game_status/node_ready` with the node name and the success boolean as parameters.
+     * Calls the service `/ai/game_manager/node_ready` with the node name and the success boolean as parameters.
      * 
      * @param success Indicates if the node succeeded to start and initialize.
      */
@@ -53,8 +53,8 @@ private:
     ros::Subscriber _armServer;
     ros::Subscriber _gameStatusSubscriber;
 
-    void _on_arm(const ai_game_status::ArmRequest::ConstPtr& msg);
-    void _on_gameStatus(const ai_game_status::GameStatus::ConstPtr& msg);
+    void _on_arm(const ai_game_manager::ArmRequest::ConstPtr& msg);
+    void _on_gameStatus(const ai_game_manager::GameStatus::ConstPtr& msg);
 };
 
 #endif // AI_GAME_STATUS_INIT_SERVICE_H
