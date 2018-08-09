@@ -1,6 +1,4 @@
-#!/usr/bin/python
-import time
-import rospy
+import time, rospy
 
 from ai_game_status.msg import GameStatus
 from ai_game_status.srv import SetStatus
@@ -9,14 +7,13 @@ from ai_game_status import StatusServices
 from ai_timer.srv import SetTimer, SetTimerResponse, Delay, DelayResponse
 from ai_timer.msg import GameTime
 
-
 class Status():
     STATUS_INIT   = 0
     STATUS_INGAME = 1
     STATUS_HALT   = 2
 
 
-class TimerManager():
+class Timer():
     def __init__(self):
         self.game_duration = -1  # Holds the match duration.
         self.started = False     # Set to true when Timer is active.
@@ -45,9 +42,8 @@ class TimerManager():
         return True if self.time_left() < 0 else False
 
 
-class TimerNode():
+class TimerManager():
     def __init__(self):
-        rospy.init_node("timer", log_level=rospy.INFO)
         self._set_timer_srv = rospy.Service("/ai/timer/set_timer", SetTimer,  self.on_set_timer)
         self._delay_srv     = rospy.Service("/ai/timer/delay",     Delay,  self.on_delay)
         self._timer_pub     = rospy.Publisher("/ai/timer/time",    GameTime,  queue_size = 10)
@@ -55,22 +51,20 @@ class TimerNode():
         rospy.Subscriber("/ai/game_status/status", GameStatus, self.on_status)
         self._game_status = Status.STATUS_INIT
 
-        self.timer = TimerManager()
+        self.timer = Timer()
 
         # Tell ai/game_status the node initialized successfuly.
         StatusServices("ai", "timer").ready(True)
 
-        r = rospy.Rate(5)
-        while not rospy.is_shutdown():
-            if self.timer.started:
-                if self.timer.time_left() <= 0:
-                    rospy.logwarn_throttle(20, "Timer ended! setting HALT to ai/game_status, stopping timer.")
-                    self.set_game_status(GameStatus.STATUS_HALT)
-                    self.timer.stop()
-                else:
-                    rospy.loginfo_throttle(20, "Timer seconds left : {}".format(int(round(self.timer.time_left()))) + " s")
-            self.publish_timer()
-            r.sleep()
+    def update(self):
+        if self.timer.started:
+            if self.timer.time_left() <= 0:
+                rospy.logwarn_throttle(20, "Timer ended! setting HALT to ai/game_status, stopping timer.")
+                self.set_game_status(GameStatus.STATUS_HALT)
+                self.timer.stop()
+            else:
+                rospy.loginfo_throttle(20, "Timer seconds left : {}".format(int(round(self.timer.time_left()))) + " s")
+        self.publish_timer()
 
     def publish_timer(self):
         m = GameTime()
@@ -113,7 +107,3 @@ class TimerNode():
         rospy.wait_for_service("/ai/game_status/set_status", timeout = 2)
         service = rospy.ServiceProxy("/ai/game_status/set_status", SetStatus)
         return service(status)
-
-
-if __name__ == "__main__":
-    TimerNode()

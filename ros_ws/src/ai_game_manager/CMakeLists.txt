@@ -22,12 +22,16 @@ add_message_files(
     GameStatus.msg
     NodesStatus.msg
     ArmRequest.msg
+
+    GameTime.msg
 )
 
 add_service_files(
     FILES
     SetStatus.srv
     NodeReady.srv
+
+    SetTimer.srv
 )
 
 generate_messages(

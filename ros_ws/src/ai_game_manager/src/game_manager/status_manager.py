@@ -1,58 +1,15 @@
-#!/usr/bin/python
-import time
-import rospy
+import time, rospy
 
 from ai_game_status.msg import GameStatus, NodesStatus, ArmRequest
 from ai_game_status.srv import SetStatus, SetStatusResponse, NodeReady, NodeReadyResponse
-
 from drivers_ard_hmi.msg import HMIEvent
 
+from status_config import Status
 
-class Status():
-    STATUS_INIT   = 0 # All nodes initializing, didn't respond yet.
-    STATUS_INGAME = 1 # Scheduler started, doing its job.
-    STATUS_HALT   = 2 # Robot stopped (game end, critical HALT requested by a node...)
-
-    INIT_INITIALIZING = 0 # All nodes didn't respond and we didn't reach the init timeout yet.
-    INIT_INITIALIZED  = 1 # All nodes responded successfully and are initialized.
-    INIT_FAILED       = 2 # Nodes responded false or didn't respond after before the init timeout.
-
-    INIT_CHECKLIST = {  # Please comment the lines instead of deleting them.
-        "/ai/scheduler": None,
-        "/ai/timer": None,
-
-        "/memory/map": None,
-        "/memory/definitions": None,
-
-        "/navigation/navigator": None,
-        "/navigation/pathfinder": None,
-        "/navigation/collisions": None,
-
-        "/movement/actuators": None,
-
-        "/recognition/localizer": None,
-        "/recognition/enemy_tracker": None,
-        # "/recognition/cube_finder": None,
-        # "/recognition/cp_recognizer": None,
-        "/recognition/objects_classifier": None,
-
-        "/processing/belt_interpreter": None,
-        # "/processing/lidar_objects": None,
-
-        "/drivers/ard_asserv": None,
-        #"/drivers/ard_hmi": None,
-        #"/drivers/ard_others": None,
-        "/drivers/port_finder": None,
-        "/drivers/ax12": None,
-        "/drivers/teraranger": None,
-    }
-
-
-class GameStatusNode():
+class StatusManager():
     INIT_TIMEOUT = 40 # seconds to wait for the nodes to send their init response before timeout.
 
     def __init__(self):
-        rospy.init_node("game_status", log_level=rospy.INFO)
         self._node_ready_notif = rospy.Service("/ai/game_status/node_ready", NodeReady, self.on_node_ready)
         self._set_status_srv   = rospy.Service("/ai/game_status/set_status", SetStatus, self.on_set_status)
         self._game_status_pub  = rospy.Publisher("/ai/game_status/status", GameStatus,        queue_size = 10)
@@ -65,19 +22,17 @@ class GameStatusNode():
         self.init_status = Status.INIT_INITIALIZING
 
         self._init_start_time = time.time()
-        r = rospy.Rate(5)
-        while not rospy.is_shutdown():
-            if self.init_status == Status.INIT_INITIALIZING:
-                self.check_init_checklist()
-                if time.time() - self._init_start_time > self.INIT_TIMEOUT:
-                    rospy.logdebug("Waited %d seconds" % self.INIT_TIMEOUT)
-                    if len([n for n in Status.INIT_CHECKLIST if Status.INIT_CHECKLIST[n] in [None, False]]) > 0:
-                        self.set_init_status(Status.INIT_FAILED)
-                    else:
-                        self.set_init_status(Status.INIT_INITIALIZED)
-            self.publish_statuses() # publish game status at 5Hz.
-
-            r.sleep()
+    
+    def update(self):
+        if self.init_status == Status.INIT_INITIALIZING:
+            self.check_init_checklist()
+            if time.time() - self._init_start_time > self.INIT_TIMEOUT:
+                rospy.logdebug("Waited %d seconds" % self.INIT_TIMEOUT)
+                if len([n for n in Status.INIT_CHECKLIST if Status.INIT_CHECKLIST[n] in [None, False]]) > 0:
+                    self.set_init_status(Status.INIT_FAILED)
+                else:
+                    self.set_init_status(Status.INIT_INITIALIZED)
+        self.publish_statuses() # publish game status at 5Hz.
 
     def set_init_status(self, new_status):
         if new_status == Status.INIT_INITIALIZING:
@@ -134,6 +89,3 @@ class GameStatusNode():
             self._arm_pub.publish(ArmRequest())
         elif req.event == req.EVENT_GAME_CANCEL:
             self.game_status = GameStatus.STATUS_HALT
-
-if __name__ == "__main__":
-    GameStatusNode()
