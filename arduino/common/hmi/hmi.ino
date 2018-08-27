@@ -12,8 +12,8 @@ Author: Pierre LACLAU, December 2017, UTCoupe.
 #include <drivers_ard_hmi/SetTeams.h>       // ROS sets teams names for displaying on hmi.
 #include <drivers_ard_hmi/HMIEvent.h>       // HMI sends events : JACK, GAME_STOP
 #include <drivers_ard_hmi/ROSEvent.h>       // ROS sends events : ASK_JACK, GAME_STOP
-#include <ai_game_status/GameStatus.h>      // ROS sends game and init status (to  determine when RPi ready).
-#include <ai_timer/GameTime.h>              // ROS sends the timer status (for the ingame progress bar).
+#include <ai_game_manager/GameStatus.h>      // ROS sends game and init status (to  determine when RPi ready).
+#include <ai_game_manager/GameTime.h>              // ROS sends the timer status (for the ingame progress bar).
 #include <ai_scheduler/AIScore.h>           // ROS sends the timer status (for the ingame progress bar).
 ros::NodeHandle nh;
 
@@ -28,7 +28,7 @@ OLEDDisplayUi ui(&display);
 uint8_t current_frame;
 uint8_t cursor_pos;
 
-const char activeSymbol[] PROGMEM = {
+const uint8_t activeSymbol[] PROGMEM = {
     B00000000,
     B00000000,
     B00011000,
@@ -39,7 +39,7 @@ const char activeSymbol[] PROGMEM = {
     B00011000
 };
 
-const char inactiveSymbol[] PROGMEM = {
+const uint8_t inactiveSymbol[] PROGMEM = {
     B00000000,
     B00000000,
     B00000000,
@@ -149,7 +149,7 @@ void on_set_teams(const drivers_ard_hmi::SetTeams& msg){
   }
 }
 
-void on_game_status(const ai_game_status::GameStatus& msg){
+void on_game_status(const ai_game_manager::GameStatus& msg){
     game_status = msg.game_status;
     init_status = msg.init_status;
 
@@ -157,7 +157,7 @@ void on_game_status(const ai_game_status::GameStatus& msg){
         ui.switchToFrame(5);
 }
 
-void on_game_timer(const ai_timer::GameTime& msg){
+void on_game_timer(const ai_game_manager::GameTime& msg){
     if(msg.is_active) {
         game_duration = msg.game_time_duration;
         elapsed_time = msg.game_elapsed_time;
@@ -176,8 +176,8 @@ void on_ros_event(const drivers_ard_hmi::ROSEvent& msg){
 ros::Subscriber<drivers_ard_hmi::SetStrategies> sub_strats     ("/feedback/ard_hmi/set_strategies", &on_set_strategies);
 ros::Subscriber<drivers_ard_hmi::SetTeams>      sub_teams      ("/feedback/ard_hmi/set_teams", &on_set_teams);
 ros::Subscriber<drivers_ard_hmi::ROSEvent>      sub_ros_events ("/feedback/ard_hmi/ros_event", &on_ros_event);
-ros::Subscriber<ai_game_status::GameStatus>     sub_game_status("/ai/game_status/status",      &on_game_status);
-ros::Subscriber<ai_timer::GameTime>             sub_game_timer ("/ai/timer/time",             &on_game_timer);
+ros::Subscriber<ai_game_manager::GameStatus>    sub_game_status("/ai/game_manager/status",     &on_game_status);
+ros::Subscriber<ai_game_manager::GameTime>             sub_game_timer ("/ai/game_manager/time",       &on_game_timer);
 ros::Subscriber<ai_scheduler::AIScore>          sub_score      ("/ai/scheduler/score",         &on_score);
 
 drivers_ard_hmi::HMIEvent hmi_event_msg;
