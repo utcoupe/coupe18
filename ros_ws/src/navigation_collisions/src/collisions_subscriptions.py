@@ -14,6 +14,11 @@ from ai_game_manager import StatusServices
 
 
 class CollisionsSubscriptions(object):
+    ENABLE_SOURCES = {
+        "belt": True,
+        "lidar": True
+    }
+
     def __init__(self):
         # Preparing to get the robot's position, belt frame_id transform.
         self._tf2_pos_buffer = tf2_ros.Buffer(cache_time=rospy.Duration(5.0))
@@ -26,10 +31,14 @@ class CollisionsSubscriptions(object):
         self._vel_linear  = 0.0
         self._vel_angular = 0.0
 
-        # Subscribing to dependencies
+        # Subscribing to current path information
         rospy.Subscriber("/navigation/navigator/status", Status, self._on_nav_status)
-        rospy.Subscriber("/recognition/objects_classifier/objects", ClassifiedObjects, self._on_classifier)
-        rospy.Subscriber("/drivers/ard_asserv/speed", RobotSpeed, self.on_robot_speed)
+
+        # Subscribing to object sources
+        if(CollisionsSubscriptions.ENABLE_SOURCES["belt"]):
+            rospy.Subscriber("/recognition/objects_classifier/objects", ClassifiedObjects, self._on_classifier)
+        if(CollisionsSubscriptions.ENABLE_SOURCES["lidar"]):
+            rospy.Subscriber("/drivers/ard_asserv/speed", RobotSpeed, self.on_robot_speed)
 
         self.game_status = StatusServices("navigation", "collisions", None, self._on_game_status)
 
