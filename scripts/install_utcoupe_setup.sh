@@ -65,9 +65,9 @@ function install_ros() {
 
 function install_ros_depencies() {
 	if [ "$ARCH" = "x86_64" ]; then
-		sudo apt-get install ros-kinetic-desktop-full ros-kinetic-rosserial-arduino ros-kinetic-rosbridge-suite ros-kinetic-tf2-web-republisher ros-kinetic-serial ros-kinetic-dynamixel-sdk ros-kinetic-rosserial-python
+		sudo apt-get install ros-kinetic-desktop-full ros-kinetic-rosserial-arduino ros-kinetic-rosbridge-suite ros-kinetic-tf2-web-republisher ros-kinetic-serial ros-kinetic-dynamixel-sdk ros-kinetic-rosserial-python ros-kinetic-urg-c ros-kinetic-urg-node
 	elif [ "$ARCH" = "armv7l" ]; then
-		sudo apt-get install ros-kinetic-ros-base ros-kinetic-tf2 ros-kinetic-tf2-ros ros-kinetic-rviz ros-kinetic-diagnostic-updater ros-kinetic-roslint ros-kinetic-camera-info-manager ros-kinetic-rosserial-arduino ros-kinetic-rosbridge-suite ros-kinetic-tf2-web-republisher ros-kinetic-serial ros-kinetic-dynamixel-sdk ros-kinetic-rosserial-python
+		sudo apt-get install ros-kinetic-ros-base ros-kinetic-tf2 ros-kinetic-tf2-ros ros-kinetic-rviz ros-kinetic-diagnostic-updater ros-kinetic-roslint ros-kinetic-camera-info-manager ros-kinetic-rosserial-arduino ros-kinetic-rosbridge-suite ros-kinetic-tf2-web-republisher ros-kinetic-serial ros-kinetic-dynamixel-sdk ros-kinetic-rosserial-python ros-kinetic-urg-c ros-kinetic-urg-node
 	fi
 }
 

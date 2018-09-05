@@ -11,9 +11,6 @@ TMP_SRC=$TMP_ROOT/src
 declare -A external_nodes
 external_nodes=(
 	["teraranger"]="https://github.com/Terabee/teraranger"
-	["laser_proc"]="https://github.com/ros-perception/laser_proc"
-	["urg_node"]="https://github.com/ros-drivers/urg_node"
-	["urg_c"]="https://github.com/ros-drivers/urg_c"
 	["processing_lidar_objects"]="https://github.com/utcoupe/obstacle_detector.git"
 )
 
@@ -36,11 +33,7 @@ function compile_and_install_nodes() {
 		# Kind of ideal command to use, but catkin wont install direclty in ros base workspace because of _setup_util.py file...
 		#sudo -u $USER -H bash -c "source $INSTALL_ROOT/setup.bash; catkin_make install -DCMAKE_INSTALL_PREFIX=$INSTALL_ROOT -DCMAKE_BUILD_TYPE=Release"
 		#TODO improve using jobs directly (get the number of the current computer)
-		if [ "$ARCH" = "x86_64" ]; then
-			catkin_make install -DCMAKE_BUILD_TYPE=Release
-		else
-			catkin_make install -j 1 -DCMAKE_BUILD_TYPE=Release
-		fi
+		catkin_make install -DCMAKE_BUILD_TYPE=Release
 		sudo cp -ar $TMP_ROOT/install/include/* $INSTALL_ROOT/include
 		sudo cp -ar $TMP_ROOT/install/share/* $INSTALL_ROOT/share
 		sudo cp -ar $TMP_ROOT/install/lib/* $INSTALL_ROOT/lib
