@@ -3,12 +3,14 @@
 from memory_definitions.srv import *
 from ai_game_manager import StatusServices
 import rospy
+import rospkg
 import os
 
 
+PACKAGE_NAME = "memory_definitions"
+
 def callback(req):
-    curr_dir = os.path.dirname(os.path.abspath(__file__))
-    def_dir = os.path.join(curr_dir, "../def")
+    def_dir = rospkg.RosPack().get_path(PACKAGE_NAME) + "/def"
     req_split = req.request.split('/')
 
     if req_split[0] in ["ai", "memory", "navigation", "movement", "processing", "recognition", "drivers"]:

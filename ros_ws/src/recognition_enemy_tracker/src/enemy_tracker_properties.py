@@ -3,9 +3,9 @@
 
 import xml.etree.ElementTree as ET
 import rospy
-import os
+import rospkg
 
-_xml_path = os.path.dirname(__file__) + '/../def/enemy_tracker_properties.xml'
+_xml_path = rospkg.RosPack().get_path("recognition_enemy_tracker") + '/def/enemy_tracker_properties.xml'
 
 class EnemyTrackerProperties():
     """Properties of enemy_tracker_node"""
