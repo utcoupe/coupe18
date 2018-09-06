@@ -18,3 +18,12 @@ catkin_package(
 include_directories(
     ${catkin_INCLUDE_DIRS}
 )
+
+#############
+## Install ##
+#############
+
+catkin_install_python(
+    PROGRAMS src/teraranger_node.py
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)

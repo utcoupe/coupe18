@@ -60,6 +60,17 @@ include_directories(
 ## Install ##
 #############
 
+catkin_install_python(
+    PROGRAMS src/map_node.py src/map_communication.py
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(
+    DIRECTORY src/map_manager src/markers src/occupancy
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+    PATTERN "*.pyc" EXCLUDE
+)
+
 #############
 ## Testing ##
 #############

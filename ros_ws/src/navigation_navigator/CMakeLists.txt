@@ -67,6 +67,17 @@ catkin_package(
 ## Install ##
 #############
 
+catkin_install_python(
+    PROGRAMS src/navigator_node.py src/marker_server_node.py src/planning.py
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(
+    DIRECTORY src/asserv src/collisions src/localizer src/map src/pathfinder
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+    PATTERN "*.pyc" EXCLUDE
+)
+
 #############
 ## Testing ##
 #############

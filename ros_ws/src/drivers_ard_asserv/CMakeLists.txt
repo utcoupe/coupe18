@@ -58,3 +58,18 @@ catkin_package(
 include_directories(
     ${catkin_INCLUDE_DIRS}
 )
+
+#############
+## Install ##
+#############
+
+catkin_install_python(
+    PROGRAMS src/ard_asserv_node.py src/marker_server_node.py
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install (
+    DIRECTORY src/asserv
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+    PATTERN "*.pyc" EXCLUDE
+)

@@ -15,3 +15,23 @@ catkin_package(
 include_directories(
     ${catkin_INCLUDE_DIRS}
 )
+
+catkin_install_python(
+    PROGRAMS
+        src/enemy_tracker_node.py
+        src/enemy_tracker_properties.py
+        src/enemy_tracker_tracker.py
+        src/libtools.py
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(
+    DIRECTORY src/Data
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+    PATTERN "*.pyc" EXCLUDE
+)
+
+install(
+    DIRECTORY def/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/def
+)

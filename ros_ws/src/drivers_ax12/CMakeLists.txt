@@ -52,3 +52,19 @@ target_link_libraries(
   ax12_node
   ${catkin_LIBRARIES}
 )
+
+#############
+## Install ##
+#############
+
+install(
+    TARGETS ax12_node
+    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(
+    DIRECTORY include/
+    DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}
+)

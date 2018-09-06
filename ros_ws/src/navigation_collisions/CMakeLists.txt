@@ -58,6 +58,21 @@ include_directories(
 ## Install ##
 #############
 
+catkin_install_python(
+    PROGRAMS
+        src/collisions_node.py
+        src/collisions_robot.py
+        src/collisions_subscriptions.py
+        src/obstacles_stack.py
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(
+    DIRECTORY src/collisions_engine src/markers_publisher
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+    PATTERN "*.pyc" EXCLUDE
+)
+
 #############
 ## Testing ##
 #############

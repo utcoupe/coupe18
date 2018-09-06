@@ -39,3 +39,18 @@ catkin_package(
 include_directories(
     ${catkin_INCLUDE_DIRS}
 )
+
+#############
+## Install ##
+#############
+
+catkin_install_python(
+    PROGRAMS src/actuators_node.py
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(
+    DIRECTORY src/actuators
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+    PATTERN "*.pyc" EXCLUDE
+)

@@ -74,18 +74,40 @@ target_link_libraries(
     ${catkin_LIBRARIES}
 )
 
-add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
-
-#add_dependencies(
-#    ${${PROJECT_NAME}_EXPORTED_TARGETS}
-#    ${${PROJECT_NAME}_generate_messages_cpp}
-#    ${catkin_EXPORTED_TARGETS}
-#)
+add_dependencies(
+    ${PROJECT_NAME}
+    ${${PROJECT_NAME}_EXPORTED_TARGETS}
+    ${${PROJECT_NAME}_generate_messages_cpp}
+    ${catkin_EXPORTED_TARGETS}
+)
 
 #############
 ## Install ##
 #############
 
+install(
+    TARGETS ${PROJECT_NAME}
+    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
+)
+
+install(
+    DIRECTORY include/${PROJECT_NAME}/
+    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+    PATTERN "*.pyc" EXCLUDE
+)
+
+catkin_install_python(
+    PROGRAMS src/game_manager_node.py
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(
+    DIRECTORY src/game_manager
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+    PATTERN "*.pyc" EXCLUDE
+)
 
 #############
 ## Testing ##

@@ -38,3 +38,18 @@ generate_dynamic_reconfigure_options(
 catkin_package(
     CATKIN_DEPENDS message_runtime
 )
+
+#############
+## Install ##
+#############
+
+catkin_install_python(
+    PROGRAMS src/belt_interpreter_node.py src/belt_parser.py
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(
+    DIRECTORY cfg
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+    PATTERN "*.pyc" EXCLUDE
+)

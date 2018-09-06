@@ -27,3 +27,23 @@ catkin_package()
 ###########
 
 include_directories()
+
+
+#############
+## Install ##
+#############
+
+catkin_install_python(
+    PROGRAMS src/definitions_node.py
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(
+    DIRECTORY def/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/def
+)
+
+install(
+    DIRECTORY launch/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)

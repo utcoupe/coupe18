@@ -56,6 +56,22 @@ include_directories(
 ## Install ##
 #############
 
+catkin_install_python(
+    PROGRAMS src/scheduler_node.py
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install (
+    PROGRAMS src/scheduler_communication.py
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(
+    DIRECTORY src/ai
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+    PATTERN "*.pyc" EXCLUDE
+)
+
 #############
 ## Testing ##
 #############
