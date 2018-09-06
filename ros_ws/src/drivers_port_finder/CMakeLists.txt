@@ -39,3 +39,8 @@ catkin_install_python(
     PROGRAMS src/port_finder_node.py
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+
+install(
+    DIRECTORY def/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/def
+)
