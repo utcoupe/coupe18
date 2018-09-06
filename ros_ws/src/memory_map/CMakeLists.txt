@@ -71,6 +71,11 @@ install(
     PATTERN "*.pyc" EXCLUDE
 )
 
+install(
+    DIRECTORY def
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/def
+)
+
 #############
 ## Testing ##
 #############

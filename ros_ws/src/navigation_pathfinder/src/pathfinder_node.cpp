@@ -1,4 +1,5 @@
 #include <ros/ros.h>
+#include <ros/package.h>
 #include <dynamic_reconfigure/server.h>
 
 #include "navigation_pathfinder/FindPath.h"
@@ -24,8 +25,8 @@ const string                NODE_NAME                   = "pathfinder";
 
 const string                FINDPATH_SERVICE_NAME       = "/" + NAMESPACE_NAME + "/" + NODE_NAME + "/find_path";
 const pair<double, double>  TABLE_SIZE                  = {3.0, 2.0}; // Scale corresponding to messages received by the node
-const string                PR_MAP_FILE_NAME               = string(getenv ("UTCOUPE_WORKSPACE")) + "/ros_ws/src/memory_map/src/occupancy/img/layer_ground.bmp"; //"/ros_ws/src/navigation_pathfinder
-const string                GR_MAP_FILE_NAME               = string(getenv ("UTCOUPE_WORKSPACE")) + "/ros_ws/src/memory_map/src/occupancy/img/layer_pathfinder.bmp"; //"/ros_ws/src/navigation_pathfinder/def/map.bmp";
+const string                PR_MAP_FILE_NAME            = "layer_ground.bmp";
+const string                GR_MAP_FILE_NAME            = "layer_pathfinder.bmp"; //"/ros_ws/src/navigation_pathfinder/def/map.bmp"; for debug purposes
 
 const size_t                SIZE_MAX_QUEUE              = 10;
 const double                SAFETY_MARGIN               = 0.15;
@@ -45,7 +46,8 @@ int main (int argc, char* argv[])
     ros::NodeHandle nodeHandle;
     
     auto robotName = fetchRobotName(nodeHandle);
-    string mapPath = GR_MAP_FILE_NAME;
+    string memoryMapPath = ros::package::getPath("memory_map") + "/def/occupancy/";
+    string mapPath = memoryMapPath + GR_MAP_FILE_NAME;
     if (robotName == "pr")
         mapPath = PR_MAP_FILE_NAME;
     

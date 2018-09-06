@@ -5,6 +5,7 @@ add_compile_options(-std=c++14)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
+    roslib
     std_msgs
     genmsg
     geometry_msgs
@@ -49,7 +50,7 @@ generate_dynamic_reconfigure_options(
 ###################################
 
 catkin_package(
-    CATKIN_DEPENDS message_runtime
+    CATKIN_DEPENDS message_runtime roslib
 )
 
 ###########
