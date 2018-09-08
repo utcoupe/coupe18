@@ -94,9 +94,7 @@ bool ObjectsClassifierSubscriber::isInsideCircle(const Circle& circ, const geome
 {
     processing_lidar_objects::CircleObstacle circle(circ.circle);
     double distToCenter = sqrt(pow(pos.x - circle.center.x, 2) + pow(pos.y - circle.center.y, 2));
-    if (distToCenter + _safetyMargin <= circle.radius)
-        return true;
-    return false;
+    return (distToCenter + _safetyMargin <= circle.radius);
 }
 
 bool ObjectsClassifierSubscriber::isCloseToSegment(const Segment& seg, const geometry_msgs::Pose2D& pos) const

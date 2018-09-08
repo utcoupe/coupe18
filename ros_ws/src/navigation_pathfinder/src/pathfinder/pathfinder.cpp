@@ -37,7 +37,7 @@ bool Pathfinder::findPath(const Point& startPos, const Point& endPos, Path& path
     ROS_DEBUG_STREAM("START: " << startPos);
     ROS_DEBUG_STREAM("END: " << endPos);
 
-    if (_allowedPositions.size() == 0 || _allowedPositions.front().size() == 0)
+    if (_allowedPositions.empty() || _allowedPositions.front().empty())
     {
         ROS_ERROR("Allowed positions is empty. Did you load the file?");
         return false;
@@ -87,7 +87,7 @@ bool Pathfinder::findPathCallback(navigation_pathfinder::FindPath::Request& req,
         return false;
     for (const Point& pos : path)
         rep.path.push_back(pointToPose2D(pos));
-    if (path.size() > 0)
+    if (!path.empty())
     {
         rep.success = true;
         rep.path.front() = req.posStart;

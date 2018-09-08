@@ -29,8 +29,8 @@ namespace Memory {
         
         std::shared_ptr<PosConvertor> _convertor;
         
-        void drawRectangle(const nlohmann::json jsonRect);
-        void drawCircle(const nlohmann::json jsonCircle);
+        void drawRectangle(const nlohmann::json& jsonRect);
+        void drawCircle(const nlohmann::json& jsonCircle);
     };
 }
 

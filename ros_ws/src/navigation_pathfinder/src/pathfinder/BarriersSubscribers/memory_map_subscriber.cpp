@@ -66,7 +66,7 @@ void MapSubscriber::fetchOccupancyData(const uint& widthGrid, const uint& height
     }
 }
 
-void Memory::MapSubscriber::drawRectangle(const nlohmann::json jsonRect)
+void Memory::MapSubscriber::drawRectangle(const nlohmann::json& jsonRect)
 {
     double x, y, w, h;
     x = jsonRect["position"]["x"];
@@ -90,7 +90,7 @@ void Memory::MapSubscriber::drawRectangle(const nlohmann::json jsonRect)
             _occupancyGrid[row][column] = true;
 }
 
-void Memory::MapSubscriber::drawCircle(const nlohmann::json jsonCircle)
+void Memory::MapSubscriber::drawCircle(const nlohmann::json& jsonCircle)
 {
     double x, y, r;
     x = jsonCircle["position"]["x"];
