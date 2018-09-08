@@ -28,7 +28,7 @@ tar -xzf armv7.tgz
 
 In order to use the folder as a ROS environnement you need to do the folowing steps in all your remote terminals (or copy/paste this in the remote .bashrc):
 ```
-export $_CATKIN_SETUP_DIR=/absolute/path/to/armv7
+export _CATKIN_SETUP_DIR=/absolute/path/to/armv7
 source path/to/armv7/setup.sh
 ```
 At this point your ready to use it!
