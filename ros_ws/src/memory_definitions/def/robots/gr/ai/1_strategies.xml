@@ -44,4 +44,33 @@
 			<actionref ref="get_cubes" reward="5"/>
 		</tasklist>
 	</strategy>
+
+	<strategy name="jda">
+		<tasklist name="Setup">
+			<orderref ref="set_robot_pos">
+				<position_waypoint>way_spawn_gr</position_waypoint>
+			</orderref>
+			<orderref ref="set_game_status_ingame"/>
+		</tasklist>
+
+		<tasklist name="Main actions">
+			<orderref ref="close_arm_slow"/>
+			<orderref ref="delay">
+				<duration>2</duration>
+			</orderref>
+			<orderref ref="open_arm_slow"/>
+			<orderref ref="delay">
+				<duration>2</duration>
+			</orderref>
+
+			<orderref ref="close_arm_slow"/>
+			<orderref ref="delay">
+				<duration>2</duration>
+			</orderref>
+			<orderref ref="open_arm_slow"/>
+			<orderref ref="delay">
+				<duration>2</duration>
+			</orderref>
+		</tasklist>
+	</strategy>
 </strategies>

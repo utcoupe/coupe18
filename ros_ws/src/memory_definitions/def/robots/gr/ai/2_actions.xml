@@ -10,6 +10,14 @@
 		</actions>
 	</action>
 
+	<action ref="game_setup" name="Game setup">
+		<params/>
+		<actions>
+			<orderref ref="delay" name="5 points bee loaded" reward="5"/>
+			<orderref ref="delay" name="5 points home installed" reward="5"/>
+		</actions>
+	</action>
+
 	<action ref="game_start" name="Game start routine actions">
 		<params/>
 		<actions>
@@ -26,15 +34,6 @@
 			<orderref ref="set_game_status_ingame"/>
 		</actions>
 	</action>
-
-	<action ref="game_setup" name="Game setup">
-		<params/>
-		<actions>
-			<orderref ref="delay" name="5 points bee loaded" reward="5"/>
-			<orderref ref="delay" name="5 points home installed" reward="5"/>
-		</actions>
-	</action>
-
 
 	<!-- Actuators macros -->
 	<action ref="open_arm_wide" name="Open arm wide"> <!-- Should be replaced with a call to actuators (and set a PRESET named CLOSE)-->
